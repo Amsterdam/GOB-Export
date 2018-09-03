@@ -1,6 +1,6 @@
 """API
 
-Encapsulates a paged API endpoint into a iterator
+Encapsulates a paged API endpoint into an iterator
 
 """
 import requests
@@ -9,10 +9,22 @@ import requests
 class API:
 
     def __init__(self, host, path):
+        """Constructor
+
+        Lazy loading, Just register host and path and wait for the iterator to be called
+        to load the data
+
+        :param host:
+        :param path:
+        """
         self.host = host
         self.path = path
 
     def __repr__(self):
+        """Representation
+
+        Provide for a readable representation
+        """
         return f'API {self.host}{self.path}'
 
     def __iter__(self):
