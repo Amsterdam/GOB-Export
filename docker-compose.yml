@@ -1,0 +1,7 @@
+version: '3.0'
+
+services:
+
+  update_service:
+    build: src
+    container_name: export_service
