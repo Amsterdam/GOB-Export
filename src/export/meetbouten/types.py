@@ -12,6 +12,7 @@ def _to_string(value):
     :param value:
     :return:
     """
+    assert(type(value) is str or value is None)
     return f'$${str(value) if value else ""}$$'
 
 
@@ -21,7 +22,8 @@ def _to_boolean(value):
     :param value:
     :return:
     """
-    return _to_string('' if value else 'N')
+    assert(type(value) is bool or value is None)
+    return _to_string('' if value is True else 'N')
 
 
 def _to_number(value):
@@ -30,6 +32,7 @@ def _to_number(value):
     :param value:
     :return:
     """
+    assert(type(value) in [int, float, str] or value is None)
     return '' if value is None else str(value).replace('.', ',')
 
 
@@ -39,8 +42,9 @@ def _to_date(value):
     :param value:
     :return:
     """
+    assert(type(value) is str or value is None)
     return _to_string(
-        '' if value is None else datetime.datetime.strptime(str(value), "%Y-%m-%d").date().strftime("%Y%m%d"))
+        '' if value is None else datetime.datetime.strptime(value, "%Y-%m-%d").date().strftime("%Y%m%d"))
 
 
 def _to_geometry(value):
@@ -49,7 +53,8 @@ def _to_geometry(value):
     :param value:
     :return:
     """
-    return '' if value is None else str(value).replace('(', ' (').replace('.', ',')
+    assert(type(value) is str or value is None)
+    return '' if value is None else str(value).replace('(', ' (').replace(',', '').replace('.', ',')
 
 
 def type_convert(type_name, value):

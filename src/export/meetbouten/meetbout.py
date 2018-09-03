@@ -23,7 +23,7 @@ from export.api import API
 from export.meetbouten.types import type_convert
 
 
-def export_meetbout(meetbout):
+def _export_meetbout(meetbout):
     """Exports a single meetbout
 
     The export format is a string containing the attributes and types to be converted.
@@ -58,4 +58,4 @@ def export_meetbouten(host, file):
 
     with open(file, 'w') as fp:
         for entity in api:
-            fp.write(export_meetbout(entity) + '\n')
+            fp.write(_export_meetbout(entity) + '\n')
