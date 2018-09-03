@@ -2,7 +2,8 @@
 
 Export configuration
 
-The API HOST is retrieved from the environment. A default value is available for local development.
+The API HOST is retrieved from the environment.
+A default value is available for local development.
 
 The collection and file are retrieved from the command line arguments
 
