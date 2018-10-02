@@ -39,7 +39,7 @@ class API:
         """
         while self.path is not None:
             response = requests.get(f'{self.host}{self.path}')
-            assert(response.ok)
+            assert response.ok, self.path
             data = response.json()
             self.path = data['_links']['next']['href']
             for entity in data['results']:

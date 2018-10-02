@@ -34,8 +34,8 @@ def _export_meetbout(meetbout):
     :return:
     """
     format = 'meetboutid:str|buurt:str|xcoordinaat:num|ycoordinaat:num|hoogte_tov_nap:num|zakking_cumulatief:num|' \
-             'datum:dat|bouwblokzijde:num|eigenaar:num|indicatie_beveiligd:bool|stadsdeel:str|adres:str|locatie:str|' \
-             'zakkingssnelheid:num|status:str|bouwblok:str|blokeenheid:num|geometrie:geo'
+             'datum:dat|bouwblokzijde:num|eigenaar:num|indicatie_beveiligd:bool|stadsdeel:str|nabij_adres_text:str|' \
+             'locatie:str|zakkingssnelheid:num|status:str|bouwblok:str|blokeenheid:num|geometrie:geo'
     pattern = re.compile('(\w+):(\w+)\|?')
     export = format
     for (attr_name, attr_type) in re.findall(pattern, format):

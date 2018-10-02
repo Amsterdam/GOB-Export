@@ -1,4 +1,5 @@
 import importlib
+import os
 
 
 class MockArgumentParser:
@@ -27,8 +28,7 @@ def test_host(monkeypatch):
     before_each(monkeypatch)
     from export.config import get_host
 
-    assert(get_host() == 'http://localhost:5000')
-    pass
+    assert(get_host() == os.getenv('API_HOST', 'http://localhost:5000'))
 
 
 def test_args(monkeypatch):
