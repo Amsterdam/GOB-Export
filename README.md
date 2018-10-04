@@ -53,7 +53,11 @@ The export reads its data from the GOB API.
 The address of the API can be specified in the API_HOST environment variable.
 If no API_HOST variable is set, the default value for this variable is used:
 
-    API_HOST=http://127.0.0.1:5000/
+    export API_HOST=http://127.0.0.1:5000
+    
+When running against a dockered API use:
+
+    export API_HOST=http://127.0.0.1:8141/gob
 
 An export is run by the following commands:
 

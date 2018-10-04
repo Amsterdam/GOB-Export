@@ -78,17 +78,21 @@ def _to_geometry(value):
     The geometry is translated to match the DIVA output format.
 
     Example:
-        Input:  POINT(1.5, 2.5) =>
-        Via:    POINT (1.5, 2.5) =>
-                POINT (1.5 2.5) =>
-        Output: POINT (1,5 2,5)
+
+        {
+            type: "Point",
+            coordinates: [
+                119411.7,
+                487201.6
+            ]
+        }
+        Output: POINT (119411,7 487201,6)
 
     :param value:
     :return:
     """
-    assert(type(value) is str or value is None)
-    return '' if value is None else value\
-        .replace('(', ' (')\
+    assert(type(value) is dict or value is None)
+    return '' if value is None else f"{value['type'].upper()} ({value['coordinates'][0]} {value['coordinates'][1]})"\
         .replace(',', '')\
         .replace('.', ',')
 

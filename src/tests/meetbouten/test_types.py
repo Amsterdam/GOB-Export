@@ -50,12 +50,12 @@ def test_to_date():
 
 
 def test_to_geometry():
-    assert(_to_geometry('POINT(1, 2)') == 'POINT (1 2)')
-    assert(_to_geometry('POINT(1.1, 2.2)') == 'POINT (1,1 2,2)')
-    assert(_to_geometry('X(a b)') == 'X (a b)')
+    assert(_to_geometry({"type": "Point", "coordinates": [1, 2]}) == 'POINT (1 2)')
+    assert(_to_geometry({"type": "Point", "coordinates": [1.1, 2.2]}) == 'POINT (1,1 2,2)')
+    assert(_to_geometry({"type": "X", "coordinates": ["a", "b"]}) == 'X (a b)')
     assert(_to_geometry(None) == '')
 
-    for v in [5, 5.1, True, [], {}]:
+    for v in [5, 5.1, True, [], ""]:
         with pytest.raises(AssertionError):
             assert(_to_geometry(v))
 
@@ -74,5 +74,5 @@ def test_type_convert():
     for d in ['2030-09-25', None]:
         assert(type_convert('dat', d) == _to_date(d))
 
-    for g in ['POINT(1, 2)', 'POINT(1.1, 2.2)', None]:
+    for g in [{"type": "Point", "coordinates": [1, 2]}, {"type": "Point", "coordinates": [1.1, 2.2]}, None]:
         assert(type_convert('geo', g) == _to_geometry(g))
