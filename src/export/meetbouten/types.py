@@ -25,7 +25,8 @@ def _to_string(value):
     :return:
     """
     assert(type(value) is str or value is None)
-    return f'$${"" if value is None else str(value)}$$'
+    value = "" if value is None else str(value).replace("\r", "").replace("\n", " ")
+    return f'$${value}$$'
 
 
 def _to_boolean(value):
@@ -97,6 +98,58 @@ def _to_geometry(value):
         .replace('.', ',')
 
 
+def _to_xcoord(value):
+    """Convert to xcoord
+
+    The geometry is translated to match the DIVA output format.
+
+    Example:
+
+        {
+            type: "Point",
+            coordinates: [
+                119411.7,
+                487201.6
+            ]
+        }
+        Output: 119411,7
+
+    :param value:
+    :return:
+    """
+    assert(type(value) is dict or value is None)
+    return _get_coord(value, 0)
+
+
+def _to_ycoord(value):
+    """Convert to ycoord
+
+    The geometry is translated to match the DIVA output format.
+
+    Example:
+
+        {
+            type: "Point",
+            coordinates: [
+                119411.7,
+                487201.6
+            ]
+        }
+        Output: 487201,6
+
+    :param value:
+    :return:
+    """
+    assert(type(value) is dict or value is None)
+    return _get_coord(value, 1)
+
+
+def _get_coord(value, index):
+    return '' if value is None else f"{value['coordinates'][index]}"\
+        .replace(',', '')\
+        .replace('.', ',')
+
+
 def type_convert(type_name, value):
     """Convert a value fo a given type
 
@@ -109,6 +162,8 @@ def type_convert(type_name, value):
         'bool': _to_boolean,
         'num': _to_number,
         'dat': _to_date,
-        'geo': _to_geometry
+        'geo': _to_geometry,
+        'xco': _to_xcoord,
+        'yco': _to_ycoord,
     }
     return converters[type_name](value)

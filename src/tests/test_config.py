@@ -35,4 +35,4 @@ def test_args(monkeypatch):
     before_each(monkeypatch)
     from export.config import get_args
 
-    assert(get_args() == ['collection', 'file'])
+    assert(get_args() == ['catalog', 'collection', 'file'])

@@ -3,29 +3,32 @@ import importlib
 
 import export.api
 
+from export.meetbouten import CONFIG_MAPPING
+
 
 def before_each(monkeypatch):
-    import export.meetbouten.meetbout
-    importlib.reload(export.meetbouten.meetbout)
+    import export.meetbouten
+    importlib.reload(export.meetbouten)
 
 
-def test_export_meetbout(monkeypatch):
+def test_export_entity(monkeypatch):
     before_each(monkeypatch)
-    from export.meetbouten.meetbout import _export_meetbout
+    from export.meetbouten import _export_entity
 
     meetbout = {}
-    assert(_export_meetbout(meetbout) == "$$$$|$$$$|||||$$$$|||$$N$$|$$$$|$$$$|$$$$||$$$$|$$$$||")
+    config = CONFIG_MAPPING['meetbouten']
+    assert(_export_entity(meetbout, config.format) == "$$$$|$$$$|||||$$$$|||$$N$$|$$$$|$$$$|$$$$||$$$$|$$$$||")
 
     meetbout = {
         'meetboutid': '1'
     }
-    assert(_export_meetbout(meetbout) == "$$1$$|$$$$|||||$$$$|||$$N$$|$$$$|$$$$|$$$$||$$$$|$$$$||")
+    assert(_export_entity(meetbout, config.format) == "$$1$$|$$$$|||||$$$$|||$$N$$|$$$$|$$$$|$$$$||$$$$|$$$$||")
 
     meetbout = {
         'meetboutid': '1',
         'x': 'y'
     }
-    assert(_export_meetbout(meetbout) == "$$1$$|$$$$|||||$$$$|||$$N$$|$$$$|$$$$|$$$$||$$$$|$$$$||")
+    assert(_export_entity(meetbout, config.format) == "$$1$$|$$$$|||||$$$$|||$$N$$|$$$$|$$$$|$$$$||$$$$|$$$$||")
 
 
 class MockAPI:
@@ -62,7 +65,7 @@ def test_export_meetbouten(monkeypatch):
     monkeypatch.setattr(export.api, 'API', MockAPI)
 
     before_each(monkeypatch)
-    from export.meetbouten.meetbout import export_meetbouten
+    from export.meetbouten import export_meetbouten
 
-    export_meetbouten('host', '/tmp/ttt')
+    export_meetbouten('meetbouten', 'host', '/tmp/ttt')
     assert(MockFile.s == '$$1$$|$$$$|||||$$$$|||$$N$$|$$$$|$$$$|$$$$||$$$$|$$$$||\n')
