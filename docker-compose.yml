@@ -2,6 +2,13 @@ version: '3.0'
 
 services:
 
-  update_service:
+  export_service:
     build: src
     container_name: export_service
+    environment:
+      API_HOST: http://api_service:8000
+
+networks:
+  default:
+    external:
+      name: gob-network

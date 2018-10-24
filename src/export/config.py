@@ -32,6 +32,8 @@ def get_args():
     :return: A dictionary containing the collection and file names
     """
     parser = argparse.ArgumentParser(description='Export data collection')
+    parser.add_argument('catalog', type=str,
+                        help='the name of the data catalog (example: "meetbouten"')
     parser.add_argument('collection', type=str,
                         help='the name of the data collection (example: "meetbouten"')
     parser.add_argument('file', type=str,
