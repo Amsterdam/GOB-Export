@@ -59,19 +59,36 @@ When running against a dockered API use:
 
     export API_HOST=http://127.0.0.1:8141/
 
+To be able to connect to the objectstore some environment variables are needed.
+Add the configuration for the objectstore connection to a .env file in the root of this repository,
+based on the .env.example.
+
+```bash
+cp .env.example .env
+```
+
+Set the required shell variables:
+
+```bash
+export $(cat .env | xargs)
+```
+
 An export is run by the following commands:
 
 ```bash
 cd src
-python -m export catalog collection file    # e.g. python -m export meetbouten meetbouten /tmp/MBT_MEETBOUT.dat
+python -m export catalog collection file    # e.g. python -m export meetbouten meetbouten MBT_MEETBOUT.dat
 
 ```
+
+The file is placed on the configured ojectstore under /distributie/{catalog}/{file}
 
 The catalogs and collections that have been implemented are:
 - meetbouten
   - meetbouten
   - metingen
   - referentiepunten
+  - rollagen
 
 ### Tests
 
