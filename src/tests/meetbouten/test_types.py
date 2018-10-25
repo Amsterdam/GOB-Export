@@ -1,6 +1,6 @@
 import pytest
 
-from export.meetbouten.types import _to_string, _to_boolean, _to_number, _to_date, _to_geometry, type_convert
+from export.meetbouten.types import _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_xcoord, _to_ycoord, type_convert
 
 
 def test_to_string():
@@ -48,7 +48,6 @@ def test_to_date():
             assert(_to_date(v))
 
 
-
 def test_to_geometry():
     assert(_to_geometry({"type": "Point", "coordinates": [1, 2]}) == 'POINT (1 2)')
     assert(_to_geometry({"type": "Point", "coordinates": [1.1, 2.2]}) == 'POINT (1,1 2,2)')
@@ -59,6 +58,27 @@ def test_to_geometry():
         with pytest.raises(AssertionError):
             assert(_to_geometry(v))
 
+
+def test_to_xcoord():
+    assert(_to_xcoord({"type": "Point", "coordinates": [1, 2]}) == '1')
+    assert(_to_xcoord({"type": "Point", "coordinates": [1.1, 2.2]}) == '1,1')
+    assert(_to_xcoord({"type": "X", "coordinates": ["a", "b"]}) == 'a')
+    assert(_to_xcoord(None) == '')
+
+    for v in [5, 5.1, True, [], ""]:
+        with pytest.raises(AssertionError):
+            assert(_to_xcoord(v))
+
+
+def test_to_ycoord():
+    assert(_to_ycoord({"type": "Point", "coordinates": [1, 2]}) == '2')
+    assert(_to_ycoord({"type": "Point", "coordinates": [1.1, 2.2]}) == '2,2')
+    assert(_to_ycoord({"type": "X", "coordinates": ["a", "b"]}) == 'b')
+    assert(_to_ycoord(None) == '')
+
+    for v in [5, 5.1, True, [], ""]:
+        with pytest.raises(AssertionError):
+            assert(_to_ycoord(v))
 
 
 def test_type_convert():
