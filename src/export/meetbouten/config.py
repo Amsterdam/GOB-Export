@@ -58,5 +58,5 @@ class RollagenExportConfig:
         $$AK25$$|1|121287|485235|POINT (121287.0 485245.0)
 
     """
-    format = 'rollaagid:str|$idx:num|geometrie:xco|geometrie:yco|geometrie:geo'
-    path = '/gob/meetbouten/rollagen/?order_by=rollaagid'
+    format = 'rollaagid:str|idx:num|geometrie:xco|geometrie:yco|geometrie:geo'
+    path = '/gob/meetbouten/rollagen/?view=enhanced'
