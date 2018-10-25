@@ -4,6 +4,7 @@ certifi==2018.8.24
 chardet==3.0.4
 coverage==4.5.1
 flake8==3.5.0
+-e git+https://github.com/Amsterdam/objectstore.git@v1.0#egg=objectstore
 idna==2.7
 mccabe==0.6.1
 more-itertools==4.3.0

@@ -36,6 +36,6 @@ def get_args():
                         help='the name of the data catalog (example: "meetbouten"')
     parser.add_argument('collection', type=str,
                         help='the name of the data collection (example: "meetbouten"')
-    parser.add_argument('file', type=str,
+    parser.add_argument('file_name', type=str,
                         help='the name of the file to write the output to (example: "/tmp/MBT_MEETBOUT.dat")')
     return parser.parse_args()
