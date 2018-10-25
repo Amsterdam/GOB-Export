@@ -118,7 +118,7 @@ def _to_xcoord(value):
     :return:
     """
     assert(type(value) is dict or value is None)
-    return _get_coord(value, 0)
+    return '' if value is None else _get_coord(value, 0)
 
 
 def _to_ycoord(value):
@@ -141,11 +141,11 @@ def _to_ycoord(value):
     :return:
     """
     assert(type(value) is dict or value is None)
-    return _get_coord(value, 1)
+    return '' if value is None else _get_coord(value, 1)
 
 
 def _get_coord(value, index):
-    return '' if value is None else f"{value['coordinates'][index]}"\
+    return f"{value['coordinates'][index]}"\
         .replace(',', '')\
         .replace('.', ',')
 
