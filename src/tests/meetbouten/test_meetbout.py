@@ -30,6 +30,13 @@ def test_export_entity(monkeypatch):
     }
     assert(_export_entity(meetbout, config.format) == "$$1$$|$$$$|||||$$$$|||$$N$$|$$$$|$$$$|$$$$||$$$$|$$$$||")
 
+    config = CONFIG_MAPPING['rollagen']
+    rollaag = {
+        'rollaagid': 'AA01',
+        'x': 'y'
+    }
+    assert(_export_entity(rollaag, config.format, 1) == "$$AA01$$|1|||")
+
 
 class MockAPI:
     def __init__(self, host=None, path=None):
