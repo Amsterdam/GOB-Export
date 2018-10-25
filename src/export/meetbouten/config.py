@@ -47,3 +47,16 @@ class ReferentiepuntenExportConfig:
     format = 'referentiepuntid:num|geometrie:xco|geometrie:yco|' \
              'hoogte_tov_nap:num|datum:dat|locatie:str|geometrie:geo'
     path = '/gob/meetbouten/referentiepunten/'
+
+
+class RollagenExportConfig:
+    """
+    Example:
+        rollaagid: AK25:
+        http://localhost:5000/gob/meetbouten/rollagen/AK25/
+        =>
+        $$AK25$$|1|121287|485235|POINT (121287.0 485245.0)
+
+    """
+    format = 'rollaagid:str|$idx:num|geometrie:xco|geometrie:yco|geometrie:geo'
+    path = '/gob/meetbouten/rollagen/?order_by=rollaagid'

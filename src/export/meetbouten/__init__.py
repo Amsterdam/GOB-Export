@@ -1,7 +1,8 @@
 import re
 
 from export.api import API
-from export.meetbouten.config import MeetboutExportConfig, MetingenExportConfig, ReferentiepuntenExportConfig
+from export.meetbouten.config import MeetboutExportConfig, MetingenExportConfig, \
+                                     ReferentiepuntenExportConfig, RollagenExportConfig
 from export.meetbouten.types import type_convert
 
 
@@ -9,10 +10,11 @@ CONFIG_MAPPING = {
     'meetbouten': MeetboutExportConfig,
     'metingen': MetingenExportConfig,
     'referentiepunten': ReferentiepuntenExportConfig,
+    'rollagen': RollagenExportConfig,
 }
 
 
-def _export_entity(entity, format):
+def _export_entity(entity, format, idx=None):
     """Exports a single entity
 
     The export file specifications can be found in:
@@ -25,15 +27,19 @@ def _export_entity(entity, format):
 
     The export format is a string containing the attributes and types to be converted.
     A declarative way of describing exports is used:
-    The epxort format is used both to read the attributes and types and to write the correct output format
+    The export format is used both to read the attributes and types and to write the correct output format.
+    A special attribute can be used as an index counter: $idx:num
 
     :param meetbout:
     :return:
     """
-    pattern = re.compile('(\w+):(\w+)\|?')
+    pattern = re.compile('(\$?\w+):(\w+)\|?')
     export = format
     for (attr_name, attr_type) in re.findall(pattern, format):
-        attr_value = type_convert(attr_type, entity.get(attr_name, None))
+        if attr_name == '$idx':
+            attr_value = type_convert(attr_type, idx)
+        else:
+            attr_value = type_convert(attr_type, entity.get(attr_name, None))
         export = export.replace(f'{attr_name}:{attr_type}', attr_value)
     return export
 
@@ -53,5 +59,5 @@ def export_meetbouten(collection, host, file):
     api = API(host=host, path=config.path)
 
     with open(file, 'w') as fp:
-        for entity in api:
-            fp.write(_export_entity(entity, config.format) + '\n')
+        for (idx, entity) in enumerate(api, 1):
+            fp.write(_export_entity(entity, config.format, idx) + '\n')
