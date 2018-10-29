@@ -6,6 +6,7 @@ This module contains the export entries for the meetbouten catalog
 import os
 from pathlib import Path
 import tempfile
+import time
 
 from export.config import get_host, get_args
 from export.connector.objectstore import connect_to_objectstore
@@ -56,7 +57,7 @@ def export_collection(host, catalog, collection, file_name):
     # Distribute to final location
     with open(temporary_file, 'rb') as fp:
         distribute_to_objectstore(connection,
-                                  collection,
+                                  catalog,
                                   file_name,
                                   fp,
                                   'text/plain')
@@ -68,4 +69,13 @@ def export_collection(host, catalog, collection, file_name):
 host = get_host()
 args = get_args()
 
-export_collection(host=host, catalog=args.catalog, collection=args.collection, file_name=args.file_name)
+keep_alive = True
+
+if args.catalog:
+    # If we receive a catalog as an argument, start exporting
+    export_collection(host=host, catalog=args.catalog, collection=args.collection, file_name=args.file_name)
+else:
+    # Run indefinite to have a docker container available for exports
+    while keep_alive:
+        print('.')
+        time.sleep(60)

@@ -1,7 +1,9 @@
 import importlib
 import os
 import pytest
+import time
 
+import export
 import export.config
 import export.meetbouten
 import export.connector.objectstore
@@ -54,6 +56,10 @@ def export_entity(c, h, f):
     file_name = f
 
 
+def mock_sleep(t):
+    export.__main__.keep_alive = False
+
+
 def test_main(monkeypatch):
     monkeypatch.setitem(__builtins__, 'open', mock_open)
     monkeypatch.setattr(export.config, 'get_host', lambda: 'host')
@@ -68,7 +74,16 @@ def test_main(monkeypatch):
     assert(host == 'host')
     assert(file_name == temporary_file)
 
-    monkeypatch.setattr(export.config, 'get_args', lambda: MockArgs('unknow', 'unknown', 'file_name'))
+    monkeypatch.setattr(export.config, 'get_args', lambda: MockArgs('unknown', 'unknown', 'file_name'))
 
     with pytest.raises(KeyError):
         importlib.reload(export.__main__)
+
+def test_main_without_args(monkeypatch):
+    monkeypatch.setattr(export.config, 'get_host', lambda: 'host')
+    monkeypatch.setattr(export.config, 'get_args', lambda: MockArgs(None, None, None))
+    monkeypatch.setattr(time, 'sleep', mock_sleep)
+
+    importlib.reload(export.__main__)
+
+    from export import __main__
