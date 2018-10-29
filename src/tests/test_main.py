@@ -44,10 +44,6 @@ def mock_connection(config):
     return MockConnection
 
 
-def mock_connection_error(config):
-    raise Exception()
-
-
 host = None
 file_name = None
 
@@ -76,7 +72,3 @@ def test_main(monkeypatch):
 
     with pytest.raises(KeyError):
         importlib.reload(export.__main__)
-
-    monkeypatch.setattr(export.connector.objectstore, 'get_connection', mock_connection_error)
-    with pytest.raises(Exception):
-        __main__.connect_to_objectstore()

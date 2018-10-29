@@ -16,11 +16,4 @@ def connect_to_objectstore():
 
     :return: a connection to the given objectstore
     """
-    OBJECTSTORE = OBJECTSTORE_CONFIG
-
-    try:
-        connection = get_connection(OBJECTSTORE)
-    except Exception as e:
-        raise
-    else:
-        return connection
+    return get_connection(OBJECTSTORE_CONFIG)
