@@ -7,8 +7,8 @@ echo "Running style checks"
 flake8
 
 echo "Running unit tests"
-pytest
+pytest tests/
 
 echo "Running coverage tests"
 export COVERAGE_FILE=/tmp/.coverage
-pytest --cov=export --cov-fail-under=100 tests/
+pytest --cov=export --cov-report html --cov-fail-under=100 tests/

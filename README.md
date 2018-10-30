@@ -10,7 +10,7 @@ This will allow for a migration to GOB that minimizes the impact for the existin
     * docker-compose >= 1.17
     * docker ce >= 18.03
     * python >= 3.6
-    
+
 # Installation
 
 ## Local
@@ -20,7 +20,7 @@ Create a virtual environment:
     python3 -m venv venv
     source venv/bin/activate
     pip install -r src/requirements.txt
-    
+
 Or activate the previously created virtual environment
 
     source venv/bin/activate
@@ -54,21 +54,41 @@ The address of the API can be specified in the API_HOST environment variable.
 If no API_HOST variable is set, the default value for this variable is used:
 
     export API_HOST=http://127.0.0.1:5000
-    
+
 When running against a dockered API use:
 
-    export API_HOST=http://127.0.0.1:8141/gob
+    export API_HOST=http://127.0.0.1:8141/
+
+To be able to connect to the objectstore some environment variables are needed.
+Add the configuration for the objectstore connection to a .env file in the root of this repository,
+based on the .env.example.
+
+```bash
+cp .env.example .env
+```
+
+Set the required shell variables:
+
+```bash
+export $(cat .env | xargs)
+```
 
 An export is run by the following commands:
 
 ```bash
 cd src
-python -m export collection file    # e.g. python -m export meetbouten /tmp/MBT_MEETBOUT.dat
+python -m export catalog collection file    # e.g. python -m export meetbouten meetbouten MBT_MEETBOUT.dat
 
 ```
 
-The collections that have been implemented are:
-- meetbouten.
+The file is placed on the configured ojectstore under /distributie/{catalog}/{file}
+
+The catalogs and collections that have been implemented are:
+- meetbouten
+  - meetbouten
+  - metingen
+  - referentiepunten
+  - rollagen
 
 ### Tests
 

@@ -4,6 +4,6 @@ services:
   test:
     build:
       context: ../..
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.test
     command: >
       bash -c "./test.sh"
