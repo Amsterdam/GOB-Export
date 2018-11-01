@@ -54,6 +54,11 @@ def export_meetbouten(collection, host, file):
     config = CONFIG_MAPPING[collection]
     api = API(host=host, path=config.path)
 
+    row_count = 0
+
     with open(file, 'w') as fp:
         for entity in api:
+            row_count += 1
             fp.write(_export_entity(entity, config.format) + '\n')
+
+    return row_count
