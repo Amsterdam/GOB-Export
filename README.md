@@ -78,10 +78,10 @@ An export is run by the following commands:
 ```bash
 cd src
 python -m export catalog collection file    # e.g. python -m export meetbouten meetbouten MBT_MEETBOUT.dat
-
 ```
 
-The file is placed on the configured ojectstore under /distributie/{catalog}/{file}
+The file is placed on the configured objectstore under {CONTAINER_BASE}/{catalog}/{file}
+CONTAINER_BASE default value is `distributie`. It is recommended to change this value in development to `development/distributie` using the .env file.
 
 The catalogs and collections that have been implemented are:
 - meetbouten

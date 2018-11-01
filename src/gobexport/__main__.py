@@ -3,15 +3,23 @@
 This module contains the export entries for the meetbouten catalog
 
 """
+import datetime
 import os
 from pathlib import Path
 import tempfile
 import time
 
-from gobexport.config import get_host, get_args
+from gobcore.exceptions import GOBException
+from gobcore.log import get_logger
+
+from gobexport.config import get_host, get_args, CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.distributor.objectstore import distribute_to_objectstore
 from gobexport.meetbouten import export_meetbouten
+
+
+logger = get_logger(name="EXPORT")
+extra_log_kwargs = {}
 
 
 # TODO: Should be fetched from GOBCore in next iterations
@@ -34,6 +42,19 @@ def _get_filename(name):
 
 
 def export_collection(host, catalog, collection, file_name):
+    # Extra variables for logging, generate them since we do not get them from workflow yet
+    global extra_log_kwargs
+    start_timestamp = int(datetime.datetime.now().replace(microsecond=0).timestamp())
+    source = 'GOB Objectstore'
+    process_id = f"{start_timestamp}.{source}.{collection}"
+    extra_log_kwargs = {
+        'process_id': process_id,
+        'source': source,
+        'entity': collection
+    }
+
+    logger.info(f"Export {catalog}:{collection} to {source} started.", extra=extra_log_kwargs)
+
     """Export a collection from a catalog
 
     :param host: The API host to retrieve the catalog and collection from
@@ -49,18 +70,29 @@ def export_collection(host, catalog, collection, file_name):
     # Get temp file name
     temporary_file = _get_filename(file_name)
 
-    exporter[catalog](collection, host, temporary_file)
+    row_count = exporter[catalog](collection, host, temporary_file)
+    logger.info(f"{row_count} records exported to file.", extra=extra_log_kwargs)
 
     # Get objectstore connection
     connection = connect_to_objectstore()
 
+    logger.info(f"Connection to {source} has been made.", extra=extra_log_kwargs)
+
     # Distribute to final location
+    container = f'{CONTAINER_BASE}/{catalog}/'
     with open(temporary_file, 'rb') as fp:
-        distribute_to_objectstore(connection,
-                                  catalog,
-                                  file_name,
-                                  fp,
-                                  'text/plain')
+        try:
+            distribute_to_objectstore(connection,
+                                      container,
+                                      file_name,
+                                      fp,
+                                      'text/plain')
+        except GOBException as e:
+            logger.error(f'Failed to distribute to {source} on location: {container}{file_name}. Error: {e}',
+                         extra=extra_log_kwargs)
+            return False
+
+    logger.info(f"File distributed to {source} on location: {container}{file_name}.", extra=extra_log_kwargs)
 
     # Delete temp file
     os.remove(temporary_file)
