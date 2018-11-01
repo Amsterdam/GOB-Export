@@ -1,6 +1,6 @@
 import pytest
 
-from export.meetbouten.types import _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_xcoord, _to_ycoord, type_convert
+from gobexport.meetbouten.types import _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_xcoord, _to_ycoord, type_convert
 
 
 def test_to_string():

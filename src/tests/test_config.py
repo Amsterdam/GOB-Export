@@ -20,19 +20,19 @@ def before_each(monkeypatch):
     import argparse
     monkeypatch.setattr(argparse, 'ArgumentParser', MockArgumentParser)
 
-    import export
-    importlib.reload(export)
+    import gobexport
+    importlib.reload(gobexport)
 
 
 def test_host(monkeypatch):
     before_each(monkeypatch)
-    from export.config import get_host
+    from gobexport.config import get_host
 
     assert(get_host() == os.getenv('API_HOST', 'http://localhost:5000'))
 
 
 def test_args(monkeypatch):
     before_each(monkeypatch)
-    from export.config import get_args
+    from gobexport.config import get_args
 
     assert(get_args() == ['catalog', 'collection', 'file_name'])

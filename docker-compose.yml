@@ -2,9 +2,9 @@ version: '3.0'
 
 services:
 
-  export_service:
+  gobexport:
     build: src
-    container_name: export_service
+    container_name: gobexport
     environment:
       API_HOST: http://api_service:8000
 
