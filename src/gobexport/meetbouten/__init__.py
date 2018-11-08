@@ -32,12 +32,12 @@ def _export_entity(entity, format):
     :param meetbout:
     :return:
     """
-    pattern = re.compile('(\w+):(\w+)\|?')
-    export = format
-    for (attr_name, attr_type) in re.findall(pattern, format):
-        attr_value = type_convert(attr_type, entity.get(attr_name, None))
-        export = export.replace(f'{attr_name}:{attr_type}', attr_value)
-    return export
+    pattern = re.compile('(\w+):(\w+):?(\w+)?\|?')
+    export = []
+    for (attr_name, attr_type, args) in re.findall(pattern, format):
+        attr_value = type_convert(attr_type, entity.get(attr_name, None), args)
+        export.append(attr_value)
+    return '|'.join(export)
 
 
 def export_meetbouten(collection, host, file):

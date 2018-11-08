@@ -13,7 +13,7 @@ Todo: The final model for the meetbouten collection is required
 import datetime
 
 
-def _to_string(value):
+def _to_string(value, *args):
     """Convert to string
 
     Strings are enclosed in $$
@@ -25,11 +25,11 @@ def _to_string(value):
     :return:
     """
     assert(type(value) is str or value is None)
-    value = "" if value is None else str(value).replace("\r", "").replace("\n", " ")
-    return f'$${value}$$'
+    value = '' if value is None or value == '' else str(f'$${value}$$').replace("\r", "").replace("\n", " ")
+    return value
 
 
-def _to_boolean(value):
+def _to_boolean(value, *args):
     """Convert to boolean
 
     True => "", False or None => "N"
@@ -41,7 +41,7 @@ def _to_boolean(value):
     return _to_string('' if value is True else 'N')
 
 
-def _to_number(value):
+def _to_number(value, precision=None):
     """Convert to number
 
     The decimal dot is replaced by a comma
@@ -53,11 +53,12 @@ def _to_number(value):
     :return:
     """
     assert(type(value) in [int, float, str] or value is None)
+    value = format(value, f'.{precision}f') if precision and value else value
     return '' if value is None else str(value)\
         .replace('.', ',')
 
 
-def _to_date(value):
+def _to_date(value, *args):
     """Convert to date
 
     Date parsing and conversion is used for implicit date validation
@@ -73,7 +74,7 @@ def _to_date(value):
         '' if value is None else datetime.datetime.strptime(value, "%Y-%m-%d").date().strftime("%Y%m%d"))
 
 
-def _to_geometry(value):
+def _to_geometry(value, *args):
     """Convert to geometry
 
     The geometry is translated to match the DIVA output format.
@@ -98,31 +99,8 @@ def _to_geometry(value):
         .replace('.', ',')
 
 
-def _to_xcoord(value):
-    """Convert to xcoord
-
-    The geometry is translated to match the DIVA output format.
-
-    Example:
-
-        {
-            type: "Point",
-            coordinates: [
-                119411.7,
-                487201.6
-            ]
-        }
-        Output: 119411,7
-
-    :param value:
-    :return:
-    """
-    assert(type(value) is dict or value is None)
-    return '' if value is None else _get_coord(value, 0)
-
-
-def _to_ycoord(value):
-    """Convert to ycoord
+def _to_coord(value, coord):
+    """Convert to coord
 
     The geometry is translated to match the DIVA output format.
 
@@ -138,19 +116,21 @@ def _to_ycoord(value):
         Output: 487201,6
 
     :param value:
+    :param coord:
     :return:
     """
     assert(type(value) is dict or value is None)
-    return '' if value is None else _get_coord(value, 1)
-
-
-def _get_coord(value, index):
-    return f"{value['coordinates'][index]}"\
+    assert(coord in ['x', 'y'])
+    if coord == 'x':
+        index = 0
+    elif coord == 'y':
+        index = 1
+    return '' if value is None else f"{value['coordinates'][int(index)]}"\
         .replace(',', '')\
         .replace('.', ',')
 
 
-def type_convert(type_name, value):
+def type_convert(type_name, value, *args):
     """Convert a value fo a given type
 
     :param type_name: The name of the type, e.g. str
@@ -163,7 +143,6 @@ def type_convert(type_name, value):
         'num': _to_number,
         'dat': _to_date,
         'geo': _to_geometry,
-        'xco': _to_xcoord,
-        'yco': _to_ycoord,
+        'coo': _to_coord,
     }
-    return converters[type_name](value)
+    return converters[type_name](value, *args)
