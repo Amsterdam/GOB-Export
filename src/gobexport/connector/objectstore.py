@@ -16,4 +16,5 @@ def connect_to_objectstore():
 
     :return: a connection to the given objectstore
     """
-    return get_connection(OBJECTSTORE_CONFIG)
+    user = f"({OBJECTSTORE_CONFIG['USER']}@{OBJECTSTORE_CONFIG['TENANT_NAME']})"
+    return get_connection(OBJECTSTORE_CONFIG), user
