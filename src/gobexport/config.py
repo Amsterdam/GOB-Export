@@ -11,7 +11,9 @@ The collection and file are retrieved from the command line arguments
 import os
 import argparse
 
+
 _DEFAULT_API_HOST = 'http://localhost:5000'
+CONTAINER_BASE = os.getenv('CONTAINER_BASE', 'distributie')
 
 
 def get_host():

@@ -1,9 +1,9 @@
 import re
 
-from export.api import API
-from export.meetbouten.config import MeetboutExportConfig, MetingenExportConfig, \
+from gobexport.api import API
+from gobexport.meetbouten.config import MeetboutExportConfig, MetingenExportConfig, \
                                      ReferentiepuntenExportConfig, RollagenExportConfig
-from export.meetbouten.types import type_convert
+from gobexport.meetbouten.types import type_convert
 
 
 CONFIG_MAPPING = {
@@ -32,12 +32,12 @@ def _export_entity(entity, format):
     :param meetbout:
     :return:
     """
-    pattern = re.compile('(\w+):(\w+)\|?')
-    export = format
-    for (attr_name, attr_type) in re.findall(pattern, format):
-        attr_value = type_convert(attr_type, entity.get(attr_name, None))
-        export = export.replace(f'{attr_name}:{attr_type}', attr_value)
-    return export
+    pattern = re.compile('(\w+):(\w+):?(\w+)?\|?')
+    export = []
+    for (attr_name, attr_type, args) in re.findall(pattern, format):
+        attr_value = type_convert(attr_type, entity.get(attr_name, None), args)
+        export.append(attr_value)
+    return '|'.join(export)
 
 
 def export_meetbouten(collection, host, file):
@@ -54,6 +54,11 @@ def export_meetbouten(collection, host, file):
     config = CONFIG_MAPPING[collection]
     api = API(host=host, path=config.path)
 
+    row_count = 0
+
     with open(file, 'w') as fp:
         for entity in api:
+            row_count += 1
             fp.write(_export_entity(entity, config.format) + '\n')
+
+    return row_count

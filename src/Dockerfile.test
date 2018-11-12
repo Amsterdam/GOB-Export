@@ -1,7 +1,7 @@
 FROM amsterdam/docker_python:latest
 MAINTAINER datapunt@amsterdam.nl
 
-# Install export in /app folder
+# Install gobexport in /app folder
 WORKDIR /app
 
 # Install required Python packages
@@ -9,8 +9,8 @@ COPY requirements.txt /app/
 RUN pip3 install --no-cache-dir -r requirements.txt
 RUN rm requirements.txt
 
-# Copy export module
-COPY export export
+# Copy gobexport module
+COPY gobexport gobexport
 
 # Copy tests
 COPY tests tests

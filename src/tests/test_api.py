@@ -35,7 +35,7 @@ def mock_get(ok=True, results=[]):
 def test_api(monkeypatch):
     monkeypatch.setattr(requests, 'get', mock_get())
 
-    from export.api import API
+    from gobexport.api import API
 
     api = API('host', 'path')
     for e in api:

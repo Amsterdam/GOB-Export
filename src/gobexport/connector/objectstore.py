@@ -6,7 +6,7 @@ The following connectors are implemented in this module:
 """
 from objectstore.objectstore import get_connection
 
-from export.connector.config import OBJECTSTORE_CONFIG
+from gobexport.connector.config import OBJECTSTORE_CONFIG
 
 
 def connect_to_objectstore():

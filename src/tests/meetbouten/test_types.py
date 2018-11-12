@@ -1,12 +1,12 @@
 import pytest
 
-from export.meetbouten.types import _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_xcoord, _to_ycoord, type_convert
+from gobexport.meetbouten.types import _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_coord, type_convert
 
 
 def test_to_string():
     assert(_to_string('a string') == '$$a string$$')
-    assert(_to_string(None) == '$$$$')
-    assert(_to_string('') == '$$$$')
+    assert(_to_string(None) == '')
+    assert(_to_string('') == '')
 
     for v in [True, 5, 5.1, [], {}]:
         with pytest.raises(AssertionError):
@@ -14,7 +14,7 @@ def test_to_string():
 
 
 def test_to_boolean():
-    assert(_to_boolean(True) == '$$$$')
+    assert(_to_boolean(True) == '')
     assert(_to_boolean(False) == '$$N$$')
     assert(_to_boolean(None) == '$$N$$')
 
@@ -36,7 +36,7 @@ def test_to_number():
 def test_to_date():
     assert(_to_date('2020-05-20') == '$$20200520$$')
     assert(_to_date('2020-5-20') == '$$20200520$$')
-    assert(_to_date(None) == '$$$$')
+    assert(_to_date(None) == '')
 
     with pytest.raises(ValueError):
         assert(_to_date('2020-5'))
@@ -59,26 +59,20 @@ def test_to_geometry():
             assert(_to_geometry(v))
 
 
-def test_to_xcoord():
-    assert(_to_xcoord({"type": "Point", "coordinates": [1, 2]}) == '1')
-    assert(_to_xcoord({"type": "Point", "coordinates": [1.1, 2.2]}) == '1,1')
-    assert(_to_xcoord({"type": "X", "coordinates": ["a", "b"]}) == 'a')
-    assert(_to_xcoord(None) == '')
+def test_to_coord():
+    assert(_to_coord({"type": "Point", "coordinates": [1, 2]}, 'x') == '1')
+    assert(_to_coord({"type": "Point", "coordinates": [1.1, 2.2]}, 'x') == '1,1')
+    assert(_to_coord({"type": "X", "coordinates": ["a", "b"]}, 'x') == 'a')
+    assert(_to_coord(None, 'x') == '')
 
-    for v in [5, 5.1, True, [], ""]:
+    assert(_to_coord({"type": "Point", "coordinates": [1, 2]}, 'y') == '2')
+    assert(_to_coord({"type": "Point", "coordinates": [1.1, 2.2]}, 'y') == '2,2')
+    assert(_to_coord({"type": "X", "coordinates": ["a", "b"]}, 'y') == 'b')
+    assert(_to_coord(None, 'y') == '')
+
+    for v in [(5, 'x'), (5.1, 'x'), (True, 'x'), ([], 'y'), ("", 'x')]:
         with pytest.raises(AssertionError):
-            assert(_to_xcoord(v))
-
-
-def test_to_ycoord():
-    assert(_to_ycoord({"type": "Point", "coordinates": [1, 2]}) == '2')
-    assert(_to_ycoord({"type": "Point", "coordinates": [1.1, 2.2]}) == '2,2')
-    assert(_to_ycoord({"type": "X", "coordinates": ["a", "b"]}) == 'b')
-    assert(_to_ycoord(None) == '')
-
-    for v in [5, 5.1, True, [], ""]:
-        with pytest.raises(AssertionError):
-            assert(_to_ycoord(v))
+            assert(_to_coord(*v))
 
 
 def test_type_convert():

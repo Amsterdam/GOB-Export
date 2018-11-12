@@ -2,11 +2,13 @@ version: '3.0'
 
 services:
 
-  export_service:
+  gobexport:
     build: src
-    container_name: export_service
+    container_name: gobexport
     environment:
-      API_HOST: http://api_service:8000
+      MESSAGE_BROKER_ADDRESS: rabbitmq
+      API_HOST: http://gobapi:8000
+    env_file: .env
 
 networks:
   default:
