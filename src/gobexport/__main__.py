@@ -71,12 +71,12 @@ def export_collection(host, catalog, collection, file_name):
     temporary_file = _get_filename(file_name)
 
     row_count = exporter[catalog](collection, host, temporary_file)
-    logger.info(f"{row_count} records exported to file.", extra=extra_log_kwargs)
+    logger.info(f"{row_count} records exported to local file.", extra=extra_log_kwargs)
 
     # Get objectstore connection
-    connection = connect_to_objectstore()
+    connection, user = connect_to_objectstore()
 
-    logger.info(f"Connection to {destination} has been made.", extra=extra_log_kwargs)
+    logger.info(f"Connection to {destination} {user} has been made.", extra=extra_log_kwargs)
 
     # Distribute to final location
     container = f'{CONTAINER_BASE}/{catalog}/'
