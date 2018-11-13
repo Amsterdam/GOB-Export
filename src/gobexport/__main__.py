@@ -45,15 +45,15 @@ def export_collection(host, catalog, collection, file_name):
     # Extra variables for logging, generate them since we do not get them from workflow yet
     global extra_log_kwargs
     start_timestamp = int(datetime.datetime.now().replace(microsecond=0).timestamp())
-    source = 'GOB Objectstore'
-    process_id = f"{start_timestamp}.{source}.{collection}"
+    destination = 'GOB Objectstore'
+    process_id = f"{start_timestamp}.{destination}.{collection}"
     extra_log_kwargs = {
         'process_id': process_id,
-        'source': source,
+        'destination': destination,
         'entity': collection
     }
 
-    logger.info(f"Export {catalog}:{collection} to {source} started.", extra=extra_log_kwargs)
+    logger.info(f"Export {catalog}:{collection} to {destination} started.", extra=extra_log_kwargs)
 
     """Export a collection from a catalog
 
@@ -76,7 +76,7 @@ def export_collection(host, catalog, collection, file_name):
     # Get objectstore connection
     connection, user = connect_to_objectstore()
 
-    logger.info(f"Connection to {source} {user} has been made.", extra=extra_log_kwargs)
+    logger.info(f"Connection to {destination} {user} has been made.", extra=extra_log_kwargs)
 
     # Distribute to final location
     container = f'{CONTAINER_BASE}/{catalog}/'
@@ -88,11 +88,11 @@ def export_collection(host, catalog, collection, file_name):
                                       fp,
                                       'text/plain')
         except GOBException as e:
-            logger.error(f'Failed to distribute to {source} on location: {container}{file_name}. Error: {e}',
+            logger.error(f'Failed to distribute to {destination} on location: {container}{file_name}. Error: {e}',
                          extra=extra_log_kwargs)
             return False
 
-    logger.info(f"File distributed to {source} on location: {container}{file_name}.", extra=extra_log_kwargs)
+    logger.info(f"File distributed to {destination} on location: {container}{file_name}.", extra=extra_log_kwargs)
 
     # Delete temp file
     os.remove(temporary_file)
