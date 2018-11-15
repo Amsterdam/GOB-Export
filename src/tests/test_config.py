@@ -29,10 +29,3 @@ def test_host(monkeypatch):
     from gobexport.config import get_host
 
     assert(get_host() == os.getenv('API_HOST', 'http://localhost:5000'))
-
-
-def test_args(monkeypatch):
-    before_each(monkeypatch)
-    from gobexport.config import get_args
-
-    assert(get_args() == ['catalog', 'collection', 'file_name'])
