@@ -13,6 +13,16 @@ Todo: The final model for the meetbouten collection is required
 import datetime
 
 
+def _to_plain(value, *args):
+    """Convert to plain string value
+
+    :param value:
+    :param args:
+    :return:
+    """
+    return str(value)
+
+
 def _to_string(value, *args):
     """Convert to string
 
@@ -137,6 +147,7 @@ def type_convert(type_name, value, *args):
     :return: The converted value
     """
     converters = {
+        'plain': _to_plain,
         'str': _to_string,
         'bool': _to_boolean,
         'num': _to_number,
