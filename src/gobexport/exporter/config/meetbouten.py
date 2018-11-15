@@ -11,7 +11,7 @@ class MeetboutExportConfig:
     """
     format = 'identificatie:str|buurt:str|geometrie:coo:x|geometrie:coo:y|hoogte_tov_nap:num:4|' \
              'zakking_cumulatief:num:1|datum:dat|bouwblokzijde:num|eigenaar:num|indicatie_beveiligd:str|' \
-             'stadsdeel:str|adres:str|locatie:str|zakkingssnelheid:num:1|status:str|bouwblok:str|' \
+             'stadsdeel:str|adres:str|locatie:str|zakkingssnelheid:num:1|status_id:str|bouwblok:str|' \
              'blokeenheid:num|geometrie:geo'
     path = '/gob/meetbouten/meetbouten/?view=enhanced'
 

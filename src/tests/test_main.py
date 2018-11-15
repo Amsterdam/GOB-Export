@@ -10,7 +10,7 @@ from gobcore.exceptions import GOBException
 
 import gobexport
 import gobexport.config
-import gobexport.meetbouten
+import gobexport.exporter
 import gobexport.connector.objectstore
 
 
@@ -82,7 +82,7 @@ host = None
 file_name = None
 
 
-def export_entity(c, h, f):
+def export_entity(ca, co, h, f):
     global host, file_name
     host = h
     file_name = f
@@ -97,7 +97,7 @@ def test_main(monkeypatch):
     monkeypatch.setattr(gobcore.log, 'get_logger', mock_get_logger)
     monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
     monkeypatch.setattr(gobexport.config, 'get_args', lambda: MockArgs('meetbouten', 'meetbouten', 'file_name'))
-    monkeypatch.setattr(gobexport.meetbouten, 'export_meetbouten', export_entity)
+    monkeypatch.setattr(gobexport.exporter, 'export_to_file', export_entity)
     monkeypatch.setattr(gobexport.connector.objectstore, 'get_connection', mock_connection)
     monkeypatch.setattr(os, 'remove', lambda file: True)
 
@@ -107,18 +107,13 @@ def test_main(monkeypatch):
     assert(host == 'host')
     assert(file_name == temporary_file)
 
-    monkeypatch.setattr(gobexport.config, 'get_args', lambda: MockArgs('unknown', 'unknown', 'file_name'))
-
-    with pytest.raises(KeyError):
-        importlib.reload(gobexport.__main__)
-
 
 def test_main_without_connection(monkeypatch):
     monkeypatch.setitem(__builtins__, 'open', mock_open)
     monkeypatch.setattr(gobcore.log, 'get_logger', mock_get_logger)
     monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
     monkeypatch.setattr(gobexport.config, 'get_args', lambda: MockArgs('meetbouten', 'meetbouten', 'file_name'))
-    monkeypatch.setattr(gobexport.meetbouten, 'export_meetbouten', export_entity)
+    monkeypatch.setattr(gobexport.exporter, 'export_to_file', export_entity)
     monkeypatch.setattr(gobexport.connector.objectstore, 'get_connection', lambda config: None)
     monkeypatch.setattr(gobexport.distributor.objectstore, 'put_object', mock_put_object)
     monkeypatch.setattr(os, 'remove', lambda file: True)

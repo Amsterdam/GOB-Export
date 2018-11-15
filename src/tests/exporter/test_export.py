@@ -3,20 +3,20 @@ import importlib
 
 import gobexport.api
 
-from gobexport.meetbouten import CONFIG_MAPPING
+from gobexport.exporter import CONFIG_MAPPING
 
 
 def before_each(monkeypatch):
-    import gobexport.meetbouten
-    importlib.reload(gobexport.meetbouten)
+    import gobexport.exporter
+    importlib.reload(gobexport.exporter)
 
 
 def test_export_entity(monkeypatch):
     before_each(monkeypatch)
-    from gobexport.meetbouten import _export_entity
+    from gobexport.exporter import _export_entity
 
     meetbout = {}
-    config = CONFIG_MAPPING['meetbouten']
+    config = CONFIG_MAPPING['meetbouten']['meetbouten']
     assert(_export_entity(meetbout, config.format) == "|||||||||||||||||")
 
     meetbout = {
@@ -60,12 +60,12 @@ def mock_open(file, mode):
     return MockFile()
 
 
-def test_export_meetbouten(monkeypatch):
+def test_export_to_file(monkeypatch):
     monkeypatch.setitem(__builtins__, 'open', mock_open)
     monkeypatch.setattr(gobexport.api, 'API', MockAPI)
 
     before_each(monkeypatch)
-    from gobexport.meetbouten import export_meetbouten
+    from gobexport.exporter import export_to_file
 
-    export_meetbouten('meetbouten', 'host', '/tmp/ttt')
+    export_to_file('meetbouten', 'meetbouten', 'host', '/tmp/ttt')
     assert(MockFile.s == '$$1$$|||||||||||||||||\n')
