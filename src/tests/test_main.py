@@ -9,7 +9,8 @@ def test_main(mocked_messagedriven_service, mocked_export):
     msg = {
         "catalogue": "catalogue",
         "collection": "collection",
-        "filename": "filename"
+        "filename": "filename",
+        "destination": "Objectstore"
     }
 
     __main__.handle_export_msg(msg)

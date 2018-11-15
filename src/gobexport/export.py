@@ -53,7 +53,6 @@ def _export_collection(host, catalogue, collection, filename, destination):
     # Extra variables for logging, generate them since we do not get them from workflow yet
     global extra_log_kwargs
     start_timestamp = int(datetime.datetime.now().replace(microsecond=0).timestamp())
-    destination = 'GOB Objectstore'
     process_id = f"{start_timestamp}.{destination}.{collection}"
     extra_log_kwargs = {
         'process_id': process_id,
@@ -93,6 +92,7 @@ def _export_collection(host, catalogue, collection, filename, destination):
 
         # Delete temp file
         os.remove(results_file)
+
 
 def export(catalogue, collection, filename, destination):
     host = get_host()
