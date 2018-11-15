@@ -8,9 +8,9 @@ from gobexport.export import export
 
 
 def handle_export_msg(msg):
-    assert(msg["catalogue"])
-    assert(msg["collection"])
-    assert(msg["filename"])
+    assert(msg.get("catalogue"))
+    assert(msg.get("collection"))
+    assert(msg.get("filename"))
 
     export(catalogue=msg["catalogue"], collection=msg["collection"], filename=msg["filename"])
 

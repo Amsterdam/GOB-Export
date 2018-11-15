@@ -92,7 +92,7 @@ def mock_sleep(t):
     gobexport.export.keep_alive = False
 
 
-def test_main(monkeypatch):
+def test_export(monkeypatch):
     monkeypatch.setitem(__builtins__, 'open', mock_open)
     monkeypatch.setattr(gobcore.log, 'get_logger', mock_get_logger)
     monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
@@ -106,8 +106,11 @@ def test_main(monkeypatch):
     temporary_file = export._get_filename("test")
     assert(temporary_file == "/tmp/test")
 
+    export.export("meetbouten", "meetbouten", "filename")
+    export._export_collection("host", "meetbouten", "meetbouten", "filename")
 
-def test_main_without_connection(monkeypatch):
+
+def test_export_without_connection(monkeypatch):
     monkeypatch.setitem(__builtins__, 'open', mock_open)
     monkeypatch.setattr(gobcore.log, 'get_logger', mock_get_logger)
     monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
@@ -121,10 +124,5 @@ def test_main_without_connection(monkeypatch):
 
     from gobexport import export
 
-def test_main_without_args(monkeypatch):
-    monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
-    monkeypatch.setattr(time, 'sleep', mock_sleep)
-
-    importlib.reload(gobexport.export)
-
-    from gobexport import export
+    export.export("meetbouten", "meetbouten", "filename")
+    export._export_collection("host", "meetbouten", "meetbouten", "filename")
