@@ -89,7 +89,7 @@ def export_entity(ca, co, h, f):
 
 
 def mock_sleep(t):
-    gobexport.__main__.keep_alive = False
+    gobexport.export.keep_alive = False
 
 
 def test_main(monkeypatch):
@@ -101,11 +101,10 @@ def test_main(monkeypatch):
     monkeypatch.setattr(gobexport.connector.objectstore, 'get_connection', mock_connection)
     monkeypatch.setattr(os, 'remove', lambda file: True)
 
-    from gobexport import __main__
+    from gobexport import export
 
-    temporary_file = __main__._get_filename(file_name)
-    assert(host == 'host')
-    assert(file_name == temporary_file)
+    temporary_file = export._get_filename("test")
+    assert(temporary_file == "/tmp/test")
 
 
 def test_main_without_connection(monkeypatch):
@@ -118,15 +117,14 @@ def test_main_without_connection(monkeypatch):
     monkeypatch.setattr(gobexport.distributor.objectstore, 'put_object', mock_put_object)
     monkeypatch.setattr(os, 'remove', lambda file: True)
 
-    importlib.reload(gobexport.__main__)
+    importlib.reload(gobexport.export)
 
-    from gobexport import __main__
+    from gobexport import export
 
 def test_main_without_args(monkeypatch):
     monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
-    monkeypatch.setattr(gobexport.config, 'get_args', lambda: MockArgs(None, None, None))
     monkeypatch.setattr(time, 'sleep', mock_sleep)
 
-    importlib.reload(gobexport.__main__)
+    importlib.reload(gobexport.export)
 
-    from gobexport import __main__
+    from gobexport import export
