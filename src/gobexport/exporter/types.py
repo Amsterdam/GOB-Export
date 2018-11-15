@@ -88,15 +88,14 @@ def _to_geometry(value, *args):
                 487201.6
             ]
         }
-        Output: POINT (119411,7 487201,6)
+        Output: POINT (119411.7 487201.6)
 
     :param value:
     :return:
     """
     assert(type(value) is dict or value is None)
     return '' if value is None else f"{value['type'].upper()} ({value['coordinates'][0]} {value['coordinates'][1]})"\
-        .replace(',', '')\
-        .replace('.', ',')
+        .replace(',', '')
 
 
 def _to_coord(value, coord):

@@ -15,7 +15,7 @@ from gobcore.log import get_logger
 from gobexport.config import get_host, get_args, CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.distributor.objectstore import distribute_to_objectstore
-from gobexport.meetbouten import export_meetbouten
+from gobexport.exporter import export_to_file
 
 
 logger = get_logger(name="EXPORT")
@@ -63,14 +63,11 @@ def export_collection(host, catalog, collection, file_name):
     :param file_name: The file to write the export results to
     :return:
     """
-    exporter = {
-        'meetbouten': export_meetbouten
-    }
 
     # Get temp file name
     temporary_file = _get_filename(file_name)
 
-    row_count = exporter[catalog](collection, host, temporary_file)
+    row_count = export_to_file(catalog, collection, host, temporary_file)
     logger.info(f"{row_count} records exported to local file.", extra=extra_log_kwargs)
 
     # Get objectstore connection

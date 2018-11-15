@@ -1,24 +1,27 @@
 import re
 
 from gobexport.api import API
-from gobexport.meetbouten.config import MeetboutExportConfig, MetingenExportConfig, \
+from gobexport.exporter.config.meetbouten import MeetboutExportConfig, MetingenExportConfig, \
                                      ReferentiepuntenExportConfig, RollagenExportConfig
-from gobexport.meetbouten.types import type_convert
+from gobexport.exporter.config.nap import PeilmerkenExportConfig
+from gobexport.exporter.types import type_convert
 
 
 CONFIG_MAPPING = {
-    'meetbouten': MeetboutExportConfig,
-    'metingen': MetingenExportConfig,
-    'referentiepunten': ReferentiepuntenExportConfig,
-    'rollagen': RollagenExportConfig,
+    'meetbouten': {
+        'meetbouten': MeetboutExportConfig,
+        'metingen': MetingenExportConfig,
+        'referentiepunten': ReferentiepuntenExportConfig,
+        'rollagen': RollagenExportConfig,
+    },
+    'nap': {
+        'peilmerken': PeilmerkenExportConfig,
+    }
 }
 
 
 def _export_entity(entity, format):
     """Exports a single entity
-
-    The export file specifications can be found in:
-        https://www.amsterdam.nl/stelselpedia/meetbouten-index/producten/prodspecs-mebo/
 
     Headers:       None
     Separator:     |
@@ -40,8 +43,8 @@ def _export_entity(entity, format):
     return '|'.join(export)
 
 
-def export_meetbouten(collection, host, file):
-    """Export a collection from catalog meetbouten to a file
+def export_to_file(catalog, collection, host, file):
+    """Export a collection from a catalog to a file
 
     The entities that are exposed by the specified API host are retrieved, converted and written to
     the specified output file
@@ -51,7 +54,7 @@ def export_meetbouten(collection, host, file):
     :param file: The name of the file to write the ouput
     :return: None
     """
-    config = CONFIG_MAPPING[collection]
+    config = CONFIG_MAPPING[catalog][collection]
     api = API(host=host, path=config.path)
 
     row_count = 0

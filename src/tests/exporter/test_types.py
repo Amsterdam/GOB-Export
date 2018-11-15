@@ -1,6 +1,6 @@
 import pytest
 
-from gobexport.meetbouten.types import _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_coord, type_convert
+from gobexport.exporter.types import _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_coord, type_convert
 
 
 def test_to_string():
@@ -50,7 +50,7 @@ def test_to_date():
 
 def test_to_geometry():
     assert(_to_geometry({"type": "Point", "coordinates": [1, 2]}) == 'POINT (1 2)')
-    assert(_to_geometry({"type": "Point", "coordinates": [1.1, 2.2]}) == 'POINT (1,1 2,2)')
+    assert(_to_geometry({"type": "Point", "coordinates": [1.1, 2.2]}) == 'POINT (1.1 2.2)')
     assert(_to_geometry({"type": "X", "coordinates": ["a", "b"]}) == 'X (a b)')
     assert(_to_geometry(None) == '')
 
