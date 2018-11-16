@@ -108,6 +108,8 @@ def test_export(monkeypatch):
     export.export("meetbouten", "meetbouten", "filename", "Objectstore")
     export._export_collection("host", "meetbouten", "meetbouten", "filename", "Objectstore")
 
+    export._export_collection("host", "meetbouten", "meetbouten", "/dev/null", "File")
+
 
 def test_export_without_connection(monkeypatch):
     monkeypatch.setitem(__builtins__, 'open', mock_open)
