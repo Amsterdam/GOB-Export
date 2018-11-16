@@ -92,6 +92,8 @@ def _export_collection(host, catalogue, collection, filename, destination):
 
         # Delete temp file
         os.remove(results_file)
+    elif destination == "File":
+        logger.info(f"Export is written to {results_file}.", extra=extra_log_kwargs)
 
 
 def export(catalogue, collection, filename, destination):
