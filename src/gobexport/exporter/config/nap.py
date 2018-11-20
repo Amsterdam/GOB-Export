@@ -9,7 +9,7 @@ class PeilmerkenExportConfig:
         gemetselde rollaag van de plint)$$|$$O$$|-31,0|83,0||POINT (119193.3 486914.2)
 
     """
-    format = 'identificatie:str|hoogte_tov_nap:num:3|jaar:num|merk_id:num|omschrijving:str|' \
-             'windrichting:str|x_coordinaat_muurvlak:num|y_coordinaat_muurvlak:num|rws_nummer:str|' \
+    format = 'identificatie:str|hoogteTovNap:num:3|jaar:num|merkId:num|omschrijving:str|' \
+             'windrichting:str|xCoordinaatMuurvlak:num|yCoordinaatMuurvlak:num|rwsNummer:str|' \
              'geometrie:geo'
     path = '/gob/nap/peilmerken/?view=enhanced'
