@@ -9,9 +9,9 @@ class MeetboutExportConfig:
         |$$PB15 $$|1|POINT (120951.0 491840.0)
 
     """
-    format = 'identificatie:str|buurt:str|geometrie:coo:x|geometrie:coo:y|hoogte_tov_nap:num:4|' \
-             'zakking_cumulatief:num:1|datum:dat|bouwblokzijde:num|eigenaar:num|indicatie_beveiligd:str|' \
-             'stadsdeel:str|adres:str|locatie:str|zakkingssnelheid:num:1|status_id:str|bouwblok:str|' \
+    format = 'identificatie:str|buurt:str|geometrie:coo:x|geometrie:coo:y|hoogteTovNap:num:4|' \
+             'zakkingCumulatief:num:1|datum:dat|bouwblokzijde:num|eigenaar:num|indicatieBeveiligd:str|' \
+             'stadsdeel:str|adres:str|locatie:str|zakkingssnelheid:num:1|statusId:str|bouwblok:str|' \
              'blokeenheid:num|geometrie:geo'
     path = '/gob/meetbouten/meetbouten/?view=enhanced'
 
@@ -28,10 +28,10 @@ class MetingenExportConfig:
         |$$Fugro$$|3|274||$$K$$|$$W$$
 
     """
-    format = 'identificatie:num|datum:dat|type_meting:str|hoogte_tov_nap:num:4|zakking:num:1|hoort_bij_meetbout:str|' \
-             'refp1_nr:str|refp2_nr:str|refp3_nr:str|zakkingssnelheid:num:1|zakking_cumulatief:num:1|' \
-             'is_gemeten_door:str|hoeveelste_meting:num|aantal_dagen:num|pandmsl:str|' \
-             'ligt_in_stadseel_text:str|wvi:str'
+    format = 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|hoortBijMeetbout:str|' \
+             'refp1Nr:str|refp2Nr:str|refp3Nr:str|zakkingssnelheid:num:1|zakkingCumulatief:num:1|' \
+             'isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|pandmsl:str|' \
+             'ligtInStadseel:str|wvi:str'
     path = '/gob/meetbouten/metingen/?view=enhanced'
 
 
@@ -46,7 +46,7 @@ class ReferentiepuntenExportConfig:
 
     """
     format = 'identificatie:num|geometrie:coo:x|geometrie:coo:y|' \
-             'hoogte_tov_nap:num:4|datum:dat|locatie:str|geometrie:geo'
+             'hoogteTovNap:num:4|datum:dat|locatie:str|geometrie:geo'
     path = '/gob/meetbouten/referentiepunten/?view=enhanced'
 
 
