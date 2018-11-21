@@ -1,6 +1,6 @@
 import pytest
 
-from gobexport.exporter.types import _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_coord, type_convert
+from gobexport.exporter.types import _to_plain, _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_coord, type_convert
 
 
 def test_to_string():
@@ -90,3 +90,6 @@ def test_type_convert():
 
     for g in [{"type": "Point", "coordinates": [1, 2]}, {"type": "Point", "coordinates": [1.1, 2.2]}, None]:
         assert(type_convert('geo', g) == _to_geometry(g))
+
+def test_to_plain():
+    assert(_to_plain(5) == '5')

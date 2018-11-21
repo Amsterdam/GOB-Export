@@ -105,8 +105,10 @@ def test_export(monkeypatch):
     temporary_file = export._get_filename("test")
     assert(temporary_file == "/tmp/test")
 
-    export.export("meetbouten", "meetbouten", "filename")
-    export._export_collection("host", "meetbouten", "meetbouten", "filename")
+    export.export("meetbouten", "meetbouten", "filename", "Objectstore")
+    export._export_collection("host", "meetbouten", "meetbouten", "filename", "Objectstore")
+
+    export._export_collection("host", "meetbouten", "meetbouten", "/dev/null", "File")
 
 
 def test_export_without_connection(monkeypatch):
@@ -122,5 +124,5 @@ def test_export_without_connection(monkeypatch):
 
     from gobexport import export
 
-    export.export("meetbouten", "meetbouten", "filename")
-    export._export_collection("host", "meetbouten", "meetbouten", "filename")
+    export.export("meetbouten", "meetbouten", "filename", "Objectstore")
+    export._export_collection("host", "meetbouten", "meetbouten", "filename", "Objectstore")

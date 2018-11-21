@@ -4,10 +4,14 @@ from gobexport.api import API
 from gobexport.exporter.config.meetbouten import MeetboutExportConfig, MetingenExportConfig, \
                                      ReferentiepuntenExportConfig, RollagenExportConfig
 from gobexport.exporter.config.nap import PeilmerkenExportConfig
+from gobexport.exporter.config.test import TestEntityExportConfig
 from gobexport.exporter.types import type_convert
 
 
 CONFIG_MAPPING = {
+    'test_catalogue': {
+        'test_entity': TestEntityExportConfig
+    },
     'meetbouten': {
         'meetbouten': MeetboutExportConfig,
         'metingen': MetingenExportConfig,
