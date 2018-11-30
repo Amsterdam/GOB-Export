@@ -28,4 +28,4 @@ def test_host(monkeypatch):
     before_each(monkeypatch)
     from gobexport.config import get_host
 
-    assert(get_host() == os.getenv('API_HOST', 'http://localhost:5000'))
+    assert(get_host() == os.getenv('API_HOST', 'http://localhost:8141'))
