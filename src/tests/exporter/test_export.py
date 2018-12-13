@@ -4,6 +4,8 @@ import importlib
 import gobexport.api
 
 from gobexport.exporter import CONFIG_MAPPING
+from gobexport.exporter.dat import dat_exporter
+from gobexport.exporter.csv import csv_exporter
 
 
 def before_each(monkeypatch):
@@ -11,32 +13,12 @@ def before_each(monkeypatch):
     importlib.reload(gobexport.exporter)
 
 
-def test_export_entity(monkeypatch):
-    before_each(monkeypatch)
-    from gobexport.exporter import _export_entity
-
-    meetbout = {}
-    config = CONFIG_MAPPING['meetbouten']['meetbouten']
-    assert(_export_entity(meetbout, config.format) == "|||||||||||||||||")
-
-    meetbout = {
-        'identificatie': '1'
-    }
-    assert(_export_entity(meetbout, config.format) == "$$1$$|||||||||||||||||")
-
-    meetbout = {
-        'identificatie': '1',
-        'x': 'y'
-    }
-    assert(_export_entity(meetbout, config.format) == "$$1$$|||||||||||||||||")
-
-
 class MockAPI:
     def __init__(self, host=None, path=None):
         pass
 
     def __iter__(self):
-        for e in [{'identificatie': '1'}]:
+        for e in [{'identificatie': '1', 'geometrie': {'type': 'Point', 'coordinates': [125.6, 10.1]}}]:
             yield e
 
 
@@ -53,7 +35,7 @@ class MockFile:
         pass
 
     def write(self, s):
-        MockFile.s = s
+        MockFile.s += s
 
 
 def mock_open(file, mode):
@@ -67,5 +49,25 @@ def test_export_to_file(monkeypatch):
     before_each(monkeypatch)
     from gobexport.exporter import export_to_file
 
-    export_to_file('meetbouten', 'meetbouten', 'host', '/tmp/ttt')
-    assert(MockFile.s == '$$1$$|||||||||||||||||\n')
+    # Test DAT export
+
+    catalogue = 'meetbouten'
+    collection = 'meetbouten'
+
+    # Get the configuration for this collection
+    config = CONFIG_MAPPING[catalogue][collection]
+
+    export_to_file(catalogue, collection, dat_exporter, '/tmp/ttt', config.products['dat']['format'])
+    assert(MockFile.s == '$$1$$||125,6|10,1||||||||||||||POINT (125.6 10.1)\n')
+
+    MockFile.s = ''
+
+    catalogue = 'gebieden'
+    collection = 'stadsdelen'
+
+    # Get the configuration for this collection
+    config = CONFIG_MAPPING[catalogue][collection]
+    format = config.products['csv_actueel'].get('format')
+
+    export_to_file(catalogue, collection, csv_exporter, '/tmp/ttt', format)
+    assert(MockFile.s == 'identificatie;geometrie\r\n1;POINT (125.6 10.1)\r\n')

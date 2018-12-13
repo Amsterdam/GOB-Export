@@ -10,7 +10,9 @@ Todo: The final model for the meetbouten collection is required
     to finish the conversion methods. Especially the None tests should be re-evaluated
 
 """
+
 import datetime
+import re
 
 
 def _to_plain(value, *args):
@@ -156,3 +158,31 @@ def type_convert(type_name, value, *args):
         'coo': _to_coord,
     }
     return converters[type_name](value, *args)
+
+
+def dat_exporter(api, file, format=None):
+    """Exports a single entity
+
+    Headers:       None
+    Separator:     |
+    String marker: $$
+
+
+    The export format is a string containing the attributes and types to be converted.
+    A declarative way of describing exports is used:
+    The export format is used both to read the attributes and types and to write the correct output format.
+
+    :return:
+    """
+    row_count = 0
+    with open(file, 'w') as fp:
+        # Get the headers from the first record in the API
+        for entity in api:
+            pattern = re.compile('(\w+):(\w+):?(\w+)?\|?')
+            export = []
+            for (attr_name, attr_type, args) in re.findall(pattern, format):
+                attr_value = type_convert(attr_type, entity.get(attr_name, None), args)
+                export.append(attr_value)
+
+            row_count += 1
+            fp.write('|'.join(export) + '\n')
