@@ -1,3 +1,6 @@
+from gobexport.exporter.dat import dat_exporter
+
+
 class PeilmerkenExportConfig:
     """Peilmerken config
 
@@ -9,7 +12,13 @@ class PeilmerkenExportConfig:
         gemetselde rollaag van de plint)$$|$$O$$|-31,0|83,0||POINT (119193.3 486914.2)
 
     """
-    format = 'identificatie:str|hoogteTovNap:num:4|jaar:num|merkId:num|omschrijving:str|' \
-             'windrichting:str|xCoordinaatMuurvlak:num|yCoordinaatMuurvlak:num|rwsNummer:str|' \
-             'geometrie:geo'
-    path = '/gob/nap/peilmerken/?view=enhanced'
+    products = {
+        'dat': {
+            'exporter': dat_exporter,
+            'endpoint': '/gob/nap/peilmerken/?view=enhanced',
+            'filename': 'NAP_PEILMERK.dat',
+            'format': 'identificatie:str|hoogteTovNap:num:4|jaar:num|merkId:num|omschrijving:str|'
+                      'windrichting:str|xCoordinaatMuurvlak:num|yCoordinaatMuurvlak:num|rwsNummer:str|'
+                      'geometrie:geo'
+        }
+    }

@@ -1,6 +1,7 @@
 import importlib
 import os
 import pytest
+import tempfile
 import time
 
 import swiftclient
@@ -82,7 +83,7 @@ host = None
 file_name = None
 
 
-def export_entity(ca, co, h, f):
+def export_entity(h, en, ex, f, fo):
     global host, file_name
     host = h
     file_name = f
@@ -103,12 +104,13 @@ def test_export(monkeypatch):
     from gobexport import export
 
     temporary_file = export._get_filename("test")
-    assert(temporary_file == "/tmp/test")
+    tmp_dir = tempfile.gettempdir()
+    assert(temporary_file == f"{tmp_dir}/test")
 
-    export.export("meetbouten", "meetbouten", "filename", "Objectstore")
-    export._export_collection("host", "meetbouten", "meetbouten", "filename", "Objectstore")
+    export.export("meetbouten", "meetbouten", "Objectstore")
+    export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")
 
-    export._export_collection("host", "meetbouten", "meetbouten", "/dev/null", "File")
+    export._export_collection("host", "meetbouten", "meetbouten", "File")
 
 
 def test_export_without_connection(monkeypatch):
@@ -124,5 +126,5 @@ def test_export_without_connection(monkeypatch):
 
     from gobexport import export
 
-    export.export("meetbouten", "meetbouten", "filename", "Objectstore")
-    export._export_collection("host", "meetbouten", "meetbouten", "filename", "Objectstore")
+    export.export("meetbouten", "meetbouten", "Objectstore")
+    export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")
