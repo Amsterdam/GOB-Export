@@ -45,7 +45,7 @@ class MetingenExportConfig:
             'format': 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|'
                       'hoortBijMeetbout:str|refp1Nr:str|refp2Nr:str|refp3Nr:str|zakkingssnelheid:num:1|'
                       'zakkingCumulatief:num:1|isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|'
-                      'pandmsl:str|ligtInStadseel:str|wvi:str'
+                      'pandmsl:str|stadsdeel:str|wvi:str'
         }
     }
 
