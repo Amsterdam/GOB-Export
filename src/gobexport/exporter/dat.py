@@ -186,3 +186,4 @@ def dat_exporter(api, file, format=None):
 
             row_count += 1
             fp.write('|'.join(export) + '\n')
+    return row_count

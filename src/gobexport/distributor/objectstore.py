@@ -5,7 +5,7 @@ from gobcore.exceptions import GOBException
 from objectstore.objectstore import put_object
 
 
-def distribute_to_objectstore(connection, container, object_name, filename, content_type):
+def distribute_to_objectstore(connection, container, object_name, contents, content_type):
     """Distribute to the objectstore
 
     The Amsterdam/objectstore library is used to connect to the container
@@ -16,8 +16,7 @@ def distribute_to_objectstore(connection, container, object_name, filename, cont
     :param content_type:
     :return:
     """
-    with open(filename, 'rb') as contents:
-        try:
-            put_object(connection, container, object_name, contents=contents, content_type=content_type)
-        except swiftclient.exceptions.ClientException as e:
-            raise GOBException(e)
+    try:
+        put_object(connection, container, object_name, contents=contents, content_type=content_type)
+    except swiftclient.exceptions.ClientException as e:
+        raise GOBException(e)
