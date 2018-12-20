@@ -44,7 +44,7 @@ class BuurtenExportConfig:
         'csv_actueel_en_historie': {
             'exporter': csv_exporter,
             'endpoint': '/gob/toestanden/?collections=gebieden:buurten,gebieden:wijken,gebieden:stadsdelen',
-            'filename': 'ActueelEnHistorie_CSV/GBD_buurten.csv'
+            'filename': 'ActueelEnHistorie_CSV/GBD_buurt.csv'
         }
     }
 
