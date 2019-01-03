@@ -5,7 +5,6 @@ This module contains the export entries for the meetbouten catalog
 """
 import datetime
 import os
-from pathlib import Path
 import tempfile
 
 from gobcore.exceptions import GOBException
@@ -35,9 +34,9 @@ def _get_filename(name):
     """
     dir = tempfile.gettempdir()
     # Create the path if the path not yet exists
-    path = Path(dir)
-    path.mkdir(exist_ok=True)
-    return os.path.join(dir, name)
+    temp_filename = os.path.join(dir, name)
+    os.makedirs(os.path.dirname(temp_filename), exist_ok=True)
+    return temp_filename
 
 
 def _export_collection(host, catalogue, collection, destination):  # noqa: C901
@@ -65,44 +64,60 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
     # Get the configuration for this collection
     config = CONFIG_MAPPING[catalogue][collection]
 
+    files = []
+
     # Start exporting each product
     for name, product in config.products.items():
         # Get name of local file to write results to
-        results_file = _get_filename(name) if destination == "Objectstore" else product['filename']
+        results_file = _get_filename(product['filename']) if destination == "Objectstore" else product['filename']
 
         format = product.get('format')
         row_count = export_to_file(host, product['endpoint'], product['exporter'], results_file, format)
 
-        logger.info(f"{row_count} records exported to local file.", extra=extra_log_kwargs)
+        logger.info(f"{row_count} records exported to local file {name}.", extra=extra_log_kwargs)
 
+        files.append({
+            'temp_location': results_file,
+            'distribution': product['filename'],
+            'mime_type': product['mime_type']})
+
+        # Add extra result files (e.g. .prj file)
+        extra_files = product.get('extra_files', [])
+        files.extend([{'temp_location': _get_filename(file['filename']),
+                       'distribution': file['filename'],
+                       'mime_type': file['mime_type']} for file in extra_files])
+
+    if destination == "Objectstore":
+        # Get objectstore connection
+        connection, user = connect_to_objectstore()
+        logger.info(f"Connection to {destination} {user} has been made.", extra=extra_log_kwargs)
+
+    # Start distribution of all resulting files
+    for file in files:
         if destination == "Objectstore":
-            # Get objectstore connection
-            connection, user = connect_to_objectstore()
-
-            logger.info(f"Connection to {destination} {user} has been made.", extra=extra_log_kwargs)
-
             # Distribute to final location
             container = f'{CONTAINER_BASE}/{catalogue}/'
-            with open(results_file, 'rb') as fp:
+            with open(file['temp_location'], 'rb') as fp:
                 try:
                     distribute_to_objectstore(connection,
                                               container,
-                                              product['filename'],
+                                              file['distribution'],
                                               fp,
-                                              'text/plain')
+                                              file['mime_type'])
                 except GOBException as e:
-                    logger.error(f"Failed to distribute to {destination} on location: {container}{product['filename']}. \
+                    logger.error(f"Failed to distribute to {destination} on location: {container}{file['distribution']}. \
                                  Error: {e}",
                                  extra=extra_log_kwargs)
                     return False
 
-            logger.info(f"File distributed to {destination} on location: {container}{product['filename']}.",
+            logger.info(f"File distributed to {destination} on location: {container}{file['distribution']}.",
                         extra=extra_log_kwargs)
 
             # Delete temp file
-            os.remove(results_file)
+            os.remove(file['temp_location'])
+
         elif destination == "File":
-            logger.info(f"Export is written to {results_file}.", extra=extra_log_kwargs)
+            logger.info(f"Export is written to {file['distribution']}.", extra=extra_log_kwargs)
 
 
 def export(catalogue, collection, destination):
