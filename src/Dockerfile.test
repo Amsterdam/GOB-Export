@@ -1,6 +1,14 @@
 FROM amsterdam/docker_python:latest
 MAINTAINER datapunt@amsterdam.nl
 
+# Install GDAL
+RUN apt-get update
+RUN apt-get install -y libgdal-dev
+
+# Update C env vars so compiler can find gdal
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+
 # Install gobexport in /app folder
 WORKDIR /app
 
