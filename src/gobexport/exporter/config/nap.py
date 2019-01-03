@@ -17,6 +17,7 @@ class PeilmerkenExportConfig:
             'exporter': dat_exporter,
             'endpoint': '/gob/nap/peilmerken/?view=enhanced',
             'filename': 'NAP_PEILMERK.dat',
+            'mime_type': 'plain/text',
             'format': 'identificatie:str|hoogteTovNap:num:4|jaar:num|merkId:num|omschrijving:str|'
                       'windrichting:str|xCoordinaatMuurvlak:num|yCoordinaatMuurvlak:num|rwsNummer:str|'
                       'geometrie:geo'
