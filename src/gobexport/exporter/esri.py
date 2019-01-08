@@ -6,6 +6,19 @@ gdal.UseExceptions()
 
 
 def esri_exporter(api, file, format=None):
+    """ESRI Exporter
+
+    This function will transform the output of an API to ESRI shape files. The
+    result will be 4 files (.shp, .dbf, .shx and .prj), which all contain some
+    required data.
+
+    It uses the python bindings to the GDAL library.
+
+    :param api: The encapsulated API as an iterator
+    :param file: The main file (.shp) to write to
+    :param format: The mapping of the API output to ESRI fields as defined in the
+    export config. The max length of an esri fieldname is 10 characters.
+    """
     row_count = 0
     driver = ogr.GetDriverByName("ESRI Shapefile")
     dstfile = driver.CreateDataSource(file)
