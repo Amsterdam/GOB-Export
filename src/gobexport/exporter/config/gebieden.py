@@ -2,6 +2,28 @@ from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
 
+"""Gebieden export config
+
+In these configuration files it is possible to define all products that need
+to be exported for a catalogue. Each product is defined by a unique name and the
+following properties:
+
+    exporter: The python module used for this product, current options include:
+        - dat_exporter
+        - csv_exporter
+        - esri_exporter
+    endpoint: The endpoint to the API used for getting the data
+    filename: The resulting filename of the exported file
+    mime_type: The mime_type for the product, needed for export to the objectstore
+    format: Additional configuration or mapping
+    extra_files: Resulting extra files of an export which need to be uploaded as
+                 well. For example the esri product creates .dbf, .shx and .prj
+                 files.
+
+
+"""
+
+
 class StadsdelenExportConfig:
 
     products = {
