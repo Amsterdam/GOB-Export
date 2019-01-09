@@ -52,7 +52,7 @@ if (BRANCH == "develop") {
     node {
         stage('Push develop image') {
             tryStep "image tagging", {
-                def image = docker.image("build.datapunt.amsterdam.nl:5000/datapunt/gob_upload:${env.BUILD_NUMBER}")
+                def image = docker.image("build.datapunt.amsterdam.nl:5000/datapunt/gob_export:${env.BUILD_NUMBER}")
                 image.pull()
                 image.push("develop")
             }
