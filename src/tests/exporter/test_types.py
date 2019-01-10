@@ -1,6 +1,6 @@
 import pytest
 
-from gobexport.exporter.types import _to_plain, _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_coord, type_convert
+from gobexport.exporter.dat import _to_plain, _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_coord, type_convert
 
 
 def test_to_string():

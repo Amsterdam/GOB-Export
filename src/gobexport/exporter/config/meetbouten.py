@@ -1,3 +1,6 @@
+from gobexport.exporter.dat import dat_exporter
+
+
 class MeetboutExportConfig:
     """Meetbouten config
 
@@ -9,11 +12,18 @@ class MeetboutExportConfig:
         |$$PB15 $$|1|POINT (120951.0 491840.0)
 
     """
-    format = 'identificatie:str|buurt:str|geometrie:coo:x|geometrie:coo:y|hoogteTovNap:num:4|' \
-             'zakkingCumulatief:num:1|datum:dat|bouwblokzijde:num|eigenaar:num|indicatieBeveiligd:str|' \
-             'stadsdeel:str|adres:str|locatie:str|zakkingssnelheid:num:1|statusId:str|bouwblok:str|' \
-             'blokeenheid:num|geometrie:geo'
-    path = '/gob/meetbouten/meetbouten/?view=enhanced'
+    products = {
+        'dat': {
+            'exporter': dat_exporter,
+            'endpoint': '/gob/meetbouten/meetbouten/?view=enhanced',
+            'filename': 'MBT_MEETBOUT.dat',
+            'mime_type': 'plain/text',
+            'format': 'identificatie:str|buurt:str|geometrie:coo:x|geometrie:coo:y|hoogteTovNap:num:4|'
+                      'zakkingCumulatief:num:1|datum:dat|bouwblokzijde:num|eigenaar:num|indicatieBeveiligd:str|'
+                      'stadsdeel:str|adres:str|locatie:str|zakkingssnelheid:num:1|statusId:str|bouwblok:str|'
+                      'blokeenheid:num|geometrie:geo'
+        }
+    }
 
 
 class MetingenExportConfig:
@@ -28,11 +38,18 @@ class MetingenExportConfig:
         |$$Fugro$$|3|274||$$K$$|$$W$$
 
     """
-    format = 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|hoortBijMeetbout:str|' \
-             'refp1Nr:str|refp2Nr:str|refp3Nr:str|zakkingssnelheid:num:1|zakkingCumulatief:num:1|' \
-             'isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|pandmsl:str|' \
-             'ligtInStadseel:str|wvi:str'
-    path = '/gob/meetbouten/metingen/?view=enhanced'
+    products = {
+        'dat': {
+            'exporter': dat_exporter,
+            'endpoint': '/gob/meetbouten/metingen/?view=enhanced',
+            'filename': 'MBT_METING.dat',
+            'mime_type': 'plain/text',
+            'format': 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|'
+                      'hoortBijMeetbout:str|refp1Nr:str|refp2Nr:str|refp3Nr:str|zakkingssnelheid:num:1|'
+                      'zakkingCumulatief:num:1|isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|'
+                      'pandmsl:str|stadsdeel:str|wvi:str'
+        }
+    }
 
 
 class ReferentiepuntenExportConfig:
@@ -45,9 +62,16 @@ class ReferentiepuntenExportConfig:
         |POINT (121155.0 489090.0)
 
     """
-    format = 'identificatie:num|geometrie:coo:x|geometrie:coo:y|' \
-             'hoogteTovNap:num:4|datum:dat|locatie:str|geometrie:geo'
-    path = '/gob/meetbouten/referentiepunten/?view=enhanced'
+    products = {
+        'dat': {
+            'exporter': dat_exporter,
+            'endpoint': '/gob/meetbouten/referentiepunten/?view=enhanced',
+            'filename': 'MBT_REFERENTIEPUNT.dat',
+            'mime_type': 'plain/text',
+            'format': 'identificatie:num|geometrie:coo:x|geometrie:coo:y|'
+                      'hoogteTovNap:num:4|datum:dat|locatie:str|geometrie:geo'
+        }
+    }
 
 
 class RollagenExportConfig:
@@ -59,5 +83,12 @@ class RollagenExportConfig:
         $$AK25$$|1|121287|485235|POINT (121287.0 485245.0)
 
     """
-    format = 'identificatie:str|idx:num|geometrie:coo:x|geometrie:coo:y|geometrie:geo'
-    path = '/gob/meetbouten/rollagen/?view=enhanced'
+    products = {
+        'dat': {
+            'exporter': dat_exporter,
+            'endpoint': '/gob/meetbouten/rollagen/?view=enhanced',
+            'filename': 'MBT_ROLLAAG.dat',
+            'mime_type': 'plain/text',
+            'format': 'identificatie:str|idx:num|geometrie:coo:x|geometrie:coo:y|geometrie:geo'
+        }
+    }

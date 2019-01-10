@@ -10,7 +10,6 @@ from gobexport.export import export
 def handle_export_msg(msg):
     assert(msg.get("catalogue"))
     assert(msg.get("collection"))
-    assert(msg.get("filename"))
     assert(msg.get("destination"))
 
     export(**msg)
