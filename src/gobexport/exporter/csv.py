@@ -9,7 +9,8 @@ def csv_exporter(api, file, format=None):
         # Get the headers from the first record in the API
         for entity in api:
             if row_count == 0:
-                writer = csv.DictWriter(fp, fieldnames=[k for k in entity.keys()], delimiter=';')
+                fieldnames = format.split(',') if format else [k for k in entity.keys()]
+                writer = csv.DictWriter(fp, fieldnames=fieldnames, delimiter=';')
                 writer.writeheader()
 
             # Convert geojson to wkt

@@ -40,8 +40,8 @@ class StadsdelenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': {
                 'identificatie': 'id',
-                'naam': 'naam',
                 'code': 'code',
+                'naam': 'naam',
                 'datumBeginGeldigheid': 'begindatum',
                 'datumEindeGeldigheid': 'einddatum',
                 'documentdatum': 'docdatum',
@@ -69,6 +69,10 @@ class StadsdelenExportConfig:
             'endpoint': '/gob/toestanden/?collections=gebieden:stadsdelen',
             'filename': 'ActueelEnHistorie_CSV/GBD_stadsdeel.csv',
             'mime_type': 'plain/text',
+            'format': 'identificatie,volgnummer,registratiedatum,code,naam,' \
+                      'datumBeginGeldigheid,datumEindeGeldigheid,documentdatum,' \
+                      'documentnummer,datumBeginTijdvak,datumEindeTijdvak,' \
+                      'geometrie'
         }
     }
 
@@ -89,18 +93,19 @@ class WijkenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': {
                 'identificatie': 'id',
-                'naam': 'naam',
                 'code': 'code',
+                'naam': 'naam',
                 'datumBeginGeldigheid': 'begindatum',
                 'datumEindeGeldigheid': 'einddatum',
                 'documentdatum': 'docdatum',
                 'documentnummer': 'docnummer',
+                'cbsCode': 'CBS_code',
                 'ggwIdentificatie': 'ggw_id',
-                'ggwNaam': 'ggw_naam',
                 'ggwCode': 'ggw_code',
+                'ggwNaam': 'ggw_naam',
                 'stadsdeelidentificatie': 'sdl_id',
-                'stadsdeelnaam': 'sdl_naam',
                 'stadsdeelcode': 'sdl_code',
+                'stadsdeelnaam': 'sdl_naam',
                 'brkGemeenteidentificatie': 'gme_id',
                 'brkGemeentenaam': 'gme_naam',
             },
@@ -124,6 +129,11 @@ class WijkenExportConfig:
             'endpoint': '/gob/toestanden/?collections=gebieden:wijken,gebieden:stadsdelen',
             'filename': 'ActueelEnHistorie_CSV/GBD_wijk.csv',
             'mime_type': 'plain/text',
+            'format': 'identificatie,volgnummer,registratiedatum,code,naam,' \
+                      'datumBeginGeldigheid,datumEindeGeldigheid,documentdatum,' \
+                      'documentnummer,cbsCode,datumBeginTijdvak,datumEindeTijdvak,' \
+                      'gebieden:stadsdelenVolgnummer,gebieden:stadsdelenIdentificatie,' \
+                      'gebieden:stadsdelenCode,gebieden:stadsdelenNaam,geometrie'
         }
     }
 
@@ -144,21 +154,22 @@ class BuurtenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': {
                 'identificatie': 'id',
-                'naam': 'naam',
                 'code': 'code',
+                'naam': 'naam',
                 'datumBeginGeldigheid': 'begindatum',
                 'datumEindeGeldigheid': 'einddatum',
                 'documentdatum': 'docdatum',
                 'documentnummer': 'docnummer',
+                'cbsCode': 'CBS_code',
                 'wijkidentificatie': 'wijk_id',
-                'wijknaam': 'wijk_naam',
                 'wijkcode': 'wijk_code',
+                'wijknaam': 'wijk_naam',
                 'ggwIdentificatie': 'ggw_id',
-                'ggwNaam': 'ggw_naam',
                 'ggwCode': 'ggw_code',
+                'ggwNaam': 'ggw_naam',
                 'stadsdeelidentificatie': 'sdl_id',
-                'stadsdeelnaam': 'sdl_naam',
                 'stadsdeelcode': 'sdl_code',
+                'stadsdeelnaam': 'sdl_naam',
                 'brkGemeenteidentificatie': 'gme_id',
                 'brkGemeentenaam': 'gme_naam',
             },
@@ -182,6 +193,13 @@ class BuurtenExportConfig:
             'endpoint': '/gob/toestanden/?collections=gebieden:buurten,gebieden:wijken,gebieden:stadsdelen',
             'filename': 'ActueelEnHistorie_CSV/GBD_buurt.csv',
             'mime_type': 'plain/text',
+            'format': 'identificatie,volgnummer,registratiedatum,code,naam,' \
+                      'datumBeginGeldigheid,datumEindeGeldigheid,documentdatum,' \
+                      'documentnummer,cbsCode,datumBeginTijdvak,datumEindeTijdvak,' \
+                      'gebieden:wijkenVolgnummer,gebieden:wijkenIdentificatie,' \
+                      'gebieden:wijkenCode,gebieden:wijkenNaam,' \
+                      'gebieden:stadsdelenVolgnummer,gebieden:stadsdelenIdentificatie,' \
+                      'gebieden:stadsdelenCode,gebieden:stadsdelenNaam,geometrie'
         }
     }
 
@@ -206,20 +224,20 @@ class BouwblokkenExportConfig:
                 'datumBeginGeldigheid': 'begindatum',
                 'datumEindeGeldigheid': 'einddatum',
                 'buurtidentificatie': 'brt_id',
-                'buurtnaam': 'brt_naam',
                 'buurtcode': 'brt_code',
+                'buurtnaam': 'brt_naam',
                 'wijkidentificatie': 'wijk_id',
-                'wijknaam': 'wijk_naam',
                 'wijkcode': 'wijk_code',
+                'wijknaam': 'wijk_naam',
                 'ggwIdentificatie': 'ggw_id',
-                'ggwNaam': 'ggw_naam',
                 'ggwCode': 'ggw_code',
+                'ggwNaam': 'ggw_naam',
                 'ggpIdentificatie': 'ggp_id',
-                'ggpNaam': 'ggp_naam',
                 'ggpCode': 'ggp_code',
+                'ggpNaam': 'ggp_naam',
                 'stadsdeelidentificatie': 'sdl_id',
-                'stadsdeelnaam': 'sdl_naam',
                 'stadsdeelcode': 'sdl_code',
+                'stadsdeelnaam': 'sdl_naam',
                 'brkGemeenteidentificatie': 'gme_id',
                 'brkGemeentenaam': 'gme_naam',
             },
@@ -244,5 +262,14 @@ class BouwblokkenExportConfig:
                         'gebieden:buurten,gebieden:wijken,gebieden:stadsdelen',
             'filename': 'ActueelEnHistorie_CSV/GBD_bouwblok.csv',
             'mime_type': 'plain/text',
+            'format': 'identificatie,volgnummer,registratiedatum,code,naam,' \
+                      'datumBeginGeldigheid,datumEindeGeldigheid,documentdatum,' \
+                      'documentnummer,cbsCode,datumBeginTijdvak,datumEindeTijdvak,' \
+                      'gebieden:buurtenVolgnummer,gebieden:buurtenIdentificatie,' \
+                      'gebieden:buurtenCode,gebieden:buurtenNaam,' \
+                      'gebieden:wijkenVolgnummer,gebieden:wijkenIdentificatie,' \
+                      'gebieden:wijkenCode,gebieden:wijkenNaam,' \
+                      'gebieden:stadsdelenVolgnummer,gebieden:stadsdelenIdentificatie,' \
+                      'gebieden:stadsdelenCode,gebieden:stadsdelenNaam,geometrie'
         }
     }
