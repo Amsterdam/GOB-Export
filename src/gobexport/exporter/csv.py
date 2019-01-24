@@ -54,7 +54,7 @@ def reorder_list(input_list, items_to_move, move_to_end=True):
     """
     # Note that False<True and sort algorithm is stable, so:
     return sorted(input_list, key=lambda x: x in items_to_move) if move_to_end else \
-           sorted(input_list, key=lambda x: x not in items_to_move)
+        sorted(input_list, key=lambda x: x not in items_to_move)
 
 
 def csv_exporter(api, file, format=None):
