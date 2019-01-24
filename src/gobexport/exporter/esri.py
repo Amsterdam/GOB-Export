@@ -65,8 +65,9 @@ def esri_exporter(api, file, format=None):
 
         # Add all fields from the config to the file
         for attribute_name, source in mapping.items():
-            # A '.' specifies a nested value
-            value = nested_entity_get(entity, source.split('.')) if '.' in source else entity.get(source, '')
+            # A '.' specifies a nested value. Convert a None value to an empty string
+            value = nested_entity_get(entity, source.split('.')) if '.' in source else entity.get(source)
+            value = '' if value is None else value
             feature.SetField(attribute_name, value)
 
         dstlayer.CreateFeature(feature)
