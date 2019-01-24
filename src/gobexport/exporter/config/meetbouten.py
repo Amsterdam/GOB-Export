@@ -18,9 +18,10 @@ class MeetboutExportConfig:
             'endpoint': '/gob/meetbouten/meetbouten/?view=enhanced',
             'filename': 'MBT_MEETBOUT.dat',
             'mime_type': 'plain/text',
-            'format': 'identificatie:str|buurt:str|geometrie:coo:x|geometrie:coo:y|hoogteTovNap:num:4|'
+            'format': 'identificatie:str|ligtInBuurt.code:str|geometrie:coo:x|geometrie:coo:y|hoogteTovNap:num:4|'
                       'zakkingCumulatief:num:1|datum:dat|bouwblokzijde:num|eigenaar:num|indicatieBeveiligd:str|'
-                      'stadsdeel:str|adres:str|locatie:str|zakkingssnelheid:num:1|statusId:str|bouwblok:str|'
+                      'ligtInStadsdeel.code:str|nabijNummeraanduiding.bronwaarde:str|locatie:str|'
+                      'zakkingssnelheid:num:1|status.code:str:{1: "A", 2:"A", 3:"V"}|ligtInBouwblok.code:str|'
                       'blokeenheid:num|geometrie:geo'
         }
     }
@@ -45,9 +46,11 @@ class MetingenExportConfig:
             'filename': 'MBT_METING.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|'
-                      'hoortBijMeetbout:str|refp1Nr:str|refp2Nr:str|refp3Nr:str|zakkingssnelheid:num:1|'
+                      'hoortBijMeetbout.bronwaarde:str|refereert_aan_referentiepunten.0.bronwaarde:str|'
+                      'refereert_aan_referentiepunten.1.bronwaarde:str|'
+                      'refereert_aan_referentiepunten.2.bronwaarde:str|zakkingssnelheid:num:1|'
                       'zakkingCumulatief:num:1|isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|'
-                      'pandmsl:str|stadsdeel:str|wvi:str'
+                      'pandmsl:str|ligtInStadsdeel.code:str|wijzeVanInwinnen.code:str:{1:"W",2:"T",3:"G"}'
         }
     }
 

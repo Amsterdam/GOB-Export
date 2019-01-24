@@ -14,6 +14,8 @@ Todo: The final model for the meetbouten collection is required
 import datetime
 import re
 
+from gobexport.exporter.utils import nested_entity_get
+
 
 def _to_plain(value, *args):
     """Convert to plain string value
@@ -25,17 +27,25 @@ def _to_plain(value, *args):
     return str(value)
 
 
-def _to_string(value, *args):
+def _to_string(value, mapping=None):
     """Convert to string
 
     Strings are enclosed in $$
 
     Example:
         X => $$X$$
+        1,{"1": "A", "3": "V"} => $$A$$
 
     :param value:
+    :param mapping: A dictionary of values to convert using a mapping. E.g. {1:"A", 3:"V"}
     :return:
     """
+    # Get the mapped value if a mapping is provided, as mapping is returned as a string we need to evaluate it
+    try:
+        value = eval(mapping)[value] if mapping else value
+    except KeyError:
+        pass
+
     assert(type(value) is str or value is None)
     value = '' if value is None or value == '' else str(f'$${value}$$').replace("\r", "").replace("\n", " ")
     return value
@@ -178,10 +188,12 @@ def dat_exporter(api, file, format=None):
     with open(file, 'w') as fp:
         # Get the headers from the first record in the API
         for entity in api:
-            pattern = re.compile('(\w+):(\w+):?(\w+)?\|?')
+            pattern = re.compile('([\w.]+):(\w+):?({[\d\w\s:",]*}|\w+)?\|?')
             export = []
             for (attr_name, attr_type, args) in re.findall(pattern, format):
-                attr_value = type_convert(attr_type, entity.get(attr_name, None), args)
+                # Get the nested value if a '.' is in the attr_name
+                value = nested_entity_get(entity, attr_name.split('.')) if '.' in attr_name else entity.get(attr_name)
+                attr_value = type_convert(attr_type, value, args)
                 export.append(attr_value)
 
             row_count += 1
