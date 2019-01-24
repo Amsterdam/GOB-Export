@@ -1,5 +1,6 @@
 from gobexport.api import API
-from gobexport.exporter.config.gebieden import StadsdelenExportConfig, WijkenExportConfig, \
+from gobexport.exporter.config.gebieden import StadsdelenExportConfig, GGWGebiedenExportConfig, \
+                                    GGPGebiedenExportConfig, WijkenExportConfig, \
                                     BuurtenExportConfig, BouwblokkenExportConfig
 from gobexport.exporter.config.meetbouten import MeetboutExportConfig, MetingenExportConfig, \
                                      ReferentiepuntenExportConfig, RollagenExportConfig
@@ -24,6 +25,8 @@ CONFIG_MAPPING = {
         'bouwblokken': BouwblokkenExportConfig,
         'buurten': BuurtenExportConfig,
         'wijken': WijkenExportConfig,
+        'ggwgebieden': GGWGebiedenExportConfig,
+        'ggpgebieden': GGPGebiedenExportConfig,
         'stadsdelen': StadsdelenExportConfig,
     }
 }
