@@ -41,6 +41,17 @@ def get_entity_value(entity, lookup_key):
 
 
 def reorder_list(input_list, items_to_move, move_to_end=True):
+    """Move a selection of items in a list to the front or back of the list
+
+    Example [0,1,2,3,4,5], [2] ==> [0,1,3,4,5,2]
+            [0,1,2,3,4,5], [2,4] ==> [0,1,3,5,2,4]
+            [0,1,2,3,4,5], [4], False ==> [4,0,1,2,3,5]
+
+    :param input_list: The list to apply the reorder on
+    :param items_to_move: The items to be moved
+    :param move_to_end: Default behaviour is to move to the end, can be overruled
+    :return: the reorderd list
+    """
     # Note that False<True and sort algorithm is stable, so:
     return sorted(input_list, key=lambda x: x in items_to_move) if move_to_end else \
            sorted(input_list, key=lambda x: x not in items_to_move)
