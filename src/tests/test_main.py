@@ -9,11 +9,15 @@ def test_main(mocked_messagedriven_service, mocked_export):
     msg = {
         "catalogue": "catalogue",
         "collection": "collection",
-        "filename": "filename",
+        "any other arg": "any other arg",
         "destination": "Objectstore"
     }
 
     __main__.handle_export_msg(msg)
 
     mocked_messagedriven_service.assert_called_with(__main__.SERVICEDEFINITION, "Export")
-    mocked_export.assert_called_with(**msg)
+    mocked_export.assert_called_with(**{
+        "catalogue": "catalogue",
+        "collection": "collection",
+        "destination": "Objectstore"
+    })
