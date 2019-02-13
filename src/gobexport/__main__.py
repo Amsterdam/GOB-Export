@@ -8,11 +8,12 @@ from gobexport.export import export
 
 
 def handle_export_msg(msg):
-    assert(msg.get("catalogue"))
-    assert(msg.get("collection"))
-    assert(msg.get("destination"))
+    attrs = ["catalogue", "collection", "destination"]
 
-    export(**msg)
+    for attr in attrs:
+        assert msg.get(attr), f"Missing attribute {attr}"
+
+    export(**{attr: value for attr, value in msg.items() if attr in attrs})
 
 
 SERVICEDEFINITION = {

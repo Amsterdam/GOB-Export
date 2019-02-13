@@ -8,16 +8,12 @@ import os
 import tempfile
 
 from gobcore.exceptions import GOBException
-from gobcore.log import get_logger
+from gobcore.logging.logger import logger
 
 from gobexport.config import get_host, CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.distributor.objectstore import distribute_to_objectstore
 from gobexport.exporter import CONFIG_MAPPING, export_to_file
-
-
-logger = get_logger(name="EXPORT")
-extra_log_kwargs = {}
 
 
 # TODO: Should be fetched from GOBCore in next iterations
@@ -58,8 +54,10 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
         'destination': destination,
         'entity': collection
     }
+    logger.set_name("EXPORT")
+    logger.set_default_args(extra_log_kwargs)
 
-    logger.info(f"Export {catalogue}:{collection} to {destination} started.", extra=extra_log_kwargs)
+    logger.info(f"Export {catalogue}:{collection} to {destination} started.")
 
     # Get the configuration for this collection
     config = CONFIG_MAPPING[catalogue][collection]
@@ -74,7 +72,7 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
         format = product.get('format')
         row_count = export_to_file(host, product['endpoint'], product['exporter'], results_file, format)
 
-        logger.info(f"{row_count} records exported to local file {name}.", extra=extra_log_kwargs)
+        logger.info(f"{row_count} records exported to local file {name}.")
 
         files.append({
             'temp_location': results_file,
@@ -90,7 +88,7 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
     if destination == "Objectstore":
         # Get objectstore connection
         connection, user = connect_to_objectstore()
-        logger.info(f"Connection to {destination} {user} has been made.", extra=extra_log_kwargs)
+        logger.info(f"Connection to {destination} {user} has been made.")
 
     # Start distribution of all resulting files
     for file in files:
@@ -106,18 +104,16 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
                                               file['mime_type'])
                 except GOBException as e:
                     logger.error(f"Failed to distribute to {destination} on location: {container}{file['distribution']}. \
-                                 Error: {e}",
-                                 extra=extra_log_kwargs)
+                                 Error: {e}")
                     return False
 
-            logger.info(f"File distributed to {destination} on location: {container}{file['distribution']}.",
-                        extra=extra_log_kwargs)
+            logger.info(f"File distributed to {destination} on location: {container}{file['distribution']}.")
 
             # Delete temp file
             os.remove(file['temp_location'])
 
         elif destination == "File":
-            logger.info(f"Export is written to {file['distribution']}.", extra=extra_log_kwargs)
+            logger.info(f"Export is written to {file['distribution']}.")
 
 
 def export(catalogue, collection, destination):

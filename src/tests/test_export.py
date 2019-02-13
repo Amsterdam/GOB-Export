@@ -6,6 +6,8 @@ import time
 
 import swiftclient
 
+from unittest import mock
+
 import gobcore.log
 from gobcore.exceptions import GOBException
 
@@ -102,6 +104,8 @@ def test_export(monkeypatch):
     monkeypatch.setattr(os, 'remove', lambda file: True)
 
     from gobexport import export
+    export.logger = mock.MagicMock()
+    export.logger.info = mock.MagicMock()
 
     temporary_file = export._get_filename("test")
     tmp_dir = tempfile.gettempdir()
@@ -125,6 +129,8 @@ def test_export_without_connection(monkeypatch):
     importlib.reload(gobexport.export)
 
     from gobexport import export
+    export.logger = mock.MagicMock()
+    export.logger.info = mock.MagicMock()
 
     export.export("meetbouten", "meetbouten", "Objectstore")
     export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")

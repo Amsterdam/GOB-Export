@@ -16,7 +16,7 @@ class MeetboutExportConfig:
         'dat': {
             'exporter': dat_exporter,
             'endpoint': '/gob/meetbouten/meetbouten/?view=enhanced',
-            'filename': 'MBT_MEETBOUT.dat',
+            'filename': 'DAT/MBT_MEETBOUT.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:str|ligtInBuurt.code:str|geometrie:coo:x|geometrie:coo:y|hoogteTovNap:num:4|'
                       'zakkingCumulatief:num:1|datum:dat|bouwblokzijde:num|eigenaar:num|indicatieBeveiligd:str|'
@@ -43,7 +43,7 @@ class MetingenExportConfig:
         'dat': {
             'exporter': dat_exporter,
             'endpoint': '/gob/meetbouten/metingen/?view=enhanced',
-            'filename': 'MBT_METING.dat',
+            'filename': 'DAT/MBT_METING.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|'
                       'hoortBijMeetbout.bronwaarde:str|refereert_aan_referentiepunten.0.bronwaarde:str|'
@@ -69,7 +69,7 @@ class ReferentiepuntenExportConfig:
         'dat': {
             'exporter': dat_exporter,
             'endpoint': '/gob/meetbouten/referentiepunten/?view=enhanced',
-            'filename': 'MBT_REFERENTIEPUNT.dat',
+            'filename': 'DAT/MBT_REFERENTIEPUNT.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:num|geometrie:coo:x|geometrie:coo:y|'
                       'hoogteTovNap:num:4|datum:dat|locatie:str|geometrie:geo'
@@ -90,7 +90,7 @@ class RollagenExportConfig:
         'dat': {
             'exporter': dat_exporter,
             'endpoint': '/gob/meetbouten/rollagen/?view=enhanced',
-            'filename': 'MBT_ROLLAAG.dat',
+            'filename': 'DAT/MBT_ROLLAAG.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:str|idx:num|geometrie:coo:x|geometrie:coo:y|geometrie:geo'
         }
