@@ -47,7 +47,7 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
 
     # Extra variables for logging, generate them since we do not get them from workflow yet
     global extra_log_kwargs
-    start_timestamp = int(datetime.datetime.now().replace(microsecond=0).timestamp())
+    start_timestamp = int(datetime.datetime.utcnow().replace(microsecond=0).timestamp())
     process_id = f"{start_timestamp}.{destination}.{collection}"
     extra_log_kwargs = {
         'process_id': process_id,
