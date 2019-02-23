@@ -8,7 +8,6 @@ import swiftclient
 
 from unittest import mock
 
-import gobcore.log
 from gobcore.exceptions import GOBException
 
 import gobexport
@@ -97,7 +96,6 @@ def mock_sleep(t):
 
 def test_export(monkeypatch):
     monkeypatch.setitem(__builtins__, 'open', mock_open)
-    monkeypatch.setattr(gobcore.log, 'get_logger', mock_get_logger)
     monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
     monkeypatch.setattr(gobexport.exporter, 'export_to_file', export_entity)
     monkeypatch.setattr(gobexport.connector.objectstore, 'get_connection', mock_connection)
@@ -119,7 +117,6 @@ def test_export(monkeypatch):
 
 def test_export_without_connection(monkeypatch):
     monkeypatch.setitem(__builtins__, 'open', mock_open)
-    monkeypatch.setattr(gobcore.log, 'get_logger', mock_get_logger)
     monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
     monkeypatch.setattr(gobexport.exporter, 'export_to_file', export_entity)
     monkeypatch.setattr(gobexport.connector.objectstore, 'get_connection', lambda config: None)
