@@ -41,6 +41,7 @@ docker-compose -f src/.jenkins/test/docker-compose.yml run test
 ## Requirements
 
 * python >= 3.6
+* gdal-dev
 
 ## Initialisation
 
