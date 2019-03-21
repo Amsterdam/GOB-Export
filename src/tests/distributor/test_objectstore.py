@@ -28,7 +28,7 @@ def mock_open(file, mode):
     return MockFile()
 
 
-def mock_put_object(connection, container, object_name, contents, content_type):
+def mock_put_object(connection, container, object_name, contents, content_type, proxy=None):
     if connection == None:
         raise swiftclient.exceptions.ClientException('Error')
     else:
