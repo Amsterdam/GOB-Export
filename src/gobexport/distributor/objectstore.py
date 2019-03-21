@@ -1,3 +1,4 @@
+import os
 import swiftclient
 
 from gobcore.exceptions import GOBException
@@ -16,7 +17,8 @@ def distribute_to_objectstore(connection, container, object_name, contents, cont
     :param content_type:
     :return:
     """
+    proxy = os.getenv('HTTPS_PROXY')
     try:
-        put_object(connection, container, object_name, contents=contents, content_type=content_type)
+        put_object(connection, container, object_name, contents=contents, content_type=content_type, proxy=proxy)
     except swiftclient.exceptions.ClientException as e:
         raise GOBException(e)

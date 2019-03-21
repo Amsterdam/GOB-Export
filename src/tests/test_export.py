@@ -62,7 +62,7 @@ def mock_open(file, mode):
 
 class MockConnection:
 
-    def put_object(container, object_name, contents, content_type):
+    def put_object(container, object_name, contents, content_type, proxy=None):
         if object_name == None:
             raise swiftclient.exceptions.ClientException()
         else:
@@ -73,7 +73,7 @@ def mock_connection(config):
     return MockConnection
 
 
-def mock_put_object(connection, container, object_name, contents, content_type):
+def mock_put_object(connection, container, object_name, contents, content_type, proxy=None):
     if connection == None:
         raise GOBException('Error')
     else:
