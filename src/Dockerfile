@@ -20,6 +20,9 @@ RUN rm requirements.txt
 # Copy gobexport service module
 COPY gobexport gobexport
 
+# Copy sftp test
+COPY sftp sftp
+
 # Copy tests
 COPY tests tests
 COPY .flake8 .flake8
