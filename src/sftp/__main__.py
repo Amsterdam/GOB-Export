@@ -16,9 +16,15 @@ password = os.getenv("GOB_OBJECTSTORE_PASSWORD")
 cnopts = pysftp.CnOpts()
 cnopts.hostkeys.load(f"{dir_path}/known_hosts")
 
-print(f"Connect to {hostname} using {username}/{password}")
+print(f"Connecting to {hostname} using {username}/{password}")
 with pysftp.Connection(hostname, username=username, password=password, cnopts=cnopts) as sftp:
+    print(f"Connected to {sftp}")
     with sftp.cd(container_base):
-        sftp.put(__file__)
+        print(f"Changed to {container_base}")
+        dirs = sftp.listdir()
+        print("Dirs", dirs)
+        print(f"About to write {__file__}")
+        result = sftp.put(__file__)
+        print(f"Result: {result}")
         dirs = sftp.listdir()
         print("Dirs", dirs)
