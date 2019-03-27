@@ -1,4 +1,3 @@
-import os
 import swiftclient
 
 from gobcore.exceptions import GOBException
