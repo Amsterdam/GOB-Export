@@ -119,7 +119,7 @@ class GGPGebiedenExportConfig:
         'csv_actueel': {
             'exporter': csv_exporter,
             'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced',
-            'filename': 'CSV_Actueel/GBD_ggp_gebieden.csv',
+            'filename': 'CSV_Actueel/GBD_ggw_praktijkgebieden.csv',
             'mime_type': 'plain/text',
             'format': {
                 'columns': [
@@ -149,7 +149,7 @@ class GGPGebiedenExportConfig:
         'esri_actueel': {
             'exporter': esri_exporter,
             'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced',
-            'filename': 'SHP/GBD_ggp_gebieden.shp',
+            'filename': 'SHP/GBD_ggw_praktijkgebieden.shp',
             'mime_type': 'application/octet-stream',
             'format': {
                 'mapping': {
@@ -169,15 +169,15 @@ class GGPGebiedenExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': 'SHP/GBD_ggp_gebieden.dbf',
+                    'filename': 'SHP/GBD_ggw_praktijkgebieden.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'SHP/GBD_ggp_gebieden.shx',
+                    'filename': 'SHP/GBD_ggw_praktijkgebieden.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'SHP/GBD_ggp_gebieden.prj',
+                    'filename': 'SHP/GBD_ggw_praktijkgebieden.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ]
@@ -185,7 +185,7 @@ class GGPGebiedenExportConfig:
         'csv_actueel_en_historie': {
             'exporter': csv_exporter,
             'endpoint': '/gob/toestanden/?collections=gebieden:ggpgebieden,gebieden:stadsdelen',
-            'filename': 'CSV_ActueelEnHistorie/GBD_ggp_gebieden.csv',
+            'filename': 'CSV_ActueelEnHistorie/GBD_ggw_praktijkgebieden.csv',
             'mime_type': 'plain/text',
             'format': {
                 'columns': [
@@ -592,7 +592,6 @@ class BouwblokkenExportConfig:
                 'columns': [
                     'identificatie',
                     'code',
-                    'naam',
                     'beginGeldigheid',
                     'eindGeldigheid',
                     'geometrie',
@@ -640,7 +639,6 @@ class BouwblokkenExportConfig:
                 'mapping': {
                     'id': 'identificatie',
                     'code': 'code',
-                    'naam': 'naam',
                     'begindatum': 'beginGeldigheid',
                     'einddatum': 'eindGeldigheid',
                     'brt_id': 'ligtInBuurt.identificatie',
@@ -690,7 +688,6 @@ class BouwblokkenExportConfig:
                     'volgnummer',
                     'registratiedatum',
                     'code',
-                    'naam',
                     'beginGeldigheid',
                     'eindGeldigheid',
                     'beginTijdvak',
