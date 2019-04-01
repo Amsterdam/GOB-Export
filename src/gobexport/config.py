@@ -12,7 +12,7 @@ import os
 
 
 _DEFAULT_API_HOST = 'http://localhost:8141'
-CONTAINER_BASE = os.getenv('CONTAINER_BASE', 'distributie')
+CONTAINER_BASE = os.getenv('CONTAINER_BASE', 'development')
 
 
 def get_host():
