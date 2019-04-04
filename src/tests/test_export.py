@@ -112,10 +112,10 @@ def test_export(monkeypatch):
     tmp_dir = tempfile.gettempdir()
     assert(temporary_file == f"{tmp_dir}/test")
 
-    # export.export("meetbouten", "meetbouten", "Objectstore")
-    # export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")
-    #
-    # export._export_collection("host", "meetbouten", "meetbouten", "File")
+    export.export("meetbouten", "meetbouten", "Objectstore")
+    export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")
+
+    export._export_collection("host", "meetbouten", "meetbouten", "File")
 
 
 def test_export_without_connection(monkeypatch):
