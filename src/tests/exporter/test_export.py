@@ -14,6 +14,7 @@ def before_each(monkeypatch):
     importlib.reload(gobexport.exporter)
 
 records = [{'identificatie': '1', 'geometrie': {'type': 'Point', 'coordinates': [125.6, 10.1]}}]
+graphql_records = [{'identificatie': '2', 'geometrie': {'type': 'Point', 'coordinates': [125.6, 10.1]}}]
 
 
 class MockAPI:
@@ -24,6 +25,35 @@ class MockAPI:
         global records
         for e in records:
             yield e
+
+
+class MockGraphQL:
+    def __init__(self, host=None, query=None, catalogue=None, collection=None, expand_history=None):
+        pass
+
+    def __iter__(self):
+        global graphql_records
+        for e in graphql_records:
+            yield e
+
+
+class MockConfig:
+
+    products = {
+        'csv': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'filename': 'CSV_Actueel/BAG_woonplaats.csv',
+            'mime_type': 'plain/text',
+            'format': {
+                'columns': [
+                    'identificatie',
+                    'geometrie'
+                ]
+            },
+            'query': ''
+        }
+    }
 
 
 class MockFile:
@@ -50,19 +80,19 @@ def test_export_to_file(monkeypatch):
     global records
     monkeypatch.setitem(__builtins__, 'open', mock_open)
     monkeypatch.setattr(gobexport.api, 'API', MockAPI)
+    monkeypatch.setattr(gobexport.graphql, 'GraphQL', MockGraphQL)
 
     before_each(monkeypatch)
     from gobexport.exporter import export_to_file
 
     # Test DAT export
-
     catalogue = 'meetbouten'
     collection = 'meetbouten'
 
     # Get the configuration for this collection
     config = CONFIG_MAPPING[catalogue][collection]
 
-    export_to_file(catalogue, collection, dat_exporter, '/tmp/ttt', config.products['dat']['format'])
+    export_to_file('host', config.products['dat'], '/tmp/ttt', catalogue, collection)
     assert(MockFile.s == '$$1$$||125,6|10,1||||||||||||||POINT (125.6 10.1)\n')
 
     MockFile.s = ''
@@ -74,8 +104,17 @@ def test_export_to_file(monkeypatch):
     config = CONFIG_MAPPING[catalogue][collection]
     format = config.products['csv_actueel'].get('format')
 
-    export_to_file(catalogue, collection, csv_exporter, '/tmp/ttt', format)
+    export_to_file('host', config.products['csv_actueel'], '/tmp/ttt', catalogue, collection)
     expected_result = 'identificatie;code;naam;beginGeldigheid;eindGeldigheid;documentdatum;documentnummer;ligtIn:BRK.GME.identificatie;ligtIn:BRK.GME.naam;geometrie\r\n1;;;;;;;;;POINT (125.6 10.1)\r\n'
+    assert(MockFile.s == expected_result)
+
+    MockFile.s = ''
+
+    # Get the configuration for this collection
+    config = MockConfig
+
+    export_to_file('host', config.products['csv'], '/tmp/ttt', catalogue, collection)
+    expected_result = 'identificatie;geometrie\r\n2;POINT (125.6 10.1)\r\n'
     assert(MockFile.s == expected_result)
 
     catalogue = 'gebieden'
@@ -90,7 +129,7 @@ def test_export_to_file(monkeypatch):
     # Update records to contain an geometry collection
     records = [{'identificatie': '2', 'geometrie': {'type': 'GeometryCollection', 'geometries': [{'type': 'LineString', 'coordinates': [[125891.16, 480253.38], [125891.07, 480253.34]]}, {'type': 'Polygon', 'coordinates': [[[125891.16, 480253.38], [125893.06, 480250.0], [125892.57, 480250.0]]]}]}}]
 
-    export_to_file(catalogue, collection, esri_exporter, file_name, format)
+    export_to_file('host', config.products['esri_actueel'], file_name, catalogue, collection)
 
     # Remove created files
     for file in ['esri.shp', 'esri.dbf', 'esri.shx', 'esri.prj']:
