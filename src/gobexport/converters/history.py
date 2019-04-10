@@ -125,18 +125,15 @@ def _convert_to_date(value):
     :param value:
     :return: a date(time) object
     """
-    date_value = None
-
     try:
-        date_value = GOB.Date.from_value(value).to_value
+        return GOB.Date.from_value(value).to_value
     except GOBTypeException:
         pass
 
     try:
-        date_value = GOB.DateTime.from_value(value).to_value
+        return GOB.DateTime.from_value(value).to_value
     except GOBTypeException:
         pass
-    return date_value
 
 
 def _convert_date_to_string(obj):
