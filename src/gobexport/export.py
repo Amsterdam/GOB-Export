@@ -69,8 +69,7 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
         # Get name of local file to write results to
         results_file = _get_filename(product['filename']) if destination == "Objectstore" else product['filename']
 
-        format = product.get('format')
-        row_count = export_to_file(host, product['endpoint'], product['exporter'], results_file, format)
+        row_count = export_to_file(host, product, results_file, catalogue, collection)
 
         logger.info(f"{row_count} records exported to local file {name}.")
 

@@ -84,8 +84,9 @@ class StadsdelenExportConfig:
             ]
         },
         'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
             'exporter': csv_exporter,
-            'endpoint': '/gob/toestanden/?collections=gebieden:stadsdelen',
             'filename': 'CSV_ActueelEnHistorie/GBD_stadsdeel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -103,12 +104,34 @@ class StadsdelenExportConfig:
                     'eindTijdvak',
                     'geometrie',
                 ],
-                'mapping': {
-                    'ligtIn:BRK.GME.identificatie': 'brk:gemeentenIdentificatie',
-                    'ligtIn:BRK.GME.volgnummer': 'brk:gemeentenVolgnummer',
-                    'ligtIn:BRK.GME.naam': 'brk:gemeentenNaam',
+                'references': {
+                    'ligtInGemeente': {
+                        'ref': 'BRK.GME',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer' 'naam'],
+                    }
                 }
-            }
+            },
+            'query': """
+{
+  stadsdelen(sort: [identificatie_asc, volgnummer_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        geometrie
+      }
+    }
+  }
+}
+"""
         }
     }
 
@@ -183,8 +206,9 @@ class GGPGebiedenExportConfig:
             ]
         },
         'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
             'exporter': csv_exporter,
-            'endpoint': '/gob/toestanden/?collections=gebieden:ggpgebieden,gebieden:stadsdelen',
             'filename': 'CSV_ActueelEnHistorie/GBD_ggw_praktijkgebieden.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -202,16 +226,49 @@ class GGPGebiedenExportConfig:
                     'eindTijdvak',
                     'geometrie',
                 ],
-                'mapping': {
-                    'ligtIn:GBD.SDL.identificatie': 'gebieden:stadsdelenIdentificatie',
-                    'ligtIn:GDB.SDL.volgnummer': 'gebieden:stadsdelenVolgnummer',
-                    'ligtIn:GDB.SDL.code': 'gebieden:stadsdelenCode',
-                    'ligtIn:GDB.SDL.naam': 'gebieden:stadsdelenNaam',
-                    'ligtIn:BRK.GME.identificatie': 'brk:gemeentenIdentificatie',
-                    'ligtIn:BRK.GME.volgnummer': 'brk:gemeentenVolgnummer',
-                    'ligtIn:BRK.GME.naam': 'brk:gemeentenNaam',
+                'references': {
+                    'ligtInStadsdeel': {
+                        'ref': 'GBD.SDL',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'ligtInGemeente': {
+                        'ref': 'BRK.GME',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'naam'],
+                    }
                 }
+            },
+            'query': '''
+{
+  ggpgebieden(sort: [identificatie_asc, volgnummer_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        geometrie
+        ligtInStadsdeel {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              code
+              naam
             }
+          }
+        }
+      }
+    }
+  }
+}
+'''
         }
     }
 
@@ -286,8 +343,9 @@ class GGWGebiedenExportConfig:
             ]
         },
         'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
             'exporter': csv_exporter,
-            'endpoint': '/gob/toestanden/?collections=gebieden:ggwgebieden,gebieden:stadsdelen',
             'filename': 'CSV_ActueelEnHistorie/GBD_ggw_gebieden.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -305,16 +363,49 @@ class GGWGebiedenExportConfig:
                     'eindTijdvak',
                     'geometrie',
                 ],
-                'mapping': {
-                    'ligtIn:GBD.SDL.identificatie': 'gebieden:stadsdelenIdentificatie',
-                    'ligtIn:GDB.SDL.volgnummer': 'gebieden:stadsdelenVolgnummer',
-                    'ligtIn:GDB.SDL.code': 'gebieden:stadsdelenCode',
-                    'ligtIn:GDB.SDL.naam': 'gebieden:stadsdelenNaam',
-                    'ligtIn:BRK.GME.identificatie': 'brk:gemeentenIdentificatie',
-                    'ligtIn:BRK.GME.volgnummer': 'brk:gemeentenVolgnummer',
-                    'ligtIn:BRK.GME.naam': 'brk:gemeentenNaam',
+                'references': {
+                    'ligtInStadsdeel': {
+                        'ref': 'GBD.SDL',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'ligtInGemeente': {
+                        'ref': 'BRK.GME',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'naam'],
+                    }
                 }
+            },
+            'query': '''
+{
+  ggwgebieden(sort: [identificatie_asc, volgnummer_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        geometrie
+        ligtInStadsdeel {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              code
+              naam
             }
+          }
+        }
+      }
+    }
+  }
+}
+'''
         }
     }
 
@@ -399,8 +490,9 @@ class WijkenExportConfig:
             ]
         },
         'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
             'exporter': csv_exporter,
-            'endpoint': '/gob/toestanden/?collections=gebieden:wijken,gebieden:ggwgebieden,gebieden:stadsdelen',
             'filename': 'CSV_ActueelEnHistorie/GBD_wijk.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -419,20 +511,70 @@ class WijkenExportConfig:
                     'eindTijdvak',
                     'geometrie',
                 ],
-                'mapping': {
-                    'ligtIn:GBD.GGW.identificatie': 'gebieden:stadsdelenIdentificatie',
-                    'ligtIn:GDB.GGW.volgnummer': 'gebieden:stadsdelenVolgnummer',
-                    'ligtIn:GDB.GGW.code': 'gebieden:stadsdelenCode',
-                    'ligtIn:GDB.GGW.naam': 'gebieden:ggwgebiedenNaam',
-                    'ligtIn:GBD.SDL.identificatie': 'gebieden:stadsdelenIdentificatie',
-                    'ligtIn:GDB.SDL.volgnummer': 'gebieden:stadsdelenVolgnummer',
-                    'ligtIn:GDB.SDL.code': 'gebieden:stadsdelenCode',
-                    'ligtIn:GDB.SDL.naam': 'gebieden:stadsdelenNaam',
-                    'ligtIn:BRK.GME.identificatie': 'brk:gemeentenIdentificatie',
-                    'ligtIn:BRK.GME.volgnummer': 'brk:gemeentenVolgnummer',
-                    'ligtIn:BRK.GME.naam': 'brk:gemeentenNaam',
+                'references': {
+                    'LigtInGgwgebied': {
+                        'ref': 'GBD.GGW',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'ligtInStadsdeel': {
+                        'ref': 'GBD.SDL',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'ligtInGemeente': {
+                        'ref': 'BRK.GME',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'naam'],
+                    }
                 }
+            },
+            'query': '''
+{
+  wijken(sort: [identificatie_asc, volgnummer_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        cbsCode
+        geometrie
+        LigtInGgwgebied {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              code
+              naam
+              beginGeldigheid
+              eindGeldigheid
             }
+          }
+        }
+        ligtInStadsdeel {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              code
+              naam
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+'''
         }
     }
 
@@ -533,9 +675,9 @@ class BuurtenExportConfig:
             ]
         },
         'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
             'exporter': csv_exporter,
-            'endpoint': '/gob/toestanden/?collections=gebieden:buurten,gebieden:wijken,'
-            'gebieden:ggwgebieden,gebieden:ggpgebieden,gebieden:stadsdelen',
             'filename': 'CSV_ActueelEnHistorie/GBD_buurt.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -554,28 +696,103 @@ class BuurtenExportConfig:
                     'eindTijdvak',
                     'geometrie',
                 ],
-                'mapping': {
-                    'ligtIn:GBD.WIJK.identificatie': 'gebieden:wijkenIdentificatie',
-                    'ligtIn:GDB.WIJK.volgnummer': 'gebieden:wijkenVolgnummer',
-                    'ligtIn:GDB.WIJK.code': 'gebieden:wijkenCode',
-                    'ligtIn:GDB.WIJK.naam': 'gebieden:wijkenNaam',
-                    'ligtIn:GBD.GGW.identificatie': 'gebieden:ggwgebiedenIdentificatie',
-                    'ligtIn:GDB.GGW.volgnummer': 'gebieden:ggwgebiedenVolgnummer',
-                    'ligtIn:GDB.GGW.code': 'gebieden:ggwgebiedenCode',
-                    'ligtIn:GDB.GGW.naam': 'gebieden:ggwgebiedenNaam',
-                    'ligtIn:GBD.GGP.identificatie': 'gebieden:ggpgebiedenIdentificatie',
-                    'ligtIn:GDB.GGP.volgnummer': 'gebieden:ggpgebiedenVolgnummer',
-                    'ligtIn:GDB.GGP.code': 'gebieden:ggpgebiedenCode',
-                    'ligtIn:GDB.GGP.naam': 'gebieden:ggpgebiedenNaam',
-                    'ligtIn:GBD.SDL.identificatie': 'gebieden:stadsdelenIdentificatie',
-                    'ligtIn:GDB.SDL.volgnummer': 'gebieden:stadsdelenVolgnummer',
-                    'ligtIn:GDB.SDL.code': 'gebieden:stadsdelenCode',
-                    'ligtIn:GDB.SDL.naam': 'gebieden:stadsdelenNaam',
-                    'ligtIn:BRK.GME.identificatie': 'brk:gemeentenIdentificatie',
-                    'ligtIn:BRK.GME.volgnummer': 'brk:gemeentenVolgnummer',
-                    'ligtIn:BRK.GME.naam': 'brk:gemeentenNaam',
+                'references': {
+                    'ligtInWijk': {
+                        'ref': 'GBD.WIJK',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'LigtInGgwgebied': {
+                        'ref': 'GBD.GGW',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'LigtInGgpgebied': {
+                        'ref': 'GBD.GGP',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'ligtInStadsdeel': {
+                        'ref': 'GBD.SDL',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'ligtInGemeente': {
+                        'ref': 'BRK.GME',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'naam'],
+                    }
                 }
+            },
+            'query': '''
+{
+  buurten(sort: [identificatie_asc, volgnummer_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        cbsCode
+        geometrie
+        LigtInGgwgebied {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              code
+              naam
+              beginGeldigheid
+              eindGeldigheid
             }
+          }
+        }
+        LigtInGgpgebied {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              code
+              naam
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+        ligtInWijk {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              code
+              naam
+              beginGeldigheid
+              eindGeldigheid
+              ligtInStadsdeel {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    code
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
         }
     }
 
@@ -676,10 +893,9 @@ class BouwblokkenExportConfig:
             ]
         },
         'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
             'exporter': csv_exporter,
-            'endpoint': '/gob/toestanden/?collections=gebieden:bouwblokken,'
-                        'gebieden:buurten,gebieden:wijken,gebieden:ggwgebieden,'
-                        'gebieden:ggpgebieden,gebieden:stadsdelen',
             'filename': 'CSV_ActueelEnHistorie/GBD_bouwblok.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -694,31 +910,115 @@ class BouwblokkenExportConfig:
                     'eindTijdvak',
                     'geometrie',
                 ],
-                'mapping': {
-                    'ligtIn:GBD.BRT.identificatie': 'gebieden:buurtenIdentificatie',
-                    'ligtIn:GDB.BRT.volgnummer': 'gebieden:buurtenVolgnummer',
-                    'ligtIn:GDB.BRT.code': 'gebieden:buurtenCode',
-                    'ligtIn:GDB.BRT.naam': 'gebieden:buurtenNaam',
-                    'ligtIn:GBD.WIJK.identificatie': 'gebieden:wijkenIdentificatie',
-                    'ligtIn:GDB.WIJK.volgnummer': 'gebieden:wijkenVolgnummer',
-                    'ligtIn:GDB.WIJK.code': 'gebieden:wijkenCode',
-                    'ligtIn:GDB.WIJK.naam': 'gebieden:wijkenNaam',
-                    'ligtIn:GBD.GGW.identificatie': 'gebieden:ggwgebiedenIdentificatie',
-                    'ligtIn:GDB.GGW.volgnummer': 'gebieden:ggwgebiedenVolgnummer',
-                    'ligtIn:GDB.GGW.code': 'gebieden:ggwgebiedenCode',
-                    'ligtIn:GDB.GGW.naam': 'gebieden:ggwgebiedenNaam',
-                    'ligtIn:GBD.GGP.identificatie': 'gebieden:ggpgebiedenIdentificatie',
-                    'ligtIn:GDB.GGP.volgnummer': 'gebieden:ggpgebiedenVolgnummer',
-                    'ligtIn:GDB.GGP.code': 'gebieden:ggpgebiedenCode',
-                    'ligtIn:GDB.GGP.naam': 'gebieden:ggpgebiedenNaam',
-                    'ligtIn:GBD.SDL.identificatie': 'gebieden:stadsdelenIdentificatie',
-                    'ligtIn:GDB.SDL.volgnummer': 'gebieden:stadsdelenVolgnummer',
-                    'ligtIn:GDB.SDL.code': 'gebieden:stadsdelenCode',
-                    'ligtIn:GDB.SDL.naam': 'gebieden:stadsdelenNaam',
-                    'ligtIn:BRK.GME.identificatie': 'brk:gemeentenIdentificatie',
-                    'ligtIn:BRK.GME.volgnummer': 'brk:gemeentenVolgnummer',
-                    'ligtIn:BRK.GME.naam': 'brk:gemeentenNaam',
+                'references': {
+                    'ligtInBuurt': {
+                        'ref': 'GBD.BRT',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'ligtInWijk': {
+                        'ref': 'GBD.WIJK',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'LigtInGgwgebied': {
+                        'ref': 'GBD.GGW',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'LigtInGgpgebied': {
+                        'ref': 'GBD.GGP',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'ligtInStadsdeel': {
+                        'ref': 'GBD.SDL',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'code', 'naam'],
+                    },
+                    'ligtInGemeente': {
+                        'ref': 'BRK.GME',
+                        'ref_name': 'ligtIn',
+                        'columns': ['identificatie', 'volgnummer', 'naam'],
+                    }
                 }
+            },
+            'query': '''
+{
+  bouwblokken(sort: [identificatie_asc, volgnummer_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        code
+        beginGeldigheid
+        eindGeldigheid
+        geometrie
+        ligtInBuurt {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              code
+              naam
+              beginGeldigheid
+              eindGeldigheid
+              LigtInGgwgebied {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    code
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+              LigtInGgpgebied {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    code
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+              ligtInWijk {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    code
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                    ligtInStadsdeel {
+                      edges {
+                        node {
+                          identificatie
+                          volgnummer
+                          code
+                          naam
+                          beginGeldigheid
+                          eindGeldigheid
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
+          }
+        }
+      }
+    }
+  }
+}
+'''
         }
     }
