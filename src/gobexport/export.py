@@ -114,6 +114,8 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
         elif destination == "File":
             logger.info(f"Export is written to {file['distribution']}.")
 
+    logger.info("Export completed")
+
 
 def export(catalogue, collection, destination):
     host = get_host()
