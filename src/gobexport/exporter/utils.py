@@ -16,15 +16,28 @@ def nested_entity_get(entity, keys, default=None):  # noqa: C901
     """
     # If the first key is not in the entity, try to find it in _embedded
     if not keys[0] in entity:
+        keys = keys.copy()
         keys.insert(0, '_embedded')
     for key in keys:
         if isinstance(entity, dict):
             entity = entity.get(key, default)
         elif isinstance(entity, list):
-            try:
-                entity = entity[key]
-            except IndexError:
-                entity = default
+            if isinstance(key, str):
+                # First try to convert the key to an int and use as index
+                try:
+                    entity = entity[int(key)]
+                except ValueError:
+                    # Try to find the key in the first item of the list
+                    try:
+                        entity = entity[0].get(key, default)
+                    except IndexError:
+                        entity = default
+            else:
+                # Use the key as an index
+                try:
+                    entity = entity[key]
+                except IndexError:
+                    entity = default
         else:
             return default
     return entity
