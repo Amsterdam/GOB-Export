@@ -108,7 +108,7 @@ class StadsdelenExportConfig:
                     'ligtInGemeente': {
                         'ref': 'BRK.GME',
                         'ref_name': 'ligtIn',
-                        'columns': ['identificatie', 'volgnummer' 'naam'],
+                        'columns': ['identificatie', 'volgnummer', 'naam'],
                     }
                 }
             },
@@ -261,6 +261,8 @@ class GGPGebiedenExportConfig:
               volgnummer
               code
               naam
+              beginGeldigheid
+              eindGeldigheid
             }
           }
         }
@@ -398,6 +400,8 @@ class GGWGebiedenExportConfig:
               volgnummer
               code
               naam
+              beginGeldigheid
+              eindGeldigheid
             }
           }
         }
@@ -945,7 +949,7 @@ class BouwblokkenExportConfig:
             },
             'query': '''
 {
-  bouwblokken(sort: [identificatie_asc, volgnummer_asc]) {
+  bouwblokken(sort: [code_asc, volgnummer_asc]) {
     edges {
       node {
         identificatie
