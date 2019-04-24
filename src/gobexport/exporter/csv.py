@@ -12,7 +12,7 @@ def build_mapping_from_format(format):
     :return: the mapping
     """
     # First add the regular columns
-    mapping = {c: c for c in format['columns']}
+    mapping = generate_column_mapping(format['columns'])
 
     # Add references and their columns if supplied
     references = format.get('references', {})
@@ -27,6 +27,22 @@ def build_mapping_from_format(format):
     # Add a mapping if provided
     mapping.update(format.get('mapping', {}))
 
+    return mapping
+
+
+def generate_column_mapping(columns):
+    """Builds a mapping dictionary with csv column name and the lookup key
+
+    :param columns: A list of columns, json lookups will be translated into a list of lookup keys
+    :return: the mapping
+    """
+    mapping = {}
+    for c in columns:
+        if '.' in c:
+            keys = c.split('.')
+            mapping[keys[0]] = [keys[0], keys[1]]
+        else:
+            mapping[c] = c
     return mapping
 
 
@@ -113,7 +129,8 @@ def csv_exporter(api, file, format=None):
                 row[attribute_name] = get_entity_value(entity, lookup_key)
 
             # Convert geojson to wkt
-            row['geometrie'] = shape(entity['geometrie']).wkt if entity['geometrie'] else ''
+            if 'geometrie' in row:
+                row['geometrie'] = shape(entity['geometrie']).wkt if entity['geometrie'] else ''
 
             writer.writerow(row)
             row_count += 1
