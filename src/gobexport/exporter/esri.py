@@ -44,10 +44,8 @@ def esri_exporter(api, file, format=None):
     # Please note that it will fail if a file with the same name already exists
     dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=ogr.wkbPolygon)
 
-    mapping = format.get('mapping', {})
-
     # Add all field definitions
-    add_field_definitions(dstlayer, mapping.keys())
+    add_field_definitions(dstlayer, format.keys())
 
     # Get records from the API and build the esri file
     for entity in api:
@@ -64,7 +62,7 @@ def esri_exporter(api, file, format=None):
             feature.SetGeometry(poly)
 
         # Add all fields from the config to the file
-        for attribute_name, source in mapping.items():
+        for attribute_name, source in format.items():
             # A '.' specifies a nested value. Convert a None value to an empty string
             value = nested_entity_get(entity, source.split('.')) if '.' in source else entity.get(source)
             value = '' if value is None else value
@@ -73,7 +71,7 @@ def esri_exporter(api, file, format=None):
         dstlayer.CreateFeature(feature)
 
         row_count += 1
-    feature.Destroy()
+        feature.Destroy()
     dstfile.Destroy()
 
     return row_count

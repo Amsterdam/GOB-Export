@@ -46,10 +46,8 @@ class MockConfig:
             'filename': 'CSV_Actueel/BAG_woonplaats.csv',
             'mime_type': 'plain/text',
             'format': {
-                'columns': [
-                    'identificatie',
-                    'geometrie'
-                ]
+                'identificatie': 'identificatie',
+                'geometrie': 'geometrie',
             },
             'query': ''
         }
