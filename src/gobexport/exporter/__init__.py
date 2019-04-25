@@ -1,38 +1,36 @@
 from gobexport.api import API
-from gobexport.exporter.config.bag import WoonplaatsenExportConfig, OpenbareruimtesExportConfig
-from gobexport.exporter.config.gebieden import StadsdelenExportConfig, GGWGebiedenExportConfig, \
-                                    GGPGebiedenExportConfig, WijkenExportConfig, \
-                                    BuurtenExportConfig, BouwblokkenExportConfig
-from gobexport.exporter.config.meetbouten import MeetboutExportConfig, MetingenExportConfig, \
-                                     ReferentiepuntenExportConfig, RollagenExportConfig
-from gobexport.exporter.config.nap import PeilmerkenExportConfig
-from gobexport.exporter.config.test import TestEntityExportConfig
+from gobexport.exporter.config import bag, gebieden, meetbouten, nap, test
 from gobexport.graphql import GraphQL
 
 CONFIG_MAPPING = {
     'test_catalogue': {
-        'test_entity': TestEntityExportConfig
+        'test_entity': test.TestEntityExportConfig
     },
     'meetbouten': {
-        'meetbouten': MeetboutExportConfig,
-        'metingen': MetingenExportConfig,
-        'referentiepunten': ReferentiepuntenExportConfig,
-        'rollagen': RollagenExportConfig,
+        'meetbouten': meetbouten.MeetboutExportConfig,
+        'metingen': meetbouten.MetingenExportConfig,
+        'referentiepunten': meetbouten.ReferentiepuntenExportConfig,
+        'rollagen': meetbouten.RollagenExportConfig,
     },
     'nap': {
-        'peilmerken': PeilmerkenExportConfig,
+        'peilmerken': nap.PeilmerkenExportConfig,
     },
     'gebieden': {
-        'bouwblokken': BouwblokkenExportConfig,
-        'buurten': BuurtenExportConfig,
-        'wijken': WijkenExportConfig,
-        'ggwgebieden': GGWGebiedenExportConfig,
-        'ggpgebieden': GGPGebiedenExportConfig,
-        'stadsdelen': StadsdelenExportConfig,
+        'bouwblokken': gebieden.BouwblokkenExportConfig,
+        'buurten': gebieden.BuurtenExportConfig,
+        'wijken': gebieden.WijkenExportConfig,
+        'ggwgebieden': gebieden.GGWGebiedenExportConfig,
+        'ggpgebieden': gebieden.GGPGebiedenExportConfig,
+        'stadsdelen': gebieden.StadsdelenExportConfig,
     },
     'bag': {
-        'woonplaatsen': WoonplaatsenExportConfig,
-        'openbareruimtes': OpenbareruimtesExportConfig,
+        'woonplaatsen': bag.WoonplaatsenExportConfig,
+        'openbareruimtes': bag.OpenbareruimtesExportConfig,
+        'nummeraanduidingen': bag.NummeraanduidingenExportConfig,
+        'verblijfsobjecten': bag.VerblijfsobjectenExportConfig,
+        'ligplaatsen': bag.LigplaatsenExportConfig,
+        'standplaatsen': bag.StandplaatsenExportConfig,
+        'panden': bag.PandenExportConfig,
     }
 }
 
