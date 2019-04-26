@@ -11,21 +11,9 @@ def build_mapping_from_format(format):
     :param format: A format description, see csv exporter for examples of format
     :return: the mapping
     """
-    # First add the regular columns
-    mapping = {c: c for c in format['columns']}
-
-    # Add references and their columns if supplied
-    references = format.get('references', {})
-    for key, reference in references.items():
-        # Add all columns from this reference
-        for column in reference['columns']:
-            attribute_name = f"{reference['ref_name']}:{reference['ref']}.{column}"
-
-            # Store the fieldname and an array of keys needed for lookup
-            mapping[attribute_name] = [key, column]
-
-    # Add a mapping if provided
-    mapping.update(format.get('mapping', {}))
+    mapping = {}
+    for key, value in format.items():
+        mapping[key] = value.split('.') if '.' in value else value
 
     return mapping
 
@@ -38,23 +26,6 @@ def get_entity_value(entity, lookup_key):
     :return: the value of the entity's attribute or None
     """
     return nested_entity_get(entity, lookup_key) if isinstance(lookup_key, list) else entity.get(lookup_key)
-
-
-def reorder_list(input_list, items_to_move, move_to_end=True):
-    """Move a selection of items in a list to the front or back of the list
-
-    Example [0,1,2,3,4,5], [2] ==> [0,1,3,4,5,2]
-            [0,1,2,3,4,5], [2,4] ==> [0,1,3,5,2,4]
-            [0,1,2,3,4,5], [4], False ==> [4,0,1,2,3,5]
-
-    :param input_list: The list to apply the reorder on
-    :param items_to_move: The items to be moved
-    :param move_to_end: Default behaviour is to move to the end, can be overruled
-    :return: the reorderd list
-    """
-    # Note that False<True and sort algorithm is stable, so:
-    return sorted(input_list, key=lambda x: x in items_to_move) if move_to_end else \
-        sorted(input_list, key=lambda x: x not in items_to_move)
 
 
 def csv_exporter(api, file, format=None):
@@ -101,10 +72,6 @@ def csv_exporter(api, file, format=None):
                 # Get the fieldnames from the mapping
                 fieldnames = [*mapping.keys()]
 
-                # beginTijdvak, eindTijdvak and geometrie should always be the last columns
-                items_to_move = ['beginTijdvak', 'eindTijdvak', 'geometrie']
-                fieldnames = reorder_list(fieldnames, items_to_move)
-
                 writer = csv.DictWriter(fp, fieldnames=fieldnames, delimiter=';')
                 writer.writeheader()
 
@@ -113,7 +80,8 @@ def csv_exporter(api, file, format=None):
                 row[attribute_name] = get_entity_value(entity, lookup_key)
 
             # Convert geojson to wkt
-            row['geometrie'] = shape(entity['geometrie']).wkt if entity['geometrie'] else ''
+            if 'geometrie' in row:
+                row['geometrie'] = shape(entity['geometrie']).wkt if entity['geometrie'] else ''
 
             writer.writerow(row)
             row_count += 1
