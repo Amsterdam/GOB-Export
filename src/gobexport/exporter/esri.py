@@ -1,6 +1,8 @@
 from osgeo import gdal, ogr, osr
 from shapely.geometry import shape
 
+from gobcore.utils import ProgressTicker
+
 from gobexport.exporter.utils import nested_entity_get
 
 
@@ -47,31 +49,34 @@ def esri_exporter(api, file, format=None):
     # Add all field definitions
     add_field_definitions(dstlayer, format.keys())
 
-    # Get records from the API and build the esri file
-    for entity in api:
-        feature = ogr.Feature(dstlayer.GetLayerDefn())
+    with ProgressTicker(f"Export entities", 10000) as progress:
+        # Get records from the API and build the esri file
+        for entity in api:
+            feature = ogr.Feature(dstlayer.GetLayerDefn())
 
-        if entity['geometrie']:
-            # Add geometrie
-            poly = ogr.CreateGeometryFromWkt(shape(entity['geometrie']).wkt)
+            if entity['geometrie']:
+                # Add geometrie
+                poly = ogr.CreateGeometryFromWkt(shape(entity['geometrie']).wkt)
 
-            # Force geometriecollection to polygon
-            if poly.GetGeometryType() == ogr.wkbGeometryCollection:
-                poly = ogr.ForceToPolygon(poly)
+                # Force geometriecollection to polygon
+                if poly.GetGeometryType() == ogr.wkbGeometryCollection:
+                    poly = ogr.ForceToPolygon(poly)
 
-            feature.SetGeometry(poly)
+                feature.SetGeometry(poly)
 
-        # Add all fields from the config to the file
-        for attribute_name, source in format.items():
-            # A '.' specifies a nested value. Convert a None value to an empty string
-            value = nested_entity_get(entity, source.split('.')) if '.' in source else entity.get(source)
-            value = '' if value is None else value
-            feature.SetField(attribute_name, value)
+            # Add all fields from the config to the file
+            for attribute_name, source in format.items():
+                # A '.' specifies a nested value. Convert a None value to an empty string
+                value = nested_entity_get(entity, source.split('.')) if '.' in source else entity.get(source)
+                value = '' if value is None else value
+                feature.SetField(attribute_name, value)
 
-        dstlayer.CreateFeature(feature)
+            dstlayer.CreateFeature(feature)
 
-        row_count += 1
-        feature.Destroy()
+            feature.Destroy()
+            row_count += 1
+            progress.tick()
+
     dstfile.Destroy()
 
     return row_count
