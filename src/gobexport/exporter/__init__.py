@@ -31,6 +31,7 @@ CONFIG_MAPPING = {
         'ligplaatsen': bag.LigplaatsenExportConfig,
         'standplaatsen': bag.StandplaatsenExportConfig,
         'panden': bag.PandenExportConfig,
+        'brondocumenten': bag.BrondocumentenExportConfig,
     }
 }
 

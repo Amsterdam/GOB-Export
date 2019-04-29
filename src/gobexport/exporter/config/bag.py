@@ -30,7 +30,6 @@ class WoonplaatsenExportConfig:
     edges {
       node {
         identificatie
-        volgnummer
         aanduidingInOnderzoek
         geconstateerd
         naam
@@ -54,7 +53,6 @@ class WoonplaatsenExportConfig:
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
                 'geconstateerd': 'geconstateerd',
                 'naam': 'naam',
@@ -76,7 +74,6 @@ class WoonplaatsenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': {
                 'id': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'onderzoek': 'aanduidingInOnderzoek',
                 'geconst': 'geconstateerd',
                 'naam': 'naam',
@@ -115,7 +112,6 @@ class OpenbareruimtesExportConfig:
     edges {
       node {
         identificatie
-        volgnummer
         aanduidingInOnderzoek
         geconstateerd
         naam
@@ -126,7 +122,6 @@ class OpenbareruimtesExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
             }
           }
         }
@@ -148,7 +143,6 @@ class OpenbareruimtesExportConfig:
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
                 'geconstateerd': 'geconstateerd',
                 'naam': 'naam',
@@ -160,7 +154,6 @@ class OpenbareruimtesExportConfig:
                 'documentnummer': 'documentnummer',
                 'status': 'status.omschrijving',
                 'ligtIn:BAG.WPL.identificatie': 'ligtInWoonplaats.identificatie',
-                'ligtIn:BAG.WPL.volgnummer': 'ligtInWoonplaats.volgnummer',
                 'geometrie': 'geometrie',
             },
             'query': query_actueel
@@ -172,7 +165,6 @@ class OpenbareruimtesExportConfig:
             'mime_type': 'application/octet-stream',
             'format': {
                 'id': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'onderzoek': 'aanduidingInOnderzoek',
                 'geconst': 'geconstateerd',
                 'naam': 'naam',
@@ -208,7 +200,6 @@ class OpenbareruimtesExportConfig:
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'naam': 'naam',
                 'beschrijvingNaam': 'beschrijvingNaam',
             },
@@ -218,7 +209,6 @@ class OpenbareruimtesExportConfig:
     edges {
       node {
         identificatie
-        volgnummer
         naam
         beschrijvingNaam
       }
@@ -238,7 +228,6 @@ class NummeraanduidingenExportConfig:
     edges {
       node {
         identificatie
-        volgnummer
         aanduidingInOnderzoek
         geconstateerd
         huisnummer
@@ -249,7 +238,6 @@ class NummeraanduidingenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
               naam
             }
           }
@@ -258,7 +246,6 @@ class NummeraanduidingenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
               naam
             }
           }
@@ -273,7 +260,6 @@ class NummeraanduidingenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
             }
           }
         }
@@ -281,7 +267,6 @@ class NummeraanduidingenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
             }
           }
         }
@@ -289,7 +274,6 @@ class NummeraanduidingenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
             }
           }
         }
@@ -306,7 +290,6 @@ class NummeraanduidingenExportConfig:
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
                 'geconstateerd': 'geconstateerd',
                 'huisnummer': 'huisnummer',
@@ -314,10 +297,8 @@ class NummeraanduidingenExportConfig:
                 'huisnummertoevoeging': 'huisnummertoevoeging',
                 'postcode': 'postcode',
                 'ligtAan:BAG.ORE.identificatie': 'ligtAanOpenbareruimte.identificatie',
-                'ligtAan:BAG.ORE.voglnummer': 'ligtAanOpenbareruimte.volgnummer',
                 'ligtAan:BAG.ORE.naam': 'ligtAanOpenbareruimte.naam',
                 'ligtIn:BAG.WPL.identificatie': 'ligtInWoonplaats.identificatie',
-                'ligtIn:BAG.WPL.volgnummer': 'ligtInWoonplaats.volgnummer',
                 'ligtIn:BAG.WPL.naam': 'ligtInWoonplaats.naam',
                 'beginGeldigheid': 'beginGeldigheid',
                 'eindGeldigheid': 'eindGeldigheid',
@@ -328,9 +309,6 @@ class NummeraanduidingenExportConfig:
                 'adresseert:BAG.VOT.identificatie': 'adresseertVerblijfsobject.identificatie',
                 'adresseert:BAG.LPS.identificatie': 'adresseertLigplaats.identificatie',
                 'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
-                'adresseert:BAG.VOT.volgnummer': 'adresseertVerblijfsobject.volgnummer',
-                'adresseert:BAG.LPS.volgnummer': 'adresseertLigplaats.volgnummer',
-                'adresseert:BAG.SPS.volgnummer': 'adresseertStandplaats.volgnummer',
             },
             'query': query_actueel
         }
@@ -345,14 +323,12 @@ class VerblijfsobjectenExportConfig:
     edges {
       node {
         identificatie
-        volgnummer
         aanduidingInOnderzoek
         geconstateerd
         heeftHoofdadres {
           edges {
             node {
               identificatie
-              volgnummer
               huisnummer
               huisletter
               huisnummertoevoeging
@@ -361,7 +337,6 @@ class VerblijfsobjectenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                   }
                 }
@@ -370,7 +345,6 @@ class VerblijfsobjectenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                   }
                 }
@@ -382,7 +356,6 @@ class VerblijfsobjectenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
             }
           }
         }
@@ -390,12 +363,10 @@ class VerblijfsobjectenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
               ligtInBouwblok {
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     code
                   }
                 }
@@ -407,21 +378,18 @@ class VerblijfsobjectenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
               naam
               code
               ligtInWijk {
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                     ligtInStadsdeel {
                       edges {
                         node {
                           identificatie
-                          volgnummer
                           naam
                           code
                         }
@@ -434,7 +402,6 @@ class VerblijfsobjectenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                   }
@@ -444,7 +411,6 @@ class VerblijfsobjectenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                   }
@@ -487,25 +453,20 @@ class VerblijfsobjectenExportConfig:
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
                 'geconstateerd': 'geconstateerd',
                 'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
-                'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
                 'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
                 'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
                 'huisnummerToevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
                 'postcodeHoofdadres': 'heeftHoofdadres.postcode',
                 'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
-                'ligtAan:BAG.ORE.voglnummerHoofdadres': 'ligtAanOpenbareruimte.volgnummer',
                 'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
                 'ligtIn:BAG.WPL.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
-                'ligtIn:BAG.WPL.volgnummerHoofdadres': 'ligtInWoonplaats.volgnummer',
                 'ligtIn:BAG.WPL.naamHoofdadres': 'ligtInWoonplaats.naam',
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
-                'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
                 'gebruiksdoel': 'gebruiksdoel',
                 'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie',
                 'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie',
@@ -527,28 +488,21 @@ class VerblijfsobjectenExportConfig:
                 'redenopvoer': 'redenopvoer',
                 'redenafvoer': 'redenafvoer',
                 'ligtIn:BAG.PND.identificatie': 'ligtInPanden.0.identificatie',
-                'ligtIn:BAG.PND.volgnummer': 'ligtInPanden.0.volgnummer',
                 'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
-                'ligtIn:GBD.BBK.volgnummer': 'ligtInBouwblok.volgnummer',
                 'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
                 'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
-                'ligtIn:GBD.BRT.volgnummer': 'ligtInBuurt.volgnummer',
                 'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
                 'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
                 'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
-                'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
                 'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
                 'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
                 'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
                 'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
                 'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'geometrie': 'geometrie'
@@ -562,7 +516,6 @@ class VerblijfsobjectenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': {
                 'id': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'onderzoek': 'aanduidingInOnderzoek',
                 'geconst': 'geconstateerd',
                 'num_id_hfd': 'heeftHoofdadres.identificatie',
@@ -635,14 +588,12 @@ class StandplaatsenExportConfig:
     edges {
       node {
         identificatie
-        volgnummer
         aanduidingInOnderzoek
         geconstateerd
         heeftHoofdadres {
           edges {
             node {
               identificatie
-              volgnummer
               huisnummer
               huisletter
               huisnummertoevoeging
@@ -651,7 +602,6 @@ class StandplaatsenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                   }
                 }
@@ -660,7 +610,6 @@ class StandplaatsenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                   }
                 }
@@ -672,7 +621,6 @@ class StandplaatsenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
             }
           }
         }
@@ -680,21 +628,18 @@ class StandplaatsenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
               naam
               code
               ligtInWijk {
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                     ligtInStadsdeel {
                       edges {
                         node {
                           identificatie
-                          volgnummer
                           naam
                           code
                         }
@@ -707,7 +652,6 @@ class StandplaatsenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                   }
@@ -717,7 +661,6 @@ class StandplaatsenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                   }
@@ -746,25 +689,20 @@ class StandplaatsenExportConfig:
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
                 'geconstateerd': 'geconstateerd',
                 'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
-                'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
                 'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
                 'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
                 'huisnummerToevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
                 'postcodeHoofdadres': 'heeftHoofdadres.postcode',
                 'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
-                'ligtAan:BAG.ORE.voglnummerHoofdadres': 'ligtAanOpenbareruimte.volgnummer',
                 'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
                 'ligtIn:BAG.WPL.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
-                'ligtIn:BAG.WPL.volgnummerHoofdadres': 'ligtInWoonplaats.volgnummer',
                 'ligtIn:BAG.WPL.naamHoofdadres': 'ligtInWoonplaats.naam',
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
-                'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
                 'status': 'status.omschrijving',
                 'feitelijkGebruik': 'feitelijkGebruik.omschrijving',
                 'beginGeldigheid': 'beginGeldigheid',
@@ -772,23 +710,18 @@ class StandplaatsenExportConfig:
                 'documentdatum': 'documentdatum',
                 'documentnummer': 'documentnummer',
                 'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
-                'ligtIn:GBD.BRT.volgnummer': 'ligtInBuurt.volgnummer',
                 'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
                 'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
                 'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
-                'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
                 'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
                 'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
                 'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
                 'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
                 'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'geometrie': 'geometrie'
@@ -802,7 +735,6 @@ class StandplaatsenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': {
                 'id': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'onderzoek': 'aanduidingInOnderzoek',
                 'geconst': 'geconstateerd',
                 'num_id_hfd': 'heeftHoofdadres.identificatie',
@@ -858,14 +790,12 @@ class LigplaatsenExportConfig:
     edges {
       node {
         identificatie
-        volgnummer
         aanduidingInOnderzoek
         geconstateerd
         heeftHoofdadres {
           edges {
             node {
               identificatie
-              volgnummer
               huisnummer
               huisletter
               huisnummertoevoeging
@@ -874,7 +804,6 @@ class LigplaatsenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                   }
                 }
@@ -883,7 +812,6 @@ class LigplaatsenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                   }
                 }
@@ -895,7 +823,6 @@ class LigplaatsenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
             }
           }
         }
@@ -903,21 +830,18 @@ class LigplaatsenExportConfig:
           edges {
             node {
               identificatie
-              volgnummer
               naam
               code
               ligtInWijk {
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                     ligtInStadsdeel {
                       edges {
                         node {
                           identificatie
-                          volgnummer
                           naam
                           code
                         }
@@ -930,7 +854,6 @@ class LigplaatsenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                   }
@@ -940,7 +863,6 @@ class LigplaatsenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                   }
@@ -969,25 +891,20 @@ class LigplaatsenExportConfig:
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
                 'geconstateerd': 'geconstateerd',
                 'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
-                'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
                 'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
                 'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
                 'huisnummerToevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
                 'postcodeHoofdadres': 'heeftHoofdadres.postcode',
                 'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
-                'ligtAan:BAG.ORE.voglnummerHoofdadres': 'ligtAanOpenbareruimte.volgnummer',
                 'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
                 'ligtIn:BAG.WPL.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
-                'ligtIn:BAG.WPL.volgnummerHoofdadres': 'ligtInWoonplaats.volgnummer',
                 'ligtIn:BAG.WPL.naamHoofdadres': 'ligtInWoonplaats.naam',
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
-                'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
                 'status': 'status.omschrijving',
                 'feitelijkGebruik': 'feitelijkGebruik.omschrijving',
                 'beginGeldigheid': 'beginGeldigheid',
@@ -995,23 +912,18 @@ class LigplaatsenExportConfig:
                 'documentdatum': 'documentdatum',
                 'documentnummer': 'documentnummer',
                 'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
-                'ligtIn:GBD.BRT.volgnummer': 'ligtInBuurt.volgnummer',
                 'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
                 'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
                 'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
-                'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
                 'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
                 'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
                 'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
                 'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
                 'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'geometrie': 'geometrie'
@@ -1025,7 +937,6 @@ class LigplaatsenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': {
                 'id': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'onderzoek': 'aanduidingInOnderzoek',
                 'geconst': 'geconstateerd',
                 'num_id_hfd': 'heeftHoofdadres.identificatie',
@@ -1081,7 +992,6 @@ class PandenExportConfig:
     edges {
       node {
         identificatie
-        volgnummer
         aanduidingInOnderzoek
         geconstateerd
         oorspronkelijkBouwjaar
@@ -1103,21 +1013,18 @@ class PandenExportConfig:
                 edges {
                   node {
                     identificatie
-                    volgnummer
                     naam
                     code
                     ligtInWijk {
                       edges {
                         node {
                           identificatie
-                          volgnummer
                           naam
                           code
                           ligtInStadsdeel {
                             edges {
                               node {
                                 identificatie
-                                volgnummer
                                 naam
                                 code
                               }
@@ -1130,7 +1037,6 @@ class PandenExportConfig:
                       edges {
                         node {
                           identificatie
-                          volgnummer
                           naam
                           code
                         }
@@ -1140,7 +1046,6 @@ class PandenExportConfig:
                       edges {
                         node {
                           identificatie
-                          volgnummer
                           naam
                           code
                         }
@@ -1165,7 +1070,6 @@ class PandenExportConfig:
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
                 'geconstateerd': 'geconstateerd',
                 'status': 'status',
@@ -1180,26 +1084,20 @@ class PandenExportConfig:
                 'hoogsteBouwlaag': 'hoogsteBouwlaag',
                 'laagsteBouwlaag': 'laagsteBouwlaag',
                 'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
-                'ligtIn:GBD.BBK.volgnummer': 'ligtInBouwblok.volgnummer',
                 'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
                 'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
-                'ligtIn:GBD.BRT.volgnummer': 'ligtInBuurt.volgnummer',
                 'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
                 'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
                 'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
-                'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
                 'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
                 'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
                 'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
                 'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
                 'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'geometrie': 'geometrie'
@@ -1213,7 +1111,6 @@ class PandenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': {
                 'pnd_id': 'identificatie',
-                'volgnummer': 'volgnummer',
                 'onderzoek': 'aanduidingInOnderzoek',
                 'geconst': 'geconstateerd',
                 'status': 'status',
@@ -1258,6 +1155,43 @@ class PandenExportConfig:
                     'mime_type': 'application/octet-stream'
                 },
             ],
+            'query': query_actueel
+        },
+    }
+
+
+class BrondocumentenExportConfig:
+
+    query_actueel = '''
+{
+  brondocumenten(active: true) {
+    edges {
+      node {
+        documentnummer
+        dossier
+        registratiedatum
+        bronleverancier
+        typeDossier
+        typeBrondocument
+      }
+    }
+  }
+}
+'''
+    products = {
+        'csv_actueel': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'filename': 'CSV_Actueel/BAG_brondocument.csv',
+            'mime_type': 'plain/text',
+            'format': {
+                'documentnummer': 'documentnummer',
+                'dossier': 'dossier',
+                'documentdatum': 'registratiedatum',
+                'bronleverancier': 'bronleverancier.omschrijving',
+                'typeDossier': 'typeDossier.omschrijving',
+                'typeBrondocument': 'typeBrondocument.omschrijving',
+            },
             'query': query_actueel
         },
     }
