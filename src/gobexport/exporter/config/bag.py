@@ -196,7 +196,7 @@ class OpenbareruimtesExportConfig:
         'csv_beschrijving_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_ORE_beschrijving.csv',
+            'filename': 'CSV_Actueel/BAG_openbare_ruimte_beschrijving.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
