@@ -324,6 +324,8 @@ class GGWGebiedenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+                'beginTijdvak': 'beginTijdvak',
+                'eindTijdvak': 'eindTijdvak',
                 'geometrie': 'geometrie',
             },
             'query': '''
@@ -456,6 +458,8 @@ class WijkenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+                'beginTijdvak': 'beginTijdvak',
+                'eindTijdvak': 'eindTijdvak',
                 'geometrie': 'geometrie',
             },
             'query': '''
@@ -621,6 +625,8 @@ class BuurtenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+                'beginTijdvak': 'beginTijdvak',
+                'eindTijdvak': 'eindTijdvak',
                 'geometrie': 'geometrie',
             },
             'query': '''
@@ -810,6 +816,8 @@ class BouwblokkenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+                'beginTijdvak': 'beginTijdvak',
+                'eindTijdvak': 'eindTijdvak',
                 'geometrie': 'geometrie',
             },
             'query': '''

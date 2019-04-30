@@ -2,6 +2,8 @@ import csv
 
 from shapely.geometry import shape
 
+from gobcore.utils import ProgressTicker
+
 from gobexport.exporter.utils import nested_entity_get
 
 
@@ -65,7 +67,7 @@ def csv_exporter(api, file, format=None):
 
     mapping = build_mapping_from_format(format)
 
-    with open(file, 'w') as fp:
+    with open(file, 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
         # Get the headers from the first record in the API
         for entity in api:
             if row_count == 0:
@@ -85,5 +87,6 @@ def csv_exporter(api, file, format=None):
 
             writer.writerow(row)
             row_count += 1
+            progress.tick()
 
     return row_count

@@ -14,6 +14,8 @@ Todo: The final model for the meetbouten collection is required
 import datetime
 import re
 
+from gobcore.utils import ProgressTicker
+
 from gobexport.exporter.utils import nested_entity_get
 
 
@@ -185,7 +187,7 @@ def dat_exporter(api, file, format=None):
     :return:
     """
     row_count = 0
-    with open(file, 'w') as fp:
+    with open(file, 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
         # Get the headers from the first record in the API
         for entity in api:
             pattern = re.compile('([\w.]+):(\w+):?({[\d\w\s:",]*}|\w+)?\|?')
@@ -196,6 +198,9 @@ def dat_exporter(api, file, format=None):
                 attr_value = type_convert(attr_type, value, args)
                 export.append(attr_value)
 
-            row_count += 1
             fp.write('|'.join(export) + '\n')
+
+            row_count += 1
+            progress.tick()
+
     return row_count

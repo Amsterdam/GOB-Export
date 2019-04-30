@@ -2,8 +2,10 @@
 
 This component exports data sources
 """
-from gobcore.message_broker.config import WORKFLOW_EXCHANGE, EXPORT_QUEUE
+from gobcore.message_broker.config import WORKFLOW_EXCHANGE, EXPORT_QUEUE, RESULT_QUEUE
 from gobcore.message_broker.messagedriven_service import messagedriven_service
+from gobcore.logging.logger import logger
+
 from gobexport.export import export
 
 
@@ -15,13 +17,27 @@ def handle_export_msg(msg):
 
     export(**{attr: value for attr, value in msg.items() if attr in attrs})
 
+    return {
+        "header": msg.get("header"),
+        "summary": {
+            "warnings": logger.get_warnings(),
+            "errors": logger.get_errors()
+        },
+        "contents": None
+    }
+
 
 SERVICEDEFINITION = {
     'export_request': {
         'exchange': WORKFLOW_EXCHANGE,
         'queue': EXPORT_QUEUE,
         'key': "export.start",
-        'handler': handle_export_msg
+        'handler': handle_export_msg,
+        'report': {
+            'exchange': WORKFLOW_EXCHANGE,
+            'queue': RESULT_QUEUE,
+            'key': 'export.result'
+        }
     }
 }
 
