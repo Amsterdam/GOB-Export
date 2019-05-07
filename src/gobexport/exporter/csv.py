@@ -27,7 +27,11 @@ def get_entity_value(entity, lookup_key):
     :param lookup_key: A attribute name or a list of attribute names
     :return: the value of the entity's attribute or None
     """
-    return nested_entity_get(entity, lookup_key) if isinstance(lookup_key, list) else entity.get(lookup_key)
+    value = nested_entity_get(entity, lookup_key) if isinstance(lookup_key, list) else entity.get(lookup_key)
+    # Return J or N when the value is a boolean
+    if isinstance(value, bool):
+        value = 'J' if value else 'N'
+    return value
 
 
 def csv_exporter(api, file, format=None):
