@@ -127,7 +127,7 @@ class GGPGebiedenExportConfig:
         'csv_actueel': {
             'exporter': csv_exporter,
             'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced',
-            'filename': 'CSV_Actueel/GBD_ggw_praktijkgebieden.csv',
+            'filename': 'CSV_Actueel/GBD_ggw_praktijkgebied.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -149,7 +149,7 @@ class GGPGebiedenExportConfig:
         'esri_actueel': {
             'exporter': esri_exporter,
             'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced',
-            'filename': 'SHP/GBD_ggw_praktijkgebieden.shp',
+            'filename': 'SHP/GBD_ggw_praktijkgebied.shp',
             'mime_type': 'application/octet-stream',
             'format': {
                 'id': 'identificatie',
@@ -167,15 +167,15 @@ class GGPGebiedenExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': 'SHP/GBD_ggw_praktijkgebieden.dbf',
+                    'filename': 'SHP/GBD_ggw_praktijkgebied.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'SHP/GBD_ggw_praktijkgebieden.shx',
+                    'filename': 'SHP/GBD_ggw_praktijkgebied.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'SHP/GBD_ggw_praktijkgebieden.prj',
+                    'filename': 'SHP/GBD_ggw_praktijkgebied.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ]
@@ -184,7 +184,7 @@ class GGPGebiedenExportConfig:
             'api_type': 'graphql',
             'expand_history': True,
             'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/GBD_ggw_praktijkgebieden.csv',
+            'filename': 'CSV_ActueelEnHistorie/GBD_ggw_praktijkgebied.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -249,7 +249,7 @@ class GGWGebiedenExportConfig:
         'csv_actueel': {
             'exporter': csv_exporter,
             'endpoint': '/gob/gebieden/ggwgebieden/?view=enhanced',
-            'filename': 'CSV_Actueel/GBD_ggw_gebieden.csv',
+            'filename': 'CSV_Actueel/GBD_ggw_gebied.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -270,7 +270,7 @@ class GGWGebiedenExportConfig:
         'esri_actueel': {
             'exporter': esri_exporter,
             'endpoint': '/gob/gebieden/ggwgebieden/?view=enhanced',
-            'filename': 'SHP/GBD_ggw_gebieden.shp',
+            'filename': 'SHP/GBD_ggw_gebied.shp',
             'mime_type': 'application/octet-stream',
             'format': {
                 'id': 'identificatie',
@@ -288,15 +288,15 @@ class GGWGebiedenExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': 'SHP/GBD_ggw_gebieden.dbf',
+                    'filename': 'SHP/GBD_ggw_gebied.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'SHP/GBD_ggw_gebieden.shx',
+                    'filename': 'SHP/GBD_ggw_gebied.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'SHP/GBD_ggw_gebieden.prj',
+                    'filename': 'SHP/GBD_ggw_gebied.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ]
@@ -305,7 +305,7 @@ class GGWGebiedenExportConfig:
             'api_type': 'graphql',
             'expand_history': True,
             'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/GBD_ggw_gebieden.csv',
+            'filename': 'CSV_ActueelEnHistorie/GBD_ggw_gebied.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
