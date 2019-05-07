@@ -69,6 +69,9 @@ def esri_exporter(api, file, format=None):
                 # A '.' specifies a nested value. Convert a None value to an empty string
                 value = nested_entity_get(entity, source.split('.')) if '.' in source else entity.get(source)
                 value = '' if value is None else value
+                # Return J or N when the value is a boolean
+                if isinstance(value, bool):
+                    value = 'J' if value else 'N'
                 feature.SetField(attribute_name, value)
 
             dstlayer.CreateFeature(feature)
