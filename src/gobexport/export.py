@@ -3,7 +3,6 @@
 This module contains the export entries for the meetbouten catalog
 
 """
-import datetime
 import os
 import tempfile
 
@@ -44,19 +43,6 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
     :param destination: The destination of the resulting output file(s)
     :return:
     """
-
-    # Extra variables for logging, generate them since we do not get them from workflow yet
-    global extra_log_kwargs
-    start_timestamp = int(datetime.datetime.utcnow().replace(microsecond=0).timestamp())
-    process_id = f"{start_timestamp}.{destination}.{collection}"
-    extra_log_kwargs = {
-        'process_id': process_id,
-        'destination': destination,
-        'entity': collection
-    }
-    logger.set_name("EXPORT")
-    logger.set_default_args(extra_log_kwargs)
-
     logger.info(f"Export {catalogue}:{collection} to {destination} started.")
 
     # Get the configuration for this collection
