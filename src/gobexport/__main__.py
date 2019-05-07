@@ -2,6 +2,8 @@
 
 This component exports data sources
 """
+import datetime
+
 from gobcore.message_broker.config import WORKFLOW_EXCHANGE, EXPORT_QUEUE, RESULT_QUEUE
 from gobcore.message_broker.messagedriven_service import messagedriven_service
 from gobcore.logging.logger import logger
@@ -15,7 +17,25 @@ def handle_export_msg(msg):
     for attr in attrs:
         assert msg.get(attr), f"Missing attribute {attr}"
 
-    export(**{attr: value for attr, value in msg.items() if attr in attrs})
+    catalogue = msg['catalogue']
+    collection = msg['collection']
+    destination = msg['destination']
+    application = "GOBExport"
+
+    start_timestamp = int(datetime.datetime.utcnow().replace(microsecond=0).timestamp())
+    process_id = f"{start_timestamp}.{destination}.{collection}"
+
+    msg["header"].update({
+        'process_id': process_id,
+        'destination': destination,
+        'application': application,
+        'catalogue': catalogue,
+        'entity': collection,
+    })
+
+    logger.configure(msg, "EXPORT")
+
+    export(catalogue, collection, destination)
 
     return {
         "header": msg.get("header"),
