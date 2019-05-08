@@ -14,7 +14,7 @@ def before_each(monkeypatch):
     importlib.reload(gobexport.exporter)
 
 records = [{'identificatie': '1', 'geometrie': {'type': 'Point', 'coordinates': [125.6, 10.1]}}]
-graphql_records = [{'identificatie': '2', 'geometrie': {'type': 'Point', 'coordinates': [125.6, 10.1]}}]
+graphql_records = [{'identificatie': '2', 'boolean': True, 'geometrie': {'type': 'Point', 'coordinates': [125.6, 10.1]}}]
 
 
 class MockAPI:
@@ -47,7 +47,18 @@ class MockConfig:
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
+                'boolean': 'boolean',
                 'geometrie': 'geometrie',
+            },
+            'query': ''
+        },
+        'shape': {
+            'exporter': esri_exporter,
+            'filename': 'CSV_Actueel/BAG_woonplaats.shp',
+            'mime_type': 'plain/text',
+            'format': {
+                'id': 'identificatie',
+                'boolean': 'boolean',
             },
             'query': ''
         }
@@ -112,22 +123,17 @@ def test_export_to_file(monkeypatch):
     config = MockConfig
 
     export_to_file('host', config.products['csv'], '/tmp/ttt', catalogue, collection)
-    expected_result = 'identificatie;geometrie\r\n2;POINT (125.6 10.1)\r\n'
+    expected_result = 'identificatie;boolean;geometrie\r\n2;J;POINT (125.6 10.1)\r\n'
     assert(MockFile.s == expected_result)
 
-    catalogue = 'gebieden'
-    collection = 'stadsdelen'
-
-    # Get the configuration for this collection
-    config = CONFIG_MAPPING[catalogue][collection]
-    format = config.products['esri_actueel'].get('format')
+    format = config.products['shape'].get('format')
 
     file_name = 'esri.shp'
 
     # Update records to contain an geometry collection
-    records = [{'identificatie': '2', 'geometrie': {'type': 'GeometryCollection', 'geometries': [{'type': 'LineString', 'coordinates': [[125891.16, 480253.38], [125891.07, 480253.34]]}, {'type': 'Polygon', 'coordinates': [[[125891.16, 480253.38], [125893.06, 480250.0], [125892.57, 480250.0]]]}]}}]
+    records = [{'identificatie': '2', 'boolean': False, 'geometrie': {'type': 'GeometryCollection', 'geometries': [{'type': 'LineString', 'coordinates': [[125891.16, 480253.38], [125891.07, 480253.34]]}, {'type': 'Polygon', 'coordinates': [[[125891.16, 480253.38], [125893.06, 480250.0], [125892.57, 480250.0]]]}]}}]
 
-    export_to_file('host', config.products['esri_actueel'], file_name, catalogue, collection)
+    export_to_file('host', config.products['shape'], file_name, catalogue, collection)
 
     # Remove created files
     for file in ['esri.shp', 'esri.dbf', 'esri.shx', 'esri.prj']:
