@@ -85,9 +85,9 @@ class GraphQL:
             # References
             if isinstance(value, dict) and 'edges' in value:
                 if main:
-                    main[key] = [self._flatten_edge(e, main) for e in value['edges']]
+                    main.setdefault(key, []).extend([self._flatten_edge(e, main) for e in value['edges']])
                 else:
-                    flat_edge[key] = [self._flatten_edge(e, flat_edge) for e in value['edges']]
+                    flat_edge.setdefault(key, []).extend([self._flatten_edge(e, flat_edge) for e in value['edges']])
             else:
                 flat_edge[key] = value
         return flat_edge
