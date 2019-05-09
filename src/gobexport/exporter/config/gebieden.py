@@ -28,7 +28,7 @@ class StadsdelenExportConfig:
         'csv_actueel': {
             'exporter': csv_exporter,
             'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced',
-            'filename': 'CSV_Actueel/GBD_stadsdeel.csv',
+            'filename': 'CSV_Actueel/GBD_stadsdeel_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -78,7 +78,7 @@ class StadsdelenExportConfig:
             'api_type': 'graphql',
             'expand_history': True,
             'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/GBD_stadsdeel.csv',
+            'filename': 'CSV_ActueelEnHistorie/GBD_stadsdeel_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -127,7 +127,7 @@ class GGPGebiedenExportConfig:
         'csv_actueel': {
             'exporter': csv_exporter,
             'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced',
-            'filename': 'CSV_Actueel/GBD_ggw_praktijkgebied.csv',
+            'filename': 'CSV_Actueel/GBD_ggw_praktijkgebied_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -184,7 +184,7 @@ class GGPGebiedenExportConfig:
             'api_type': 'graphql',
             'expand_history': True,
             'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/GBD_ggw_praktijkgebied.csv',
+            'filename': 'CSV_ActueelEnHistorie/GBD_ggw_praktijkgebied_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -249,7 +249,7 @@ class GGWGebiedenExportConfig:
         'csv_actueel': {
             'exporter': csv_exporter,
             'endpoint': '/gob/gebieden/ggwgebieden/?view=enhanced',
-            'filename': 'CSV_Actueel/GBD_ggw_gebied.csv',
+            'filename': 'CSV_Actueel/GBD_ggw_gebied_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -305,7 +305,7 @@ class GGWGebiedenExportConfig:
             'api_type': 'graphql',
             'expand_history': True,
             'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/GBD_ggw_gebied.csv',
+            'filename': 'CSV_ActueelEnHistorie/GBD_ggw_gebied_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -370,7 +370,7 @@ class WijkenExportConfig:
         'csv_actueel': {
             'exporter': csv_exporter,
             'endpoint': '/gob/gebieden/wijken/?view=enhanced',
-            'filename': 'CSV_Actueel/GBD_wijk.csv',
+            'filename': 'CSV_Actueel/GBD_wijk_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -434,7 +434,7 @@ class WijkenExportConfig:
             'api_type': 'graphql',
             'expand_history': True,
             'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/GBD_wijk.csv',
+            'filename': 'CSV_ActueelEnHistorie/GBD_wijk_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -517,7 +517,7 @@ class BuurtenExportConfig:
         'csv_actueel': {
             'exporter': csv_exporter,
             'endpoint': '/gob/gebieden/buurten/?view=enhanced',
-            'filename': 'CSV_Actueel/GBD_buurt.csv',
+            'filename': 'CSV_Actueel/GBD_buurt_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -593,7 +593,7 @@ class BuurtenExportConfig:
             'api_type': 'graphql',
             'expand_history': True,
             'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/GBD_buurt.csv',
+            'filename': 'CSV_ActueelEnHistorie/GBD_buurt_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -708,7 +708,7 @@ class BouwblokkenExportConfig:
         'csv_actueel': {
             'exporter': csv_exporter,
             'endpoint': '/gob/gebieden/bouwblokken/?view=enhanced',
-            'filename': 'CSV_Actueel/GBD_bouwblok.csv',
+            'filename': 'CSV_Actueel/GBD_bouwblok_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -782,7 +782,7 @@ class BouwblokkenExportConfig:
             'api_type': 'graphql',
             'expand_history': True,
             'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/GBD_bouwblok.csv',
+            'filename': 'CSV_ActueelEnHistorie/GBD_bouwblok_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',

@@ -49,7 +49,7 @@ class WoonplaatsenExportConfig:
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_woonplaats.csv',
+            'filename': 'CSV_Actueel/BAG_woonplaats_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -139,7 +139,7 @@ class OpenbareruimtesExportConfig:
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_openbare_ruimte.csv',
+            'filename': 'CSV_Actueel/BAG_openbare_ruimte_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -196,7 +196,7 @@ class OpenbareruimtesExportConfig:
         'csv_beschrijving_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_openbare_ruimte_beschrijving.csv',
+            'filename': 'CSV_Actueel/BAG_openbare_ruimte_beschrijving_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -286,7 +286,7 @@ class NummeraanduidingenExportConfig:
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_nummeraanduiding.csv',
+            'filename': 'CSV_Actueel/BAG_nummeraanduiding_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -449,7 +449,7 @@ class VerblijfsobjectenExportConfig:
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_verblijfsobject.csv',
+            'filename': 'CSV_Actueel/BAG_verblijfsobject_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -685,7 +685,7 @@ class StandplaatsenExportConfig:
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_standplaats.csv',
+            'filename': 'CSV_Actueel/BAG_standplaats_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -887,7 +887,7 @@ class LigplaatsenExportConfig:
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_ligplaats.csv',
+            'filename': 'CSV_Actueel/BAG_ligplaats_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -1066,7 +1066,7 @@ class PandenExportConfig:
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_pand.csv',
+            'filename': 'CSV_Actueel/BAG_pand_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -1182,7 +1182,7 @@ class BrondocumentenExportConfig:
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_brondocument.csv',
+            'filename': 'CSV_Actueel/BAG_brondocument_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'documentnummer': 'documentnummer',
