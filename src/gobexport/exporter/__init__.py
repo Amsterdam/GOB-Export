@@ -1,5 +1,5 @@
 from gobexport.api import API
-from gobexport.exporter.config import bag, gebieden, meetbouten, nap, test
+from gobexport.exporter.config import bag, brk, gebieden, meetbouten, nap, test
 from gobexport.graphql import GraphQL
 
 CONFIG_MAPPING = {
@@ -32,6 +32,9 @@ CONFIG_MAPPING = {
         'standplaatsen': bag.StandplaatsenExportConfig,
         'panden': bag.PandenExportConfig,
         'brondocumenten': bag.BrondocumentenExportConfig,
+    },
+    'brk': {
+        'kadastralesubjecten': brk.KadastralesubjectenExportConfig,
     }
 }
 

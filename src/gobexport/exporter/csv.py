@@ -15,9 +15,43 @@ def build_mapping_from_format(format):
     """
     mapping = {}
     for key, value in format.items():
-        mapping[key] = value.split('.') if '.' in value else value
+        mapping[key] = _split_field_reference(value)
 
     return mapping
+
+
+def _split_field_reference(ref: str):
+    return ref.split('.') if '.' in ref else ref
+
+
+def evaluate_condition(entity: dict, condition: dict):
+    """Expects an entity and a condition as dict, which has as keys:
+
+    condition: for example 'isnull'
+    reference: the field reference to which to apply the condition
+    value:     the value (field reference) to return if condition evaluates to true
+
+    negate:    optional. if true, negate the condition
+
+    :param condition:
+    :return:
+    """
+    assert all([k in condition for k in ['condition', 'reference', 'value']]), "Invalid condition definition"
+    assert condition.get('reference') != condition.get('value'), "Reference and value cannot be the same"
+
+    onfield_value = get_entity_value(entity, _split_field_reference(condition.get('reference')))
+    value = _split_field_reference(condition.get('value'))
+    condition_type = condition.get('condition')
+
+    if condition_type == 'isempty':
+        condition_result = bool(onfield_value)
+    else:
+        raise NotImplementedError(f"Not implemented condition f{condition_type}")
+
+    if condition_result is not condition.get('negate', False):
+        return value
+
+    return None
 
 
 def get_entity_value(entity, lookup_key):
@@ -27,6 +61,9 @@ def get_entity_value(entity, lookup_key):
     :param lookup_key: A attribute name or a list of attribute names
     :return: the value of the entity's attribute or None
     """
+    if isinstance(lookup_key, dict):
+        lookup_key = evaluate_condition(entity, lookup_key)
+
     value = nested_entity_get(entity, lookup_key) if isinstance(lookup_key, list) else entity.get(lookup_key)
     # Return J or N when the value is a boolean
     if isinstance(value, bool):
