@@ -9,12 +9,7 @@ class KadastralesubjectenCsvFormat:
         return {f"{key_prefix}{key}": f"{val_prefix}{val}" for key, val in dct.items()}
 
     def _add_condition_to_attrs(self, condition: dict, attrs: dict):
-        res = {}
-        for k, v in attrs.items():
-            c = condition.copy()
-            c.update({'value': v})
-            res[k] = c
-        return res
+        return {k: {**condition, 'value': v} for k, v in attrs.items()}
 
     def show_when_field_notempty_condition(self, fieldref: str):
         return {
