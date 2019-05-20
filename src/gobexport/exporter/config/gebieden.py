@@ -99,7 +99,7 @@ class StadsdelenExportConfig:
             },
             'query': """
 {
-  stadsdelen(sort: [identificatie_asc, volgnummer_asc]) {
+  stadsdelen(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -209,7 +209,7 @@ class GGPGebiedenExportConfig:
             },
             'query': '''
 {
-  ggpgebieden(sort: [identificatie_asc, volgnummer_asc]) {
+  ggpgebieden(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -222,7 +222,7 @@ class GGPGebiedenExportConfig:
         documentdatum
         documentnummer
         geometrie
-        ligtInStadsdeel {
+        ligtInStadsdeel(active: false) {
           edges {
             node {
               identificatie
@@ -330,7 +330,7 @@ class GGWGebiedenExportConfig:
             },
             'query': '''
 {
-  ggwgebieden(sort: [identificatie_asc, volgnummer_asc]) {
+  ggwgebieden(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -343,7 +343,7 @@ class GGWGebiedenExportConfig:
         documentdatum
         documentnummer
         geometrie
-        ligtInStadsdeel {
+        ligtInStadsdeel(active: false) {
           edges {
             node {
               identificatie
@@ -464,7 +464,7 @@ class WijkenExportConfig:
             },
             'query': '''
 {
-  wijken(sort: [identificatie_asc, volgnummer_asc]) {
+  wijken(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -478,7 +478,7 @@ class WijkenExportConfig:
         documentnummer
         cbsCode
         geometrie
-        LigtInGgwgebied {
+        LigtInGgwgebied(active: false) {
           edges {
             node {
               identificatie
@@ -490,7 +490,7 @@ class WijkenExportConfig:
             }
           }
         }
-        ligtInStadsdeel {
+        ligtInStadsdeel(active: false) {
           edges {
             node {
               identificatie
@@ -631,7 +631,7 @@ class BuurtenExportConfig:
             },
             'query': '''
 {
-  buurten(sort: [identificatie_asc, volgnummer_asc]) {
+  buurten(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -645,7 +645,7 @@ class BuurtenExportConfig:
         documentnummer
         cbsCode
         geometrie
-        LigtInGgwgebied {
+        LigtInGgwgebied(active: false) {
           edges {
             node {
               identificatie
@@ -657,7 +657,7 @@ class BuurtenExportConfig:
             }
           }
         }
-        LigtInGgpgebied {
+        LigtInGgpgebied(active: false) {
           edges {
             node {
               identificatie
@@ -669,7 +669,7 @@ class BuurtenExportConfig:
             }
           }
         }
-        ligtInWijk {
+        ligtInWijk(active: false) {
           edges {
             node {
               identificatie
@@ -678,7 +678,7 @@ class BuurtenExportConfig:
               naam
               beginGeldigheid
               eindGeldigheid
-              ligtInStadsdeel {
+              ligtInStadsdeel(active: false) {
                 edges {
                   node {
                     identificatie
@@ -820,7 +820,7 @@ class BouwblokkenExportConfig:
             },
             'query': '''
 {
-  bouwblokken(sort: [code_asc, volgnummer_asc]) {
+  bouwblokken(sort: [code_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -830,7 +830,7 @@ class BouwblokkenExportConfig:
         beginGeldigheid
         eindGeldigheid
         geometrie
-        ligtInBuurt {
+        ligtInBuurt(active: false) {
           edges {
             node {
               identificatie
@@ -839,7 +839,7 @@ class BouwblokkenExportConfig:
               naam
               beginGeldigheid
               eindGeldigheid
-              LigtInGgwgebied {
+              LigtInGgwgebied(active: false) {
                 edges {
                   node {
                     identificatie
@@ -851,7 +851,7 @@ class BouwblokkenExportConfig:
                   }
                 }
               }
-              LigtInGgpgebied {
+              LigtInGgpgebied(active: false) {
                 edges {
                   node {
                     identificatie
@@ -863,7 +863,7 @@ class BouwblokkenExportConfig:
                   }
                 }
               }
-              ligtInWijk {
+              ligtInWijk(active: false) {
                 edges {
                   node {
                     identificatie
@@ -872,7 +872,7 @@ class BouwblokkenExportConfig:
                     naam
                     beginGeldigheid
                     eindGeldigheid
-                    ligtInStadsdeel {
+                    ligtInStadsdeel(active: false) {
                       edges {
                         node {
                           identificatie
