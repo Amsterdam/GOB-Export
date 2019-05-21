@@ -18,7 +18,7 @@ class KadastralesubjectenCsvFormat:
             "negate": True,
         }
 
-    def hide_when_field_isempty_condition(self, fieldref: str):
+    def show_when_field_empty_condition(self, fieldref: str):
         return {
             "condition": "isempty",
             "reference": fieldref,
@@ -46,10 +46,10 @@ class KadastralesubjectenCsvFormat:
         }
 
         show_when_bsn_condition = self.show_when_field_notempty_condition(bsn_field)
-        hide_when_bsn_condition = self.hide_when_field_isempty_condition(bsn_field)
+        show_when_not_bsn_condition = self.show_when_field_empty_condition(bsn_field)
 
         sjt_np_attrs = self._add_condition_to_attrs(show_when_bsn_condition, sjt_np_attrs)
-        sjt_kad_attrs = self._add_condition_to_attrs(hide_when_bsn_condition, sjt_kad_attrs)
+        sjt_kad_attrs = self._add_condition_to_attrs(show_when_not_bsn_condition, sjt_kad_attrs)
         bsn_only_attrs = self._add_condition_to_attrs(show_when_bsn_condition, bsn_only_attrs)
 
         return {
@@ -83,9 +83,9 @@ class KadastralesubjectenCsvFormat:
         sjt_kad_attrs = self._prefix_dict(generic_attrs, 'SJT_KAD_', '')
 
         show_when_kvk_condition = self.show_when_field_notempty_condition(kvk_field)
-        hide_when_kvk_condition = self.hide_when_field_isempty_condition(kvk_field)
+        show_when_not_kvk_condition = self.show_when_field_empty_condition(kvk_field)
         sjt_nnp_attrs = self._add_condition_to_attrs(show_when_kvk_condition, sjt_nnp_attrs)
-        sjt_kad_attrs = self._add_condition_to_attrs(hide_when_kvk_condition, sjt_kad_attrs)
+        sjt_kad_attrs = self._add_condition_to_attrs(show_when_not_kvk_condition, sjt_kad_attrs)
 
         return {
             'SJT_NNP_RSIN': '_embedded.heeftRsinVoor.bronwaarde',
@@ -140,41 +140,6 @@ class KadastralesubjectenCsvFormat:
 
 
 class KadastralesubjectenExportConfig:
-    query = '''
-{
-  kadastralesubjecten {
-    edges {
-      node {
-        identificatie
-        typeSubject
-        beschikkingsbevoegdheid
-        voornamen
-        voorvoegsels
-        geslachtsnaam
-        geslacht
-        naamGebruik
-        geboortedatum
-        geboorteplaats
-        geboorteland
-        datumOverlijden
-        voornamenPartner
-        voorvoegselsPartner
-        geslachtsnaamPartner
-        landWaarnaarVertrokken
-        indicatieOverleden
-        rechtsvorm
-        statutaireNaam
-        statutaireZetel
-        woonadres
-        postadresPostbus
-        postadres
-        postadresBuitenland
-      }
-    }
-  }
-}
-'''
-
     format = KadastralesubjectenCsvFormat()
 
     now = datetime.datetime.now()
