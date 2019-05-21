@@ -36,20 +36,44 @@ def evaluate_condition(entity: dict, condition: dict):
     :param condition:
     :return:
     """
-    assert all([k in condition for k in ['condition', 'reference', 'value']]), "Invalid condition definition"
-    assert condition.get('reference') != condition.get('value'), "Reference and value cannot be the same"
+    assert all([k in condition for k in ['condition', 'reference']]), "Invalid condition definition"
+    assert any([k in condition for k in ['value', 'override']]), "Value or override should be provided"
 
-    onfield_value = get_entity_value(entity, _split_field_reference(condition.get('reference')))
-    value = _split_field_reference(condition.get('value'))
     condition_type = condition.get('condition')
+    reference = condition.get('reference')
+    value = condition.get('value')
+    override = condition.get('override')
+    negate = condition.get('negate', False)
+
+    if not override:
+        # If no override value has been provided, reference and value can't be the same
+        assert reference != value, "Reference and value cannot be the same"
+
+    onfield_value = get_entity_value(entity, _split_field_reference(reference))
 
     if condition_type == 'isempty':
-        condition_result = bool(onfield_value)
+        condition_result = not bool(onfield_value)
     else:
         raise NotImplementedError(f"Not implemented condition f{condition_type}")
 
-    if condition_result is not condition.get('negate', False):
-        return value
+    return process_condition_result(entity, condition_result, negate, value, reference, override)
+
+
+def process_condition_result(entity, condition_result, negate, value, reference, override):
+    reference_list = _split_field_reference(reference)
+
+    if condition_result is not negate:
+        if value:
+            # If a field reference is provided, return this as the new mapping
+            return _split_field_reference(value)
+
+        if override:
+            # When the condition is met, update the entity reference value
+            update_entity_value(entity, reference_list, override)
+            return reference_list
+    elif override:
+        # When the condition isn't met return the original value
+        return reference_list
 
     return None
 
@@ -69,6 +93,25 @@ def get_entity_value(entity, lookup_key):
     if isinstance(value, bool):
         value = 'J' if value else 'N'
     return value
+
+
+def update_entity_value(entity, lookup_key, value):
+    """Update the value from the entity using a key or a list of keys
+
+    :param entity: The API entity to get the value from
+    :param lookup_key: A attribute name or a list of attribute names
+    :param new_value: The value to assign
+    :return:
+    """
+    if isinstance(lookup_key, list):
+        inside = entity
+        for key in lookup_key:
+            if isinstance(inside.get(key), dict):
+                inside = inside[key]
+            else:
+                inside[key] = value
+    else:
+        entity[lookup_key] = value
 
 
 def csv_exporter(api, file, format=None):
