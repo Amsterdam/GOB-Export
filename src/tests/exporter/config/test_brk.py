@@ -53,5 +53,5 @@ class TestKadastralesubjectenCsvFormat(TestCase):
             'reference': 'FIELDREF',
         }
 
-        self.assertEqual(expected, self.format.hide_when_field_isempty_condition('FIELDREF'))
+        self.assertEqual(expected, self.format.show_when_field_empty_condition('FIELDREF'))
 

@@ -99,7 +99,7 @@ class StadsdelenExportConfig:
             },
             'query': """
 {
-  stadsdelen(sort: [identificatie_asc, volgnummer_asc], active: false) {
+  stadsdelen(sort: [code_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -464,7 +464,7 @@ class WijkenExportConfig:
             },
             'query': '''
 {
-  wijken(sort: [identificatie_asc, volgnummer_asc], active: false) {
+  wijken(sort: [code_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
