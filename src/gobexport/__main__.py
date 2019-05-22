@@ -60,8 +60,9 @@ def handle_export_test_msg(msg):
 
     msg["header"].update({
         'process_id': process_id,
-        'application': "GOBExportTest",
-        'catalogue': catalogue
+        'application': f"GOBExportTest",
+        'catalogue': catalogue,
+        'entity': catalogue
     })
 
     logger.configure(msg, "EXPORT_TEST")
