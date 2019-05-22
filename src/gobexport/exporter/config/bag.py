@@ -22,6 +22,31 @@ following properties:
 """
 
 
+class BAGDefaultCSVFormat:
+
+    default_values = {
+        'aanduidingInOnderzoek': 'N',
+        'geconstateerd': 'N'
+    }
+
+    def __init__(self, format):
+        self.format = format
+        self._update_attrs_with_default()
+
+    def _update_attrs_with_default(self):
+        for name, value in self.default_values.items():
+            if name in self.format:
+                reference = self.format[name]
+                self.format[name] = {
+                    'condition': 'isempty',
+                    'override': value,
+                    'reference': reference,
+                }
+
+    def get_format(self):
+        return self.format
+
+
 class WoonplaatsenExportConfig:
 
     query_actueel = '''
@@ -45,26 +70,28 @@ class WoonplaatsenExportConfig:
 }
 '''
 
+    format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'naam': 'naam',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'status': 'status.omschrijving',
+        'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
+        'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+        'geometrie': 'geometrie',
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_woonplaats_Actueel.csv',
             'mime_type': 'plain/text',
-            'format': {
-                'identificatie': 'identificatie',
-                'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
-                'geconstateerd': 'geconstateerd',
-                'naam': 'naam',
-                'beginGeldigheid': 'beginGeldigheid',
-                'eindGeldigheid': 'eindGeldigheid',
-                'documentdatum': 'documentdatum',
-                'documentnummer': 'documentnummer',
-                'status': 'status.omschrijving',
-                'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
-                'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'geometrie': 'geometrie',
-            },
+            'format': format.get_format(),
             'query': query_actueel
         },
         'esri_actueel': {
@@ -122,6 +149,7 @@ class OpenbareruimtesExportConfig:
           edges {
             node {
               identificatie
+              naam
             }
           }
         }
@@ -135,27 +163,30 @@ class OpenbareruimtesExportConfig:
   }
 }
 '''
+    format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'naam': 'naam',
+        'naamNEN': 'naamNen',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'type': 'type.omschrijving',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'status': 'status.omschrijving',
+        'ligtIn:BAG.WPS.identificatie': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.naam': 'ligtInWoonplaats.naam',
+        'geometrie': 'geometrie',
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_openbare_ruimte_Actueel.csv',
             'mime_type': 'plain/text',
-            'format': {
-                'identificatie': 'identificatie',
-                'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
-                'geconstateerd': 'geconstateerd',
-                'naam': 'naam',
-                'naamNen': 'naamNen',
-                'beginGeldigheid': 'beginGeldigheid',
-                'eindGeldigheid': 'eindGeldigheid',
-                'type': 'type.omschrijving',
-                'documentdatum': 'documentdatum',
-                'documentnummer': 'documentnummer',
-                'status': 'status.omschrijving',
-                'ligtIn:BAG.WPL.identificatie': 'ligtInWoonplaats.identificatie',
-                'geometrie': 'geometrie',
-            },
+            'format': format.get_format(),
             'query': query_actueel
         },
         'esri_actueel': {
@@ -282,34 +313,37 @@ class NummeraanduidingenExportConfig:
   }
 }
 '''
+
+    format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'huisnummer': 'huisnummer',
+        'huisletter': 'huisletter',
+        'huisnummertoevoeging': 'huisnummertoevoeging',
+        'postcode': 'postcode',
+        'ligtAan:BAG.ORE.identificatie': 'ligtAanOpenbareruimte.identificatie',
+        'ligtAan:BAG.ORE.naam': 'ligtAanOpenbareruimte.naam',
+        'ligtIn:BAG.WPS.identificatie': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.naam': 'ligtInWoonplaats.naam',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'typeAdresseerbaarObject': 'typeAdresseerbaarObject.omschrijving',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'status': 'status.omschrijving',
+        'adresseert:BAG.VOT.identificatie': 'adresseertVerblijfsobject.identificatie',
+        'adresseert:BAG.LPS.identificatie': 'adresseertLigplaats.identificatie',
+        'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_nummeraanduiding_Actueel.csv',
             'mime_type': 'plain/text',
-            'format': {
-                'identificatie': 'identificatie',
-                'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
-                'geconstateerd': 'geconstateerd',
-                'huisnummer': 'huisnummer',
-                'huisletter': 'huisletter',
-                'huisnummertoevoeging': 'huisnummertoevoeging',
-                'postcode': 'postcode',
-                'ligtAan:BAG.ORE.identificatie': 'ligtAanOpenbareruimte.identificatie',
-                'ligtAan:BAG.ORE.naam': 'ligtAanOpenbareruimte.naam',
-                'ligtIn:BAG.WPL.identificatie': 'ligtInWoonplaats.identificatie',
-                'ligtIn:BAG.WPL.naam': 'ligtInWoonplaats.naam',
-                'beginGeldigheid': 'beginGeldigheid',
-                'eindGeldigheid': 'eindGeldigheid',
-                'typeAdresseerbaarObject': 'typeAdresseerbaarObject.omschrijving',
-                'documentdatum': 'documentdatum',
-                'documentnummer': 'documentnummer',
-                'status': 'status.omschrijving',
-                'adresseert:BAG.VOT.identificatie': 'adresseertVerblijfsobject.identificatie',
-                'adresseert:BAG.LPS.identificatie': 'adresseertLigplaats.identificatie',
-                'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
-            },
+            'format': format.get_format(),
             'query': query_actueel
         }
     }
@@ -445,68 +479,71 @@ class VerblijfsobjectenExportConfig:
   }
 }
 '''
+
+    format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
+        'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
+        'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'postcodeHoofdadres': 'heeftHoofdadres.postcode',
+        'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
+        'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
+        'ligtIn:BAG.WPS.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.naamHoofdadres': 'ligtInWoonplaats.naam',
+        'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
+        'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'gebruiksdoel': 'gebruiksdoel.omschrijving',
+        'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie.omschrijving',
+        'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
+        'aantalEenhedenComplex': 'aantalEenhedenComplex',
+        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'oppervlakte': 'oppervlakte',
+        'status': 'status.omschrijving',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'verdiepingToegang': 'verdiepingToegang',
+        'toegang': 'toegang.omschrijving',
+        'aantalBouwlagen': 'aantalBouwlagen',
+        'hoogsteBouwlaag': 'hoogsteBouwlaag',
+        'laagsteBouwlaag': 'laagsteBouwlaag',
+        'aantalKamers': 'aantalKamers',
+        'eigendomsverhouding': 'eigendomsverhouding.omschrijving',
+        'redenopvoer': 'redenopvoer.omschrijving',
+        'redenafvoer': 'redenafvoer.omschrijving',
+        'ligtIn:BAG.PND.identificatie': 'ligtInPanden.0.identificatie',
+        'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
+        'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
+        'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
+        'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
+        'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
+        'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
+        'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
+        'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
+        'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+        'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+        'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
+        'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
+        'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
+        'geometrie': 'geometrie'
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_verblijfsobject_Actueel.csv',
             'mime_type': 'plain/text',
-            'format': {
-                'identificatie': 'identificatie',
-                'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
-                'geconstateerd': 'geconstateerd',
-                'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
-                'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
-                'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
-                'huisnummerToevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
-                'postcodeHoofdadres': 'heeftHoofdadres.postcode',
-                'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
-                'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
-                'ligtIn:BAG.WPL.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
-                'ligtIn:BAG.WPL.naamHoofdadres': 'ligtInWoonplaats.naam',
-                'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
-                'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
-                'gebruiksdoel': 'gebruiksdoel.omschrijving',
-                'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie.omschrijving',
-                'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
-                'aantalEenhedenComplex': 'aantalEenhedenComplex',
-                'feitelijkGebruik': 'feitelijkGebruik.omschrijving',
-                'oppervlakte': 'oppervlakte',
-                'status': 'status.omschrijving',
-                'beginGeldigheid': 'beginGeldigheid',
-                'eindGeldigheid': 'eindGeldigheid',
-                'documentdatum': 'documentdatum',
-                'documentnummer': 'documentnummer',
-                'verdiepingToegang': 'verdiepingToegang',
-                'toegang': 'toegang.omschrijving',
-                'aantalBouwlagen': 'aantalBouwlagen',
-                'hoogsteBouwlaag': 'hoogsteBouwlaag',
-                'laagsteBouwlaag': 'laagsteBouwlaag',
-                'aantalKamers': 'aantalKamers',
-                'eigendomsverhouding': 'eigendomsverhouding.omschrijving',
-                'redenopvoer': 'redenopvoer.omschrijving',
-                'redenafvoer': 'redenafvoer.omschrijving',
-                'ligtIn:BAG.PND.identificatie': 'ligtInPanden.0.identificatie',
-                'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
-                'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
-                'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
-                'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
-                'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
-                'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
-                'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
-                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
-                'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-                'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
-                'geometrie': 'geometrie'
-            },
+            'format': format.get_format(),
             'query': query_actueel
         },
         'esri_actueel': {
@@ -681,51 +718,54 @@ class StandplaatsenExportConfig:
   }
 }
 '''
+
+    format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
+        'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
+        'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'postcodeHoofdadres': 'heeftHoofdadres.postcode',
+        'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
+        'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
+        'ligtIn:BAG.WPS.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.naamHoofdadres': 'ligtInWoonplaats.naam',
+        'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
+        'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'status': 'status.omschrijving',
+        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
+        'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
+        'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
+        'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
+        'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
+        'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
+        'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+        'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+        'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+        'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
+        'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
+        'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
+        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'geometrie': 'geometrie'
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_standplaats_Actueel.csv',
             'mime_type': 'plain/text',
-            'format': {
-                'identificatie': 'identificatie',
-                'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
-                'geconstateerd': 'geconstateerd',
-                'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
-                'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
-                'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
-                'huisnummerToevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
-                'postcodeHoofdadres': 'heeftHoofdadres.postcode',
-                'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
-                'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
-                'ligtIn:BAG.WPL.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
-                'ligtIn:BAG.WPL.naamHoofdadres': 'ligtInWoonplaats.naam',
-                'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
-                'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
-                'status': 'status.omschrijving',
-                'feitelijkGebruik': 'feitelijkGebruik.omschrijving',
-                'beginGeldigheid': 'beginGeldigheid',
-                'eindGeldigheid': 'eindGeldigheid',
-                'documentdatum': 'documentdatum',
-                'documentnummer': 'documentnummer',
-                'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
-                'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
-                'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
-                'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
-                'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
-                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
-                'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-                'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
-                'geometrie': 'geometrie'
-            },
+            'format': format.get_format(),
             'query': query_actueel
         },
         'esri_actueel': {
@@ -883,51 +923,54 @@ class LigplaatsenExportConfig:
   }
 }
 '''
+
+    format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
+        'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
+        'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'postcodeHoofdadres': 'heeftHoofdadres.postcode',
+        'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
+        'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
+        'ligtIn:BAG.WPS.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.naamHoofdadres': 'ligtInWoonplaats.naam',
+        'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
+        'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'status': 'status.omschrijving',
+        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
+        'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
+        'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
+        'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
+        'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
+        'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
+        'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+        'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+        'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+        'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
+        'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
+        'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
+        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'geometrie': 'geometrie'
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_ligplaats_Actueel.csv',
             'mime_type': 'plain/text',
-            'format': {
-                'identificatie': 'identificatie',
-                'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
-                'geconstateerd': 'geconstateerd',
-                'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
-                'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
-                'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
-                'huisnummerToevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
-                'postcodeHoofdadres': 'heeftHoofdadres.postcode',
-                'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
-                'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
-                'ligtIn:BAG.WPL.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
-                'ligtIn:BAG.WPL.naamHoofdadres': 'ligtInWoonplaats.naam',
-                'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
-                'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
-                'status': 'status.omschrijving',
-                'feitelijkGebruik': 'feitelijkGebruik.omschrijving',
-                'beginGeldigheid': 'beginGeldigheid',
-                'eindGeldigheid': 'eindGeldigheid',
-                'documentdatum': 'documentdatum',
-                'documentnummer': 'documentnummer',
-                'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
-                'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
-                'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
-                'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
-                'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
-                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
-                'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-                'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
-                'geometrie': 'geometrie'
-            },
+            'format': format.get_format(),
             'query': query_actueel
         },
         'esri_actueel': {
@@ -1062,46 +1105,49 @@ class PandenExportConfig:
   }
 }
 '''
+
+    format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'status': 'status.omschrijving',
+        'oorspronkelijkBouwjaar': 'oorspronkelijkBouwjaar',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'naam': 'naam',
+        'ligging': 'ligging.omschrijving',
+        'aantalBouwlagen': 'aantalBouwlagen',
+        'hoogsteBouwlaag': 'hoogsteBouwlaag',
+        'laagsteBouwlaag': 'laagsteBouwlaag',
+        'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
+        'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
+        'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
+        'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
+        'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
+        'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
+        'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
+        'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
+        'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+        'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+        'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+        'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
+        'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
+        'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
+        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'geometrie': 'geometrie'
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_pand_Actueel.csv',
             'mime_type': 'plain/text',
-            'format': {
-                'identificatie': 'identificatie',
-                'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
-                'geconstateerd': 'geconstateerd',
-                'status': 'status.omschrijving',
-                'oorspronkelijkBouwjaar': 'oorspronkelijkBouwjaar',
-                'beginGeldigheid': 'beginGeldigheid',
-                'eindGeldigheid': 'eindGeldigheid',
-                'documentdatum': 'documentdatum',
-                'documentnummer': 'documentnummer',
-                'naam': 'naam',
-                'ligging': 'ligging',
-                'aantalBouwlagen': 'aantalBouwlagen',
-                'hoogsteBouwlaag': 'hoogsteBouwlaag',
-                'laagsteBouwlaag': 'laagsteBouwlaag',
-                'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
-                'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
-                'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
-                'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
-                'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
-                'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
-                'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
-                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
-                'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-                'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
-                'geometrie': 'geometrie'
-            },
+            'format': format.get_format(),
             'query': query_actueel
         },
         'esri_actueel': {
@@ -1182,11 +1228,11 @@ class BrondocumentenExportConfig:
         'csv_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_brondocument_Actueel.csv',
+            'filename': 'CSV_Actueel/BAG_brondocument.csv',
             'mime_type': 'plain/text',
             'format': {
-                'documentnummer': 'documentnummer',
                 'dossier': 'dossier',
+                'documentnummer': 'documentnummer',
                 'documentdatum': 'registratiedatum',
                 'bronleverancier': 'bronleverancier.omschrijving',
                 'typeDossier': 'typeDossier.omschrijving',
