@@ -95,3 +95,11 @@ class RollagenExportConfig:
             'format': 'identificatie:str|idx:num|geometrie:coo:x|geometrie:coo:y|geometrie:geo'
         }
     }
+
+
+configs = [
+    MeetboutExportConfig,
+    MetingenExportConfig,
+    ReferentiepuntenExportConfig,
+    RollagenExportConfig
+]

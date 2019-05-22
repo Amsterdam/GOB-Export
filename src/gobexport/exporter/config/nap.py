@@ -23,3 +23,6 @@ class PeilmerkenExportConfig:
                       'geometrie:geo'
         }
     }
+
+
+configs = [PeilmerkenExportConfig]
