@@ -35,6 +35,7 @@ CONFIG_MAPPING = {
     },
     'brk': {
         'kadastralesubjecten': brk.KadastralesubjectenExportConfig,
+        'aantekeningen': brk.AantekeningenExportConfig,
     }
 }
 
@@ -65,6 +66,6 @@ def export_to_file(host, product, file, catalogue, collection):
     exporter = product.get('exporter')
     format = product.get('format')
 
-    row_count = exporter(api, file, format)
+    row_count = exporter(api, file, format, append=product.get('append', False))
 
     return row_count

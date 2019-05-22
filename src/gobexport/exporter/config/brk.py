@@ -155,3 +155,146 @@ class KadastralesubjectenExportConfig:
             'format': format.get_format(),
         }
     }
+
+
+class AantekeningenExportConfig:
+    now = datetime.datetime.now()
+    datestr = now.strftime('%Y%m%d')
+    filename = f'BRK_Aantekening_{datestr}.csv'
+
+    art_query = '''
+{
+  aantekeningenrechten {
+    edges {
+      node {
+        identificatie
+        aard
+        omschrijving
+        aardZakelijkRecht
+        einddatum
+        heeftBetrokkenPersoon {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        betrokkenTenaamstelling {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        isGebaseerdOpStukdeel {
+          edges {
+            node {
+              identificatie
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    art_format = {
+        'BRK_ATG_ID': 'identificatie',
+        'ATG_AARDAANTEKENING_CODE': 'aard.code',
+        'ATG_AARDAANTEKENING_OMS': 'aard.omschrijving',
+        'ATG_OMSCHRIJVING': 'omschrijving',
+        'ATG_EINDDATUM': 'einddatum',
+        'ATG_TYPE': '',
+        'BRK_KOT_ID': '',
+        'KOT_KADASTRALEGEMCODE_CODE': '',
+        'KOT_SECTIE': '',
+        'KOT_PERCEELNUMMER': '',
+        'KOT_INDEX_LETTER': '',
+        'KOT_INDEX_NUMMER': '',
+        'BRK_TNG_ID': 'betrokkenTenaamstelling.identificatie',
+        'ZRT_AARD_ZAKELIJKRECHT_CODE': 'aardZakelijkRecht.code',
+        'ZRT_AARD_ZAKELIJKRECHT_OMS': 'aardZakelijkRecht.omschrijving',
+        'BRK_SJT_ID': 'heeftBetrokkenPersoon.identificatie',
+    }
+
+    akt_query = '''
+{
+  aantekeningenkadastraleobjecten {
+    edges {
+      node {
+        identificatie
+        aard
+        omschrijving
+        einddatum,
+        heeftBetrokkenPersoon {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        heeftBetrekkingOpKadastraalObject {
+          edges {
+            node {
+              identificatie
+              perceelnummer
+              indexletter
+              indexnummer
+            }
+          }
+        }
+        isGebaseerdOpStukdeel {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    akt_format = {
+        'BRK_ATG_ID': 'identificatie',
+        'ATG_AARDAANTEKENING_CODE': 'aard.code',
+        'ATG_AARDAANTEKENING_OMS': 'aard.omschrijving',
+        'ATG_OMSCHRIJVING': 'omschrijving',
+        'ATG_EINDDATUM': 'einddatum',
+        'ATG_TYPE': '',
+        'BRK_KOT_ID': 'heeftBetrekkingOpKadastraalObject.identificatie',
+        'KOT_KADASTRALEGEMCODE_CODE': '',
+        'KOT_SECTIE': '',
+        'KOT_PERCEELNUMMER': 'heeftBetrekkingOpKadastraalObject.perceelnummer',
+        'KOT_INDEX_LETTER': 'heeftBetrekkingOpKadastraalObject.indexletter',
+        'KOT_INDEX_NUMMER': 'heeftBetrekkingOpKadastraalObject.indexnummer',
+        'BRK_TNG_ID': '',
+        'ZRT_AARD_ZAKELIJKRECHT_CODE': '',
+        'ZRT_AARD_ZAKELIJKRECHT_OMS': '',
+        'BRK_SJT_ID': 'heeftBetrokkenPersoon.identificatie',
+    }
+
+    products = {
+        'csv_art': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'query': art_query,
+            'collection': 'aantekeningenrechten',
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': art_format,
+        },
+        'csv_akt': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'query': akt_query,
+            'collection': 'aantekeningenkadastraleobjecten',
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': akt_format,
+            'append': True,
+        }
+    }

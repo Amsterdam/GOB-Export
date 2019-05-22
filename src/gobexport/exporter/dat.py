@@ -172,7 +172,7 @@ def type_convert(type_name, value, *args):
     return converters[type_name](value, *args)
 
 
-def dat_exporter(api, file, format=None):
+def dat_exporter(api, file, format=None, append=False):
     """Exports a single entity
 
     Headers:       None
@@ -186,6 +186,9 @@ def dat_exporter(api, file, format=None):
 
     :return:
     """
+    if append:
+        raise NotImplementedError("Appending not implemented for this exporter")
+
     row_count = 0
     with open(file, 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
         # Get the headers from the first record in the API
