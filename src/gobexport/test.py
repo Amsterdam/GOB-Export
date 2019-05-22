@@ -1,22 +1,40 @@
+"""
+Test export files
+
+Test each exported file.
+File characteristics are used to test export files
+"""
 import json
+import hashlib
+import statistics
 import datetime
 import dateutil.parser
 
-from objectstore.objectstore import get_full_container_list, get_object
+from objectstore.objectstore import get_full_container_list, get_object, put_object
 
 from gobcore.logging.logger import logger
 
 from gobexport.config import CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
-from gobexport.exporter.config import nap
+from gobexport.exporter.config import nap, gebieden, meetbouten, bag
 
 
+# All export configurations per catalogue
 export_config = {
-    "nap": [nap.PeilmerkenExportConfig]
+    "nap": nap.configs,
+    "gebieden": gebieden.configs,
+    "meetbouten": meetbouten.configs,
+    "bag": bag.configs
 }
 
 
 def test(catalogue):
+    """
+    Test export files for a given catalogue
+
+    :param catalogue: catalogue to test
+    :return: None
+    """
     logger.info(f"Test export for catalogue {catalogue}")
 
     logger.info(f"Connect to Objectstore")
@@ -26,50 +44,163 @@ def test(catalogue):
     logger.info(f"Load files from {container_name}")
     conn_info = {
         "connection": connection,
-        "container": {
-            "name": container_name,
-            "list": get_full_container_list(connection, container_name)
-        }
+        "container": container_name
     }
 
-    logger.info("Load checks")
-    checks = get_checks(conn_info)
+    # Get test definitions for the given catalogue
+    checks = _get_checks(conn_info, catalogue)
 
-    if checks is None:
-        logger.info(f"No checks defined for {container_name}")
-        return
-
+    # Make proposals for any missing test definitions
+    proposals = {}
     for config in export_config[catalogue]:
         for name, product in config.products.items():
             filename = product['filename']
-            if checks[filename]:
-                logger.info(f"Check {filename}")
-                obj_info, obj = get_file(conn_info, f"{catalogue}/{filename}")
-                stats = get_analyses(obj_info, obj)
-                if not check_file(filename, stats, checks):
-                    logger.info(f"Check failed for {filename}")
+            obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
+            if checks.get(filename):
+                stats = _get_analysis(obj_info, obj)
+                if _check_file(filename, stats, checks):
+                    logger.info(f"{filename} OK")
+                else:
+                    logger.info(f"{filename} FAILED")
+            elif obj_info is None:
+                logger.error(f"{filename} MISSING")
             else:
-                logger.warning(f"No checks defined for {filename}")
+                logger.warning(f"{filename} UNCHECKED")
+                proposal = _propose_check_file(filename, obj_info, obj)
+                proposals[filename] = proposal
+
+    # Write out any missing test definitions
+    _write_proposals(conn_info, catalogue, checks, proposals)
 
 
-def get_checks(conn_info):
-    _, checks_file = get_file(conn_info, "checks.json")
-    return None if checks_file is None else json.loads(checks_file.decode("utf-8"))
+def _get_file(conn_info, filename):
+    """
+    Get a file from Objectstore
 
-
-def get_file(conn_info, filename):
-    for item in conn_info['container']['list']:
+    :param conn_info: Objectstore connection
+    :param filename: name of the file to retrieve
+    :return:
+    """
+    for item in get_full_container_list(conn_info['connection'], conn_info['container']):
         if item["name"] == filename:
             obj_info = dict(item)
-            obj = get_object(conn_info['connection'], item, conn_info['container']['name'])
+            obj = get_object(conn_info['connection'], item, conn_info['container'])
             return obj_info, obj
     return None, None
 
 
-def check_file(filename, stats, checks):
+def _get_checks(conn_info, catalogue):
+    """
+    Get test definitions for the given catalogue
+
+    :param conn_info: Objectstore connection
+    :param catalogue: Catalogue name
+    :return:
+    """
+    filename = f"checks.{catalogue}.json"
+    _, checks_file = _get_file(conn_info, filename)
+    if checks_file is None:
+        logger.error(f"Missing checks file: {filename}")
+        return {}
+    try:
+        return json.loads(checks_file.decode("utf-8"))
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON error in checks file '{filename}': {str(e)}")
+        return {}
+
+
+def _write_proposals(conn_info, catalogue, checks, proposals):
+    """
+    Write proposals for missing test definitions to Objectstore
+
+    :param conn_info: Objectstore connection
+    :param catalogue: Catalogue name
+    :param checks: Current checks for the given catalogue
+    :param proposals: Proposals for missing test definitions
+    :return: None
+    """
+    if proposals.keys():
+        # Write a proposal file
+        # If no checks have yet been defined write an initial check definitions file
+        proposal = ".proposal" if checks.keys() else ""
+        filename = f"checks.{catalogue}{proposal}.json"
+        put_object(conn_info['connection'],
+                   conn_info['container'],
+                   filename,
+                   contents=json.dumps(proposals, indent=4),
+                   content_type="application/json")
+
+
+def _propose_check_file(filename, obj_info, obj):
+    """
+    Build a proposal to check the given file
+
+    :param filename: Name of the file to check
+    :param obj_info: Current file object info
+    :param obj: Current file object
+    :return: proposal object
+    """
+    # Base the proposal on the analysis of the current file
+    analysis = _get_analysis(obj_info, obj)
+    analysis["age_hours"] = 24
+
+    proposal = {}
+    for key, value in analysis.items():
+        if key in ["age_hours"]:
+            # Maximum value
+            proposal[key] = [0, value]
+        elif key in ["bytes", "chars"]:
+            # Minimum value
+            proposal[key] = [value, None]
+        elif key in ["empty_lines", "first_bytes"]:
+            # Absolute value
+            proposal[key] = [value]
+        else:
+            # Within limits
+            low, high = _get_low_high(value)
+            proposal[key] = [low, high]
+    return proposal
+
+
+def _get_low_high(value):
+    """
+    Get a lower and upper limit for a given value
+
+    :param value: value to evaluate
+    :return: low and high limit
+    """
+    # Use an up-down margin of 5%
+    margin = 0.05
+    low = value * (1 - margin)
+    high = value * (1 + margin)
+
+    # Round the limits to 0.01 for percentages and integers for any other values
+    dist = 0.01 if value < 1 else 1
+    low = int(low / dist) * dist
+    high = int(high / dist) * dist
+
+    if low >= value:
+        low -= dist
+    if high <= value:
+        high += dist
+    assert low < value < high
+
+    return low, high
+
+
+def _check_file(filename, stats, checks):
+    """
+    Test if all checks that have been defined for the given file are OK
+
+    :param filename: Name of the file to check
+    :param stats: Statistics of the file
+    :param checks: Check to apply onto the statistics
+    :return: True if all checks succeed
+    """
     check = checks[filename]
     total_result = True
     for key, margin in check.items():
+        # Get corresponding value for check
         value = stats[key]
         if len(margin) == 1:
             result = value == margin[0]
@@ -81,18 +212,44 @@ def check_file(filename, stats, checks):
             result = margin[0] <= value <= margin[1]
         total_result = total_result and result
 
+        # Report any errors for the given filename as a group
         if not result:
             str_value = f"{value:.2f}".replace(".00", "")
-            logger.error(f"Check on {key} failed: {str_value} <> {margin}")
+            extra_data = {
+                'id': filename,
+                'data': {
+                    key: str_value,
+                    'margin': margin
+                }
+            }
+            logger.error("Check failed", extra_data)
     return total_result
 
 
-def get_analyses(obj_info, obj):
+def _get_analysis(obj_info, obj):
+    """
+    Get statistics for the given file (object)
+
+    :param obj_info: meta information
+    :param obj: contents
+    :return:
+    """
     last_modified = obj_info["last_modified"]
     age = datetime.datetime.now() - dateutil.parser.parse(last_modified)
     age_hours = age.total_seconds() / (60 * 60)
 
     bytes = obj_info["bytes"]
+
+    first_bytes = hashlib.md5(obj[:10000]).hexdigest()
+
+    base_analysis = {
+        "age_hours": age_hours,
+        "bytes": bytes,
+        "first_bytes": first_bytes
+    }
+
+    if obj_info['content_type'] != "plain/text":
+        return base_analysis
 
     content = obj.decode("utf-8")
     chars = len(content)
@@ -102,6 +259,7 @@ def get_analyses(obj_info, obj):
     line_lengths = [len(line) for line in lines]
     zero_line_lengths = [n for n in line_lengths if n == 0]
     other_line_lengths = [m for m in line_lengths if m > 0]
+    avg_line = statistics.mean(other_line_lengths)
 
     digits = sum(c.isdigit() for c in content)
     alphas = sum(c.isalpha() for c in content)
@@ -110,12 +268,12 @@ def get_analyses(obj_info, obj):
     uppers = sum(c.isupper() for c in content)
 
     return {
-        "age_hours": age_hours,
-        "bytes": bytes,
+        **base_analysis,
         "chars": chars,
         "empty_lines": len(zero_line_lengths),
         "max_line": max(other_line_lengths),
         "min_line": min(other_line_lengths),
+        "avg_line": avg_line,
         "digits": digits / chars,
         "alphas": alphas / chars,
         "spaces": spaces / chars,
