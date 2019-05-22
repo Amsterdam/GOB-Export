@@ -20,7 +20,7 @@ from gobexport.exporter.config import nap, gebieden, meetbouten, bag
 
 
 # All export configurations per catalogue
-export_config = {
+_export_config = {
     "nap": nap.configs,
     "gebieden": gebieden.configs,
     "meetbouten": meetbouten.configs,
@@ -52,7 +52,7 @@ def test(catalogue):
 
     # Make proposals for any missing test definitions
     proposals = {}
-    for config in export_config[catalogue]:
+    for config in _export_config[catalogue]:
         for name, product in config.products.items():
             filename = product['filename']
             obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
@@ -176,8 +176,11 @@ def _get_low_high(value):
 
     # Round the limits to 0.01 for percentages and integers for any other values
     dist = 0.01 if value < 1 else 1
-    low = int(low / dist) * dist
-    high = int(high / dist) * dist
+    if value < 1:
+        low = round(low, 2)
+        high = round(high, 2)
+    # low = int(low / dist) * dist
+    # high = int(high / dist) * dist
 
     if low >= value:
         low -= dist
@@ -248,7 +251,7 @@ def _get_analysis(obj_info, obj):
         "first_bytes": first_bytes
     }
 
-    if obj_info['content_type'] != "plain/text":
+    if obj_info['content_type'] != "plain/text" or bytes == 0:
         return base_analysis
 
     content = obj.decode("utf-8")
@@ -277,6 +280,6 @@ def _get_analysis(obj_info, obj):
         "digits": digits / chars,
         "alphas": alphas / chars,
         "spaces": spaces / chars,
-        "lowers": lowers / alphas,
-        "uppers": uppers / alphas
+        "lowers": 0 if alphas == 0 else lowers / alphas,
+        "uppers": 0 if uppers == 0 else uppers / alphas
     }
