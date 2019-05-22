@@ -1195,3 +1195,15 @@ class BrondocumentenExportConfig:
             'query': query_actueel
         },
     }
+
+
+configs = [
+    WoonplaatsenExportConfig,
+    OpenbareruimtesExportConfig,
+    NummeraanduidingenExportConfig,
+    VerblijfsobjectenExportConfig,
+    StandplaatsenExportConfig,
+    LigplaatsenExportConfig,
+    PandenExportConfig,
+    BrondocumentenExportConfig
+]
