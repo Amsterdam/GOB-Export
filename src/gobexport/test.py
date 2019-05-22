@@ -179,8 +179,6 @@ def _get_low_high(value):
     if value < 1:
         low = round(low, 2)
         high = round(high, 2)
-    # low = int(low / dist) * dist
-    # high = int(high / dist) * dist
 
     if low >= value:
         low -= dist
