@@ -21,7 +21,18 @@ def add_field_definitions(layer, fieldnames):
         layer.CreateField(fielddef)
 
 
-def esri_exporter(api, file, format=None):
+def create_geometry(entity_geometry):
+    # Add geometrie
+    poly = ogr.CreateGeometryFromWkt(shape(entity_geometry).wkt)
+
+    # Force geometriecollection to polygon
+    if poly.GetGeometryType() == ogr.wkbGeometryCollection:
+        poly = ogr.ForceToPolygon(poly)
+
+    return poly
+
+
+def esri_exporter(api, file, format=None, append=False):
     """ESRI Exporter
 
     This function will transform the output of an API to ESRI shape files. The
@@ -35,6 +46,9 @@ def esri_exporter(api, file, format=None):
     :param format: The mapping of the API output to ESRI fields as defined in the
     export config. The max length of an esri fieldname is 10 characters.
     """
+    if append:
+        raise NotImplementedError("Appending not implemented for this exporter")
+
     row_count = 0
     driver = ogr.GetDriverByName("ESRI Shapefile")
     dstfile = driver.CreateDataSource(file)
@@ -55,14 +69,7 @@ def esri_exporter(api, file, format=None):
             feature = ogr.Feature(dstlayer.GetLayerDefn())
 
             if entity['geometrie']:
-                # Add geometrie
-                poly = ogr.CreateGeometryFromWkt(shape(entity['geometrie']).wkt)
-
-                # Force geometriecollection to polygon
-                if poly.GetGeometryType() == ogr.wkbGeometryCollection:
-                    poly = ogr.ForceToPolygon(poly)
-
-                feature.SetGeometry(poly)
+                feature.SetGeometry(create_geometry(entity['geometrie']))
 
             # Add all fields from the config to the file
             for attribute_name, source in format.items():

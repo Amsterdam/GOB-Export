@@ -2,6 +2,7 @@ import csv
 
 from shapely.geometry import shape
 
+from gobcore.exceptions import GOBException
 from gobcore.utils import ProgressTicker
 
 from gobexport.exporter.utils import nested_entity_get
@@ -114,7 +115,26 @@ def update_entity_value(entity, lookup_key, value):
         entity[lookup_key] = value
 
 
-def csv_exporter(api, file, format=None):
+def _get_headers_from_file(file: str) -> list:
+    """Returns existing column names from a CSV file
+
+    :param file:
+    :return:
+    """
+    with open(file, 'r') as fp:
+        reader = csv.DictReader(fp, delimiter=';')
+        headers = reader.fieldnames
+    return headers
+
+
+def _ensure_fieldnames_match_existing_file(fieldnames, file):
+    existing_headers = _get_headers_from_file(file)
+
+    if existing_headers != fieldnames:
+        raise GOBException('Fields from existing file do not match fields to append')
+
+
+def csv_exporter(api, file, format=None, append=False):
     """CSV Exporter
 
     Exports the output of the API to a ; delimited csv file.
@@ -145,22 +165,25 @@ def csv_exporter(api, file, format=None):
     :param api: the API wrapper which can be iterated through
     :param file: the local file to write to
     :param format: format definition, see above for examples
+    :param append:
     :return:
     """
     row_count = 0
 
     mapping = build_mapping_from_format(format)
+    fieldnames = [*mapping.keys()]
 
-    with open(file, 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
-        # Get the headers from the first record in the API
+    if append:
+        _ensure_fieldnames_match_existing_file(fieldnames, file)
+
+    with open(file, 'a' if append else 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
+        # Get the fieldnames from the mapping
+        writer = csv.DictWriter(fp, fieldnames=fieldnames, delimiter=';')
+
+        if not append:
+            writer.writeheader()
+
         for entity in api:
-            if row_count == 0:
-                # Get the fieldnames from the mapping
-                fieldnames = [*mapping.keys()]
-
-                writer = csv.DictWriter(fp, fieldnames=fieldnames, delimiter=';')
-                writer.writeheader()
-
             row = {}
             for attribute_name, lookup_key in mapping.items():
                 row[attribute_name] = get_entity_value(entity, lookup_key)
