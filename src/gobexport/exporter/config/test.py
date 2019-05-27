@@ -14,3 +14,6 @@ class TestEntityExportConfig:
             'format': None
         }
     }
+
+
+configs = [TestEntityExportConfig]
