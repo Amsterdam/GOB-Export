@@ -1,4 +1,4 @@
-from gobexport.exporter.dat import dat_exporter
+from gobexport.exporter.ndjson import ndjson_exporter
 
 
 class TestEntityExportConfig:
@@ -7,10 +7,10 @@ class TestEntityExportConfig:
     """
     products = {
         'dat': {
-            'exporter': dat_exporter,
+            'exporter': ndjson_exporter,
             'endpoint': '/gob/test_catalogue/test_entity/',
-            'filename': 'NAP_PEILMERK.dat',
-            'mime_type': 'plain/text',
-            'format': '|integer:plain|decimal:plain|character:plain|string:plain|date:plain|point:plain|boolean:plain|'
+            'filename': 'test_output.ndjson',
+            'mime_type': 'application/x-ndjson',
+            'format': None
         }
     }
