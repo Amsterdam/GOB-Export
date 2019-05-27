@@ -215,7 +215,7 @@ def _check_file(filename, stats, checks):
 
         # Report any errors for the given filename as a group
         if not result:
-            str_value = f"{value:.2f}".replace(".00", "")
+            str_value = f"{value:.2f}".replace(".00", "") if type(value) == float else value
             extra_data = {
                 'id': filename,
                 'data': {
