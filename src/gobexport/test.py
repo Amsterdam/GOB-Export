@@ -16,7 +16,7 @@ from gobcore.logging.logger import logger
 
 from gobexport.config import CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
-from gobexport.exporter.config import nap, gebieden, meetbouten, bag
+from gobexport.exporter.config import nap, gebieden, meetbouten, bag, test
 
 
 # All export configurations per catalogue
@@ -24,7 +24,8 @@ _export_config = {
     "nap": nap.configs,
     "gebieden": gebieden.configs,
     "meetbouten": meetbouten.configs,
-    "bag": bag.configs
+    "bag": bag.configs,
+    "test_catalogue": test.configs
 }
 
 
