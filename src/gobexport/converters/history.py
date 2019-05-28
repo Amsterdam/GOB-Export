@@ -1,4 +1,5 @@
 import datetime
+import operator
 import re
 
 from gobcore.exceptions import GOBTypeException
@@ -10,10 +11,52 @@ END_TIMESLOT = 'eindTijdvak'
 START_VALIDITY = 'beginGeldigheid'
 END_VALIDITY = 'eindGeldigheid'
 
-_BEGIN_OF_TIME = datetime.date.min
-_END_OF_TIME = datetime.date.max
+_BEGIN_OF_TIME = datetime.datetime.min
+_END_OF_TIME = datetime.datetime.max
+# Dates compare at start of day
+_START_OF_DAY = datetime.time(0, 0, 0)
 
 model = GOBModel()
+
+
+def _compare_date(value):
+    """
+    Transform value to datetime to allow date - datetime comparison
+
+    :param value: datetime.date or datetime.datatime
+    :return: value as datetime.datetime value
+    """
+    if not isinstance(value, datetime.datetime):
+        return _date_to_datetime(value)
+    else:
+        return value
+
+
+def _compare_dates(date1, compare, date2):
+    """
+    Compare two dates.
+
+    If the values have equal type, use the plain comparison function
+    Else, transform the value into universally comparable value
+    :param date1:
+    :param compare: the compare function, e.g. operator.lt
+    :param date2:
+    :return:
+    """
+    if type(date1) == type(date2):
+        return compare(date1, date2)
+    else:
+        return compare(_compare_date(date1), _compare_date(date2))
+
+
+def _date_to_datetime(value):
+    """
+    Convert a date value to a datetime value
+
+    :param value: a date value
+    :return: The corresponding datetime value
+    """
+    return datetime.datetime.combine(value, _START_OF_DAY)
 
 
 def convert_to_history_rows(row):
@@ -28,15 +71,13 @@ def convert_to_history_rows(row):
 
     all_references = _get_all_references()
     for timeslot in timeslots:
-        if timeslot[START_TIMESLOT] < _convert_to_date(row[START_VALIDITY]) or \
-           (row[END_VALIDITY] and timeslot[END_TIMESLOT] > _convert_to_date(row[END_VALIDITY])):
+        if _compare_dates(timeslot[START_TIMESLOT], operator.lt, _convert_to_date(row[START_VALIDITY])) or \
+           (row[END_VALIDITY] and
+           _compare_dates(timeslot[END_TIMESLOT], operator.gt, _convert_to_date(row[END_VALIDITY]))):
             continue  # pragma: no cover
-        state_row = {
-            START_TIMESLOT: _convert_date_to_string(timeslot[START_TIMESLOT])
-            if timeslot[START_TIMESLOT] != _BEGIN_OF_TIME else '',
-            END_TIMESLOT: _convert_date_to_string(timeslot[END_TIMESLOT])
-            if timeslot[END_TIMESLOT] != _END_OF_TIME else ''
-        }
+
+        state_row = _get_state_row(timeslot, row)
+
         for key, value in row.items():
             if _convert_to_snake_case(key) in all_references:
                 state_row[key] = _get_valid_reference(value, timeslot)
@@ -44,6 +85,18 @@ def convert_to_history_rows(row):
                 state_row[key] = value
         history_rows.append(state_row)
     return history_rows
+
+
+def _get_state_row(timeslot, row):
+    date_type = datetime.date if len(row.get(START_VALIDITY)) == len('YYYY-MM-DD') else datetime.datetime
+
+    state_row = {
+        START_TIMESLOT: _convert_date_to_string(timeslot[START_TIMESLOT], date_type)
+        if timeslot[START_TIMESLOT] != _BEGIN_OF_TIME else '',
+        END_TIMESLOT: _convert_date_to_string(timeslot[END_TIMESLOT], date_type)
+        if timeslot[END_TIMESLOT] != _END_OF_TIME else ''
+    }
+    return state_row
 
 
 def _get_all_references():
@@ -120,15 +173,13 @@ def _get_valid_reference(references, timeslot):
 
 
 def _convert_to_date(value):
-    """Convert a string to a date(time) object for comparisons
+    """Convert a string to a datetime object for comparisons
 
     :param value:
     :return: a date(time) object
     """
-    try:
-        return GOB.Date.from_value(value).to_value
-    except GOBTypeException:
-        pass
+    if len(str(value)) == len('YYYY-MM-DD'):
+        value = f'{value}T{_START_OF_DAY.isoformat()}'
 
     try:
         return GOB.DateTime.from_value(value).to_value
@@ -136,16 +187,16 @@ def _convert_to_date(value):
         pass
 
 
-def _convert_date_to_string(obj):
+def _convert_date_to_string(obj, date_type=datetime.datetime):
     """Convert a date(time) object to a string
 
     :param obj:
     :return: a date(time) string
     """
-    value = obj.isoformat()
-    if len(value) == len('YYYY-MM-DDTHH:MM:SS'):
-        # Add missing microseconds
-        value += '.000000'
+    if date_type == datetime.datetime:
+        value = obj.isoformat()
+    else:
+        value = obj.strftime('%Y-%m-%d')
     return value
 
 

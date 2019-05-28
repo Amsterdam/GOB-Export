@@ -51,7 +51,7 @@ class WoonplaatsenExportConfig:
 
     query_actueel = '''
 {
-  woonplaatsen(active: true) {
+  woonplaatsen {
     edges {
       node {
         identificatie
@@ -82,6 +82,25 @@ class WoonplaatsenExportConfig:
         'status': 'status.omschrijving',
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+        'geometrie': 'geometrie',
+    })
+
+    history_format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'volgnummer': 'volgnummer',
+        'registratiedatum': 'registratiedatum',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'naam': 'naam',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'status': 'status.omschrijving',
+        'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
+        'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+        'beginTijdvak': 'beginTijdvak',
+        'eindTijdvak': 'eindTijdvak',
         'geometrie': 'geometrie',
     })
 
@@ -127,7 +146,37 @@ class WoonplaatsenExportConfig:
                 },
             ],
             'query': query_actueel
-        }
+        },
+        'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_woonplaats_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': '''
+{
+  woonplaatsen(active: false, sort: [identificatie_asc, begin_geldigheid_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        aanduidingInOnderzoek
+        geconstateerd
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        status
+        geometrie
+      }
+    }
+  }
+}
+'''
+        },
     }
 
 
@@ -135,7 +184,7 @@ class OpenbareruimtesExportConfig:
 
     query_actueel = '''
 {
-  openbareruimtes(active: true) {
+  openbareruimtes {
     edges {
       node {
         identificatie
@@ -180,6 +229,28 @@ class OpenbareruimtesExportConfig:
         'geometrie': 'geometrie',
     })
 
+    history_format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'volgnummer': 'volgnummer',
+        'registratiedatum': 'registratiedatum',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'naam': 'naam',
+        'naamNEN': 'naamNen',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'type': 'type.omschrijving',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'status': 'status.omschrijving',
+        'ligtIn:BAG.WPS.identificatie': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.volgnummer': 'ligtInWoonplaats.volgnummer',
+        'ligtIn:BAG.WPS.naam': 'ligtInWoonplaats.naam',
+        'beginTijdvak': 'beginTijdvak',
+        'eindTijdvak': 'eindTijdvak',
+        'geometrie': 'geometrie',
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
@@ -202,11 +273,12 @@ class OpenbareruimtesExportConfig:
                 'naam_nen': 'naamNen',
                 'begindatum': 'beginGeldigheid',
                 'einddatum': 'eindGeldigheid',
-                'wpl_id': 'ligtInWoonplaats.identificatie',
                 'type': 'type.omschrijving',
                 'docdatum': 'documentdatum',
                 'docnummer': 'documentnummer',
                 'status': 'status.omschrijving',
+                'wps_id': 'ligtInWoonplaats.identificatie',
+                'wps_naam': 'ligtInWoonplaats.naam',
             },
             'extra_files': [
                 {
@@ -247,7 +319,50 @@ class OpenbareruimtesExportConfig:
   }
 }
 '''
+        },
+        'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_openbare_ruimte_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': '''
+{
+  openbareruimtes(active: false, sort: [identificatie_asc, volgnummer_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        aanduidingInOnderzoek
+        geconstateerd
+        naam
+        naamNen
+        beginGeldigheid
+        eindGeldigheid
+        ligtInWoonplaats(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
         }
+        type
+        documentdatum
+        documentnummer
+        status
+        geometrie
+      }
+    }
+  }
+}
+'''
+        },
     }
 
 
@@ -255,7 +370,7 @@ class NummeraanduidingenExportConfig:
 
     query_actueel = '''
 {
-  nummeraanduidingen(active: true) {
+  nummeraanduidingen {
     edges {
       node {
         identificatie
@@ -337,6 +452,38 @@ class NummeraanduidingenExportConfig:
         'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
     })
 
+    history_format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'volgnummer': 'volgnummer',
+        'registratiedatum': 'registratiedatum',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'huisnummer': 'huisnummer',
+        'huisletter': 'huisletter',
+        'huisnummertoevoeging': 'huisnummertoevoeging',
+        'postcode': 'postcode',
+        'ligtAan:BAG.ORE.identificatie': 'ligtAanOpenbareruimte.identificatie',
+        'ligtAan:BAG.ORE.volgnummer': 'ligtAanOpenbareruimte.volgnummer',
+        'ligtAan:BAG.ORE.naam': 'ligtAanOpenbareruimte.naam',
+        'ligtIn:BAG.WPS.identificatie': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.volgnummer': 'ligtInWoonplaats.volgnummer',
+        'ligtIn:BAG.WPS.naam': 'ligtInWoonplaats.naam',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'typeAdresseerbaarObject': 'typeAdresseerbaarObject.omschrijving',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'status': 'status.omschrijving',
+        'adresseert:BAG.VOT.identificatie': 'adresseertVerblijfsobject.identificatie',
+        'adresseert:BAG.LPS.identificatie': 'adresseertLigplaats.identificatie',
+        'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
+        'adresseert:BAG.VOT.volgnummer': 'adresseertVerblijfsobject.volgnummer',
+        'adresseert:BAG.LPS.volgnummer': 'adresseertLigplaats.volgnummer',
+        'adresseert:BAG.SPS.volgnummer': 'adresseertStandplaats.volgnummer',
+        'beginTijdvak': 'beginTijdvak',
+        'eindTijdvak': 'eindTijdvak',
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
@@ -345,6 +492,91 @@ class NummeraanduidingenExportConfig:
             'mime_type': 'plain/text',
             'format': format.get_format(),
             'query': query_actueel
+        },
+        'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_nummeraanduiding_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': '''
+{
+  nummeraanduidingen(active: false) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        aanduidingInOnderzoek
+        geconstateerd
+        huisnummer
+        huisletter
+        huisnummertoevoeging
+        postcode
+        ligtAanOpenbareruimte(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+        ligtInWoonplaats(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+        beginGeldigheid
+        eindGeldigheid
+        typeAdresseerbaarObject
+        documentdatum
+        documentnummer
+        status
+        adresseertVerblijfsobject(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+        adresseertLigplaats(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+        adresseertStandplaats(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
         }
     }
 
@@ -353,7 +585,7 @@ class VerblijfsobjectenExportConfig:
 
     query_actueel = '''
 {
-  verblijfsobjecten(active: true) {
+  verblijfsobjecten {
     edges {
       node {
         identificatie
@@ -528,12 +760,85 @@ class VerblijfsobjectenExportConfig:
         'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
         'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
         'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
-        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
         'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
         'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
+        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'geometrie': 'geometrie'
+    })
+
+    history_format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'volgnummer': 'volgnummer',
+        'registratiedatum': 'registratiedatum',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
+        'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
+        'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
+        'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'postcodeHoofdadres': 'heeftHoofdadres.postcode',
+        'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
+        'ligtAan:BAG.ORE.volgnummerHoofdadres': 'ligtAanOpenbareruimte.volgnummer',
+        'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
+        'ligtIn:BAG.WPS.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.volgnummerHoofdadres': 'ligtInWoonplaats.volgnummer',
+        'ligtIn:BAG.WPS.naamHoofdadres': 'ligtInWoonplaats.naam',
+        'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
+        'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
+        'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
+        'gebruiksdoel': 'gebruiksdoel.omschrijving',
+        'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie.omschrijving',
+        'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
+        'aantalEenhedenComplex': 'aantalEenhedenComplex',
+        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'oppervlakte': 'oppervlakte',
+        'status': 'status.omschrijving',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'verdiepingToegang': 'verdiepingToegang',
+        'toegang': 'toegang.omschrijving',
+        'aantalBouwlagen': 'aantalBouwlagen',
+        'hoogsteBouwlaag': 'hoogsteBouwlaag',
+        'laagsteBouwlaag': 'laagsteBouwlaag',
+        'aantalKamers': 'aantalKamers',
+        'eigendomsverhouding': 'eigendomsverhouding.omschrijving',
+        'redenopvoer': 'redenopvoer.omschrijving',
+        'redenafvoer': 'redenafvoer.omschrijving',
+        'ligtIn:BAG.PND.identificatie': 'ligtInPanden.0.identificatie',
+        'ligtIn:BAG.PND.volgnummer': 'ligtInPanden.0.volgnummer',
+        'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
+        'ligtIn:GBD.BBK.volgnummer': 'ligtInBouwblok.volgnummer',
+        'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
+        'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
+        'ligtIn:GBD.BRT.volgnummer': 'ligtInBuurt.volgnummer',
+        'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
+        'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
+        'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
+        'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
+        'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
+        'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
+        'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+        'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
+        'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+        'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+        'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
+        'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
+        'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
+        'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
+        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
+        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'beginTijdvak': 'beginTijdvak',
+        'eindTijdvak': 'eindTijdvak',
         'geometrie': 'geometrie'
     })
 
@@ -557,13 +862,13 @@ class VerblijfsobjectenExportConfig:
                 'geconst': 'geconstateerd',
                 'num_id_hfd': 'heeftHoofdadres.identificatie',
                 'gme_id': 'ligtInGemeente.identificatie',
-                'gm_naam': 'ligtInGemeente.naam',
+                'gme_naam': 'ligtInGemeente.naam',
                 'num_id_nvn': 'heeftNevenadres.identificatie',
                 'gebr_doel': 'gebruiksdoel.omschrijving',
-                'gebr_wonen': 'gebruiksdoelWoonfunctie.omschrijving',
-                'gebr_gezond': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
+                'gdl_wonen': 'gebruiksdoelWoonfunctie.omschrijving',
+                'gdl_gezond': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
                 'eenheden': 'aantalEenhedenComplex',
-                'feit_gebr': 'feitelijkGebruik.omschrijving',
+                'soort_obj': 'feitelijkGebruik.omschrijving',
                 'oppervlak': 'oppervlakte',
                 'status': 'status.omschrijving',
                 'begindatum': 'beginGeldigheid',
@@ -591,12 +896,12 @@ class VerblijfsobjectenExportConfig:
                 'ggw_id': 'LigtInGgwgebied.identificatie',
                 'ggw_naam': 'LigtInGgwgebied.naam',
                 'ggw_code': 'LigtInGgwgebied.code',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
-                'ggp_naam': 'LigtInGgpgebied.naam',
-                'ggp_code': 'LigtInGgpgebied.code',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_naam': 'ligtInStadsdeel.naam',
                 'sdl_code': 'ligtInStadsdeel.code',
+                'ggp_id': 'LigtInGgpgebied.identificatie',
+                'ggp_naam': 'LigtInGgpgebied.naam',
+                'ggp_code': 'LigtInGgpgebied.code',
             },
             'extra_files': [
                 {
@@ -614,6 +919,175 @@ class VerblijfsobjectenExportConfig:
             ],
             'query': query_actueel
         },
+        'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_verblijfsobject_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': '''
+{
+  verblijfsobjecten(active: false) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        aanduidingInOnderzoek
+        geconstateerd
+        heeftHoofdadres(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              huisnummer
+              huisletter
+              huisnummertoevoeging
+              postcode
+              beginGeldigheid
+              eindGeldigheid
+              ligtAanOpenbareruimte(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+              ligtInWoonplaats(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+            }
+          }
+        }
+        heeftNevenadres(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+        ligtInPanden(active: false) {
+          edges {
+            node {
+              identificatie
+              ligtInBouwblok(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+            }
+          }
+        }
+        ligtInBuurt(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
+              code
+              beginGeldigheid
+              eindGeldigheid
+              ligtInWijk(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                    ligtInStadsdeel(active: false) {
+                      edges {
+                        node {
+                          identificatie
+                          volgnummer
+                          naam
+                          code
+                          beginGeldigheid
+                          eindGeldigheid
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              LigtInGgpgebied(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+              LigtInGgwgebied(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+            }
+          }
+        }
+        gebruiksdoel
+        gebruiksdoelWoonfunctie
+        gebruiksdoelGezondheidszorgfunctie
+        aantalEenhedenComplex
+        feitelijkGebruik
+        oppervlakte
+        status
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        verdiepingToegang
+        toegang
+        aantalBouwlagen
+        hoogsteBouwlaag
+        laagsteBouwlaag
+        aantalKamers
+        eigendomsverhouding
+        redenopvoer
+        redenafvoer
+        beginTijdvak
+        eindTijdvak
+        geometrie
+      }
+    }
+  }
+}
+'''
+        },
     }
 
 
@@ -621,7 +1095,7 @@ class StandplaatsenExportConfig:
 
     query_actueel = '''
 {
-  standplaatsen(active: true) {
+  standplaatsen {
     edges {
       node {
         identificatie
@@ -756,6 +1230,58 @@ class StandplaatsenExportConfig:
         'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
         'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
         'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'geometrie': 'geometrie'
+    })
+
+    history_format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
+        'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
+        'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
+        'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'postcodeHoofdadres': 'heeftHoofdadres.postcode',
+        'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
+        'ligtAan:BAG.ORE.volgnummerHoofdadres': 'ligtAanOpenbareruimte.volgnummer',
+        'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
+        'ligtIn:BAG.WPS.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.volgnummerHoofdadres': 'ligtInWoonplaats.volgnummer',
+        'ligtIn:BAG.WPS.naamHoofdadres': 'ligtInWoonplaats.naam',
+        'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
+        'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
+        'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
+        'status': 'status.omschrijving',
+        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
+        'ligtIn:GBD.BRT.volgnummer': 'ligtInBuurt.volgnummer',
+        'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
+        'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
+        'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
+        'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
+        'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
+        'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
+        'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+        'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
+        'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+        'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+        'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
+        'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
+        'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
+        'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
+        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
+        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'beginTijdvak': 'beginTijdvak',
+        'eindTijdvak': 'eindTijdvak',
         'geometrie': 'geometrie'
     })
 
@@ -779,10 +1305,10 @@ class StandplaatsenExportConfig:
                 'geconst': 'geconstateerd',
                 'num_id_hfd': 'heeftHoofdadres.identificatie',
                 'gme_id': 'ligtInGemeente.identificatie',
-                'gm_naam': 'ligtInGemeente.naam',
+                'gme_naam': 'ligtInGemeente.naam',
                 'num_id_nvn': 'heeftNevenadres.identificatie',
                 'status': 'status.omschrijving',
-                'feit_gebr': 'feitelijkGebruik.omschrijving',
+                'soort_obj': 'feitelijkGebruik.omschrijving',
                 'begindatum': 'beginGeldigheid',
                 'einddatum': 'eindGeldigheid',
                 'docdatum': 'documentdatum',
@@ -796,12 +1322,12 @@ class StandplaatsenExportConfig:
                 'ggw_id': 'LigtInGgwgebied.identificatie',
                 'ggw_naam': 'LigtInGgwgebied.naam',
                 'ggw_code': 'LigtInGgwgebied.code',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
-                'ggp_naam': 'LigtInGgpgebied.naam',
-                'ggp_code': 'LigtInGgpgebied.code',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_naam': 'ligtInStadsdeel.naam',
                 'sdl_code': 'ligtInStadsdeel.code',
+                'ggp_id': 'LigtInGgpgebied.identificatie',
+                'ggp_naam': 'LigtInGgpgebied.naam',
+                'ggp_code': 'LigtInGgpgebied.code',
             },
             'extra_files': [
                 {
@@ -819,6 +1345,143 @@ class StandplaatsenExportConfig:
             ],
             'query': query_actueel
         },
+        'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_standplaats_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': '''
+{
+  standplaatsen(active: false) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        aanduidingInOnderzoek
+        geconstateerd
+        heeftHoofdadres(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              huisnummer
+              huisletter
+              huisnummertoevoeging
+              postcode
+              beginGeldigheid
+              eindGeldigheid
+              ligtAanOpenbareruimte(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+              ligtInWoonplaats(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+            }
+          }
+        }
+        heeftNevenadres(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+        ligtInBuurt(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
+              code
+              beginGeldigheid
+              eindGeldigheid
+              ligtInWijk(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                    ligtInStadsdeel(active: false) {
+                      edges {
+                        node {
+                          identificatie
+                          volgnummer
+                          naam
+                          code
+                          beginGeldigheid
+                          eindGeldigheid
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              LigtInGgpgebied(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+              LigtInGgwgebied(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+            }
+          }
+        }
+        feitelijkGebruik
+        status
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        beginTijdvak
+        eindTijdvak
+        geometrie
+      }
+    }
+  }
+}
+'''
+        },
     }
 
 
@@ -826,7 +1489,7 @@ class LigplaatsenExportConfig:
 
     query_actueel = '''
 {
-  ligplaatsen(active: true) {
+  ligplaatsen {
     edges {
       node {
         identificatie
@@ -964,6 +1627,58 @@ class LigplaatsenExportConfig:
         'geometrie': 'geometrie'
     })
 
+    history_format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
+        'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
+        'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
+        'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'postcodeHoofdadres': 'heeftHoofdadres.postcode',
+        'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
+        'ligtAan:BAG.ORE.volgnummerHoofdadres': 'ligtAanOpenbareruimte.volgnummer',
+        'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
+        'ligtIn:BAG.WPS.identificatieHoofdadres': 'ligtInWoonplaats.identificatie',
+        'ligtIn:BAG.WPS.volgnummerHoofdadres': 'ligtInWoonplaats.volgnummer',
+        'ligtIn:BAG.WPS.naamHoofdadres': 'ligtInWoonplaats.naam',
+        'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
+        'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
+        'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
+        'status': 'status.omschrijving',
+        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
+        'ligtIn:GBD.BRT.volgnummer': 'ligtInBuurt.volgnummer',
+        'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
+        'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
+        'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
+        'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
+        'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
+        'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
+        'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+        'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
+        'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+        'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+        'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
+        'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
+        'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
+        'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
+        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
+        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'beginTijdvak': 'beginTijdvak',
+        'eindTijdvak': 'eindTijdvak',
+        'geometrie': 'geometrie'
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
@@ -984,10 +1699,10 @@ class LigplaatsenExportConfig:
                 'geconst': 'geconstateerd',
                 'num_id_hfd': 'heeftHoofdadres.identificatie',
                 'gme_id': 'ligtInGemeente.identificatie',
-                'gm_naam': 'ligtInGemeente.naam',
+                'gme_naam': 'ligtInGemeente.naam',
                 'num_id_nvn': 'heeftNevenadres.identificatie',
                 'status': 'status.omschrijving',
-                'feit_gebr': 'feitelijkGebruik.omschrijving',
+                'soort_obj': 'feitelijkGebruik.omschrijving',
                 'begindatum': 'beginGeldigheid',
                 'einddatum': 'eindGeldigheid',
                 'docdatum': 'documentdatum',
@@ -1001,12 +1716,12 @@ class LigplaatsenExportConfig:
                 'ggw_id': 'LigtInGgwgebied.identificatie',
                 'ggw_naam': 'LigtInGgwgebied.naam',
                 'ggw_code': 'LigtInGgwgebied.code',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
-                'ggp_naam': 'LigtInGgpgebied.naam',
-                'ggp_code': 'LigtInGgpgebied.code',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_naam': 'ligtInStadsdeel.naam',
                 'sdl_code': 'ligtInStadsdeel.code',
+                'ggp_id': 'LigtInGgpgebied.identificatie',
+                'ggp_naam': 'LigtInGgpgebied.naam',
+                'ggp_code': 'LigtInGgpgebied.code',
             },
             'extra_files': [
                 {
@@ -1024,6 +1739,143 @@ class LigplaatsenExportConfig:
             ],
             'query': query_actueel
         },
+        'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_standplaats_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': '''
+{
+  ligplaatsen(active: false) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        aanduidingInOnderzoek
+        geconstateerd
+        heeftHoofdadres(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              huisnummer
+              huisletter
+              huisnummertoevoeging
+              postcode
+              beginGeldigheid
+              eindGeldigheid
+              ligtAanOpenbareruimte(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+              ligtInWoonplaats(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+            }
+          }
+        }
+        heeftNevenadres(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+        ligtInBuurt(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
+              code
+              beginGeldigheid
+              eindGeldigheid
+              ligtInWijk(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                    ligtInStadsdeel(active: false) {
+                      edges {
+                        node {
+                          identificatie
+                          volgnummer
+                          naam
+                          code
+                          beginGeldigheid
+                          eindGeldigheid
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              LigtInGgpgebied(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+              LigtInGgwgebied(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+            }
+          }
+        }
+        feitelijkGebruik
+        status
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        beginTijdvak
+        eindTijdvak
+        geometrie
+      }
+    }
+  }
+}
+'''
+        },
     }
 
 
@@ -1031,7 +1883,7 @@ class PandenExportConfig:
 
     query_actueel = '''
 {
-  panden(active: true) {
+  panden {
     edges {
       node {
         identificatie
@@ -1048,6 +1900,7 @@ class PandenExportConfig:
         aantalBouwlagen
         hoogsteBouwlaag
         laagsteBouwlaag
+        typeWoonobject
         geometrie
         ligtInBouwblok {
           edges {
@@ -1121,6 +1974,7 @@ class PandenExportConfig:
         'aantalBouwlagen': 'aantalBouwlagen',
         'hoogsteBouwlaag': 'hoogsteBouwlaag',
         'laagsteBouwlaag': 'laagsteBouwlaag',
+        'typeWoonobject': 'typeWoonobject',
         'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
         'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
         'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
@@ -1141,6 +1995,50 @@ class PandenExportConfig:
         'geometrie': 'geometrie'
     })
 
+    history_format = BAGDefaultCSVFormat({
+        'identificatie': 'identificatie',
+        'volgnummer': 'volgnummer',
+        'registratiedatum': 'registratiedatum',
+        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'geconstateerd': 'geconstateerd',
+        'status': 'status.omschrijving',
+        'oorspronkelijkBouwjaar': 'oorspronkelijkBouwjaar',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'documentdatum': 'documentdatum',
+        'documentnummer': 'documentnummer',
+        'naam': 'naam',
+        'ligging': 'ligging.omschrijving',
+        'aantalBouwlagen': 'aantalBouwlagen',
+        'hoogsteBouwlaag': 'hoogsteBouwlaag',
+        'laagsteBouwlaag': 'laagsteBouwlaag',
+        'typeWoonobject': 'typeWoonobject',
+        'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
+        'ligtIn:GBD.BBK.volgnummer': 'ligtInBouwblok.volgnummer',
+        'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
+        'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
+        'ligtIn:GBD.BRT.volgnummer': 'ligtInBuurt.volgnummer',
+        'ligtIn:GBD.BRT.naam': 'ligtInBuurt.naam',
+        'ligtIn:GBD.BRT.code': 'ligtInBuurt.code',
+        'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
+        'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
+        'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
+        'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
+        'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+        'ligtIn:GBD.GGW.voglnummer': 'LigtInGgwgebied.volgnummer',
+        'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+        'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+        'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
+        'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
+        'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
+        'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
+        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
+        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'geometrie': 'geometrie'
+    })
+
     products = {
         'csv_actueel': {
             'api_type': 'graphql',
@@ -1156,7 +2054,7 @@ class PandenExportConfig:
             'filename': 'SHP/BAG_pand.shp',
             'mime_type': 'application/octet-stream',
             'format': {
-                'pnd_id': 'identificatie',
+                'id': 'identificatie',
                 'onderzoek': 'aanduidingInOnderzoek',
                 'geconst': 'geconstateerd',
                 'status': 'status.omschrijving',
@@ -1169,6 +2067,8 @@ class PandenExportConfig:
                 'ligging': 'ligging',
                 'aant_bouwl': 'aantalBouwlagen',
                 'hoog_bouwl': 'hoogsteBouwlaag',
+                'laag_bouwl': 'laagsteBouwlaag',
+                'type_oms': 'typeWoonobject',
                 'bbk_id': 'ligtInBouwblok.identificatie',
                 'bbk_code': 'ligtInBouwblok.code',
                 'brt_id': 'ligtInBuurt.identificatie',
@@ -1180,12 +2080,12 @@ class PandenExportConfig:
                 'ggw_id': 'LigtInGgwgebied.identificatie',
                 'ggw_naam': 'LigtInGgwgebied.naam',
                 'ggw_code': 'LigtInGgwgebied.code',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
-                'ggp_naam': 'LigtInGgpgebied.naam',
-                'ggp_code': 'LigtInGgpgebied.code',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_naam': 'ligtInStadsdeel.naam',
                 'sdl_code': 'ligtInStadsdeel.code',
+                'ggp_id': 'LigtInGgpgebied.identificatie',
+                'ggp_naam': 'LigtInGgpgebied.naam',
+                'ggp_code': 'LigtInGgpgebied.code',
             },
             'extra_files': [
                 {
@@ -1203,6 +2103,108 @@ class PandenExportConfig:
             ],
             'query': query_actueel
         },
+        'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'expand_history': True,
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_pand_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': '''
+{
+  panden(active: false) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        aanduidingInOnderzoek
+        geconstateerd
+        oorspronkelijkBouwjaar
+        status
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        naam
+        ligging
+        aantalBouwlagen
+        hoogsteBouwlaag
+        laagsteBouwlaag
+        typeWoonobject
+        geometrie
+        ligtInBouwblok(active: false) {
+          edges {
+            node {
+              ligtInBuurt(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                    ligtInWijk(active: false) {
+                      edges {
+                        node {
+                          identificatie
+                          volgnummer
+                          naam
+                          code
+                          beginGeldigheid
+                          eindGeldigheid
+                          ligtInStadsdeel(active: false) {
+                            edges {
+                              node {
+                                identificatie
+                                volgnummer
+                                naam
+                                code
+                                beginGeldigheid
+                                eindGeldigheid
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    LigtInGgpgebied(active: false) {
+                      edges {
+                        node {
+                          identificatie
+                          volgnummer
+                          naam
+                          code
+                          beginGeldigheid
+                          eindGeldigheid
+                        }
+                      }
+                    }
+                    LigtInGgwgebied(active: false) {
+                      edges {
+                        node {
+                          identificatie
+                          volgnummer
+                          naam
+                          code
+                          beginGeldigheid
+                          eindGeldigheid
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+        },
     }
 
 
@@ -1210,7 +2212,7 @@ class BrondocumentenExportConfig:
 
     query_actueel = '''
 {
-  brondocumenten(active: true) {
+  brondocumenten {
     edges {
       node {
         documentnummer
