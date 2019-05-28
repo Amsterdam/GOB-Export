@@ -4,7 +4,7 @@ Encapsulates a paged GraphQL endpoint into an iterator
 
 """
 import re
-import requests
+import gobexport.requests as requests
 
 from gobcore.model import GOBModel
 
