@@ -3,7 +3,7 @@
 Encapsulates a paged API endpoint into an iterator
 
 """
-import requests
+import gobexport.requests as requests
 
 
 class API:
