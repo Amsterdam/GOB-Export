@@ -3,7 +3,7 @@ import requests
 import time
 
 _MAX_TRIES = 5       # Maximum number of times to try the request
-_RETRY_TIMEOUT = 10  # Seconds between consecetive retries
+_RETRY_TIMEOUT = 60  # Seconds between consecetive retries
 
 
 class RequestException(IOError):
