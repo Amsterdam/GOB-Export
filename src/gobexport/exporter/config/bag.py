@@ -1079,8 +1079,6 @@ class VerblijfsobjectenExportConfig:
         eigendomsverhouding
         redenopvoer
         redenafvoer
-        beginTijdvak
-        eindTijdvak
         geometrie
       }
     }
@@ -1473,8 +1471,6 @@ class StandplaatsenExportConfig:
         eindGeldigheid
         documentdatum
         documentnummer
-        beginTijdvak
-        eindTijdvak
         geometrie
       }
     }
@@ -1867,8 +1863,6 @@ class LigplaatsenExportConfig:
         eindGeldigheid
         documentdatum
         documentnummer
-        beginTijdvak
-        eindTijdvak
         geometrie
       }
     }
