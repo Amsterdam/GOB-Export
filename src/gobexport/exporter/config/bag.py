@@ -299,7 +299,7 @@ class OpenbareruimtesExportConfig:
         'csv_beschrijving_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_openbare_ruimte_beschrijving_Actueel.csv',
+            'filename': 'CSV_Actueel/BAG_openbare_ruimte_beschrijving.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -1079,8 +1079,6 @@ class VerblijfsobjectenExportConfig:
         eigendomsverhouding
         redenopvoer
         redenafvoer
-        beginTijdvak
-        eindTijdvak
         geometrie
       }
     }
@@ -1473,8 +1471,6 @@ class StandplaatsenExportConfig:
         eindGeldigheid
         documentdatum
         documentnummer
-        beginTijdvak
-        eindTijdvak
         geometrie
       }
     }
@@ -1867,8 +1863,6 @@ class LigplaatsenExportConfig:
         eindGeldigheid
         documentdatum
         documentnummer
-        beginTijdvak
-        eindTijdvak
         geometrie
       }
     }
