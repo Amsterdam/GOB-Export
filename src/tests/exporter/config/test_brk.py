@@ -27,12 +27,12 @@ class TestKadastralesubjectenCsvFormat(TestCase):
             'KEY1': {
                 'condition': 'isempty',
                 'reference': 'field.ref',
-                'value': 'val1',
+                'trueval': 'val1',
             },
             'KEY2': {
                 'condition': 'isempty',
                 'reference': 'field.ref',
-                'value': 'val2',
+                'trueval': 'val2',
             }
         }
         res = self.format._add_condition_to_attrs(condition, attrs)
