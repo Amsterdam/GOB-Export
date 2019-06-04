@@ -541,3 +541,37 @@ class ZakelijkerechtenExportConfig:
             'format': format.get_format(),
         }
     }
+
+
+class AardzakelijkerechtenExportConfig:
+    filename = brk_filename("CAardZakelijkRecht")
+    format = {
+        'AZT_CODE': 'code',
+        'AZT_OMSCHRIJVING': 'waarde',
+        'AZT_AARDZAKELIJKRECHT_AKR_CODE': 'akrCode',
+    }
+
+    query = '''
+{
+  aardzakelijkerechten(sort:code_asc) {
+    edges {
+      node {
+        code
+        waarde
+        akrCode
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'csv': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql',
+            'query': query,
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': format,
+        }
+    }
