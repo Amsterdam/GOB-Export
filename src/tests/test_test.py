@@ -262,6 +262,7 @@ class TestExportTest(TestCase):
     @patch('gobexport.test._write_proposals')
     @patch('gobexport.test._get_checks')
     @patch('gobexport.test.connect_to_objectstore')
+    @patch('gobexport.test.CONTAINER_BASE', 'development')
     def test_test(self, mock_connect_to_objectstore, mock_get_checks, mock_write_proposals, mock_get_file):
         catalogue = "any catalogue"
         mock_connect_to_objectstore.return_value = "Any connection", None

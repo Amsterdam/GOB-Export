@@ -36,6 +36,7 @@ CONFIG_MAPPING = {
     'brk': {
         'kadastralesubjecten': brk.KadastralesubjectenExportConfig,
         'aantekeningen': brk.AantekeningenExportConfig,
+        'zakelijkerechten': brk.ZakelijkerechtenExportConfig,
     }
 }
 
