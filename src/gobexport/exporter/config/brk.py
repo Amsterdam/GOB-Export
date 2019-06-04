@@ -575,3 +575,83 @@ class AardzakelijkerechtenExportConfig:
             'format': format,
         }
     }
+
+
+class BrkBagExportConfig:
+    filename = brk_filename("BRKBAG")
+    format = {
+        'BRK_KOT_ID': 'identificatie',
+        'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_AKRKADGEMEENTECODE_OMS': '',  # TODO when gemeentecode is imported
+        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+        'KOT_PERCEELNUMMER': 'perceelnummer',
+        'KOT_INDEX_LETTER': 'indexletter',
+        'KOT_INDEX_NUMMER': 'indexnummer',
+        'BAG_BOT_ID': 'heeftEenRelatieMetVerblijfsobject.identificatie',
+        'AOT_OPENBARERUIMTENAAM': 'ligtAanOpenbareruimte.naam',
+        'AOT_HUISNUMMER': 'heeftHoofdadres.huisnummer',
+        'AOT_HUISLETTER': 'heeftHoofdadres.huisletter',
+        'AOT_HUISNUMMERTOEVOEGING': 'heeftHoofdadres.huisnummertoevoeging',
+        'AOT_POSTCODE': 'heeftHoofdadres.postcode',
+        'BRON_RELATIE': {
+            'action': 'literal',
+            'value': 'BRK'
+        },
+        'TOESTANDSDATUM_DIVA': 'toestandsdatum'
+    }
+
+    query = '''
+{
+  kadastraleobjecten {
+    edges {
+      node {
+        identificatie
+        aangeduidDoorKadastralegemeente
+        aangeduidDoorKadastralegemeentecode
+        aangeduidDoorKadastralesectie
+        perceelnummer
+        indexletter
+        indexnummer
+        toestandsdatum
+        heeftEenRelatieMetVerblijfsobject {
+          edges {
+            node {
+              identificatie
+                heeftHoofdadres {
+                edges {
+                  node {
+                    identificatie
+                    ligtAanOpenbareruimte {
+                      edges {
+                        node {
+                          naam
+                        }
+                      }
+                    }
+                    huisnummer
+                    huisletter
+                    huisnummertoevoeging
+                    postcode
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'csv': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql',
+            'collection': 'kadastraleobjecten',
+            'query': query,
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': format,
+        }
+    }
