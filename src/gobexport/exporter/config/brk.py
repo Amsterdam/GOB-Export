@@ -655,3 +655,95 @@ class BrkBagExportConfig:
             'format': format,
         }
     }
+
+
+class StukdelenExportConfig:
+    filename = brk_filename('Stukdeel')
+    format = {
+        'BRK_SDL_ID': 'identificatie',
+        'SDL_AARDSTUKDEEL_CODE': 'aard.code',
+        'SDL_AARDSTUKDEEL_OMS': 'aard.omschrijving',
+        'SDL_KOOPSOM': 'bedragTransactie.bedrag',
+        'SDL_KOOPSOM_VALUTA': 'bedragTransactie.valuta',
+        'BRK_STK_ID': 'stukidentificatie',
+        'STK_AKRPORTEFEUILLENR': 'portefeuillenummerAkr',
+        'STK_TIJDSTIP_AANBIEDING': 'tijdstipAanbiedingStuk',
+        'STK_REEKS_CODE': 'reeks',
+        'STK_VOLGNUMMER': 'volgnummerStuk',
+        'STK_REGISTERCODE_CODE': 'registercodeStuk.code',
+        'STK_REGISTERCODE_OMS': 'registercodeStuk.omschrijving',
+        'STK_SOORTREGISTER_CODE': 'soortRegisterStuk.code',
+        'STK_SOORTREGISTER_OMS': 'soortRegisterStuk.omschrijving',
+        'STK_DEEL_SOORT': 'deelSoortStuk',
+        'BRK_TNG_ID': 'isBronVoorTenaamstelling.identificatie',
+        'BRK_ATG_ID': {
+            'condition': 'isempty',
+            'reference': 'isBronVoorAantekeningRecht.identificatie',
+            'negate': True,
+            # Either one or the other is set, or none, but never both
+            'trueval': 'isBronVoorAantekeningRecht.identificatie',
+            'elseval': 'isBronVoorAantekeningKadastraalObject.identificatie'
+        },
+        'BRK_ASG_VVE': 'isBronVoorZakelijkRecht.appartementsrechtsplitsingidentificatie'
+    }
+
+    query = '''
+{
+  stukdelen {
+    edges {
+      node {
+        identificatie
+        aard
+        bedragTransactie
+        stukidentificatie
+        portefeuillenummerAkr
+        tijdstipAanbiedingStuk
+        reeks
+        volgnummerStuk
+        registercodeStuk
+        soortRegisterStuk
+        deelSoortStuk
+        isBronVoorTenaamstelling {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        isBronVoorAantekeningRecht {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        isBronVoorAantekeningKadastraalObject {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        isBronVoorZakelijkRecht {
+          edges {
+            node {
+              appartementsrechtsplitsingidentificatie
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'csv': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql',
+            'query': query,
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': format,
+        }
+    }
