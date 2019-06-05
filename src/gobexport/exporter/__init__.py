@@ -39,6 +39,7 @@ CONFIG_MAPPING = {
         'zakelijkerechten': brk.ZakelijkerechtenExportConfig,
         'aardzakelijkerechten': brk.AardzakelijkerechtenExportConfig,
         'brkbag': brk.BrkBagExportConfig,
+        'stukdelen': brk.StukdelenExportConfig,
     }
 }
 
