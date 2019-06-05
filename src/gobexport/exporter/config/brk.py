@@ -6,7 +6,14 @@ from gobexport.exporter.csv import csv_exporter
 def brk_filename(name):
     now = datetime.datetime.now()
     datestr = now.strftime('%Y%m%d')
-    return f'BRK_{name}_{datestr}.csv'
+    return f'AmsterdamRegio/CSV_actueel/BRK_{name}_{datestr}.csv'
+
+
+def sort_attributes(attrs: dict, ordering: list):
+    assert len(attrs.keys()) == len(ordering), "Number of attributes does not match the number of items to sort"
+    assert set(attrs.keys()) == set(ordering), "Attribute keys don't match the items to sort"
+
+    return {k: attrs[k] for k in ordering}
 
 
 class BrkCsvFormat:
@@ -32,6 +39,79 @@ class BrkCsvFormat:
 
 class KadastralesubjectenCsvFormat(BrkCsvFormat):
 
+    ordering = [
+        'BRK_SJT_ID',
+        'SJT_TYPE',
+        'SJT_BESCHIKKINGSBEVOEGDH_CODE',
+        'SJT_BESCHIKKINGSBEVOEGDH_OMS',
+        'SJT_BSN',
+        'SJT_NP_VOORNAMEN',
+        'SJT_NP_VOORVOEGSELSGESLSNAAM',
+        'SJT_NAAM',
+        'SJT_NP_GESLACHTSCODE',
+        'SJT_NP_GESLACHTSCODE_OMS',
+        'SJT_NP_AANDUIDINGNAAMGEBR_CODE',
+        'SJT_NP_AANDUIDINGNAAMGEBR_OMS',
+        'SJT_NP_GEBOORTEDATUM',
+        'SJT_NP_GEBOORTEPLAATS',
+        'SJT_NP_GEBOORTELAND_CODE',
+        'SJT_NP_GEBOORTELAND_OMS',
+        'SJT_NP_DATUMOVERLIJDEN',
+        'SJT_NP_VOORNAMEN_PARTNER',
+        'SJT_NP_VOORVOEGSEL_PARTNER',
+        'SJT_NP_GESLACHTSNAAM_PARTNER',
+        'SJT_NP_LANDWAARNAARVERTR_CODE',
+        'SJT_NP_LANDWAARNAARVERTR_OMS',
+        'SJT_KAD_GESLACHTSCODE',
+        'SJT_KAD_GESLACHTSCODE_OMS',
+        'SJT_KAD_VOORNAMEN',
+        'SJT_KAD_VOORVOEGSELSGESLSNAAM',
+        'SJT_KAD_GESLACHTSNAAM',
+        'SJT_KAD_GEBOORTEDATUM',
+        'SJT_KAD_GEBOORTEPLAATS',
+        'SJT_KAD_GEBOORTELAND_CODE',
+        'SJT_KAD_GEBOORTELAND_OMS',
+        'SJT_KAD_INDICATIEOVERLEDEN',
+        'SJT_KAD_DATUMOVERLIJDEN',
+        'SJT_NNP_RSIN',
+        'SJT_NNP_KVKNUMMER',
+        'SJT_NNP_RECHTSVORM_CODE',
+        'SJT_NNP_RECHTSVORM_OMS',
+        'SJT_NNP_STATUTAIRE_NAAM',
+        'SJT_NNP_STATUTAIRE_ZETEL',
+        'SJT_KAD_STATUTAIRE_NAAM',
+        'SJT_KAD_RECHTSVORM_CODE',
+        'SJT_KAD_RECHTSVORM_OMS',
+        'SJT_KAD_STATUTAIRE_ZETEL',
+        'SWS_OPENBARERUIMTENAAM',
+        'SWS_HUISNUMMER',
+        'SWS_HUISLETTER',
+        'SWS_HUISNUMMERTOEVOEGING',
+        'SWS_POSTCODE',
+        'SWS_WOONPLAATSNAAM',
+        'SWS_BUITENLAND_ADRES',
+        'SWS_BUITENLAND_WOONPLAATS',
+        'SWS_BUITENLAND_REGIO',
+        'SWS_BUITENLAND_NAAM',
+        'SWS_BUITENLAND_CODE',
+        'SWS_BUITENLAND_OMS',
+        'SPS_POSTBUSNUMMER',
+        'SPS_POSTBUS_POSTCODE',
+        'SPS_POSTBUS_WOONPLAATSNAAM',
+        'SPS_OPENBARERUIMTENAAM',
+        'SPS_HUISNUMMER',
+        'SPS_HUISLETTER',
+        'SPS_HUISNUMMERTOEVOEGING',
+        'SPS_POSTCODE',
+        'SPS_WOONPLAATSNAAM',
+        'SPS_BUITENLAND_ADRES',
+        'SPS_BUITENLAND_WOONPLAATS',
+        'SPS_BUITENLAND_REGIO',
+        'SPS_BUITENLAND_NAAM',
+        'SPS_BUITENLAND_CODE',
+        'SPS_BUITENLAND_OMS'
+    ]
+
     def _get_person_attrs(self):
         bsn_field = "_embedded.heeftBsnVoor.bronwaarde"
 
@@ -52,6 +132,9 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
         bsn_only_attrs = {
             'SJT_NAAM': 'geslachtsnaam',
         }
+        non_bsn_attrs = {
+            'SJT_KAD_GESLACHTSNAAM': 'geslachtsnaam'
+        }
 
         show_when_bsn_condition = self.show_when_field_notempty_condition(bsn_field)
         show_when_not_bsn_condition = self.show_when_field_empty_condition(bsn_field)
@@ -59,10 +142,12 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
         sjt_np_attrs = self._add_condition_to_attrs(show_when_bsn_condition, sjt_np_attrs)
         sjt_kad_attrs = self._add_condition_to_attrs(show_when_not_bsn_condition, sjt_kad_attrs)
         bsn_only_attrs = self._add_condition_to_attrs(show_when_bsn_condition, bsn_only_attrs)
+        non_bsn_attrs = self._add_condition_to_attrs(show_when_not_bsn_condition, non_bsn_attrs)
 
         return {
             'SJT_BSN': bsn_field,
             **bsn_only_attrs,
+            **non_bsn_attrs,
             **sjt_np_attrs,
             'SJT_NP_AANDUIDINGNAAMGEBR_CODE': 'naamGebruik.code',
             'SJT_NP_AANDUIDINGNAAMGEBR_OMS': 'naamGebruik.omschrijving',
@@ -136,7 +221,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
         }
 
     def get_format(self):
-        return {
+        return sort_attributes({
             'BRK_SJT_ID': 'identificatie',
             'SJT_TYPE': 'typeSubject',
             'SJT_BESCHIKKINGSBEVOEGDH_CODE': 'beschikkingsbevoegdheid.code',
@@ -144,7 +229,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
             **self._get_person_attrs(),
             **self._get_kvk_attrs(),
             **self._get_address_attrs(),
-        }
+        }, self.ordering)
 
 
 class KadastralesubjectenExportConfig:
