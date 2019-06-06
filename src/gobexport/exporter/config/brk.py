@@ -3,13 +3,25 @@ import datetime
 from gobexport.exporter.csv import csv_exporter
 
 
-class KadastralesubjectenCsvFormat:
+def brk_filename(name):
+    now = datetime.datetime.now()
+    datestr = now.strftime('%Y%m%d')
+    return f'AmsterdamRegio/CSV_actueel/BRK_{name}_{datestr}.csv'
 
+
+def sort_attributes(attrs: dict, ordering: list):
+    assert len(attrs.keys()) == len(ordering), "Number of attributes does not match the number of items to sort"
+    assert set(attrs.keys()) == set(ordering), "Attribute keys don't match the items to sort"
+
+    return {k: attrs[k] for k in ordering}
+
+
+class BrkCsvFormat:
     def _prefix_dict(self, dct: dict, key_prefix: str, val_prefix: str):
         return {f"{key_prefix}{key}": f"{val_prefix}{val}" for key, val in dct.items()}
 
     def _add_condition_to_attrs(self, condition: dict, attrs: dict):
-        return {k: {**condition, 'value': v} for k, v in attrs.items()}
+        return {k: {**condition, 'trueval': v} for k, v in attrs.items()}
 
     def show_when_field_notempty_condition(self, fieldref: str):
         return {
@@ -23,6 +35,82 @@ class KadastralesubjectenCsvFormat:
             "condition": "isempty",
             "reference": fieldref,
         }
+
+
+class KadastralesubjectenCsvFormat(BrkCsvFormat):
+
+    ordering = [
+        'BRK_SJT_ID',
+        'SJT_TYPE',
+        'SJT_BESCHIKKINGSBEVOEGDH_CODE',
+        'SJT_BESCHIKKINGSBEVOEGDH_OMS',
+        'SJT_BSN',
+        'SJT_NP_VOORNAMEN',
+        'SJT_NP_VOORVOEGSELSGESLSNAAM',
+        'SJT_NAAM',
+        'SJT_NP_GESLACHTSCODE',
+        'SJT_NP_GESLACHTSCODE_OMS',
+        'SJT_NP_AANDUIDINGNAAMGEBR_CODE',
+        'SJT_NP_AANDUIDINGNAAMGEBR_OMS',
+        'SJT_NP_GEBOORTEDATUM',
+        'SJT_NP_GEBOORTEPLAATS',
+        'SJT_NP_GEBOORTELAND_CODE',
+        'SJT_NP_GEBOORTELAND_OMS',
+        'SJT_NP_DATUMOVERLIJDEN',
+        'SJT_NP_VOORNAMEN_PARTNER',
+        'SJT_NP_VOORVOEGSEL_PARTNER',
+        'SJT_NP_GESLACHTSNAAM_PARTNER',
+        'SJT_NP_LANDWAARNAARVERTR_CODE',
+        'SJT_NP_LANDWAARNAARVERTR_OMS',
+        'SJT_KAD_GESLACHTSCODE',
+        'SJT_KAD_GESLACHTSCODE_OMS',
+        'SJT_KAD_VOORNAMEN',
+        'SJT_KAD_VOORVOEGSELSGESLSNAAM',
+        'SJT_KAD_GESLACHTSNAAM',
+        'SJT_KAD_GEBOORTEDATUM',
+        'SJT_KAD_GEBOORTEPLAATS',
+        'SJT_KAD_GEBOORTELAND_CODE',
+        'SJT_KAD_GEBOORTELAND_OMS',
+        'SJT_KAD_INDICATIEOVERLEDEN',
+        'SJT_KAD_DATUMOVERLIJDEN',
+        'SJT_NNP_RSIN',
+        'SJT_NNP_KVKNUMMER',
+        'SJT_NNP_RECHTSVORM_CODE',
+        'SJT_NNP_RECHTSVORM_OMS',
+        'SJT_NNP_STATUTAIRE_NAAM',
+        'SJT_NNP_STATUTAIRE_ZETEL',
+        'SJT_KAD_STATUTAIRE_NAAM',
+        'SJT_KAD_RECHTSVORM_CODE',
+        'SJT_KAD_RECHTSVORM_OMS',
+        'SJT_KAD_STATUTAIRE_ZETEL',
+        'SWS_OPENBARERUIMTENAAM',
+        'SWS_HUISNUMMER',
+        'SWS_HUISLETTER',
+        'SWS_HUISNUMMERTOEVOEGING',
+        'SWS_POSTCODE',
+        'SWS_WOONPLAATSNAAM',
+        'SWS_BUITENLAND_ADRES',
+        'SWS_BUITENLAND_WOONPLAATS',
+        'SWS_BUITENLAND_REGIO',
+        'SWS_BUITENLAND_NAAM',
+        'SWS_BUITENLAND_CODE',
+        'SWS_BUITENLAND_OMS',
+        'SPS_POSTBUSNUMMER',
+        'SPS_POSTBUS_POSTCODE',
+        'SPS_POSTBUS_WOONPLAATSNAAM',
+        'SPS_OPENBARERUIMTENAAM',
+        'SPS_HUISNUMMER',
+        'SPS_HUISLETTER',
+        'SPS_HUISNUMMERTOEVOEGING',
+        'SPS_POSTCODE',
+        'SPS_WOONPLAATSNAAM',
+        'SPS_BUITENLAND_ADRES',
+        'SPS_BUITENLAND_WOONPLAATS',
+        'SPS_BUITENLAND_REGIO',
+        'SPS_BUITENLAND_NAAM',
+        'SPS_BUITENLAND_CODE',
+        'SPS_BUITENLAND_OMS'
+    ]
 
     def _get_person_attrs(self):
         bsn_field = "_embedded.heeftBsnVoor.bronwaarde"
@@ -44,6 +132,9 @@ class KadastralesubjectenCsvFormat:
         bsn_only_attrs = {
             'SJT_NAAM': 'geslachtsnaam',
         }
+        non_bsn_attrs = {
+            'SJT_KAD_GESLACHTSNAAM': 'geslachtsnaam'
+        }
 
         show_when_bsn_condition = self.show_when_field_notempty_condition(bsn_field)
         show_when_not_bsn_condition = self.show_when_field_empty_condition(bsn_field)
@@ -51,10 +142,12 @@ class KadastralesubjectenCsvFormat:
         sjt_np_attrs = self._add_condition_to_attrs(show_when_bsn_condition, sjt_np_attrs)
         sjt_kad_attrs = self._add_condition_to_attrs(show_when_not_bsn_condition, sjt_kad_attrs)
         bsn_only_attrs = self._add_condition_to_attrs(show_when_bsn_condition, bsn_only_attrs)
+        non_bsn_attrs = self._add_condition_to_attrs(show_when_not_bsn_condition, non_bsn_attrs)
 
         return {
             'SJT_BSN': bsn_field,
             **bsn_only_attrs,
+            **non_bsn_attrs,
             **sjt_np_attrs,
             'SJT_NP_AANDUIDINGNAAMGEBR_CODE': 'naamGebruik.code',
             'SJT_NP_AANDUIDINGNAAMGEBR_OMS': 'naamGebruik.omschrijving',
@@ -128,7 +221,7 @@ class KadastralesubjectenCsvFormat:
         }
 
     def get_format(self):
-        return {
+        return sort_attributes({
             'BRK_SJT_ID': 'identificatie',
             'SJT_TYPE': 'typeSubject',
             'SJT_BESCHIKKINGSBEVOEGDH_CODE': 'beschikkingsbevoegdheid.code',
@@ -136,15 +229,12 @@ class KadastralesubjectenCsvFormat:
             **self._get_person_attrs(),
             **self._get_kvk_attrs(),
             **self._get_address_attrs(),
-        }
+        }, self.ordering)
 
 
 class KadastralesubjectenExportConfig:
     format = KadastralesubjectenCsvFormat()
-
-    now = datetime.datetime.now()
-    datestr = now.strftime('%Y%m%d')
-    filename = f'BRK_KadastraalSubject_{datestr}.csv'
+    filename = brk_filename("KadastraalSubject")
 
     products = {
         'csv': {
@@ -158,9 +248,7 @@ class KadastralesubjectenExportConfig:
 
 
 class AantekeningenExportConfig:
-    now = datetime.datetime.now()
-    datestr = now.strftime('%Y%m%d')
-    filename = f'BRK_Aantekening_{datestr}.csv'
+    filename = brk_filename("Aantekening")
 
     art_query = '''
 {
@@ -296,5 +384,451 @@ class AantekeningenExportConfig:
             'mime_type': 'plain/text',
             'format': akt_format,
             'append': True,
+        }
+    }
+
+
+class ZakelijkerechtenCsvFormat(BrkCsvFormat):
+
+    def _get_np_attrs(self):
+        bsn_field = "vanKadastraalsubject.heeftBsnVoor.bronwaarde"
+
+        attrs = {
+            'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject'
+                                    '.geboortedatum',
+            'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject'
+                                     '.geboorteplaats',
+            'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject'
+                                        '.geboorteland.code',
+            'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject'
+                                       '.geboorteland.omschrijving',
+            'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject'
+                                      '.datumOverlijden',
+        }
+
+        return self._add_condition_to_attrs(
+            self.show_when_field_notempty_condition(bsn_field),
+            attrs,
+        )
+
+    def _get_nnp_attrs(self):
+        kvk_field = 'vanKadastraalsubject.heeftKvknummerVoor.bronwaarde'
+
+        attrs = {
+            'SJT_NNP_RSIN': '',
+            'SJT_NNP_KVKNUMMER': '',
+            'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject'
+                                       '.rechtsvorm.code',
+            'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject'
+                                      '.rechtsvorm.omschrijving',
+            'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject'
+                                       '.statutaireNaam',
+            'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject'
+                                        '.statutaireZetel'
+        }
+
+        return self._add_condition_to_attrs(
+            self.show_when_field_notempty_condition(kvk_field),
+            attrs,
+        )
+
+    def get_format(self):
+        return {
+            'BRK_ZRT_ID': 'identificatie',
+            'ZRT_AARDZAKELIJKRECHT_CODE': 'aardZakelijkRecht.code',
+            'ZRT_AARDZAKELIJKRECHT_OMS': 'aardZakelijkRecht.omschrijving',
+            'ZRT_AARDZAKELIJKRECHT_AKR_CODE': 'akrAardZakelijkRecht',
+            'ZRT_BELAST_AZT': 'belastZakelijkeRechten.akrAardZakelijkRecht',
+            'ZRT_BELAST_MET_AZT': 'belastMetZakelijkeRechten.akrAardZakelijkRecht',
+            'ZRT_ONTSTAAN_UIT': 'ontstaanUitAppartementsrechtsplitsing',
+            'ZRT_BETROKKEN_BIJ': 'betrokkenBijAppartementsrechtsplitsing',
+            'ZRT_ISBEPERKT_TOT_TNG': 'isBeperktTot',
+            'ZRT_BETREKKING_OP_KOT': {
+                'action': 'concat',
+                'fields': [
+                    'rustOpKadastraalobject.aangeduidDoorKadastralegemeentecode.bronwaarde',
+                    {
+                        'action': 'literal',
+                        'value': ','
+                    },
+                    'rustOpKadastraalobject.aangeduidDoorKadastralesectie.bronwaarde',
+                    {
+                        'action': 'literal',
+                        'value': ','
+                    },
+                    'rustOpKadastraalobject.perceelnummer',
+                    {
+                        'action': 'literal',
+                        'value': ','
+                    },
+                    'rustOpKadastraalobject.indexletter',
+                    {
+                        'action': 'literal',
+                        'value': ','
+                    },
+                    'rustOpKadastraalobject.indexnummer',
+                ]
+            },
+            'BRK_KOT_ID': 'rustOpKadastraalobject.identificatie',
+            'KOT_STATUS_CODE': 'rustOpKadastraalobject.status',
+            'KOT_MODIFICATION': 'rustOpKadastraalobject.wijzigingsdatum',
+            'BRK_TNG_ID': 'invVanZakelijkrechtBrkTenaamstellingen.identificatie',
+            'TNG_AANDEEL_TELLER': 'invVanZakelijkrechtBrkTenaamstellingen.aandeel.teller',
+            'TNG_AANDEEL_NOEMER': 'invVanZakelijkrechtBrkTenaamstellingen.aandeel.noemer',
+            'TNG_EINDDATUM': 'invVanZakelijkrechtBrkTenaamstellingen.eindGeldigheid',
+            'TNG_ACTUEEL': {
+                'condition': 'isempty',
+                'reference': 'invVanZakelijkrechtBrkTenaamstellingen.eindGeldigheid',
+                'trueval': {
+                    'action': 'literal',
+                    'value': 'TRUE',
+                },
+                'falseval': {
+                    'action': 'literal',
+                    'value': 'FALSE',
+                }
+            },
+            'ASG_APP_RECHTSPLITSTYPE_CODE': 'appartementsrechtsplitsingtype.code',
+            'ASG_APP_RECHTSPLITSTYPE_OMS': 'appartementsrechtsplitsingtype.omschrijving',
+            'ASG_EINDDATUM': 'einddatumAppartementsrechtsplitsing',
+            'ASG_ACTUEEL': 'indicatieActueelAppartementsrechtsplitsing',
+            'BRK_SJT_ID': 'vanKadastraalsubject.identificatie',
+            'SJT_BSN': 'vanKadastraalsubject.heeftBsnVoor.bronwaarde',
+            'SJT_BESCHIKKINGSBEVOEGDH_CODE': 'vanKadastraalsubject'
+                                             '.beschikkingsbevoegdheid.code',
+            'SJT_BESCHIKKINGSBEVOEGDH_OMS': 'vanKadastraalsubject'
+                                            '.beschikkingsbevoegdheid.omschrijving',
+            'SJT_NAAM': {
+                'condition': 'isempty',
+                'reference': 'vanKadastraalsubject.heeftBsnVoor.bronwaarde',
+                'negate': True,
+                'trueval': {
+                    'action': 'concat',
+                    'fields': [
+                        'vanKadastraalsubject.geslachtsnaam',
+                        {
+                            'action': 'literal',
+                            'value': ','
+                        },
+                        'vanKadastraalsubject.voornamen',
+                        {
+                            'action': 'literal',
+                            'value': ','
+                        },
+                        'vanKadastraalsubject.voorvoegsels',
+                        {
+                            'action': 'literal',
+                            'value': ',('
+                        },
+                        'vanKadastraalsubject.geslacht.code',
+                        {
+                            'action': 'literal',
+                            'value': ')'
+                        },
+                    ]
+                },
+                'falseval': 'vanKadastraalsubject.statutaireNaam'
+            },
+            **self._get_np_attrs(),
+            **self._get_nnp_attrs(),
+        }
+
+
+class ZakelijkerechtenExportConfig:
+    filename = brk_filename("ZakelijkRecht")
+    format = ZakelijkerechtenCsvFormat()
+
+    query = '''
+{
+  zakelijkerechten {
+    edges {
+      node {
+        identificatie
+        aardZakelijkRecht
+        akrAardZakelijkRecht
+        belastZakelijkerechten {
+          edges {
+            node {
+              akrAardZakelijkRecht
+            }
+          }
+        }
+        belastMetZakelijkerechten {
+          edges {
+            node {
+              akrAardZakelijkRecht
+            }
+          }
+        }
+        ontstaanUitAppartementsrechtsplitsing
+        betrokkenBijAppartementsrechtsplitsing
+        isBeperktTot
+        rustOpKadastraalobject {
+          edges {
+            node {
+              perceelnummer
+              indexletter
+              indexnummer
+              identificatie
+              status
+              wijzigingsdatum
+              aangeduidDoorKadastralegemeentecode
+              aangeduidDoorKadastralesectie
+            }
+          }
+        }
+        appartementsrechtsplitsingtype,
+        einddatumAppartementsrechtsplitsing,
+        indicatieActueelAppartementsrechtsplitsing
+        invVanZakelijkrechtBrkTenaamstellingen {
+          edges {
+            node {
+              identificatie
+              aandeel
+              eindGeldigheid
+              vanKadastraalsubject {
+                edges {
+                  node {
+                    identificatie
+                    beschikkingsbevoegdheid
+                    geslachtsnaam
+                    voornamen
+                    geslacht
+                    voorvoegsels
+                    geboortedatum
+                    geboorteplaats
+                    geboorteland
+                    datumOverlijden
+                    rechtsvorm
+                    statutaireNaam
+                    statutaireZetel
+                    heeftBsnVoor
+                    heeftKvknummerVoor
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'csv': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql',
+            'query': query,
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': format.get_format(),
+        }
+    }
+
+
+class AardzakelijkerechtenExportConfig:
+    filename = brk_filename("CAardZakelijkRecht")
+    format = {
+        'AZT_CODE': 'code',
+        'AZT_OMSCHRIJVING': 'waarde',
+        'AZT_AARDZAKELIJKRECHT_AKR_CODE': 'akrCode',
+    }
+
+    query = '''
+{
+  aardzakelijkerechten(sort:code_asc) {
+    edges {
+      node {
+        code
+        waarde
+        akrCode
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'csv': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql',
+            'query': query,
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': format,
+        }
+    }
+
+
+class BrkBagExportConfig:
+    filename = brk_filename("BRKBAG")
+    format = {
+        'BRK_KOT_ID': 'identificatie',
+        'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_AKRKADGEMEENTECODE_OMS': '',  # TODO when gemeentecode is imported
+        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+        'KOT_PERCEELNUMMER': 'perceelnummer',
+        'KOT_INDEX_LETTER': 'indexletter',
+        'KOT_INDEX_NUMMER': 'indexnummer',
+        'BAG_BOT_ID': 'heeftEenRelatieMetVerblijfsobject.identificatie',
+        'AOT_OPENBARERUIMTENAAM': 'ligtAanOpenbareruimte.naam',
+        'AOT_HUISNUMMER': 'heeftHoofdadres.huisnummer',
+        'AOT_HUISLETTER': 'heeftHoofdadres.huisletter',
+        'AOT_HUISNUMMERTOEVOEGING': 'heeftHoofdadres.huisnummertoevoeging',
+        'AOT_POSTCODE': 'heeftHoofdadres.postcode',
+        'BRON_RELATIE': {
+            'action': 'literal',
+            'value': 'BRK'
+        },
+        'TOESTANDSDATUM_DIVA': 'toestandsdatum'
+    }
+
+    query = '''
+{
+  kadastraleobjecten {
+    edges {
+      node {
+        identificatie
+        aangeduidDoorKadastralegemeente
+        aangeduidDoorKadastralegemeentecode
+        aangeduidDoorKadastralesectie
+        perceelnummer
+        indexletter
+        indexnummer
+        toestandsdatum
+        heeftEenRelatieMetVerblijfsobject {
+          edges {
+            node {
+              identificatie
+                heeftHoofdadres {
+                edges {
+                  node {
+                    identificatie
+                    ligtAanOpenbareruimte {
+                      edges {
+                        node {
+                          naam
+                        }
+                      }
+                    }
+                    huisnummer
+                    huisletter
+                    huisnummertoevoeging
+                    postcode
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'csv': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql',
+            'collection': 'kadastraleobjecten',
+            'query': query,
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': format,
+        }
+    }
+
+
+class StukdelenExportConfig:
+    filename = brk_filename('Stukdeel')
+    format = {
+        'BRK_SDL_ID': 'identificatie',
+        'SDL_AARDSTUKDEEL_CODE': 'aard.code',
+        'SDL_AARDSTUKDEEL_OMS': 'aard.omschrijving',
+        'SDL_KOOPSOM': 'bedragTransactie.bedrag',
+        'SDL_KOOPSOM_VALUTA': 'bedragTransactie.valuta',
+        'BRK_STK_ID': 'stukidentificatie',
+        'STK_AKRPORTEFEUILLENR': 'portefeuillenummerAkr',
+        'STK_TIJDSTIP_AANBIEDING': 'tijdstipAanbiedingStuk',
+        'STK_REEKS_CODE': 'reeks',
+        'STK_VOLGNUMMER': 'volgnummerStuk',
+        'STK_REGISTERCODE_CODE': 'registercodeStuk.code',
+        'STK_REGISTERCODE_OMS': 'registercodeStuk.omschrijving',
+        'STK_SOORTREGISTER_CODE': 'soortRegisterStuk.code',
+        'STK_SOORTREGISTER_OMS': 'soortRegisterStuk.omschrijving',
+        'STK_DEEL_SOORT': 'deelSoortStuk',
+        'BRK_TNG_ID': 'isBronVoorTenaamstelling.identificatie',
+        'BRK_ATG_ID': {
+            'condition': 'isempty',
+            'reference': 'isBronVoorAantekeningRecht.identificatie',
+            'negate': True,
+            # Either one or the other is set, or none, but never both
+            'trueval': 'isBronVoorAantekeningRecht.identificatie',
+            'elseval': 'isBronVoorAantekeningKadastraalObject.identificatie'
+        },
+        'BRK_ASG_VVE': 'isBronVoorZakelijkRecht.appartementsrechtsplitsingidentificatie'
+    }
+
+    query = '''
+{
+  stukdelen {
+    edges {
+      node {
+        identificatie
+        aard
+        bedragTransactie
+        stukidentificatie
+        portefeuillenummerAkr
+        tijdstipAanbiedingStuk
+        reeks
+        volgnummerStuk
+        registercodeStuk
+        soortRegisterStuk
+        deelSoortStuk
+        isBronVoorTenaamstelling {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        isBronVoorAantekeningRecht {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        isBronVoorAantekeningKadastraalObject {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        isBronVoorZakelijkRecht {
+          edges {
+            node {
+              appartementsrechtsplitsingidentificatie
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'csv': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql',
+            'query': query,
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': format,
         }
     }

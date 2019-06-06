@@ -39,7 +39,11 @@ class BAGDefaultCSVFormat:
                 reference = self.format[name]
                 self.format[name] = {
                     'condition': 'isempty',
-                    'override': value,
+                    'trueval': {
+                        'action': 'literal',
+                        'value': value,
+                    },
+                    'falseval': reference,
                     'reference': reference,
                 }
 

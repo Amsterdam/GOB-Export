@@ -28,27 +28,24 @@ def _split_field_reference(ref: str):
 def evaluate_condition(entity: dict, condition: dict):
     """Expects an entity and a condition as dict, which has as keys:
 
-    condition: for example 'isnull'
+    condition: for example 'isempty'
     reference: the field reference to which to apply the condition
-    value:     the value (field reference) to return if condition evaluates to true
+    trueval: the value (field reference) to return if condition evaluates to true
+    falseval: you get it
 
     negate:    optional. if true, negate the condition
 
     :param condition:
     :return:
     """
-    assert all([k in condition for k in ['condition', 'reference']]), "Invalid condition definition"
-    assert any([k in condition for k in ['value', 'override']]), "Value or override should be provided"
+    assert all([k in condition for k in ['condition', 'reference', 'trueval']]), "Invalid condition definition"
 
     condition_type = condition.get('condition')
     reference = condition.get('reference')
-    value = condition.get('value')
-    override = condition.get('override')
+    trueval = condition.get('trueval')
+    falseval = condition.get('falseval')
     negate = condition.get('negate', False)
-
-    if not override:
-        # If no override value has been provided, reference and value can't be the same
-        assert reference != value, "Reference and value cannot be the same"
+    condition_should_be = not negate
 
     onfield_value = get_entity_value(entity, _split_field_reference(reference))
 
@@ -57,62 +54,73 @@ def evaluate_condition(entity: dict, condition: dict):
     else:
         raise NotImplementedError(f"Not implemented condition f{condition_type}")
 
-    return process_condition_result(entity, condition_result, negate, value, reference, override)
+    if condition_result is condition_should_be:
+        result = trueval
+    else:
+        result = falseval
+
+    if result:
+        return get_entity_value(entity, result)
 
 
-def process_condition_result(entity, condition_result, negate, value, reference, override):
-    reference_list = _split_field_reference(reference)
+def _evaluate_concat_action(entity: dict, action: dict):
+    assert 'fields' in action
+    return "".join([str(item) if item is not None else "" for
+                    item in [get_entity_value(entity, field) for field in action['fields']]])
 
-    if condition_result is not negate:
-        if value:
-            # If a field reference is provided, return this as the new mapping
-            return _split_field_reference(value)
 
-        if override:
-            # When the condition is met, update the entity reference value
-            update_entity_value(entity, reference_list, override)
-            return reference_list
-    elif override:
-        # When the condition isn't met return the original value
-        return reference_list
+def _evaluate_literal_action(action: dict):
+    return action.get('value')
 
-    return None
+
+def evaluate_action(entity: dict, action: dict):
+    if action.get('action') == 'concat':
+        return _evaluate_concat_action(entity, action)
+    elif action.get('action') == 'literal':
+        return _evaluate_literal_action(action)
+    else:
+        raise NotImplementedError()
+
+
+def _get_entity_value_dict_lookup_key(entity: dict, lookup_key: dict):
+    if lookup_key.get('action'):
+        return evaluate_action(entity, lookup_key)
+    elif lookup_key.get('condition'):
+        return evaluate_condition(entity, lookup_key)
+
+    raise NotImplementedError()
 
 
 def get_entity_value(entity, lookup_key):
     """Get the value from the entity using a key or a list of keys
 
+    lookup_key can be of type dict, with either 'action' or 'condition' set.
+
+    An action overrides the remainder of this function and returns the value immediately.
+    A condition returns a new (or the same) lookup key/dict for further processing.
+
+    If lookup_key is of type list or string, we perform a lookup on entity.
+
     :param entity: The API entity to get the value from
     :param lookup_key: A attribute name or a list of attribute names
     :return: the value of the entity's attribute or None
     """
+    if not lookup_key:
+        return None
+
+    if isinstance(lookup_key, str):
+        lookup_key = _split_field_reference(lookup_key)
+
     if isinstance(lookup_key, dict):
-        lookup_key = evaluate_condition(entity, lookup_key)
+        return _get_entity_value_dict_lookup_key(entity, lookup_key)
+
+    assert isinstance(lookup_key, str) or isinstance(lookup_key, list)
 
     value = nested_entity_get(entity, lookup_key) if isinstance(lookup_key, list) else entity.get(lookup_key)
     # Return J or N when the value is a boolean
     if isinstance(value, bool):
         value = 'J' if value else 'N'
     return value
-
-
-def update_entity_value(entity, lookup_key, value):
-    """Update the value from the entity using a key or a list of keys
-
-    :param entity: The API entity to get the value from
-    :param lookup_key: A attribute name or a list of attribute names
-    :param new_value: The value to assign
-    :return:
-    """
-    if isinstance(lookup_key, list):
-        inside = entity
-        for key in lookup_key:
-            if isinstance(inside.get(key), dict):
-                inside = inside[key]
-            else:
-                inside[key] = value
-    else:
-        entity[lookup_key] = value
 
 
 def _get_headers_from_file(file: str) -> list:
