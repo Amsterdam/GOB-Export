@@ -145,7 +145,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
         non_bsn_attrs = self._add_condition_to_attrs(show_when_not_bsn_condition, non_bsn_attrs)
 
         return {
-            'SJT_BSN': bsn_field,
+            'SJT_BSN': '',
             **bsn_only_attrs,
             **non_bsn_attrs,
             **sjt_np_attrs,
