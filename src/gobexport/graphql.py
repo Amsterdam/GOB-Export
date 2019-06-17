@@ -56,7 +56,7 @@ class GraphQL:
         :return:
         """
         num_records = NUM_RECORDS
-        max_records = 10000
+        max_records = 1000
         count = 0
         while self.has_next_page:
             start = time.time()
@@ -66,7 +66,7 @@ class GraphQL:
             duration = round(end - start, 2)
             # Adjust number of records to get to the target duration
             correction = TARGET_DURATION / duration
-            num_records = int(num_records * correction)
+            num_records = min(int(num_records * correction), 1)
             print(f"Request data end ({duration} secs), records set to {num_records}")
             assert response.ok
             data = response.json()
