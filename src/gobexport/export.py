@@ -55,22 +55,25 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
         # Get name of local file to write results to
         results_file = _get_filename(product['filename']) if destination == "Objectstore" else product['filename']
 
-        row_count = export_to_file(host, product, results_file, catalogue, product.get('collection', collection))
+        try:
+            row_count = export_to_file(host, product, results_file, catalogue, product.get('collection', collection))
+        except Exception as e:
+            logger.error(f"Exported to local file {name} failed: {str(e)}.")
+        else:
+            logger.info(f"{row_count} records exported to local file {name}.")
 
-        logger.info(f"{row_count} records exported to local file {name}.")
+            if not product.get('append', False):
+                # Do not add file to files again when appending
+                files.append({
+                    'temp_location': results_file,
+                    'distribution': product['filename'],
+                    'mime_type': product['mime_type']})
 
-        if not product.get('append', False):
-            # Do not add file to files again when appending
-            files.append({
-                'temp_location': results_file,
-                'distribution': product['filename'],
-                'mime_type': product['mime_type']})
-
-        # Add extra result files (e.g. .prj file)
-        extra_files = product.get('extra_files', [])
-        files.extend([{'temp_location': _get_filename(file['filename']),
-                       'distribution': file['filename'],
-                       'mime_type': file['mime_type']} for file in extra_files])
+            # Add extra result files (e.g. .prj file)
+            extra_files = product.get('extra_files', [])
+            files.extend([{'temp_location': _get_filename(file['filename']),
+                           'distribution': file['filename'],
+                           'mime_type': file['mime_type']} for file in extra_files])
 
     if destination == "Objectstore":
         # Get objectstore connection
