@@ -2,8 +2,9 @@ import requests
 
 import time
 
-_MAX_TRIES = 5       # Maximum number of times to try the request
-_RETRY_TIMEOUT = 60  # Seconds between consecetive retries
+_MAX_TRIES = 5          # Maximum number of times to try the request
+_RETRY_TIMEOUT = 60     # Seconds between consecetive retries
+_REQUEST_TIMEOUT = 300  # Request timout to 300 seconds to get a response
 
 
 class RequestException(IOError):
@@ -34,8 +35,8 @@ def _exec(method, **kwargs):
 
 
 def get(url):
-    return _exec(requests.get, url=url)
+    return _exec(requests.get, url=url, timeout=_REQUEST_TIMEOUT)
 
 
 def post(url, json):
-    return _exec(requests.post, url=url, json=json)
+    return _exec(requests.post, url=url, json=json, timeout=_REQUEST_TIMEOUT)
