@@ -12,7 +12,7 @@ from gobcore.model import GOBModel
 from gobexport.converters.history import convert_to_history_rows
 
 GRAPHQL_ENDPOINT = '/gob/graphql/'
-NUM_RECORDS = 10  # Initially ask for only 10 records
+NUM_RECORDS = 1  # Initially ask for only one record
 TARGET_DURATION = 30  # Target request duration is 30 seconds
 
 
@@ -66,7 +66,7 @@ class GraphQL:
             duration = round(end - start, 2)
             # Adjust number of records to get to the target duration
             correction = TARGET_DURATION / duration
-            num_records = min(int(num_records * correction), 1)
+            num_records = max(int(num_records * correction), 1)
             print(f"Request data end ({duration} secs), records set to {num_records}")
             assert response.ok
             data = response.json()
