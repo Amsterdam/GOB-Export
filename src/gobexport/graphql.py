@@ -5,17 +5,18 @@ Encapsulates a paged GraphQL endpoint into an iterator
 """
 import re
 import gobexport.requests as requests
+import time
 
 from gobcore.model import GOBModel
 
 from gobexport.converters.history import convert_to_history_rows
 
 GRAPHQL_ENDPOINT = '/gob/graphql/'
-NUM_RECORDS = 100
+NUM_RECORDS = 10  # Initially ask for only 10 records
+TARGET_DURATION = 30  # Target request duration is 30 seconds
 
 
 class GraphQL:
-
     def __init__(self, host, query, catalogue, collection, expand_history=False):
         """Constructor
 
@@ -33,7 +34,7 @@ class GraphQL:
         self.collection = collection
         self.expand_history = expand_history
         self.end_cursor = ""
-        self.query = self._update_query(query)
+        self.query = self._update_query(query, NUM_RECORDS)
         self.has_next_page = True
         self.gob_model = GOBModel().get_collection(self.catalogue, self.collection)
 
@@ -54,8 +55,17 @@ class GraphQL:
 
         :return:
         """
+        num_records = NUM_RECORDS
         while self.has_next_page:
+            start = time.time()
+            print(f"Request {num_records} rows...")
             response = requests.post(self.url, json={'query': self.query})
+            end = time.time()
+            duration = round(end - start, 2)
+            # Adjust number of records to get to the target duration
+            correction = TARGET_DURATION / duration
+            num_records = int(num_records * correction)
+            print(f"Request data end ({duration} secs), records set to {num_records}")
             assert response.ok
             data = response.json()
 
@@ -64,7 +74,7 @@ class GraphQL:
             self.has_next_page = data['data'][self.collection]['pageInfo']['hasNextPage']
 
             if self.has_next_page:
-                self.query = self._update_query(self.query)
+                self.query = self._update_query(self.query, num_records)
 
             for edge in data['data'][self.collection]['edges']:
                 if self.expand_history:
@@ -92,7 +102,7 @@ class GraphQL:
                 flat_edge[key] = value
         return flat_edge
 
-    def _update_query(self, query):
+    def _update_query(self, query, num_records):
         """Updates a graphql query for pagination
 
         Adds the first and after parameters and the pageInfo node
@@ -102,19 +112,24 @@ class GraphQL:
         # First check if the query has a filter
         filters = re.search(f'{self.collection}\((.+)?\)', query)
         if filters:
+            # adjust number of records to request
+            match = re.search('first:\s?(([\d]+)?)', query)
+            if match:
+                query = query.replace(match[1], f"{num_records}")
+
             # Try to find the after parameter, or else add it
             match = re.search('after:\s?("([a-zA-Z\d=]+)?")', query)
             if match:
                 query = query.replace(match[1], f'"{self.end_cursor}"')
             else:
                 append_string = f', after: "{self.end_cursor}")' if 'first' in filters[0] \
-                    else f', first: {NUM_RECORDS}, after: "{self.end_cursor}")'
+                    else f', first: {num_records}, after: "{self.end_cursor}")'
                 filters_end = filters.span()[1]
                 query = query[:filters_end-1] + append_string + query[filters_end:]
         else:
             # Add first and after parameter after the main collection
             query = query.replace(self.collection,
-                                  f'{self.collection}(first: {NUM_RECORDS}, after: "{self.end_cursor}")')
+                                  f'{self.collection}(first: {num_records}, after: "{self.end_cursor}")')
 
         # Add pageInfo if it doesn't exist
         if not re.search('pageInfo', query):
