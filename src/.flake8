@@ -13,5 +13,5 @@ exclude=.git,
         tests,
         scripts,
         */settings_commons.py
-max-complexity=6
+max-complexity=7
 max-line-length = 119
