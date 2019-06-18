@@ -56,7 +56,7 @@ class GraphQL:
         :return:
         """
         num_records = NUM_RECORDS
-        max_records = 1000
+        max_records = 10
         count = 0
         while self.has_next_page:
             start = time.time()
