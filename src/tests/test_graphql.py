@@ -166,33 +166,50 @@ def test_flatten_edge():
     }
 
     nested_edge = {
-          "node": {
+        "node": {
             "value": "value",
             "reference": {
-              "edges": [
-                {
-                  "node": {
-                    "value": "value",
-                    "nested_reference": {
-                      "edges": [
-                        {
-                          "node": {
-                            "nested_value": "value"
-                          }
+                "edges": [
+                    {
+                        "node": {
+                            "value": "value",
+                            "nested_reference": {
+                                "edges": [
+                                    {
+                                        "node": {
+                                            "nested_value": "value"
+                                        }
+                                    }
+                                ]
+                            }
                         }
-                      ]
                     }
-                  }
-                }
-              ]
+                ]
+            },
+            "empty_reference": {
+                "edges": [
+                    {
+                        "node": {
+                            "empty_nested_reference": {
+                                "edges": []
+                            }
+                        }
+                    }
+                ]
             }
-          }
         }
+    }
 
     expected_result = {'reference': [{'value': 'value'}]}
     result = api._flatten_edge(edge)
     assert(expected_result == result)
 
-    expected_result = {'value': 'value', 'reference': [{'value': 'value'}], 'nested_reference': [{'nested_value': 'value'}]}
+    expected_result = {
+        'value': 'value',
+        'reference': [{'value': 'value'}],
+        'nested_reference': [{'nested_value': 'value'}],
+        'empty_reference': [],
+        'empty_nested_reference': [],
+    }
     result = api._flatten_edge(nested_edge)
     assert(expected_result == result)
