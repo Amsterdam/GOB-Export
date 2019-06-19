@@ -687,7 +687,6 @@ class VerblijfsobjectenExportConfig:
                     'mime_type': 'application/octet-stream'
                 },
             ],
-            'query': query_actueel
         },
     }
 
