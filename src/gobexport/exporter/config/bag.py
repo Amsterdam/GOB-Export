@@ -303,7 +303,7 @@ class OpenbareruimtesExportConfig:
         'csv_beschrijving_actueel': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_openbare_ruimte_beschrijving.csv',
+            'filename': 'CSV_Actueel/BAG_openbare_ruimte_beschrijving_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'identificatie': 'identificatie',
@@ -403,6 +403,7 @@ class NummeraanduidingenExportConfig:
         beginGeldigheid
         eindGeldigheid
         typeAdresseerbaarObject
+        typeAdres
         documentdatum
         documentnummer
         status
@@ -448,6 +449,7 @@ class NummeraanduidingenExportConfig:
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'typeAdresseerbaarObject': 'typeAdresseerbaarObject.omschrijving',
+        'typeAdres': 'typeAdres',
         'documentdatum': 'documentdatum',
         'documentnummer': 'documentnummer',
         'status': 'status.omschrijving',
@@ -475,6 +477,7 @@ class NummeraanduidingenExportConfig:
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'typeAdresseerbaarObject': 'typeAdresseerbaarObject.omschrijving',
+        'typeAdres': 'typeAdres',
         'documentdatum': 'documentdatum',
         'documentnummer': 'documentnummer',
         'status': 'status.omschrijving',
@@ -543,6 +546,7 @@ class NummeraanduidingenExportConfig:
         beginGeldigheid
         eindGeldigheid
         typeAdresseerbaarObject
+        typeAdres
         documentdatum
         documentnummer
         status
@@ -723,7 +727,7 @@ class VerblijfsobjectenExportConfig:
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
         'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
         'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
-        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummertoevoeging',
         'postcodeHoofdadres': 'heeftHoofdadres.postcode',
         'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
         'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
@@ -736,7 +740,7 @@ class VerblijfsobjectenExportConfig:
         'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie.omschrijving',
         'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
         'aantalEenhedenComplex': 'aantalEenhedenComplex',
-        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'oppervlakte': 'oppervlakte',
         'status': 'status.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -783,7 +787,7 @@ class VerblijfsobjectenExportConfig:
         'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
         'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
         'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
-        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummertoevoeging',
         'postcodeHoofdadres': 'heeftHoofdadres.postcode',
         'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
         'ligtAan:BAG.ORE.volgnummerHoofdadres': 'ligtAanOpenbareruimte.volgnummer',
@@ -800,7 +804,7 @@ class VerblijfsobjectenExportConfig:
         'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie.omschrijving',
         'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
         'aantalEenhedenComplex': 'aantalEenhedenComplex',
-        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'oppervlakte': 'oppervlakte',
         'status': 'status.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -1210,7 +1214,7 @@ class StandplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
         'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
         'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
-        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummertoevoeging',
         'postcodeHoofdadres': 'heeftHoofdadres.postcode',
         'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
         'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
@@ -1220,7 +1224,7 @@ class StandplaatsenExportConfig:
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'status': 'status.omschrijving',
-        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1251,7 +1255,7 @@ class StandplaatsenExportConfig:
         'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
         'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
         'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
-        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummertoevoeging',
         'postcodeHoofdadres': 'heeftHoofdadres.postcode',
         'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
         'ligtAan:BAG.ORE.volgnummerHoofdadres': 'ligtAanOpenbareruimte.volgnummer',
@@ -1265,7 +1269,7 @@ class StandplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
         'status': 'status.omschrijving',
-        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1610,7 +1614,7 @@ class LigplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
         'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
         'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
-        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummertoevoeging',
         'postcodeHoofdadres': 'heeftHoofdadres.postcode',
         'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
         'ligtAan:BAG.ORE.naamHoofdadres': 'ligtAanOpenbareruimte.naam',
@@ -1620,7 +1624,7 @@ class LigplaatsenExportConfig:
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'status': 'status.omschrijving',
-        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1651,7 +1655,7 @@ class LigplaatsenExportConfig:
         'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
         'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
         'huisletterHoofdadres': 'heeftHoofdadres.huisletter',
-        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummerToevoeging',
+        'huisnummertoevoegingHoofdadres': 'heeftHoofdadres.huisnummertoevoeging',
         'postcodeHoofdadres': 'heeftHoofdadres.postcode',
         'ligtAan:BAG.ORE.identificatieHoofdadres': 'ligtAanOpenbareruimte.identificatie',
         'ligtAan:BAG.ORE.volgnummerHoofdadres': 'ligtAanOpenbareruimte.volgnummer',
@@ -1665,7 +1669,7 @@ class LigplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
         'status': 'status.omschrijving',
-        'feitelijkGebruikUitWOZ': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -2086,7 +2090,7 @@ class PandenExportConfig:
                 'docdatum': 'documentdatum',
                 'docnummer': 'documentnummer',
                 'naam_pand': 'naam',
-                'ligging': 'ligging',
+                'ligging': 'ligging.omschrijving',
                 'aant_bouwl': 'aantalBouwlagen',
                 'hoog_bouwl': 'hoogsteBouwlaag',
                 'laag_bouwl': 'laagsteBouwlaag',
@@ -2133,85 +2137,87 @@ class PandenExportConfig:
             'mime_type': 'plain/text',
             'format': history_format.get_format(),
             'query': '''
-{
-  panden(active: false) {
-    edges {
-      node {
-        identificatie
-        volgnummer
-        registratiedatum
-        aanduidingInOnderzoek
-        geconstateerd
-        oorspronkelijkBouwjaar
-        status
-        beginGeldigheid
-        eindGeldigheid
-        documentdatum
-        documentnummer
-        naam
-        ligging
-        aantalBouwlagen
-        hoogsteBouwlaag
-        laagsteBouwlaag
-        typeWoonobject
-        geometrie
-        ligtInBouwblok(active: false) {
-          edges {
-            node {
-              ligtInBuurt(active: false) {
-                edges {
-                  node {
-                    identificatie
-                    volgnummer
-                    naam
-                    code
-                    beginGeldigheid
-                    eindGeldigheid
-                    ligtInWijk(active: false) {
-                      edges {
-                        node {
-                          identificatie
-                          volgnummer
-                          naam
-                          code
-                          beginGeldigheid
-                          eindGeldigheid
-                          ligtInStadsdeel(active: false) {
-                            edges {
-                              node {
-                                identificatie
-                                volgnummer
-                                naam
-                                code
-                                beginGeldigheid
-                                eindGeldigheid
+    {
+      panden(active: false) {
+        edges {
+          node {
+            identificatie
+            volgnummer
+            registratiedatum
+            aanduidingInOnderzoek
+            geconstateerd
+            oorspronkelijkBouwjaar
+            status
+            beginGeldigheid
+            eindGeldigheid
+            documentdatum
+            documentnummer
+            naam
+            ligging
+            aantalBouwlagen
+            hoogsteBouwlaag
+            laagsteBouwlaag
+            typeWoonobject
+            geometrie
+            ligtInBouwblok(active: false) {
+              edges {
+                node {
+                  ligtInBuurt(active: false) {
+                    edges {
+                      node {
+                        identificatie
+                        volgnummer
+                        naam
+                        code
+                        beginGeldigheid
+                        eindGeldigheid
+                        ligtInWijk(active: false) {
+                          edges {
+                            node {
+                              identificatie
+                              volgnummer
+                              naam
+                              code
+                              beginGeldigheid
+                              eindGeldigheid
+                              ligtInStadsdeel(active: false) {
+                                edges {
+                                  node {
+                                    identificatie
+                                    volgnummer
+                                    naam
+                                    code
+                                    beginGeldigheid
+                                    eindGeldigheid
+                                  }
+                                }
                               }
                             }
                           }
                         }
-                      }
-                    }
-                    LigtInGgpgebied(active: false) {
-                      edges {
-                        node {
-                          identificatie
-                          volgnummer
-                          naam
-                          code
-                          beginGeldigheid
-                          eindGeldigheid
+                        LigtInGgpgebied(active: false) {
+                          edges {
+                            node {
+                              identificatie
+                              volgnummer
+                              naam
+                              code
+                              beginGeldigheid
+                              eindGeldigheid
+                            }
+                          }
                         }
-                      }
-                    }
-                    LigtInGgwgebied(active: false) {
-                      edges {
-                        node {
-                          identificatie
-                          volgnummer
-                          naam
-                          code
-                          beginGeldigheid
-                          eindGeldigheid
+                        LigtInGgwgebied(active: false) {
+                          edges {
+                            node {
+                              identificatie
+                              volgnummer
+                              naam
+                              code
+                              beginGeldigheid
+                              eindGeldigheid
+                            }
+                          }
                         }
                       }
                     }
@@ -2223,8 +2229,6 @@ class PandenExportConfig:
         }
       }
     }
-  }
-}
 '''
         },
     }
