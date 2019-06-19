@@ -475,135 +475,6 @@ class NummeraanduidingenExportConfig:
 
 class VerblijfsobjectenExportConfig:
 
-    query_actueel = '''
-{
-  verblijfsobjecten {
-    edges {
-      node {
-        identificatie
-        aanduidingInOnderzoek
-        geconstateerd
-        heeftHoofdadres {
-          edges {
-            node {
-              identificatie
-              huisnummer
-              huisletter
-              huisnummertoevoeging
-              postcode
-              ligtAanOpenbareruimte {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                  }
-                }
-              }
-              ligtInWoonplaats {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                  }
-                }
-              }
-            }
-          }
-        }
-        heeftNevenadres {
-          edges {
-            node {
-              identificatie
-            }
-          }
-        }
-        ligtInPanden {
-          edges {
-            node {
-              identificatie
-              ligtInBouwblok {
-                edges {
-                  node {
-                    identificatie
-                    code
-                  }
-                }
-              }
-            }
-          }
-        }
-        ligtInBuurt {
-          edges {
-            node {
-              identificatie
-              naam
-              code
-              ligtInWijk {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                    code
-                    ligtInStadsdeel {
-                      edges {
-                        node {
-                          identificatie
-                          naam
-                          code
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              LigtInGgpgebied {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                    code
-                  }
-                }
-              }
-              LigtInGgwgebied {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                    code
-                  }
-                }
-              }
-            }
-          }
-        }
-        gebruiksdoel
-        gebruiksdoelWoonfunctie
-        gebruiksdoelGezondheidszorgfunctie
-        aantalEenhedenComplex
-        feitelijkGebruik
-        oppervlakte
-        status
-        beginGeldigheid
-        eindGeldigheid
-        documentdatum
-        documentnummer
-        verdiepingToegang
-        toegang
-        aantalBouwlagen
-        hoogsteBouwlaag
-        laagsteBouwlaag
-        aantalKamers
-        eigendomsverhouding
-        redenopvoer
-        redenafvoer
-        geometrie
-      }
-    }
-  }
-}
-'''
-
     format = BAGDefaultCSVFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
@@ -736,15 +607,14 @@ class VerblijfsobjectenExportConfig:
 
     products = {
         'csv_actueel': {
-            'api_type': 'graphql',
+            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_verblijfsobject_Actueel.csv',
             'mime_type': 'plain/text',
             'format': format.get_format(),
-            'query': query_actueel
         },
         'esri_actueel': {
-            'api_type': 'graphql',
+            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced',
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_verblijfsobject.shp',
             'mime_type': 'application/octet-stream',
