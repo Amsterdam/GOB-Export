@@ -100,6 +100,12 @@ class GraphQL:
                     flat_edge.setdefault(key, []).extend([self._flatten_edge(e, flat_edge) for e in value['edges']])
             else:
                 flat_edge[key] = value
+
+        # Clear the final reference lists of empty dicts
+        if not main:
+            for key, value in flat_edge.items():
+                if isinstance(value, list):
+                    flat_edge[key] = [v for v in value if v]
         return flat_edge
 
     def _update_query(self, query, num_records):
