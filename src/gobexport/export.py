@@ -52,9 +52,10 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
 
     # Start exporting each product
     for name, product in config.products.items():
+        logger.info(f"Export to file '{name}' started.")
+
         # Get name of local file to write results to
         results_file = _get_filename(product['filename']) if destination == "Objectstore" else product['filename']
-
         try:
             row_count = export_to_file(host, product, results_file, catalogue, product.get('collection', collection))
         except Exception as e:
@@ -82,6 +83,7 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
 
     # Start distribution of all resulting files
     for file in files:
+        logger.info(f"Write file '{file['distribution']}'.")
         if destination == "Objectstore":
             # Distribute to final location
             container = f'{CONTAINER_BASE}/{catalogue}/'
