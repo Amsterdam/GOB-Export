@@ -32,6 +32,15 @@ def create_geometry(entity_geometry):
     return poly
 
 
+def _get_geometry_type(entity):
+    # Try to get the geometry type from the first record
+    try:
+        geometry_type = create_geometry(entity['geometrie']).GetGeometryType()
+    except KeyError as e:
+        geometry_type = ogr.wkbPolygon
+    return geometry_type
+
+
 def esri_exporter(api, file, format=None, append=False):
     """ESRI Exporter
 
@@ -57,15 +66,19 @@ def esri_exporter(api, file, format=None, append=False):
     spatialref = osr.SpatialReference()
     spatialref.ImportFromEPSG(28992)
 
-    # Please note that it will fail if a file with the same name already exists
-    dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=ogr.wkbPolygon)
-
-    # Add all field definitions
-    add_field_definitions(dstlayer, format.keys())
-
     with ProgressTicker(f"Export entities", 10000) as progress:
         # Get records from the API and build the esri file
         for entity in api:
+
+            # On the first entity determine the type of shapefile we need to export
+            if row_count == 0:
+                # Please note that it will fail if a file with the same name already exists
+                geometry_type = _get_geometry_type(entity)
+                dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=geometry_type)
+
+                # Add all field definitions
+                add_field_definitions(dstlayer, format.keys())
+
             feature = ogr.Feature(dstlayer.GetLayerDefn())
 
             if entity['geometrie']:
