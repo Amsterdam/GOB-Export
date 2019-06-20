@@ -56,8 +56,6 @@ class GraphQL:
         :return:
         """
         num_records = NUM_RECORDS
-        max_records = 1000
-        count = 0
         while self.has_next_page:
             start = time.time()
             print(f"Request {num_records} rows...")
@@ -82,15 +80,9 @@ class GraphQL:
                 if self.expand_history:
                     history_rows = convert_to_history_rows(self._flatten_edge(edge))
                     for row in history_rows:
-                        count += 1
                         yield row
                 else:
-                    count += 1
                     yield self._flatten_edge(edge)
-
-            if count > max_records:
-                print("Max records reached")
-                break
 
     def _flatten_edge(self, edge, main=None):
         """Flatten edges and nodes from the graphql response, places all nested references
