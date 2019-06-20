@@ -511,7 +511,7 @@ class VerblijfsobjectenExportConfig:
         'eigendomsverhouding': 'eigendomsverhouding.omschrijving',
         'redenopvoer': 'redenopvoer.omschrijving',
         'redenafvoer': 'redenafvoer.omschrijving',
-        'ligtIn:BAG.PND.identificatie': 'ligtInPanden.0.identificatie',
+        'ligtIn:BAG.PND.identificatie': 'ligtInPanden.identificatie',
         'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
         'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
         'ligtIn:GBD.BRT.identificatie': 'ligtInBuurt.identificatie',
@@ -520,15 +520,15 @@ class VerblijfsobjectenExportConfig:
         'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
         'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
         'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
-        'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-        'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
-        'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+        'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
+        'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
+        'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
         'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
         'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
-        'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-        'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
-        'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+        'ligtIn:GBD.GGP.identificatie': 'ligtInGgpgebied.identificatie',
+        'ligtIn:GBD.GGP.naam': 'ligtInGgpgebied.naam',
+        'ligtIn:GBD.GGP.code': 'ligtInGgpgebied.code',
         'geometrie': 'geometrie'
     })
 
@@ -575,8 +575,8 @@ class VerblijfsobjectenExportConfig:
         'eigendomsverhouding': 'eigendomsverhouding.omschrijving',
         'redenopvoer': 'redenopvoer.omschrijving',
         'redenafvoer': 'redenafvoer.omschrijving',
-        'ligtIn:BAG.PND.identificatie': 'ligtInPanden.0.identificatie',
-        'ligtIn:BAG.PND.volgnummer': 'ligtInPanden.0.volgnummer',
+        'ligtIn:BAG.PND.identificatie': 'ligtInPanden.identificatie',
+        'ligtIn:BAG.PND.volgnummer': 'ligtInPanden.volgnummer',
         'ligtIn:GBD.BBK.identificatie': 'ligtInBouwblok.identificatie',
         'ligtIn:GBD.BBK.volgnummer': 'ligtInBouwblok.volgnummer',
         'ligtIn:GBD.BBK.code': 'ligtInBouwblok.code',
@@ -654,7 +654,7 @@ class VerblijfsobjectenExportConfig:
                 'eigendom': 'eigendomsverhouding.omschrijving',
                 'opvoer': 'redenopvoer.omschrijving',
                 'afvoer': 'redenafvoer.omschrijving',
-                'pnd_id': 'ligtInPanden.0.identificatie',
+                'pnd_id': 'ligtInPanden.identificatie',
                 'bbk_id': 'ligtInBouwblok.identificatie',
                 'bbk_code': 'ligtInBouwblok.code',
                 'brt_id': 'ligtInBuurt.identificatie',
@@ -663,15 +663,15 @@ class VerblijfsobjectenExportConfig:
                 'wijk_id': 'ligtInWijk.identificatie',
                 'wijk_naam': 'ligtInWijk.naam',
                 'wijk_code': 'ligtInWijk.code',
-                'ggw_id': 'LigtInGgwgebied.identificatie',
-                'ggw_naam': 'LigtInGgwgebied.naam',
-                'ggw_code': 'LigtInGgwgebied.code',
+                'ggw_id': 'ligtInGgwgebied.identificatie',
+                'ggw_naam': 'ligtInGgwgebied.naam',
+                'ggw_code': 'ligtInGgwgebied.code',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_naam': 'ligtInStadsdeel.naam',
                 'sdl_code': 'ligtInStadsdeel.code',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
-                'ggp_naam': 'LigtInGgpgebied.naam',
-                'ggp_code': 'LigtInGgpgebied.code',
+                'ggp_id': 'ligtInGgpgebied.identificatie',
+                'ggp_naam': 'ligtInGgpgebied.naam',
+                'ggp_code': 'ligtInGgpgebied.code',
             },
             'extra_files': [
                 {
@@ -1456,7 +1456,13 @@ class BrondocumentenExportConfig:
     edges {
       node {
         documentnummer
-        dossier
+        invHeeftBrondocumentenBagDossiers {
+          edges {
+            node {
+              dossier
+            }
+          }
+        }
         registratiedatum
         bronleverancier
         typeDossier
@@ -1473,7 +1479,7 @@ class BrondocumentenExportConfig:
             'filename': 'CSV_Actueel/BAG_brondocument.csv',
             'mime_type': 'plain/text',
             'format': {
-                'dossier': 'dossier',
+                'dossier': 'invHeeftBrondocumentenBagDossiers.0.dossier',
                 'documentnummer': 'documentnummer',
                 'documentdatum': 'registratiedatum',
                 'bronleverancier': 'bronleverancier.omschrijving',
