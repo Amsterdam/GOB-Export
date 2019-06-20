@@ -37,17 +37,10 @@ class API:
 
         :return:
         """
-        max_records = 1000
-        count = 0
         while self.path is not None:
             response = requests.get(f'{self.host}{self.path}')
             assert response.ok, self.path
             data = response.json()
             self.path = data['_links']['next']['href']
             for entity in data['results']:
-                count += 1
                 yield entity
-
-            if count > max_records:
-                print("Max records reached")
-                break
