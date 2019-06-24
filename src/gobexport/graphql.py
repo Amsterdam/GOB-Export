@@ -10,6 +10,7 @@ import time
 from gobcore.model import GOBModel
 
 from gobexport.converters.history import convert_to_history_rows
+from gobexport.sorter.graphql import GraphQlResultSorter
 
 GRAPHQL_ENDPOINT = '/gob/graphql/'
 NUM_RECORDS = 1  # Initially ask for only one record
@@ -17,7 +18,9 @@ TARGET_DURATION = 30  # Target request duration is 30 seconds
 
 
 class GraphQL:
-    def __init__(self, host, query, catalogue, collection, expand_history=False):
+    sorter = None
+
+    def __init__(self, host, query, catalogue, collection, expand_history=False, sort=None):
         """Constructor
 
         Lazy loading, Just register host and query and wait for the iterator to be called
@@ -37,6 +40,9 @@ class GraphQL:
         self.query = self._update_query(query, NUM_RECORDS)
         self.has_next_page = True
         self.gob_model = GOBModel().get_collection(self.catalogue, self.collection)
+
+        if sort:
+            self.sorter = GraphQlResultSorter(sort)
 
     def __repr__(self):
         """Representation
@@ -78,11 +84,16 @@ class GraphQL:
 
             for edge in data['data'][self.collection]['edges']:
                 if self.expand_history:
-                    history_rows = convert_to_history_rows(self._flatten_edge(edge))
-                    for row in history_rows:
-                        yield row
+                    yield from self._expand_history(edge)
                 else:
+                    if self.sorter:
+                        edge = self.sorter.sort_item(edge)
                     yield self._flatten_edge(edge)
+
+    def _expand_history(self, edge):
+        history_rows = convert_to_history_rows(self._flatten_edge(edge))
+        for row in history_rows:
+            yield row
 
     def _flatten_edge(self, edge, main=None):
         """Flatten edges and nodes from the graphql response, places all nested references

@@ -1,5 +1,6 @@
 import datetime
 
+from fractions import Fraction
 from gobexport.exporter.csv import csv_exporter
 
 
@@ -518,7 +519,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'vanKadastraalsubject.voorvoegsels',
                         {
                             'action': 'literal',
-                            'value': ',('
+                            'value': ' ('
                         },
                         'vanKadastraalsubject.geslacht.code',
                         {
@@ -830,5 +831,209 @@ class StukdelenExportConfig:
             'filename': filename,
             'mime_type': 'plain/text',
             'format': format,
+        }
+    }
+
+
+class KadastraleobjectenExportConfig:
+    filename = brk_filename('KadastraalObject')
+    format = {
+        'BRK_KOT_ID': 'identificatie',
+        # TODO Gemeente codes etc after correct import of gemeentes
+        'KOT_GEMEENTENAAM': 'gemeente',
+        'KOT_AKRKADGEMCODE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.bronwaarde',
+        'KOT_KAD_GEMEENTE_OMS': '',
+        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+        'KOT_PERCEELNUMMER': 'perceelnummer',
+        'KOT_INDEX_LETTER': 'indexletter',
+        'KOT_INDEX_NUMMER': 'indexnummer',
+        'KOT_SOORTGROOTTE_CODE': 'soortGrootte.code',
+        'KOT_SOORTGROOTTE_OMS': 'soortGrootte.omschrijving',
+        'KOT_KADGROOTTE': 'grootte',
+        'KOT_RELATIE_G_PERCEEL': 'isOntstaanUitGPerceel.identificatie',
+        'KOT_KOOPSOM': 'koopsom',
+        'KOT_KOOPSOM_VALUTA': 'koopsomValutacode',
+        'KOT_KOOPJAAR': 'koopjaar',
+        'KOT_INDICATIE_MEER_OBJECTEN': 'indicatieMeerObjecten',
+        'KOT_CULTUURCODEONBEBOUWD_CODE': 'soortCultuurOnbebouwd.code',
+        'KOT_CULTUURCODEONBEBOUWD_OMS': 'soortCultuurOnbebouwd.omschrijving',
+        'KOT_CULTUURCODEBEBOUWD_CODE': 'soortCultuurBebouwd.code',
+        'KOT_CULTUURCODEBEBOUWD_OMS': 'soortCultuurBebouwd.omschrijving',
+        'KOT_AKRREGISTER9TEKST': '',
+        'KOT_STATUS_CODE': 'status',
+        'KOT_TOESTANDSDATUM': 'toestandsdatum',
+        'KOT_IND_VOORLOPIGE_KADGRENS': 'indicatieVoorlopigeGeometrie',
+        'BRK_SJT_ID': 'vanKadastraalsubject.identificatie',
+        'SJT_NAAM': {
+            'condition': 'isempty',
+            'reference': 'vanKadastraalsubject.heeftBsnVoor.bronwaarde',
+            'negate': True,
+            'trueval': {
+                'action': 'concat',
+                'fields': [
+                    'vanKadastraalsubject.geslachtsnaam',
+                    {
+                        'action': 'literal',
+                        'value': ','
+                    },
+                    'vanKadastraalsubject.voornamen',
+                    {
+                        'action': 'literal',
+                        'value': ','
+                    },
+                    'vanKadastraalsubject.voorvoegsels',
+                    {
+                        'action': 'literal',
+                        'value': ' ('
+                    },
+                    'vanKadastraalsubject.geslacht.code',
+                    {
+                        'action': 'literal',
+                        'value': ')'
+                    },
+                ]
+            },
+            'falseval': 'vanKadastraalsubject.statutaireNaam'
+        },
+        'SJT_TYPE': 'vanKadastraalsubject.typeSubject',
+        'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject.geboortedatum',
+        'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject.geboorteplaats',
+        'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject.geboorteland.code',
+        'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject.geboorteland.omschrijving',
+        'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject.datumOverlijden',
+        'SJT_NNP_RSIN': 'vanKadastraalsubject.heeftRsinVoor.bronwaarde',
+        'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.heeftKvknummerVoor.bronwaarde',
+        'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject.rechtsvorm.code',
+        'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject.rechtsvorm.omschrijving',
+        'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject.statutaireNaam',
+        'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject.statutaireZetel',
+        'SJT_ZRT': 'invRustOpKadastraalobjectBrkZakelijkerechten.aardZakelijkRecht.code',
+        'SJT_AANDEEL': {
+            'condition': 'isempty',
+            'reference': 'invVanZakelijkrechtBrkTenaamstellingen.aandeel.teller',
+            'negate': True,
+            'trueval': {
+                'action': 'concat',
+                'fields': [
+                    'invVanZakelijkrechtBrkTenaamstellingen.aandeel.teller',
+                    {
+                        'action': 'literal',
+                        'value': '/',
+                    },
+                    'invVanZakelijkrechtBrkTenaamstellingen.aandeel.noemer'
+                ]
+            },
+        },
+        'SJT_VVE_SJT_ID': '',
+        'SJT_VVE_UIT_EIGENDOM': '',
+        'KOT_INONDERZOEK': 'inOnderzoek',
+        'KOT_MODIFICATION': 'wijzigingsdatum',
+        'GEOMETRIE': 'geometrie'
+    }
+
+    query = '''
+{
+  kadastraleobjecten {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        gemeente
+        aangeduidDoorGemeente
+        aangeduidDoorKadastralegemeentecode
+        aangeduidDoorKadastralegemeente
+        aangeduidDoorKadastralesectie
+        perceelnummer
+        indexletter
+        indexnummer
+        soortGrootte
+        grootte
+        isOntstaanUitGPerceel {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        koopsom
+        koopsomValutacode
+        koopjaar
+        indicatieMeerObjecten
+        soortCultuurOnbebouwd
+        soortCultuurBebouwd
+        status
+        toestandsdatum
+        indicatieVoorlopigeGeometrie
+        inOnderzoek
+        wijzigingsdatum
+        geometrie
+        invRustOpKadastraalobjectBrkZakelijkerechten(akrAardZakelijkRecht:"VE") {
+          edges {
+            node {
+              identificatie
+              aardZakelijkRecht
+              invVanZakelijkrechtBrkTenaamstellingen {
+                edges {
+                  node {
+                    aandeel
+                    vanKadastraalsubject {
+                      edges {
+                        node {
+                          identificatie
+                          voornamen
+                          voorvoegsels
+                          geslachtsnaam
+                          geslacht
+                          statutaireNaam
+                          typeSubject
+                          geboortedatum
+                          geboorteplaats
+                          geboorteland
+                          datumOverlijden
+                          heeftRsinVoor
+                          heeftKvknummerVoor
+                          heeftBsnVoor
+                          rechtsvorm
+                          statutaireNaam
+                          statutaireZetel
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+    """
+    Tenaamstellingen/Subject: Return the tenaamstelling with the largest aandeel (teller/noemer). When multiple
+    tenaamstellingen have an even aandeel, sort the tenaamstellingen by its subject's geslachtsnaam.
+    """
+    products = {
+        'csv': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql',
+            'query': query,
+            'filename': filename,
+            'mime_type': 'plain/text',
+            'format': format,
+            'sort': {
+                'invRustOpKadastraalobjectBrkZakelijkerechten'
+                '.invVanZakelijkrechtBrkTenaamstellingen'
+                '.aandeel':
+                    lambda x, y: Fraction(x['teller'], x['noemer']) > Fraction(y['teller'], y['noemer']),
+                'invRustOpKadastraalobjectBrkZakelijkerechten'
+                '.invVanZakelijkrechtBrkTenaamstellingen'
+                '.vanKadastraalsubject'
+                '.geslachtsnaam':
+                    lambda x, y: str(x).lower() > str(y).lower(),
+            }
         }
     }
