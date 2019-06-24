@@ -28,7 +28,7 @@ class MockAPI:
 
 
 class MockGraphQL:
-    def __init__(self, host=None, query=None, catalogue=None, collection=None, expand_history=None):
+    def __init__(self, host=None, query=None, catalogue=None, collection=None, expand_history=None, sort=None):
         pass
 
     def __iter__(self):
