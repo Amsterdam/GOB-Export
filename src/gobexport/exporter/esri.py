@@ -3,7 +3,7 @@ from shapely.geometry import shape
 
 from gobcore.utils import ProgressTicker
 
-from gobexport.exporter.utils import nested_entity_get
+from gobexport.exporter.utils import split_field_reference, get_entity_value
 
 
 gdal.UseExceptions()
@@ -36,7 +36,7 @@ def _get_geometry_type(entity):
     # Try to get the geometry type from the first record
     try:
         geometry_type = create_geometry(entity['geometrie']).GetGeometryType()
-    except KeyError as e:
+    except (KeyError, AttributeError) as e:
         geometry_type = ogr.wkbPolygon
     return geometry_type
 
@@ -86,12 +86,12 @@ def esri_exporter(api, file, format=None, append=False):
 
             # Add all fields from the config to the file
             for attribute_name, source in format.items():
-                # A '.' specifies a nested value. Convert a None value to an empty string
-                value = nested_entity_get(entity, source.split('.')) if '.' in source else entity.get(source)
+                mapping = split_field_reference(source)
+                value = get_entity_value(entity, mapping)
+
+                # Esri expects an emtpy string when value is None
                 value = '' if value is None else value
-                # Return J or N when the value is a boolean
-                if isinstance(value, bool):
-                    value = 'J' if value else 'N'
+
                 feature.SetField(attribute_name, value)
 
             dstlayer.CreateFeature(feature)
