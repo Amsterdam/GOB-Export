@@ -22,11 +22,13 @@ following properties:
 """
 
 
-class BAGDefaultCSVFormat:
+class BAGDefaultFormat:
 
     default_values = {
         'aanduidingInOnderzoek': 'N',
-        'geconstateerd': 'N'
+        'onderzoek': 'N',
+        'geconstateerd': 'N',
+        'geconst': 'N',
     }
 
     def __init__(self, format):
@@ -74,7 +76,7 @@ class WoonplaatsenExportConfig:
 }
 '''
 
-    format = BAGDefaultCSVFormat({
+    format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
@@ -89,7 +91,21 @@ class WoonplaatsenExportConfig:
         'geometrie': 'geometrie',
     })
 
-    history_format = BAGDefaultCSVFormat({
+    esri_format = BAGDefaultFormat({
+        'id': 'identificatie',
+        'onderzoek': 'aanduidingInOnderzoek',
+        'geconst': 'geconstateerd',
+        'naam': 'naam',
+        'begindatum': 'beginGeldigheid',
+        'einddatum': 'eindGeldigheid',
+        'docdatum': 'documentdatum',
+        'docnummer': 'documentnummer',
+        'status': 'status.omschrijving',
+        'gme_id': 'ligtInGemeente.identificatie',
+        'gme_naam': 'ligtInGemeente.naam',
+    })
+
+    history_format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
@@ -122,19 +138,7 @@ class WoonplaatsenExportConfig:
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_woonplaats.shp',
             'mime_type': 'application/octet-stream',
-            'format': {
-                'id': 'identificatie',
-                'onderzoek': 'aanduidingInOnderzoek',
-                'geconst': 'geconstateerd',
-                'naam': 'naam',
-                'begindatum': 'beginGeldigheid',
-                'einddatum': 'eindGeldigheid',
-                'docdatum': 'documentdatum',
-                'docnummer': 'documentnummer',
-                'status': 'status.omschrijving',
-                'gme_id': 'ligtInGemeente.identificatie',
-                'gme_naam': 'ligtInGemeente.naam',
-            },
+            'format': esri_format.get_format(),
             'extra_files': [
                 {
                     'filename': 'SHP/BAG_woonplaats.dbf',
@@ -186,7 +190,7 @@ class OpenbareruimtesExportConfig:
   }
 }
 '''
-    format = BAGDefaultCSVFormat({
+    format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
@@ -203,7 +207,23 @@ class OpenbareruimtesExportConfig:
         'geometrie': 'geometrie',
     })
 
-    history_format = BAGDefaultCSVFormat({
+    esri_format = BAGDefaultFormat({
+        'id': 'identificatie',
+        'onderzoek': 'aanduidingInOnderzoek',
+        'geconst': 'geconstateerd',
+        'naam': 'naam',
+        'naam_nen': 'naamNen',
+        'begindatum': 'beginGeldigheid',
+        'einddatum': 'eindGeldigheid',
+        'type': 'type.omschrijving',
+        'docdatum': 'documentdatum',
+        'docnummer': 'documentnummer',
+        'status': 'status.omschrijving',
+        'wps_id': 'ligtInWoonplaats.identificatie',
+        'wps_naam': 'ligtInWoonplaats.naam',
+    })
+
+    history_format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
@@ -239,21 +259,7 @@ class OpenbareruimtesExportConfig:
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_openbare_ruimte.shp',
             'mime_type': 'application/octet-stream',
-            'format': {
-                'id': 'identificatie',
-                'onderzoek': 'aanduidingInOnderzoek',
-                'geconst': 'geconstateerd',
-                'naam': 'naam',
-                'naam_nen': 'naamNen',
-                'begindatum': 'beginGeldigheid',
-                'einddatum': 'eindGeldigheid',
-                'type': 'type.omschrijving',
-                'docdatum': 'documentdatum',
-                'docnummer': 'documentnummer',
-                'status': 'status.omschrijving',
-                'wps_id': 'ligtInWoonplaats.identificatie',
-                'wps_naam': 'ligtInWoonplaats.naam',
-            },
+            'format': esri_format.get_format(),
             'extra_files': [
                 {
                     'filename': 'SHP/BAG_openbare_ruimte.dbf',
@@ -404,7 +410,7 @@ class NummeraanduidingenExportConfig:
 }
 '''
 
-    format = BAGDefaultCSVFormat({
+    format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
@@ -428,7 +434,7 @@ class NummeraanduidingenExportConfig:
         'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
     })
 
-    history_format = BAGDefaultCSVFormat({
+    history_format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
@@ -475,7 +481,7 @@ class NummeraanduidingenExportConfig:
 
 class VerblijfsobjectenExportConfig:
 
-    format = BAGDefaultCSVFormat({
+    format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
@@ -490,7 +496,7 @@ class VerblijfsobjectenExportConfig:
         'ligtIn:BAG.WPS.naamHoofdadres': 'ligtInWoonplaats.naam',
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.0.identificatie',
         'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie.omschrijving',
         'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
@@ -532,7 +538,63 @@ class VerblijfsobjectenExportConfig:
         'geometrie': 'geometrie'
     })
 
-    history_format = BAGDefaultCSVFormat({
+    esri_format = BAGDefaultFormat({
+        'id': 'identificatie',
+        'onderzoek': 'aanduidingInOnderzoek',
+        'geconst': 'geconstateerd',
+        'num_id_hfd': 'heeftHoofdadres.identificatie',
+        'huisnr_hfd': 'heeftHoofdadres.huisnummer',
+        'huislt_hfd': 'heeftHoofdadres.huisletter',
+        'huis_t_hfd': 'heeftHoofdadres.huisnummertoevoeging',
+        'pc_hfd': 'heeftHoofdadres.postcode',
+        'ore_id_hfd': 'ligtAanOpenbareruimte.identificatie',
+        'ore_nm_hfd': 'ligtAanOpenbareruimte.naam',
+        'wps_id_hfd': 'ligtInWoonplaats.identificatie',
+        'wps_nm_hfd': 'ligtInWoonplaats.naam',
+        'gme_id': 'ligtInGemeente.identificatie',
+        'gme_naam': 'ligtInGemeente.naam',
+        'num_id_nvn': 'heeftNevenadres.0.identificatie',
+        'gebr_doel': 'gebruiksdoel.omschrijving',
+        'gdl_wonen': 'gebruiksdoelWoonfunctie.omschrijving',
+        'gdl_gezond': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
+        'eenheden': 'aantalEenhedenComplex',
+        'soort_obj': 'feitelijkGebruik.omschrijving',
+        'oppervlak': 'oppervlakte',
+        'status': 'status.omschrijving',
+        'begindatum': 'beginGeldigheid',
+        'einddatum': 'eindGeldigheid',
+        'docdatum': 'documentdatum',
+        'docnummer': 'documentnummer',
+        'verd_toe': 'verdiepingToegang',
+        'toegang': 'toegang.omschrijving',
+        'aant_bouwl': 'aantalBouwlagen',
+        'hoog_bouwl': 'hoogsteBouwlaag',
+        'laag_bouwl': 'laagsteBouwlaag',
+        'aant_kamer': 'aantalKamers',
+        'eigendom': 'eigendomsverhouding.omschrijving',
+        'opvoer': 'redenopvoer.omschrijving',
+        'afvoer': 'redenafvoer.omschrijving',
+        'pnd_id': 'ligtInPanden.identificatie',
+        'bbk_id': 'ligtInBouwblok.identificatie',
+        'bbk_code': 'ligtInBouwblok.code',
+        'brt_id': 'ligtInBuurt.identificatie',
+        'brt_code': 'ligtInBuurt.code',
+        'brt_naam': 'ligtInBuurt.naam',
+        'wijk_id': 'ligtInWijk.identificatie',
+        'wijk_code': 'ligtInWijk.code',
+        'wijk_naam': 'ligtInWijk.naam',
+        'ggw_id': 'ligtInGgwgebied.identificatie',
+        'ggw_code': 'ligtInGgwgebied.code',
+        'ggw_naam': 'ligtInGgwgebied.naam',
+        'ggp_id': 'ligtInGgpgebied.identificatie',
+        'ggp_code': 'ligtInGgpgebied.code',
+        'ggp_naam': 'ligtInGgpgebied.naam',
+        'sdl_id': 'ligtInStadsdeel.identificatie',
+        'sdl_code': 'ligtInStadsdeel.code',
+        'sdl_naam': 'ligtInStadsdeel.naam',
+    })
+
+    history_format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
@@ -553,8 +615,8 @@ class VerblijfsobjectenExportConfig:
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
-        'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.0.identificatie',
+        'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.0.volgnummer',
         'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie.omschrijving',
         'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
@@ -618,61 +680,7 @@ class VerblijfsobjectenExportConfig:
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_verblijfsobject.shp',
             'mime_type': 'application/octet-stream',
-            'format': {
-                'id': 'identificatie',
-                'onderzoek': 'aanduidingInOnderzoek',
-                'geconst': 'geconstateerd',
-                'num_id_hfd': 'heeftHoofdadres.identificatie',
-                'huisnr_hfd': 'heeftHoofdadres.huisnummer',
-                'huislt_hfd': 'heeftHoofdadres.huisletter',
-                'huis_t_hfd': 'heeftHoofdadres.huisnummertoevoeging',
-                'pc_hfd': 'heeftHoofdadres.postcode',
-                'ore_id_hfd': 'ligtAanOpenbareruimte.identificatie',
-                'ore_nm_hfd': 'ligtAanOpenbareruimte.naam',
-                'wps_id_hfd': 'ligtInWoonplaats.identificatie',
-                'wps_nm_hfd': 'ligtInWoonplaats.naam',
-                'gme_id': 'ligtInGemeente.identificatie',
-                'gme_naam': 'ligtInGemeente.naam',
-                'num_id_nvn': 'heeftNevenadres.identificatie',
-                'gebr_doel': 'gebruiksdoel.omschrijving',
-                'gdl_wonen': 'gebruiksdoelWoonfunctie.omschrijving',
-                'gdl_gezond': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
-                'eenheden': 'aantalEenhedenComplex',
-                'soort_obj': 'feitelijkGebruik.omschrijving',
-                'oppervlak': 'oppervlakte',
-                'status': 'status.omschrijving',
-                'begindatum': 'beginGeldigheid',
-                'einddatum': 'eindGeldigheid',
-                'docdatum': 'documentdatum',
-                'docnummer': 'documentnummer',
-                'verd_toe': 'verdiepingToegang',
-                'toegang': 'toegang.omschrijving',
-                'aant_bouwl': 'aantalBouwlagen',
-                'hoog_bouwl': 'hoogsteBouwlaag',
-                'laag_bouwl': 'laagsteBouwlaag',
-                'aant_kamer': 'aantalKamers',
-                'eigendom': 'eigendomsverhouding.omschrijving',
-                'opvoer': 'redenopvoer.omschrijving',
-                'afvoer': 'redenafvoer.omschrijving',
-                'pnd_id': 'ligtInPanden.identificatie',
-                'bbk_id': 'ligtInBouwblok.identificatie',
-                'bbk_code': 'ligtInBouwblok.code',
-                'brt_id': 'ligtInBuurt.identificatie',
-                'brt_code': 'ligtInBuurt.code',
-                'brt_naam': 'ligtInBuurt.naam',
-                'wijk_id': 'ligtInWijk.identificatie',
-                'wijk_code': 'ligtInWijk.code',
-                'wijk_naam': 'ligtInWijk.naam',
-                'ggw_id': 'ligtInGgwgebied.identificatie',
-                'ggw_code': 'ligtInGgwgebied.code',
-                'ggw_naam': 'ligtInGgwgebied.naam',
-                'ggp_id': 'ligtInGgpgebied.identificatie',
-                'ggp_code': 'ligtInGgpgebied.code',
-                'ggp_naam': 'ligtInGgpgebied.naam',
-                'sdl_id': 'ligtInStadsdeel.identificatie',
-                'sdl_code': 'ligtInStadsdeel.code',
-                'sdl_naam': 'ligtInStadsdeel.naam',
-            },
+            'format': esri_format.get_format(),
             'extra_files': [
                 {
                     'filename': 'SHP/BAG_verblijfsobject.dbf',
@@ -793,7 +801,7 @@ class StandplaatsenExportConfig:
 }
 '''
 
-    format = BAGDefaultCSVFormat({
+    format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
@@ -808,7 +816,7 @@ class StandplaatsenExportConfig:
         'ligtIn:BAG.WPS.naamHoofdadres': 'ligtInWoonplaats.naam',
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.0.identificatie',
         'status': 'status.omschrijving',
         'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -833,7 +841,46 @@ class StandplaatsenExportConfig:
         'geometrie': 'geometrie'
     })
 
-    history_format = BAGDefaultCSVFormat({
+    esri_format = BAGDefaultFormat({
+        'id': 'identificatie',
+        'onderzoek': 'aanduidingInOnderzoek',
+        'geconst': 'geconstateerd',
+        'num_id_hfd': 'heeftHoofdadres.identificatie',
+        'huisnr_hfd': 'heeftHoofdadres.huisnummer',
+        'huislt_hfd': 'heeftHoofdadres.huisletter',
+        'huis_t_hfd': 'heeftHoofdadres.huisnummertoevoeging',
+        'pc_hfd': 'heeftHoofdadres.postcode',
+        'ore_id_hfd': 'ligtAanOpenbareruimte.identificatie',
+        'ore_nm_hfd': 'ligtAanOpenbareruimte.naam',
+        'wps_id_hfd': 'ligtInWoonplaats.identificatie',
+        'wps_nm_hfd': 'ligtInWoonplaats.naam',
+        'gme_id': 'ligtInGemeente.identificatie',
+        'gme_naam': 'ligtInGemeente.naam',
+        'num_id_nvn': 'heeftNevenadres.0.identificatie',
+        'status': 'status.omschrijving',
+        'soort_obj': 'feitelijkGebruik.omschrijving',
+        'begindatum': 'beginGeldigheid',
+        'einddatum': 'eindGeldigheid',
+        'docdatum': 'documentdatum',
+        'docnummer': 'documentnummer',
+        'brt_id': 'ligtInBuurt.identificatie',
+        'brt_code': 'ligtInBuurt.code',
+        'brt_naam': 'ligtInBuurt.naam',
+        'wijk_id': 'ligtInWijk.identificatie',
+        'wijk_code': 'ligtInWijk.code',
+        'wijk_naam': 'ligtInWijk.naam',
+        'ggw_id': 'LigtInGgwgebied.identificatie',
+        'ggw_code': 'LigtInGgwgebied.code',
+        'ggw_naam': 'LigtInGgwgebied.naam',
+        'ggp_id': 'LigtInGgpgebied.identificatie',
+        'ggp_code': 'LigtInGgpgebied.code',
+        'ggp_naam': 'LigtInGgpgebied.naam',
+        'sdl_id': 'ligtInStadsdeel.identificatie',
+        'sdl_code': 'ligtInStadsdeel.code',
+        'sdl_naam': 'ligtInStadsdeel.naam',
+    })
+
+    history_format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
@@ -852,8 +899,8 @@ class StandplaatsenExportConfig:
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
-        'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.0.identificatie',
+        'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.0.volgnummer',
         'status': 'status.omschrijving',
         'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -899,44 +946,7 @@ class StandplaatsenExportConfig:
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_standplaats.shp',
             'mime_type': 'application/octet-stream',
-            'format': {
-                'id': 'identificatie',
-                'onderzoek': 'aanduidingInOnderzoek',
-                'geconst': 'geconstateerd',
-                'num_id_hfd': 'heeftHoofdadres.identificatie',
-                'huisnr_hfd': 'heeftHoofdadres.huisnummer',
-                'huislt_hfd': 'heeftHoofdadres.huisletter',
-                'huis_t_hfd': 'heeftHoofdadres.huisnummertoevoeging',
-                'pc_hfd': 'heeftHoofdadres.postcode',
-                'ore_id_hfd': 'ligtAanOpenbareruimte.identificatie',
-                'ore_nm_hfd': 'ligtAanOpenbareruimte.naam',
-                'wps_id_hfd': 'ligtInWoonplaats.identificatie',
-                'wps_nm_hfd': 'ligtInWoonplaats.naam',
-                'gme_id': 'ligtInGemeente.identificatie',
-                'gme_naam': 'ligtInGemeente.naam',
-                'num_id_nvn': 'heeftNevenadres.identificatie',
-                'status': 'status.omschrijving',
-                'soort_obj': 'feitelijkGebruik.omschrijving',
-                'begindatum': 'beginGeldigheid',
-                'einddatum': 'eindGeldigheid',
-                'docdatum': 'documentdatum',
-                'docnummer': 'documentnummer',
-                'brt_id': 'ligtInBuurt.identificatie',
-                'brt_code': 'ligtInBuurt.code',
-                'brt_naam': 'ligtInBuurt.naam',
-                'wijk_id': 'ligtInWijk.identificatie',
-                'wijk_code': 'ligtInWijk.code',
-                'wijk_naam': 'ligtInWijk.naam',
-                'ggw_id': 'LigtInGgwgebied.identificatie',
-                'ggw_code': 'LigtInGgwgebied.code',
-                'ggw_naam': 'LigtInGgwgebied.naam',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
-                'ggp_code': 'LigtInGgpgebied.code',
-                'ggp_naam': 'LigtInGgpgebied.naam',
-                'sdl_id': 'ligtInStadsdeel.identificatie',
-                'sdl_code': 'ligtInStadsdeel.code',
-                'sdl_naam': 'ligtInStadsdeel.naam',
-            },
+            'format': esri_format.get_format(),
             'extra_files': [
                 {
                     'filename': 'SHP/BAG_standplaats.dbf',
@@ -1058,7 +1068,7 @@ class LigplaatsenExportConfig:
 }
 '''
 
-    format = BAGDefaultCSVFormat({
+    format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
@@ -1073,7 +1083,7 @@ class LigplaatsenExportConfig:
         'ligtIn:BAG.WPS.naamHoofdadres': 'ligtInWoonplaats.naam',
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.0.identificatie',
         'status': 'status.omschrijving',
         'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -1098,7 +1108,46 @@ class LigplaatsenExportConfig:
         'geometrie': 'geometrie'
     })
 
-    history_format = BAGDefaultCSVFormat({
+    esri_format = BAGDefaultFormat({
+        'id': 'identificatie',
+        'onderzoek': 'aanduidingInOnderzoek',
+        'geconst': 'geconstateerd',
+        'num_id_hfd': 'heeftHoofdadres.identificatie',
+        'huisnr_hfd': 'heeftHoofdadres.huisnummer',
+        'huislt_hfd': 'heeftHoofdadres.huisletter',
+        'huis_t_hfd': 'heeftHoofdadres.huisnummertoevoeging',
+        'pc_hfd': 'heeftHoofdadres.postcode',
+        'ore_id_hfd': 'ligtAanOpenbareruimte.identificatie',
+        'ore_nm_hfd': 'ligtAanOpenbareruimte.naam',
+        'wps_id_hfd': 'ligtInWoonplaats.identificatie',
+        'wps_nm_hfd': 'ligtInWoonplaats.naam',
+        'gme_id': 'ligtInGemeente.identificatie',
+        'gme_naam': 'ligtInGemeente.naam',
+        'num_id_nvn': 'heeftNevenadres.0.identificatie',
+        'status': 'status.omschrijving',
+        'soort_obj': 'feitelijkGebruik.omschrijving',
+        'begindatum': 'beginGeldigheid',
+        'einddatum': 'eindGeldigheid',
+        'docdatum': 'documentdatum',
+        'docnummer': 'documentnummer',
+        'brt_id': 'ligtInBuurt.identificatie',
+        'brt_code': 'ligtInBuurt.code',
+        'brt_naam': 'ligtInBuurt.naam',
+        'wijk_id': 'ligtInWijk.identificatie',
+        'wijk_code': 'ligtInWijk.code',
+        'wijk_naam': 'ligtInWijk.naam',
+        'ggw_id': 'LigtInGgwgebied.identificatie',
+        'ggw_code': 'LigtInGgwgebied.code',
+        'ggw_naam': 'LigtInGgwgebied.naam',
+        'ggp_id': 'LigtInGgpgebied.identificatie',
+        'ggp_code': 'LigtInGgpgebied.code',
+        'ggp_naam': 'LigtInGgpgebied.naam',
+        'sdl_id': 'ligtInStadsdeel.identificatie',
+        'sdl_code': 'ligtInStadsdeel.code',
+        'sdl_naam': 'ligtInStadsdeel.naam',
+    })
+
+    history_format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
@@ -1117,8 +1166,8 @@ class LigplaatsenExportConfig:
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
-        'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
+        'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.0.identificatie',
+        'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.0.volgnummer',
         'status': 'status.omschrijving',
         'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -1164,44 +1213,7 @@ class LigplaatsenExportConfig:
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_ligplaats.shp',
             'mime_type': 'application/octet-stream',
-            'format': {
-                'id': 'identificatie',
-                'onderzoek': 'aanduidingInOnderzoek',
-                'geconst': 'geconstateerd',
-                'num_id_hfd': 'heeftHoofdadres.identificatie',
-                'huisnr_hfd': 'heeftHoofdadres.huisnummer',
-                'huislt_hfd': 'heeftHoofdadres.huisletter',
-                'huis_t_hfd': 'heeftHoofdadres.huisnummertoevoeging',
-                'pc_hfd': 'heeftHoofdadres.postcode',
-                'ore_id_hfd': 'ligtAanOpenbareruimte.identificatie',
-                'ore_nm_hfd': 'ligtAanOpenbareruimte.naam',
-                'wps_id_hfd': 'ligtInWoonplaats.identificatie',
-                'wps_nm_hfd': 'ligtInWoonplaats.naam',
-                'gme_id': 'ligtInGemeente.identificatie',
-                'gme_naam': 'ligtInGemeente.naam',
-                'num_id_nvn': 'heeftNevenadres.identificatie',
-                'status': 'status.omschrijving',
-                'soort_obj': 'feitelijkGebruik.omschrijving',
-                'begindatum': 'beginGeldigheid',
-                'einddatum': 'eindGeldigheid',
-                'docdatum': 'documentdatum',
-                'docnummer': 'documentnummer',
-                'brt_id': 'ligtInBuurt.identificatie',
-                'brt_code': 'ligtInBuurt.code',
-                'brt_naam': 'ligtInBuurt.naam',
-                'wijk_id': 'ligtInWijk.identificatie',
-                'wijk_code': 'ligtInWijk.code',
-                'wijk_naam': 'ligtInWijk.naam',
-                'ggw_id': 'LigtInGgwgebied.identificatie',
-                'ggw_code': 'LigtInGgwgebied.code',
-                'ggw_naam': 'LigtInGgwgebied.naam',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
-                'ggp_code': 'LigtInGgpgebied.code',
-                'ggp_naam': 'LigtInGgpgebied.naam',
-                'sdl_id': 'ligtInStadsdeel.identificatie',
-                'sdl_code': 'ligtInStadsdeel.code',
-                'sdl_naam': 'ligtInStadsdeel.naam',
-            },
+            'format': esri_format.get_format(),
             'extra_files': [
                 {
                     'filename': 'SHP/BAG_ligplaats.dbf',
@@ -1247,6 +1259,8 @@ class PandenExportConfig:
         ligtInBouwblok {
           edges {
             node {
+            identificatie
+            code
               ligtInBuurt {
                 edges {
                   node {
@@ -1301,7 +1315,7 @@ class PandenExportConfig:
 }
 '''
 
-    format = BAGDefaultCSVFormat({
+    format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
@@ -1337,7 +1351,42 @@ class PandenExportConfig:
         'geometrie': 'geometrie'
     })
 
-    history_format = BAGDefaultCSVFormat({
+    esri_format = BAGDefaultFormat({
+        'id': 'identificatie',
+        'onderzoek': 'aanduidingInOnderzoek',
+        'geconst': 'geconstateerd',
+        'status': 'status.omschrijving',
+        'bouwjaar': 'oorspronkelijkBouwjaar',
+        'begindatum': 'beginGeldigheid',
+        'einddatum': 'eindGeldigheid',
+        'docdatum': 'documentdatum',
+        'docnummer': 'documentnummer',
+        'naam_pand': 'naam',
+        'ligging': 'ligging.omschrijving',
+        'type_oms': 'typeWoonobject',
+        'aant_bouwl': 'aantalBouwlagen',
+        'hoog_bouwl': 'hoogsteBouwlaag',
+        'laag_bouwl': 'laagsteBouwlaag',
+        'bbk_id': 'ligtInBouwblok.identificatie',
+        'bbk_code': 'ligtInBouwblok.code',
+        'brt_id': 'ligtInBuurt.identificatie',
+        'brt_code': 'ligtInBuurt.code',
+        'brt_naam': 'ligtInBuurt.naam',
+        'wijk_id': 'ligtInWijk.identificatie',
+        'wijk_code': 'ligtInWijk.code',
+        'wijk_naam': 'ligtInWijk.naam',
+        'ggw_id': 'LigtInGgwgebied.identificatie',
+        'ggw_code': 'LigtInGgwgebied.code',
+        'ggw_naam': 'LigtInGgwgebied.naam',
+        'ggp_id': 'LigtInGgpgebied.identificatie',
+        'ggp_code': 'LigtInGgpgebied.code',
+        'ggp_naam': 'LigtInGgpgebied.naam',
+        'sdl_id': 'ligtInStadsdeel.identificatie',
+        'sdl_code': 'ligtInStadsdeel.code',
+        'sdl_naam': 'ligtInStadsdeel.naam',
+    })
+
+    history_format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
@@ -1395,40 +1444,7 @@ class PandenExportConfig:
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_pand.shp',
             'mime_type': 'application/octet-stream',
-            'format': {
-                'id': 'identificatie',
-                'onderzoek': 'aanduidingInOnderzoek',
-                'geconst': 'geconstateerd',
-                'status': 'status.omschrijving',
-                'bouwjaar': 'oorspronkelijkBouwjaar',
-                'begindatum': 'beginGeldigheid',
-                'einddatum': 'eindGeldigheid',
-                'docdatum': 'documentdatum',
-                'docnummer': 'documentnummer',
-                'naam_pand': 'naam',
-                'ligging': 'ligging.omschrijving',
-                'type_oms': 'typeWoonobject',
-                'aant_bouwl': 'aantalBouwlagen',
-                'hoog_bouwl': 'hoogsteBouwlaag',
-                'laag_bouwl': 'laagsteBouwlaag',
-                'bbk_id': 'ligtInBouwblok.identificatie',
-                'bbk_code': 'ligtInBouwblok.code',
-                'brt_id': 'ligtInBuurt.identificatie',
-                'brt_code': 'ligtInBuurt.code',
-                'brt_naam': 'ligtInBuurt.naam',
-                'wijk_id': 'ligtInWijk.identificatie',
-                'wijk_code': 'ligtInWijk.code',
-                'wijk_naam': 'ligtInWijk.naam',
-                'ggw_id': 'LigtInGgwgebied.identificatie',
-                'ggw_code': 'LigtInGgwgebied.code',
-                'ggw_naam': 'LigtInGgwgebied.naam',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
-                'ggp_code': 'LigtInGgpgebied.code',
-                'ggp_naam': 'LigtInGgpgebied.naam',
-                'sdl_id': 'ligtInStadsdeel.identificatie',
-                'sdl_code': 'ligtInStadsdeel.code',
-                'sdl_naam': 'ligtInStadsdeel.naam',
-            },
+            'format': esri_format.get_format(),
             'extra_files': [
                 {
                     'filename': 'SHP/BAG_pand.dbf',
