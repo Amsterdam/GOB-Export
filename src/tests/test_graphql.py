@@ -1,5 +1,6 @@
 import requests
-import pytest
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from gobexport.graphql import GraphQL
 
@@ -65,8 +66,8 @@ class MockResponse:
                 'woonplaatsen': {
                     'edges': self.results,
                     'pageInfo': {
-                     'endCursor': 'YXJyYXljb25uZWN0aW9uOjU=',
-                     'hasNextPage': next
+                        'endCursor': 'YXJyYXljb25uZWN0aW9uOjU=',
+                        'hasNextPage': next
                     }
                 }
             }
@@ -88,7 +89,7 @@ def test_graphql(monkeypatch):
     query = '{woonplaatsen {edges {node { id}}}}'
 
     api = GraphQL('host', query, 'bag', 'woonplaatsen')
-    assert(str(api) == 'GraphQL woonplaatsen')
+    assert (str(api) == 'GraphQL woonplaatsen')
 
     # # Expect first, after and pageInfo to be present the query
     # expected_query = '{woonplaatsen(first: 100, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
@@ -202,7 +203,7 @@ def test_flatten_edge():
 
     expected_result = {'reference': [{'value': 'value'}]}
     result = api._flatten_edge(edge)
-    assert(expected_result == result)
+    assert (expected_result == result)
 
     expected_result = {
         'value': 'value',
@@ -212,4 +213,44 @@ def test_flatten_edge():
         'empty_nested_reference': [],
     }
     result = api._flatten_edge(nested_edge)
-    assert(expected_result == result)
+    assert (expected_result == result)
+
+
+class TestGraphQl(TestCase):
+
+    def test_constructor_sorter(self):
+        api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
+        self.assertIsNone(api.sorter)
+
+        api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=MagicMock())
+        self.assertIsNotNone(api.sorter)
+
+    @patch("gobexport.graphql.requests.post")
+    @patch("gobexport.graphql.GraphQlResultSorter")
+    @patch("gobexport.graphql.time.time")
+    def test_iter_with_sorter(self, mock_time, mock_sorter, mock_post):
+        sort = {"some": "sortdef"}
+        api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=sort)
+        api._flatten_edge = MagicMock()
+        mock_time.side_effect = [2, 1]  # Prevent division by zero
+        mock_post.return_value = MagicMock()
+        mock_post.return_value.json.return_value = {
+            'data': {
+                'woonplaatsen': {
+                    'pageInfo': {
+                        'endCursor': True,
+                        'hasNextPage': False,
+                    },
+                    'edges': [
+                        'THE EDGE'
+                    ]
+                }
+            }
+        }
+
+        for a in api:
+            pass
+
+        mock_sorter.assert_called_with(sort)
+        mock_sorter.return_value.sort_item.assert_called_once()
+        api._flatten_edge.assert_called_with(mock_sorter.return_value.sort_item.return_value)

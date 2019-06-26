@@ -40,6 +40,7 @@ CONFIG_MAPPING = {
         'aardzakelijkerechten': brk.AardzakelijkerechtenExportConfig,
         'brkbag': brk.BrkBagExportConfig,
         'stukdelen': brk.StukdelenExportConfig,
+        'kadastraleobjecten': brk.KadastraleobjectenExportConfig,
     }
 }
 
@@ -61,7 +62,8 @@ def export_to_file(host, product, file, catalogue, collection):
         # Use GraphQL
         query = product['query']
         expand_history = product.get('expand_history')
-        api = GraphQL(host, query, catalogue, collection, expand_history)
+        sort = product.get('sort')
+        api = GraphQL(host, query, catalogue, collection, expand_history, sort)
     else:
         # Use the REST API
         endpoint = product.get('endpoint')

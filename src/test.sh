@@ -11,4 +11,4 @@ pytest tests/
 
 echo "Running coverage tests"
 export COVERAGE_FILE=/tmp/.coverage
-pytest --cov=gobexport --cov-report html --cov-fail-under=95 tests/
+pytest --cov=gobexport --cov-report html --cov-fail-under=98 tests/
