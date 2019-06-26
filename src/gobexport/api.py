@@ -3,6 +3,7 @@
 Encapsulates a paged API endpoint into an iterator
 
 """
+import time
 import gobexport.requests as requests
 
 
@@ -38,7 +39,10 @@ class API:
         :return:
         """
         while self.path is not None:
+            start = time.time()
             response = requests.get(f'{self.host}{self.path}')
+            duration = round(time.time() - start, 2)
+            print(f"Query duration for {self.path}: {duration} secs")
             assert response.ok, self.path
             data = response.json()
             self.path = data['_links']['next']['href']
