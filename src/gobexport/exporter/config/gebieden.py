@@ -27,7 +27,7 @@ class StadsdelenExportConfig:
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced',
+            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced&page_size=10000',
             'filename': 'CSV_Actueel/GBD_stadsdeel_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -45,7 +45,7 @@ class StadsdelenExportConfig:
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced',
+            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced&page_size=10000',
             'filename': 'SHP/GBD_stadsdeel.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -126,7 +126,7 @@ class GGPGebiedenExportConfig:
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced',
+            'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced&page_size=10000',
             'filename': 'CSV_Actueel/GBD_ggw_praktijkgebied_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -148,7 +148,7 @@ class GGPGebiedenExportConfig:
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced',
+            'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced&page_size=10000',
             'filename': 'SHP/GBD_ggw_praktijkgebied.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -248,7 +248,7 @@ class GGWGebiedenExportConfig:
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/ggwgebieden/?view=enhanced',
+            'endpoint': '/gob/gebieden/ggwgebieden/?view=enhanced&page_size=10000',
             'filename': 'CSV_Actueel/GBD_ggw_gebied_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -269,7 +269,7 @@ class GGWGebiedenExportConfig:
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/ggwgebieden/?view=enhanced',
+            'endpoint': '/gob/gebieden/ggwgebieden/?view=enhanced&page_size=10000',
             'filename': 'SHP/GBD_ggw_gebied.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -369,7 +369,7 @@ class WijkenExportConfig:
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/wijken/?view=enhanced',
+            'endpoint': '/gob/gebieden/wijken/?view=enhanced&page_size=10000',
             'filename': 'CSV_Actueel/GBD_wijk_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -394,7 +394,7 @@ class WijkenExportConfig:
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/wijken/?view=enhanced',
+            'endpoint': '/gob/gebieden/wijken/?view=enhanced&page_size=10000',
             'filename': 'SHP/GBD_wijk.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -516,7 +516,7 @@ class BuurtenExportConfig:
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/buurten/?view=enhanced',
+            'endpoint': '/gob/gebieden/buurten/?view=enhanced&page_size=10000',
             'filename': 'CSV_Actueel/GBD_buurt_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -547,7 +547,7 @@ class BuurtenExportConfig:
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/buurten/?view=enhanced',
+            'endpoint': '/gob/gebieden/buurten/?view=enhanced&page_size=10000',
             'filename': 'SHP/GBD_buurt.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -707,7 +707,7 @@ class BouwblokkenExportConfig:
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/bouwblokken/?view=enhanced',
+            'endpoint': '/gob/gebieden/bouwblokken/?view=enhanced&page_size=1000',
             'filename': 'CSV_Actueel/GBD_bouwblok_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -737,7 +737,7 @@ class BouwblokkenExportConfig:
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/bouwblokken/?view=enhanced',
+            'endpoint': '/gob/gebieden/bouwblokken/?view=enhanced&page_size=1000',
             'filename': 'SHP/GBD_bouwblok.shp',
             'mime_type': 'application/octet-stream',
             'format': {
