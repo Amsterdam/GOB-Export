@@ -4,7 +4,8 @@ This component exports data sources
 """
 import datetime
 
-from gobcore.message_broker.config import WORKFLOW_EXCHANGE, EXPORT_QUEUE, RESULT_QUEUE
+from gobcore.message_broker.config import WORKFLOW_EXCHANGE, EXPORT_QUEUE, EXPORT_TEST_QUEUE, EXPORT_RESULT_KEY, \
+    EXPORT_TEST_RESULT_KEY
 from gobcore.message_broker.messagedriven_service import messagedriven_service
 from gobcore.logging.logger import logger
 
@@ -81,25 +82,19 @@ def handle_export_test_msg(msg):
 
 SERVICEDEFINITION = {
     'export_request': {
-        'exchange': WORKFLOW_EXCHANGE,
         'queue': EXPORT_QUEUE,
-        'key': "export.start",
         'handler': handle_export_msg,
         'report': {
             'exchange': WORKFLOW_EXCHANGE,
-            'queue': RESULT_QUEUE,
-            'key': 'export.result'
+            'key': EXPORT_RESULT_KEY,
         }
     },
     'export_test': {
-        'exchange': WORKFLOW_EXCHANGE,
-        'queue': EXPORT_QUEUE,
-        'key': "export_test.start",
+        'queue': EXPORT_TEST_QUEUE,
         'handler': handle_export_test_msg,
         'report': {
             'exchange': WORKFLOW_EXCHANGE,
-            'queue': RESULT_QUEUE,
-            'key': 'export_test.result'
+            'key': EXPORT_TEST_RESULT_KEY,
         }
     }
 }
