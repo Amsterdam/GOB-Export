@@ -119,8 +119,6 @@ class WoonplaatsenExportConfig:
         'status': 'status.omschrijving',
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-        'beginTijdvak': 'beginTijdvak',
-        'eindTijdvak': 'eindTijdvak',
         'geometrie': 'geometrie',
     })
 
@@ -155,6 +153,36 @@ class WoonplaatsenExportConfig:
             ],
             'query': query_actueel
         },
+        'csv_actueel_en_historie': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_woonplaats_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': '''
+{
+  woonplaatsen(active: false, sort: [identificatie_asc, begin_geldigheid_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        aanduidingInOnderzoek
+        geconstateerd
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        status
+        geometrie
+      }
+    }
+  }
+}
+'''
+        },
+
     }
 
 
@@ -348,68 +376,6 @@ class OpenbareruimtesExportConfig:
 
 class NummeraanduidingenExportConfig:
 
-    query_actueel = '''
-{
-  nummeraanduidingen {
-    edges {
-      node {
-        identificatie
-        aanduidingInOnderzoek
-        geconstateerd
-        huisnummer
-        huisletter
-        huisnummertoevoeging
-        postcode
-        ligtAanOpenbareruimte {
-          edges {
-            node {
-              identificatie
-              naam
-            }
-          }
-        }
-        ligtInWoonplaats {
-          edges {
-            node {
-              identificatie
-              naam
-            }
-          }
-        }
-        beginGeldigheid
-        eindGeldigheid
-        typeAdresseerbaarObject
-        typeAdres
-        documentdatum
-        documentnummer
-        status
-        adresseertVerblijfsobject {
-          edges {
-            node {
-              identificatie
-            }
-          }
-        }
-        adresseertLigplaats {
-          edges {
-            node {
-              identificatie
-            }
-          }
-        }
-        adresseertStandplaats {
-          edges {
-            node {
-              identificatie
-            }
-          }
-        }
-      }
-    }
-  }
-}
-'''
-
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
@@ -469,12 +435,11 @@ class NummeraanduidingenExportConfig:
 
     products = {
         'csv_actueel': {
-            'api_type': 'graphql',
+            'endpoint': '/gob/bag/nummeraanduidingen/?view=enhanced&page_size=2000',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_nummeraanduiding_Actueel.csv',
             'mime_type': 'plain/text',
             'format': format.get_format(),
-            'query': query_actueel
         },
     }
 
@@ -1235,86 +1200,6 @@ class LigplaatsenExportConfig:
 
 class PandenExportConfig:
 
-    query_actueel = '''
-{
-  panden {
-    edges {
-      node {
-        identificatie
-        aanduidingInOnderzoek
-        geconstateerd
-        oorspronkelijkBouwjaar
-        status
-        beginGeldigheid
-        eindGeldigheid
-        documentdatum
-        documentnummer
-        naam
-        ligging
-        aantalBouwlagen
-        hoogsteBouwlaag
-        laagsteBouwlaag
-        typeWoonobject
-        geometrie
-        ligtInBouwblok {
-          edges {
-            node {
-            identificatie
-            code
-              ligtInBuurt {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                    code
-                    ligtInWijk {
-                      edges {
-                        node {
-                          identificatie
-                          naam
-                          code
-                          ligtInStadsdeel {
-                            edges {
-                              node {
-                                identificatie
-                                naam
-                                code
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                    LigtInGgpgebied {
-                      edges {
-                        node {
-                          identificatie
-                          naam
-                          code
-                        }
-                      }
-                    }
-                    LigtInGgwgebied {
-                      edges {
-                        node {
-                          identificatie
-                          naam
-                          code
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-'''
-
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
@@ -1432,15 +1317,14 @@ class PandenExportConfig:
 
     products = {
         'csv_actueel': {
-            'api_type': 'graphql',
+            'endpoint': '/gob/bag/panden/?view=enhanced&page_size=5000',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_pand_Actueel.csv',
             'mime_type': 'plain/text',
             'format': format.get_format(),
-            'query': query_actueel
         },
         'esri_actueel': {
-            'api_type': 'graphql',
+            'endpoint': '/gob/bag/panden/?view=enhanced&page_size=5000',
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_pand.shp',
             'mime_type': 'application/octet-stream',
@@ -1459,7 +1343,6 @@ class PandenExportConfig:
                     'mime_type': 'application/octet-stream'
                 },
             ],
-            'query': query_actueel
         },
     }
 
