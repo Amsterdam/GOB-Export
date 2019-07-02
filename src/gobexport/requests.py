@@ -2,7 +2,7 @@ import requests
 
 import time
 
-_MAX_TRIES = 5          # Maximum number of times to try the request
+_MAX_TRIES = 60          # Maximum number of times to try the request
 _RETRY_TIMEOUT = 60     # Seconds between consecetive retries
 _REQUEST_TIMEOUT = 300  # Request timout to 300 seconds to get a response
 
