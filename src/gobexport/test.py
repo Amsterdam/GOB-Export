@@ -153,7 +153,7 @@ def _propose_check_file(filename, obj_info, obj):
         elif key in ["bytes", "chars"]:
             # Minimum value
             proposal[key] = [value, None]
-        elif key in ["empty_lines", "first_bytes"]:
+        elif key in ["empty_lines", "first_bytes", "first_line", "first_lines"]:
             # Absolute value
             proposal[key] = [value]
         else:
@@ -236,6 +236,8 @@ def _get_analysis(obj_info, obj):
     :param obj: contents
     :return:
     """
+    ENCODING = 'utf-8'
+
     last_modified = obj_info["last_modified"]
     age = datetime.datetime.now() - dateutil.parser.parse(last_modified)
     age_hours = age.total_seconds() / (60 * 60)
@@ -253,10 +255,13 @@ def _get_analysis(obj_info, obj):
     if obj_info['content_type'] != "plain/text" or bytes == 0:
         return base_analysis
 
-    content = obj.decode("utf-8")
+    content = obj.decode(ENCODING)
     chars = len(content)
 
     lines = content.split('\n')
+
+    first_line = lines[0]
+    first_lines = '\n'.join(lines[:10])
 
     line_lengths = [len(line) for line in lines]
     zero_line_lengths = [n for n in line_lengths if n == 0]
@@ -271,6 +276,8 @@ def _get_analysis(obj_info, obj):
 
     return {
         **base_analysis,
+        "first_line": hashlib.md5(first_line.encode(ENCODING)).hexdigest(),
+        "first_lines": hashlib.md5(first_lines.encode(ENCODING)).hexdigest(),
         "chars": chars,
         "empty_lines": len(zero_line_lengths),
         "max_line": max(other_line_lengths),
