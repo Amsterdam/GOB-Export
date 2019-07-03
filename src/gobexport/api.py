@@ -43,7 +43,7 @@ class API:
             response = requests.get(f'{self.host}{self.path}')
             duration = round(time.time() - start, 2)
             print(f"Query duration for {self.path}: {duration} secs")
-            assert response.ok, self.path
+            assert response.ok, f"API Response not OK for url {self.path}"
             data = response.json()
             self.path = data['_links']['next']['href']
             for entity in data['results']:

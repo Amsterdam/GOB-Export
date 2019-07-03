@@ -72,7 +72,7 @@ class GraphQL:
             correction = TARGET_DURATION / duration
             num_records = max(int(num_records * correction), 1)
             print(f"Request data end ({duration} secs), records set to {num_records}")
-            assert response.ok
+            assert response.ok, f"API Response not OK for query {self.query}"
             data = response.json()
 
             # Update the cursor and has_next_page
