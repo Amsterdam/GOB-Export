@@ -8,11 +8,12 @@ def test_main(mocked_messagedriven_service, mocked_export, mocked_test):
     from gobexport import __main__
 
     msg = {
-        "catalogue": "catalogue",
-        "collection": "collection",
+        "header": {
+            "catalogue": "catalogue",
+            "collection": "collection",
+            "destination": "Objectstore",
+        },
         "any other arg": "any other arg",
-        "destination": "Objectstore",
-        "header": {}
     }
 
     __main__.handle_export_msg(msg)
@@ -21,8 +22,9 @@ def test_main(mocked_messagedriven_service, mocked_export, mocked_test):
     mocked_export.assert_called_with("catalogue", "collection", "Objectstore")
 
     msg = {
-        "catalogue": "catalogue",
-        "header": {}
+        "header": {
+            "catalogue": "catalogue",
+        }
     }
 
     __main__.handle_export_test_msg(msg)
