@@ -12,6 +12,9 @@ class MockResponse:
         self.results = results
         pass
 
+    def raise_for_status(self):
+        pass
+
     def json(self):
         global next
 
