@@ -254,3 +254,10 @@ class TestGraphQl(TestCase):
         mock_sorter.assert_called_with(sort)
         mock_sorter.return_value.sort_item.assert_called_once()
         api._flatten_edge.assert_called_with(mock_sorter.return_value.sort_item.return_value)
+
+    def test_update_query(self):
+        api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
+        new_query = api._update_query(api.query, 100)
+        expected_query = '{woonplaatsen(first: 100, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
+
+        self.assertEqual(new_query, expected_query)

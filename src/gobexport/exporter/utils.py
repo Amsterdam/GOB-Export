@@ -1,3 +1,6 @@
+import re
+
+
 def split_field_reference(ref: str):
     return ref.split('.') if '.' in ref else ref
 
@@ -133,34 +136,21 @@ def nested_entity_get(entity, keys, default=None):
 
 def _get_value_from_list(entity, key, default):
     """
-    Tries to get the value from a list based on a key. Can be a string or integer.
+    Tries to get the value from a list based on a key.
+    If the key is an index, which is defined by an integer wrapped in
+    brackets e.g. [1], we select a single value. Otherwise a pipe delimited
+    string is returned.
     """
-    if isinstance(key, str):
-        entity = _get_value_from_list_by_string(entity, key, default)
-    else:
+    # If we've received an specific index, try to get the value
+    index = re.match(r'\[(\d+)\]', key)
+    if index:
         # Use the key as an index
         try:
-            entity = entity[key]
+            entity = entity[int(index.groups()[0])]
         except IndexError:
             entity = default
-    return entity
+    else:
+        # Return a pipe delimited string of the values by key
+        entity = '|'.join([str(d[key]) for d in entity if key in d])
 
-
-def _get_value_from_list_by_string(entity, key, default):
-    """
-    Tries to get the value from a list based on a key. Will first try to find the
-    key as the index of the list. If the key can't be cast into an int, it will
-    try to get the value from the first item in the list.
-    """
-    # First try to convert the key to an int and use as index
-    try:
-        entity = entity[int(key)]
-    except ValueError:
-        # Try to find the key in the first item of the list
-        try:
-            entity = entity[0].get(key, default)
-        except IndexError:
-            entity = default
-    except IndexError:
-        entity = default
     return entity
