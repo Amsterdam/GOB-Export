@@ -193,7 +193,7 @@ def dat_exporter(api, file, format=None, append=False):
     with open(file, 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
         # Get the headers from the first record in the API
         for entity in api:
-            pattern = re.compile('([\w.]+):(\w+):?({[\d\w\s:",]*}|\w+)?\|?')
+            pattern = re.compile('([\[\]\w.]+):(\w+):?({[\d\w\s:",]*}|\w+)?\|?')
             export = []
             for (attr_name, attr_type, args) in re.findall(pattern, format):
                 # Get the nested value if a '.' is in the attr_name

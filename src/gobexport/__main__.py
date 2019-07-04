@@ -19,11 +19,12 @@ def assert_message_attributes(msg, attrs):
 
 
 def handle_export_msg(msg):
-    assert_message_attributes(msg, ["catalogue", "collection", "destination"])
+    header = msg.get('header', {})
+    assert_message_attributes(header, ["catalogue", "collection", "destination"])
 
-    catalogue = msg['catalogue']
-    collection = msg['collection']
-    destination = msg['destination']
+    catalogue = header['catalogue']
+    collection = header['collection']
+    destination = header['destination']
     application = "GOBExport"
 
     start_timestamp = int(datetime.datetime.utcnow().replace(microsecond=0).timestamp())
@@ -52,9 +53,10 @@ def handle_export_msg(msg):
 
 
 def handle_export_test_msg(msg):
-    assert_message_attributes(msg, ["catalogue"])
+    header = msg.get('header', {})
+    assert_message_attributes(header, ["catalogue"])
 
-    catalogue = msg['catalogue']
+    catalogue = header['catalogue']
 
     start_timestamp = int(datetime.datetime.utcnow().replace(microsecond=0).timestamp())
     process_id = f"{start_timestamp}.export_test.{catalogue}"
@@ -62,7 +64,6 @@ def handle_export_test_msg(msg):
     msg["header"].update({
         'process_id': process_id,
         'application': f"GOBExportTest",
-        'catalogue': catalogue,
         'entity': catalogue
     })
 
