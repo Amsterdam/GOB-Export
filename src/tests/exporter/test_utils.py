@@ -214,35 +214,31 @@ class TestUtils(TestCase):
         assert(result == 1)
 
         # Test nested dict with list
-        result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', 0, 'b'])
+        result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', '[0]', 'b'])
         assert(result == 1)
 
         # Test nested dict with list index key as string
-        result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', '1', 'c'])
+        result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', '[1]', 'c'])
         assert(result == 2)
 
         # Test nested dict with list index key as string
-        result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', '2', 'c'])
+        result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', '[2]', 'c'])
         assert(result == None)
 
         # Test nested dict with list without specified list index keys
         result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', 'b'])
-        assert(result == 1)
-
-        # Test nested dict with list without specified list index keys, tries first in list
-        result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', 'c'])
-        assert(result == None)
+        assert(result == '1')
 
         # Test nested dict with empty list
         result = nested_entity_get({'a': []}, ['a', 'c'])
-        assert(result == None)
+        assert(result == '')
 
         # Test default missing value
         result = nested_entity_get({'a': {'b': {'c': 1}}}, ['a', 'b', 'd'])
         assert(result == None)
 
         # Test missing list index value
-        result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', 2, 'b'])
+        result = nested_entity_get({'a': [{'b': 1}, {'c':2}]}, ['a', '[2]', 'b'])
         assert(result == None)
 
         # Test missing value

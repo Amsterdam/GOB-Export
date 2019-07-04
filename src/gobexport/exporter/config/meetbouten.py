@@ -46,9 +46,9 @@ class MetingenExportConfig:
             'filename': 'DAT/MBT_METING.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|'
-                      'hoortBijMeetbout.bronwaarde:str|refereert_aan_referentiepunten.0.bronwaarde:str|'
-                      'refereert_aan_referentiepunten.1.bronwaarde:str|'
-                      'refereert_aan_referentiepunten.2.bronwaarde:str|zakkingssnelheid:num:1|'
+                      'hoortBijMeetbout.bronwaarde:str|refereertAanReferentiepunten.[0].bronwaarde:str|'
+                      'refereertAanReferentiepunten.[1].bronwaarde:str|'
+                      'refereertAanReferentiepunten.[2].bronwaarde:str|zakkingssnelheid:num:1|'
                       'zakkingCumulatief:num:1|isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|'
                       'pandmsl:str|ligtInStadsdeel.code:str|wijzeVanInwinnen.code:str:{1:"W",2:"T",3:"G"}'
         }
