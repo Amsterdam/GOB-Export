@@ -1,6 +1,7 @@
 from gobexport.api import API
 from gobexport.exporter.config import bag, brk, gebieden, meetbouten, nap, test
 from gobexport.graphql import GraphQL
+from gobexport.buffered_iterable import BufferedIterable
 
 CONFIG_MAPPING = {
     'test_catalogue': {
@@ -45,7 +46,11 @@ CONFIG_MAPPING = {
 }
 
 
-def export_to_file(host, product, file, catalogue, collection):
+def product_source(product):
+    return product.get('endpoint', product.get('query'))
+
+
+def export_to_file(host, product, file, catalogue, collection, buffer_items=False):
     """Export a collection from a catalog a file.
 
     The entities that are exposed by the specified API host are retrieved, converted and written to
@@ -72,6 +77,8 @@ def export_to_file(host, product, file, catalogue, collection):
     exporter = product.get('exporter')
     format = product.get('format')
 
-    row_count = exporter(api, file, format, append=product.get('append', False))
+    buffered_api = BufferedIterable(api, product_source(product), buffer_items=buffer_items)
+
+    row_count = exporter(buffered_api, file, format, append=product.get('append', False))
 
     return row_count
