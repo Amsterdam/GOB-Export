@@ -87,7 +87,7 @@ host = None
 file_name = None
 
 
-def export_entity(h, en, ex, f, fo):
+def export_entity(h, en, ex, f, fo, buffer_items=False):
     global host, file_name
     host = h
     file_name = f
