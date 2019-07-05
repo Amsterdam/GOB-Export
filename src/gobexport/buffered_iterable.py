@@ -1,3 +1,11 @@
+"""
+Classes to allow buffering of iterables in local files
+
+The output of an iterable is written into a local file
+When the same iterable is requested the previous result is returned
+
+These classes eliminate duplicate API calls
+"""
 import os
 import shutil
 import tempfile
@@ -9,9 +17,9 @@ import ijson
 
 class Buffer:
 
-    READ = "READ"
-    WRITE = "WRITE"
-    PASS_THROUGH = "PASS_THROUGH"
+    READ = "READ"                  # Previously recorded data is 'replayed'
+    WRITE = "WRITE"                # Data from the iterable is written into a local file
+    PASS_THROUGH = "PASS_THROUGH"  # Basically a noop
 
     def __init__(self, name, mode):
         assert mode in [self.READ, self.WRITE, self.PASS_THROUGH], f"Unknown mode {mode}"
@@ -54,12 +62,12 @@ class Buffer:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        # close self.file
         self.close()
 
     def close(self):
         if self.file is not None:
             if self.mode == self.WRITE:
+                # Close recorded data in array [..., ..., ]
                 self.file.write("\n]")
             self.file.close()
 
@@ -73,6 +81,7 @@ class Buffer:
             return
         assert self.mode == self.WRITE
         if not self.empty:
+            # Append data to array
             self.file.write(",\n")
         self.empty = False
         json_data = json.dumps(data)
@@ -85,6 +94,7 @@ class Buffer:
         if self.mode == self.READ:
             self.file = open(filename, 'r')
         elif self.mode == self.WRITE:
+            # Record data in an array [..., ..., ]
             self.file = open(filename, 'w')
             self.empty = True
             self.file.write("[\n")
@@ -93,8 +103,8 @@ class Buffer:
 class BufferedIterable:
 
     def __init__(self, items, name, buffer_items=True):
-        self.items = items  # generator
-        self.name = name  # identifying name, eg an url or query
+        self.items = items                # generator
+        self.name = name                  # identifying name, eg an url or query
         self.buffer_items = buffer_items  # whether or not to buffer items
 
         self._set_buffer_mode()
@@ -103,9 +113,9 @@ class BufferedIterable:
         if self.buffer_items:
             # Check if a buffer already exists
             if Buffer.exists(self.name):
-                self.buffer_mode = Buffer.READ
+                self.buffer_mode = Buffer.READ   # Read previously yielded items from buffer
             else:
-                self.buffer_mode = Buffer.WRITE
+                self.buffer_mode = Buffer.WRITE  # Write to buffer while yielding
         else:
             self.buffer_mode = Buffer.PASS_THROUGH
 
@@ -126,8 +136,11 @@ class BufferedIterable:
 def with_buffered_iterable(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        # Clean-up any previously buffered items
         BufferedIterable.clear_all()
+        # Process a sequence of API calls
         result = func(*args, **kwargs)
+        # Clean-up any saved data
         BufferedIterable.clear_all()
         return result
     return wrapper
