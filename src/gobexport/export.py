@@ -12,7 +12,8 @@ from gobcore.logging.logger import logger
 from gobexport.config import get_host, CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.distributor.objectstore import distribute_to_objectstore
-from gobexport.exporter import CONFIG_MAPPING, export_to_file
+from gobexport.exporter import CONFIG_MAPPING, export_to_file, product_source
+from gobexport.buffered_iterable import with_buffered_iterable
 
 
 # TODO: Should be fetched from GOBCore in next iterations
@@ -34,7 +35,8 @@ def _get_filename(name):
     return temp_filename
 
 
-def _export_collection(host, catalogue, collection, destination):  # noqa: C901
+@with_buffered_iterable  # noqa: C901
+def _export_collection(host, catalogue, collection, destination):
     """Export a collection from a catalog
 
     :param host: The API host to retrieve the catalog and collection from
@@ -56,8 +58,14 @@ def _export_collection(host, catalogue, collection, destination):  # noqa: C901
 
         # Get name of local file to write results to
         results_file = _get_filename(product['filename']) if destination == "Objectstore" else product['filename']
+
+        # Buffer items if they are used multiple times. This prevents calling API multiple times for same data
+        source = product_source(product)
+        buffer_items = len(list(filter(lambda p: product_source(p) == source, config.products.values()))) > 1
+
         try:
-            row_count = export_to_file(host, product, results_file, catalogue, product.get('collection', collection))
+            row_count = export_to_file(host, product, results_file, catalogue, product.get('collection', collection),
+                                       buffer_items=buffer_items)
         except Exception as e:
             logger.error(f"Exported to local file {name} failed: {str(e)}.")
         else:
