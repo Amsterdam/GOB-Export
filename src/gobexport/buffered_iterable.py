@@ -14,7 +14,6 @@ class Buffer:
     PASS_THROUGH = "PASS_THROUGH"
 
     def __init__(self, name, mode):
-        print("BUFFER", name, mode)
         assert mode in [self.READ, self.WRITE, self.PASS_THROUGH], f"Unknown mode {mode}"
         self.name = name
         self.mode = mode
