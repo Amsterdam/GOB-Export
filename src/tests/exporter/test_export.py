@@ -50,7 +50,7 @@ class MockConfig:
                 'boolean': 'boolean',
                 'geometrie': 'geometrie',
             },
-            'query': ''
+            'query': 'any query'
         },
         'shape': {
             'exporter': esri_exporter,
@@ -60,7 +60,7 @@ class MockConfig:
                 'id': 'identificatie',
                 'boolean': 'boolean',
             },
-            'query': ''
+            'query': 'another query'
         }
     }
 
