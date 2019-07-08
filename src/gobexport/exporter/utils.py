@@ -151,6 +151,6 @@ def _get_value_from_list(entity, key, default):
             entity = default
     else:
         # Return a pipe delimited string of the values by key
-        entity = '|'.join([str(d[key]) for d in entity if key in d])
+        entity = '|'.join([str(d[key]) if d[key] else "" for d in entity if key in d])
 
     return entity
