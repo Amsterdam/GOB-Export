@@ -3,6 +3,28 @@ Test export files
 
 Test each exported file.
 File characteristics are used to test export files
+
+For all exports:
+
+age hours    age of the file in hours
+bytes        length of the file in bytes
+first bytes  hash on the first 10,000 bytes
+
+For text exports only:
+
+first line   hash on the first line
+first lines  hash on the first 10 lines
+chars        Total number of characters in the file
+empty lines  Number of empty lines
+max line     maximum line length
+min line     minimum line length
+avg line     average line length
+digits       % numerical characters (digits)
+spaces       % whitespace characters (space, tab, newline, ...)
+alphas       % alphabetic characters
+lowers       % lowercase characters of all alphabetic characters
+uppers       % uppercase characters of all alphabetic characters
+
 """
 import json
 import hashlib
