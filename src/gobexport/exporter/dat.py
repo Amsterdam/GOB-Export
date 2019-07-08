@@ -13,6 +13,7 @@ Todo: The final model for the meetbouten collection is required
 
 import datetime
 import re
+import decimal
 
 from gobcore.utils import ProgressTicker
 
@@ -76,8 +77,8 @@ def _to_number(value, precision=None):
     :param value:
     :return:
     """
-    assert(type(value) in [int, float, str] or value is None)
-    value = format(value, f'.{precision}f') if precision and value else value
+    assert(type(value) in [int, float, str, decimal.Decimal] or value is None)
+    value = format(value, f'.{precision}f') if precision and value is not None else value
     return '' if value is None else str(value)\
         .replace('.', ',')
 
