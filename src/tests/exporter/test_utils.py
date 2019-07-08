@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock, mock_open, call
 
 from gobexport.exporter.utils import nested_entity_get, split_field_reference, evaluate_condition, \
      evaluate_action, _evaluate_concat_action, _evaluate_literal_action, \
-     _get_entity_value_dict_lookup_key, get_entity_value
+     _get_entity_value_dict_lookup_key, get_entity_value, _get_value_from_list
 
 
 class TestUtils(TestCase):
@@ -244,3 +244,14 @@ class TestUtils(TestCase):
         # Test missing value
         result = nested_entity_get({'a': {'b': {'c': 1}}}, ['a', 'b', 'd'], 'missing')
         assert(result == 'missing')
+
+    def test_get_value_from_list(self):
+        entity = [{'a': 'keyA', 'b': 'keyB'}, {'a': 'keyC', 'b': 'keyD'}]
+        key = 'a'
+        result = _get_value_from_list(entity, key, None)
+        self.assertEqual('keyA|keyC', result)
+
+        entity = [{'a': None, 'b': 'keyB'}, {'a': 'keyC', 'b': 'keyD'}]
+        result = _get_value_from_list(entity, key, None)
+        self.assertEqual('|keyC', result)
+
