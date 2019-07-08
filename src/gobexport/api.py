@@ -4,6 +4,9 @@ Encapsulates a paged API endpoint into an iterator
 
 """
 import time
+import ijson
+import json
+
 import gobexport.requests as requests
 
 
@@ -38,13 +41,25 @@ class API:
 
         :return:
         """
-        while self.path is not None:
-            start = time.time()
-            response = requests.get(f'{self.host}{self.path}')
-            duration = round(time.time() - start, 2)
-            print(f"Query duration for {self.path}: {duration} secs")
-            assert response.ok, f"API Response not OK for url {self.path}"
-            data = response.json()
-            self.path = data['_links']['next']['href']
-            for entity in data['results']:
-                yield entity
+        if "stream=true" in self.path:
+            print("Streaming")
+            result = requests.urlopen(f'{self.host}{self.path}')
+            items = ijson.items(result, prefix='item')
+            for item in items:
+                yield item
+        elif "ndjson=true" in self.path:
+            print("ndjson")
+            items = requests.get_stream(f'{self.host}{self.path}')
+            for item in items:
+                yield json.loads(item)
+        else:
+            while self.path is not None:
+                start = time.time()
+                response = requests.get(f'{self.host}{self.path}')
+                duration = round(time.time() - start, 2)
+                print(f"Query duration for {self.path}: {duration} secs")
+                assert response.ok, f"API Response not OK for url {self.path}"
+                data = response.json()
+                self.path = data['_links']['next']['href']
+                for entity in data['results']:
+                    yield entity

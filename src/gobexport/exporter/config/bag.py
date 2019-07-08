@@ -435,7 +435,7 @@ class NummeraanduidingenExportConfig:
 
     products = {
         'csv_actueel': {
-            'endpoint': '/gob/bag/nummeraanduidingen/?view=enhanced&page_size=2000',
+            'endpoint': '/gob/bag/nummeraanduidingen/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_nummeraanduiding_Actueel.csv',
             'mime_type': 'plain/text',
