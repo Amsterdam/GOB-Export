@@ -1,6 +1,11 @@
 import requests
 import pytest
 
+from unittest import TestCase
+from unittest.mock import patch
+
+from gobexport.api import API
+
 
 next = None
 
@@ -66,3 +71,22 @@ def test_api(monkeypatch):
     assert(cnt == 6)
 
     assert(str(api) == 'API hostNone')
+
+class TestStream(TestCase):
+
+    @patch('gobexport.api.requests')
+    def test_ndjson_api(self, mock_requests):
+        mock_requests.get_stream.return_value = ['1', '2', '3']
+        api = API('host', 'path ndjson=true')
+        result = [i for i in api]
+        self.assertEqual(result, [1, 2, 3])
+
+    @patch('gobexport.api.ijson')
+    @patch('gobexport.api.requests')
+    def test_streaming_api(self, mock_requests, mock_ijson):
+        mock_requests.urlopen.return_value = None
+        mock_ijson.items.return_value = [1, 2, 3]
+        api = API('host', 'path stream=true')
+        result = [i for i in api]
+        self.assertEqual(result, [1, 2, 3])
+
