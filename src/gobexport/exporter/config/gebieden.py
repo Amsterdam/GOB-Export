@@ -27,7 +27,7 @@ class StadsdelenExportConfig:
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced&page_size=10000',
+            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced&ndjson=true',
             'filename': 'CSV_Actueel/GBD_stadsdeel_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {

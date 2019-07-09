@@ -42,7 +42,7 @@ class MetingenExportConfig:
     products = {
         'dat': {
             'exporter': dat_exporter,
-            'endpoint': '/gob/meetbouten/metingen/?view=enhanced&page_size=10000',
+            'endpoint': '/gob/meetbouten/metingen/?view=enhanced&ndjson=true',
             'filename': 'DAT/MBT_METING.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|'

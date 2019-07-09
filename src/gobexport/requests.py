@@ -1,6 +1,7 @@
 import requests
-
 import time
+
+import urllib.request
 
 _MAX_TRIES = 60          # Maximum number of times to try the request
 _RETRY_TIMEOUT = 60     # Seconds between consecetive retries
@@ -50,3 +51,12 @@ def get(url):
 
 def post(url, json):
     return _exec(requests.post, url=url, json=json, timeout=_REQUEST_TIMEOUT)
+
+
+def get_stream(url):
+    result = requests.get(url, stream=True)
+    return result.iter_lines()
+
+
+def urlopen(url):
+    return urllib.request.urlopen(url)
