@@ -1,7 +1,7 @@
 import requests
 import time
 
-from urllib.request import urlopen
+import urllib.request
 
 _MAX_TRIES = 60          # Maximum number of times to try the request
 _RETRY_TIMEOUT = 60     # Seconds between consecetive retries
@@ -59,4 +59,4 @@ def get_stream(url):
 
 
 def urlopen(url):
-    return urlopen(url)
+    return urllib.request.urlopen(url)

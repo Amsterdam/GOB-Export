@@ -16,6 +16,10 @@ class MockResponse:
         raise self.exc("Any reason")
 
 
+class MockGet:
+    pass
+
+
 class TestRequests(TestCase):
 
     def setUp(self):
@@ -37,3 +41,19 @@ class TestRequests(TestCase):
         with pytest.raises(gobexport.requests.APIException):
             gobexport.requests.post("any url", "any json")
         self.assertEqual(mock_requests.post.call_count, 10)
+
+    @patch("gobexport.requests.requests")
+    def test_stream(self, mock_requests):
+
+        mock_get = MockGet()
+        mock_get.iter_lines = MagicMock()
+
+        mock_requests.get.return_value = mock_get
+
+        result = gobexport.requests.get_stream('any url')
+        mock_get.iter_lines.assert_called()
+
+    @patch('gobexport.requests.urllib.request.urlopen')
+    def test_urlopen(self, mock_open):
+        result = gobexport.requests.urlopen('any url')
+        mock_open.assert_called_with('any url')
