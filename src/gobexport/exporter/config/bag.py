@@ -634,14 +634,14 @@ class VerblijfsobjectenExportConfig:
 
     products = {
         'csv_actueel': {
-            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced&page_size=1000',
+            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_verblijfsobject_Actueel.csv',
             'mime_type': 'plain/text',
             'format': format.get_format(),
         },
         'esri_actueel': {
-            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced&page_size=1000',
+            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced&ndjson=true',
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_verblijfsobject.shp',
             'mime_type': 'application/octet-stream',
@@ -1317,14 +1317,14 @@ class PandenExportConfig:
 
     products = {
         'csv_actueel': {
-            'endpoint': '/gob/bag/panden/?view=enhanced&page_size=5000',
+            'endpoint': '/gob/bag/panden/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_pand_Actueel.csv',
             'mime_type': 'plain/text',
             'format': format.get_format(),
         },
         'esri_actueel': {
-            'endpoint': '/gob/bag/panden/?view=enhanced&page_size=5000',
+            'endpoint': '/gob/bag/panden/?view=enhanced&ndjson=true',
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_pand.shp',
             'mime_type': 'application/octet-stream',
