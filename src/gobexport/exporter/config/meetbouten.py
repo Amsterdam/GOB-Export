@@ -15,7 +15,7 @@ class MeetboutExportConfig:
     products = {
         'dat': {
             'exporter': dat_exporter,
-            'endpoint': '/gob/meetbouten/meetbouten/?view=enhanced&page_size=10000',
+            'endpoint': '/gob/meetbouten/meetbouten/?view=enhanced&ndjson=true',
             'filename': 'DAT/MBT_MEETBOUT.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:str|ligtInBuurt.code:str|geometrie:coo:x|geometrie:coo:y|hoogteTovNap:num:4|'
@@ -68,7 +68,7 @@ class ReferentiepuntenExportConfig:
     products = {
         'dat': {
             'exporter': dat_exporter,
-            'endpoint': '/gob/meetbouten/referentiepunten/?view=enhanced&page_size=10000',
+            'endpoint': '/gob/meetbouten/referentiepunten/?view=enhanced&ndjson=true',
             'filename': 'DAT/MBT_REFERENTIEPUNT.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:num|geometrie:coo:x|geometrie:coo:y|'
@@ -89,7 +89,7 @@ class RollagenExportConfig:
     products = {
         'dat': {
             'exporter': dat_exporter,
-            'endpoint': '/gob/meetbouten/rollagen/?view=enhanced&page_size=10000',
+            'endpoint': '/gob/meetbouten/rollagen/?view=enhanced&ndjson=true',
             'filename': 'DAT/MBT_ROLLAAG.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:str|idx:num|geometrie:coo:x|geometrie:coo:y|geometrie:geo'

@@ -15,7 +15,7 @@ class PeilmerkenExportConfig:
     products = {
         'dat': {
             'exporter': dat_exporter,
-            'endpoint': '/gob/nap/peilmerken/?view=enhanced&page_size=10000',
+            'endpoint': '/gob/nap/peilmerken/?view=enhanced&ndjson=true',
             'filename': 'DAT/NAP_PEILMERK.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:str|hoogteTovNap:num:4|jaar:num|merk.code:num|omschrijving:str|'
