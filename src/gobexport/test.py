@@ -280,7 +280,7 @@ def _get_analysis(obj_info, obj):
         "first_bytes": first_bytes
     }
 
-    if obj_info['content_type'] != "plain/text" or bytes == 0:
+    if obj_info['content_type'] not in ["plain/text", "text/csv", "application/x-ndjson"] or bytes == 0:
         return base_analysis
 
     content = obj.decode(ENCODING)
