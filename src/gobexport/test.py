@@ -77,20 +77,21 @@ def test(catalogue):
     proposals = {}
     for config in _export_config[catalogue]:
         for name, product in config.products.items():
-            filename = product['filename']
-            obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
-            if checks.get(filename):
-                stats = _get_analysis(obj_info, obj)
-                if _check_file(filename, stats, checks):
-                    logger.info(f"{filename} OK")
+            filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
+            for filename in filenames:
+                obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
+                if checks.get(filename):
+                    stats = _get_analysis(obj_info, obj)
+                    if _check_file(filename, stats, checks):
+                        logger.info(f"{filename} OK")
+                    else:
+                        logger.info(f"{filename} FAILED")
+                elif obj_info is None:
+                    logger.error(f"{filename} MISSING")
                 else:
-                    logger.info(f"{filename} FAILED")
-            elif obj_info is None:
-                logger.error(f"{filename} MISSING")
-            else:
-                logger.warning(f"{filename} UNCHECKED")
-                proposal = _propose_check_file(filename, obj_info, obj)
-                proposals[filename] = proposal
+                    logger.warning(f"{filename} UNCHECKED")
+                    proposal = _propose_check_file(filename, obj_info, obj)
+                    proposals[filename] = proposal
 
     # Write out any missing test definitions
     _write_proposals(conn_info, catalogue, checks, proposals)
@@ -104,12 +105,14 @@ def _get_file(conn_info, filename):
     :param filename: name of the file to retrieve
     :return:
     """
-    for item in get_full_container_list(conn_info['connection'], conn_info['container']):
-        if item["name"] == filename:
-            obj_info = dict(item)
-            obj = get_object(conn_info['connection'], item, conn_info['container'])
-            return obj_info, obj
-    return None, None
+    try:
+        for item in get_full_container_list(conn_info['connection'], conn_info['container']):
+            if item["name"] == filename:
+                obj_info = dict(item)
+                obj = get_object(conn_info['connection'], item, conn_info['container'])
+                return obj_info, obj
+    except StopIteration:
+        return None, None
 
 
 def _get_checks(conn_info, catalogue):
@@ -237,16 +240,19 @@ def _check_file(filename, stats, checks):
         total_result = total_result and result
 
         # Report any errors for the given filename as a group
-        if not result:
-            str_value = f"{value:.2f}".replace(".00", "") if type(value) == float else value
-            extra_data = {
-                'id': filename,
-                'data': {
-                    key: str_value,
-                    'margin': margin
-                }
+        str_value = f"{value:.2f}".replace(".00", "") if type(value) == float else value
+        extra_data = {
+            'id': filename,
+            'data': {
+                key: str_value
             }
-            logger.error("Check failed", extra_data)
+        }
+        if result:
+            extra_data['id'] += " OK"
+            logger.info("OK", extra_data)
+        else:
+            extra_data['data']['margin'] = margin
+            logger.error("Check FAIL", extra_data)
     return total_result
 
 

@@ -249,13 +249,13 @@ class TestExportTest(TestCase):
         }
         filename = "any filename"
 
-        mock_get_full_container_list.return_value = []
+        mock_get_full_container_list.return_value = yield from []
         obj_info, obj = test._get_file(conn_info, filename)
         self.assertIsNone(obj_info)
         self.assertIsNone(obj)
         mock_get_object.assert_not_called()
 
-        mock_get_full_container_list.return_value = [{'name': filename}]
+        mock_get_full_container_list.return_value = yield from [{'name': filename}]
         mock_get_object.return_value = "get object"
         obj_info, obj = test._get_file(conn_info, filename)
         self.assertEqual(obj_info, {'name': filename})
