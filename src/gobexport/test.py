@@ -77,7 +77,7 @@ def test(catalogue):
     proposals = {}
     for config in _export_config[catalogue]:
         for name, product in config.products.items():
-            filenames = [product['filename']] + product.get('extra_files', [])
+            filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
             for filename in filenames:
                 obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
                 if checks.get(filename):
@@ -105,12 +105,14 @@ def _get_file(conn_info, filename):
     :param filename: name of the file to retrieve
     :return:
     """
-    for item in get_full_container_list(conn_info['connection'], conn_info['container']):
-        if item["name"] == filename:
-            obj_info = dict(item)
-            obj = get_object(conn_info['connection'], item, conn_info['container'])
-            return obj_info, obj
-    return None, None
+    try:
+        for item in get_full_container_list(conn_info['connection'], conn_info['container']):
+            if item["name"] == filename:
+                obj_info = dict(item)
+                obj = get_object(conn_info['connection'], item, conn_info['container'])
+                return obj_info, obj
+    except StopIteration:
+        return None, None
 
 
 def _get_checks(conn_info, catalogue):
