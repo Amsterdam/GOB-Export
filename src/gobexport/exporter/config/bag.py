@@ -153,36 +153,6 @@ class WoonplaatsenExportConfig:
             ],
             'query': query_actueel
         },
-        'csv_actueel_en_historie': {
-            'api_type': 'graphql',
-            'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/BAG_woonplaats_ActueelEnHistorie.csv',
-            'mime_type': 'plain/text',
-            'format': history_format.get_format(),
-            'query': '''
-{
-  woonplaatsen(active: false, sort: [identificatie_asc, begin_geldigheid_asc]) {
-    edges {
-      node {
-        identificatie
-        volgnummer
-        registratiedatum
-        aanduidingInOnderzoek
-        geconstateerd
-        naam
-        beginGeldigheid
-        eindGeldigheid
-        documentdatum
-        documentnummer
-        status
-        geometrie
-      }
-    }
-  }
-}
-'''
-        },
-
     }
 
 
@@ -322,49 +292,6 @@ class OpenbareruimtesExportConfig:
         identificatie
         naam
         beschrijvingNaam
-      }
-    }
-  }
-}
-'''
-        },
-        'csv_actueel_en_historie': {
-            'api_type': 'graphql',
-            'expand_history': True,
-            'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/BAG_openbare_ruimte_ActueelEnHistorie.csv',
-            'mime_type': 'plain/text',
-            'format': history_format.get_format(),
-            'query': '''
-{
-  openbareruimtes(active: false, sort: [identificatie_asc, volgnummer_asc]) {
-    edges {
-      node {
-        identificatie
-        volgnummer
-        registratiedatum
-        aanduidingInOnderzoek
-        geconstateerd
-        naam
-        naamNen
-        beginGeldigheid
-        eindGeldigheid
-        ligtInWoonplaats(active: false) {
-          edges {
-            node {
-              identificatie
-              volgnummer
-              naam
-              beginGeldigheid
-              eindGeldigheid
-            }
-          }
-        }
-        type
-        documentdatum
-        documentnummer
-        status
-        geometrie
       }
     }
   }
