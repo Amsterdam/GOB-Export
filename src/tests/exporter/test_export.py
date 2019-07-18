@@ -1,7 +1,9 @@
 import os
 import importlib
-
 import gobexport.api
+
+from unittest import TestCase
+from unittest.mock import patch, MagicMock
 
 from gobexport.exporter import CONFIG_MAPPING
 from gobexport.exporter.dat import dat_exporter
@@ -139,3 +141,24 @@ def test_export_to_file(monkeypatch):
     for file in ['esri.shp', 'esri.dbf', 'esri.shx', 'esri.prj']:
         assert(os.path.isfile(file))
         os.remove(file)
+
+
+class TestExportToFile(TestCase):
+
+    @patch("gobexport.exporter.GraphQLStreaming")
+    @patch("gobexport.exporter.BufferedIterable")
+    @patch("gobexport.exporter.product_source", lambda x: 'source')
+    def test_export_to_file_graphql_streaming(self, mock_buffered_iterable, mock_graphql_streaming):
+        from gobexport.exporter import export_to_file
+
+        product = {
+            'api_type': 'graphql_streaming',
+            'query': 'some query',
+            'exporter': MagicMock(),
+            'format': 'the format',
+        }
+        result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
+        mock_graphql_streaming.assert_called_with('host', product['query'])
+
+        mock_buffered_iterable.assert_called_with(mock_graphql_streaming.return_value, 'source', buffer_items=False)
+        product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format', append=False)

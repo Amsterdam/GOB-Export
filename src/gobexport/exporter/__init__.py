@@ -1,6 +1,7 @@
 from gobexport.api import API
 from gobexport.exporter.config import bag, brk, gebieden, meetbouten, nap, test
 from gobexport.graphql import GraphQL
+from gobexport.graphql_streaming import GraphQLStreaming
 from gobexport.buffered_iterable import BufferedIterable
 
 CONFIG_MAPPING = {
@@ -69,6 +70,9 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
         expand_history = product.get('expand_history')
         sort = product.get('sort')
         api = GraphQL(host, query, catalogue, collection, expand_history, sort)
+    elif product.get('api_type') == 'graphql_streaming':
+        query = product['query']
+        api = GraphQLStreaming(host, query)
     else:
         # Use the REST API
         endpoint = product.get('endpoint')
