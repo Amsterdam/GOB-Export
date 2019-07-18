@@ -58,5 +58,10 @@ def get_stream(url):
     return result.iter_lines()
 
 
+def post_stream(url, json):
+    result = requests.post(url, stream=True, json=json)
+    return result.iter_lines()
+
+
 def urlopen(url):
     return urllib.request.urlopen(url)

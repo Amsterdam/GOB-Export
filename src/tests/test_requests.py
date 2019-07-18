@@ -53,6 +53,12 @@ class TestRequests(TestCase):
         result = gobexport.requests.get_stream('any url')
         mock_get.iter_lines.assert_called()
 
+    @patch("gobexport.requests.requests")
+    def test_post(self, mock_requests):
+        result = gobexport.requests.post_stream('url', 'some json')
+        mock_requests.post.assert_called_with('url', stream=True, json='some json')
+        self.assertEqual(mock_requests.post.return_value.iter_lines.return_value, result)
+
     @patch('gobexport.requests.urllib.request.urlopen')
     def test_urlopen(self, mock_open):
         result = gobexport.requests.urlopen('any url')

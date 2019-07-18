@@ -368,19 +368,17 @@ class AantekeningenExportConfig:
 
     products = {
         'csv_art': {
-            'api_type': 'graphql',
+            'api_type': 'graphql_streaming',
             'exporter': csv_exporter,
             'query': art_query,
-            'collection': 'aantekeningenrechten',
             'filename': filename,
             'mime_type': 'plain/text',
             'format': art_format,
         },
         'csv_akt': {
-            'api_type': 'graphql',
+            'api_type': 'graphql_streaming',
             'exporter': csv_exporter,
             'query': akt_query,
-            'collection': 'aantekeningenkadastraleobjecten',
             'filename': filename,
             'mime_type': 'plain/text',
             'format': akt_format,
@@ -620,7 +618,7 @@ class ZakelijkerechtenExportConfig:
     products = {
         'csv': {
             'exporter': csv_exporter,
-            'api_type': 'graphql',
+            'api_type': 'graphql_streaming',
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
@@ -733,8 +731,7 @@ class BrkBagExportConfig:
     products = {
         'csv': {
             'exporter': csv_exporter,
-            'api_type': 'graphql',
-            'collection': 'kadastraleobjecten',
+            'api_type': 'graphql_streaming',
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
@@ -826,7 +823,7 @@ class StukdelenExportConfig:
     products = {
         'csv': {
             'exporter': csv_exporter,
-            'api_type': 'graphql',
+            'api_type': 'graphql_streaming',
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
