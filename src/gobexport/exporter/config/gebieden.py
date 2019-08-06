@@ -24,10 +24,39 @@ following properties:
 
 class StadsdelenExportConfig:
 
+    query_actueel = '''
+{
+  stadsdelen(sort: [code_asc, volgnummer_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
+            }
+          }
+        }
+        geometrie
+      }
+    }
+  }
+}
+'''
+
     products = {
         'csv_actueel': {
+            'api_type': 'graphql',
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced&ndjson=true',
             'filename': 'CSV_Actueel/GBD_stadsdeel_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -41,11 +70,12 @@ class StadsdelenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'geometrie': 'geometrie',
-            }
+            },
+            'query': query_actueel
         },
         'esri_actueel': {
+            'api_type': 'graphql',
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced&ndjson=true',
             'filename': 'SHP/GBD_stadsdeel.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -72,7 +102,8 @@ class StadsdelenExportConfig:
                     'filename': 'SHP/GBD_stadsdeel.prj',
                     'mime_type': 'application/octet-stream'
                 },
-            ]
+            ],
+            'query': query_actueel
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
@@ -111,6 +142,16 @@ class StadsdelenExportConfig:
         eindGeldigheid
         documentdatum
         documentnummer
+        ligtInGemeente(active: false) {
+          edges {
+            node {
+              identificatie
+              naam
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
         geometrie
       }
     }
