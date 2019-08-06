@@ -69,6 +69,14 @@ class WoonplaatsenExportConfig:
         documentdatum
         documentnummer
         status
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
+            }
+          }
+        }
         geometrie
       }
     }
