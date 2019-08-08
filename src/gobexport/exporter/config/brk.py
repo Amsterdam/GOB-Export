@@ -1,13 +1,42 @@
 import datetime
 
 from fractions import Fraction
+from operator import itemgetter
+
 from gobexport.exporter.csv import csv_exporter
+from gobexport.exporter.esri import esri_exporter
 
 
-def brk_filename(name):
+FILE_TYPE_MAPPING = {
+    'csv': {
+        'dir': 'CSV_Actueel',
+        'extension': 'csv'
+    },
+    'shp': {
+        'dir': 'SHP_Actueel',
+        'extension': 'shp'
+    },
+    'dbf': {
+        'dir': 'SHP_Actueel',
+        'extension': 'dbf'
+    },
+    'shx': {
+        'dir': 'SHP_Actueel',
+        'extension': 'shx'
+    },
+    'prj': {
+        'dir': 'SHP_Actueel',
+        'extension': 'prj'
+    },
+}
+
+
+def brk_filename(name, type='csv'):
+    assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
+    type_dir, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
     now = datetime.datetime.now()
     datestr = now.strftime('%Y%m%d')
-    return f'AmsterdamRegio/CSV_actueel/BRK_{name}_{datestr}.csv'
+    return f'AmsterdamRegio/{type_dir}/BRK_{name}_{datestr}.{extension}'
 
 
 def sort_attributes(attrs: dict, ordering: list):
@@ -1032,5 +1061,67 @@ class KadastraleobjectenExportConfig:
                 '.geslachtsnaam':
                     lambda x, y: str(x).lower() > str(y).lower(),
             }
+        }
+    }
+
+
+class GemeentesExportConfig:
+    csv_format = {
+        'AZT_CODE': 'code',
+        'AZT_OMSCHRIJVING': 'waarde',
+        'AZT_AARDZAKELIJKRECHT_AKR_CODE': 'akrCode',
+    }
+
+    query = '''
+{
+  gemeentes(sort:naam_asc) {
+    edges {
+      node {
+        identificatie
+        naam
+        geometrie
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'csv': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql',
+            'query': query,
+            'filename': brk_filename('Gemeente', 'csv'),
+            'mime_type': 'plain/text',
+            'format': {
+                'naam': 'naam',
+                'identificatie': 'identificatie',
+                'geometrie': 'geometrie'
+            }
+        },
+        'shape': {
+            'exporter': esri_exporter,
+            'api_type': 'graphql',
+            'filename': brk_filename('Gemeente', 'shp'),
+            'mime_type': 'application/octet-stream',
+            'format': {
+                'GEMEENTE': 'naam',
+                'GME_ID': 'identificatie'
+            },
+            'extra_files': [
+                {
+                    'filename': brk_filename('Gemeente', 'dbf'),
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': brk_filename('Gemeente', 'shx'),
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': brk_filename('Gemeente', 'prj'),
+                    'mime_type': 'application/octet-stream'
+                },
+            ],
+            'query': query
         }
     }

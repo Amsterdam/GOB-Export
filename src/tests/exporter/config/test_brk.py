@@ -7,8 +7,15 @@ from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_file
 class TestBrkConfigHelpers(TestCase):
 
     def test_brk_filename(self):
-        self.assertEqual(f"AmsterdamRegio/CSV_actueel/BRK_FileName_{datetime.now().strftime('%Y%m%d')}.csv",
+        self.assertEqual(f"AmsterdamRegio/CSV_Actueel/BRK_FileName_{datetime.now().strftime('%Y%m%d')}.csv",
                          brk_filename('FileName'))
+
+        self.assertEqual(f"AmsterdamRegio/SHP_Actueel/BRK_FileName_{datetime.now().strftime('%Y%m%d')}.shp",
+                         brk_filename('FileName', 'shp'))
+
+        # Assert undefined file type raises error
+        with self.assertRaises(AssertionError):
+            brk_filename('FileName', 'xxx')
 
     def test_sort_attributes(self):
         attrs = {
