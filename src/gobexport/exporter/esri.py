@@ -1,3 +1,5 @@
+import os
+
 from osgeo import gdal, ogr, osr
 from shapely.geometry import shape
 
@@ -7,6 +9,7 @@ from gobexport.exporter.utils import split_field_reference, get_entity_value
 
 
 gdal.UseExceptions()
+os.environ['SHAPE_ENCODING'] = "utf-8"
 
 
 def add_field_definitions(layer, fieldnames):
