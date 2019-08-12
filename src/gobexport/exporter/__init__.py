@@ -43,6 +43,7 @@ CONFIG_MAPPING = {
         'brkbag': brk.BrkBagExportConfig,
         'stukdelen': brk.StukdelenExportConfig,
         'kadastraleobjecten': brk.KadastraleobjectenExportConfig,
+        'gemeentes': brk.GemeentesExportConfig,
     }
 }
 

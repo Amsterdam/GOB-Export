@@ -111,6 +111,14 @@ class StadsdelenExportConfig:
         eindGeldigheid
         documentdatum
         documentnummer
+        ligtInGemeente(active: false) {
+          edges {
+            node {
+              identificatie
+              naam
+            }
+          }
+        }
         geometrie
       }
     }
