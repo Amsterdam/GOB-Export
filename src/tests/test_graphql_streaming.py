@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from gobexport.graphql_streaming import GraphQLStreaming
+from gobexport.graphql_streaming import GraphQLStreaming, STREAMING_GRAPHQL_ENDPOINT
 from typing import Generator
 
 
@@ -19,3 +19,17 @@ class TestGraphQLStreaming(TestCase):
 
         result = [item for item in graphql_streaming]
         self.assertEqual(expected_result, result)
+
+    @patch("gobexport.graphql_streaming.post_stream")
+    @patch("gobexport.graphql_streaming.json.loads", lambda x: 'jl_' + x)
+    def test_unfold_variable(self, mock_post_stream):
+        graphql_streaming = GraphQLStreaming('host', 'query')
+        mock_post_stream.return_value = ['a', 'b']
+        result = [i for i in graphql_streaming]
+
+        url = 'host' + STREAMING_GRAPHQL_ENDPOINT
+        mock_post_stream.assert_called_with(url, {'query': 'query'}, params={'unfold': 'false'})
+
+        graphql_streaming = GraphQLStreaming('host', 'query', True)
+        result = [i for i in graphql_streaming]
+        mock_post_stream.assert_called_with(url, {'query': 'query'}, params={'unfold': 'true'})

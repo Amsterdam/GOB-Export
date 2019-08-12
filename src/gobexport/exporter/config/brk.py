@@ -648,6 +648,7 @@ class ZakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'unfold': True,
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
@@ -700,7 +701,7 @@ class BrkBagExportConfig:
         'KOT_PERCEELNUMMER': 'perceelnummer',
         'KOT_INDEX_LETTER': 'indexletter',
         'KOT_INDEX_NUMMER': 'indexnummer',
-        'BAG_BOT_ID': 'heeftEenRelatieMetVerblijfsobject.identificatie',
+        'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.identificatie',
         'AOT_OPENBARERUIMTENAAM': 'ligtAanOpenbareruimte.naam',
         'AOT_HUISNUMMER': 'heeftHoofdadres.huisnummer',
         'AOT_HUISLETTER': 'heeftHoofdadres.huisletter',
@@ -761,6 +762,7 @@ class BrkBagExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'unfold': True,
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
