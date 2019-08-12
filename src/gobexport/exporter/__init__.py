@@ -73,7 +73,7 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
         api = GraphQL(host, query, catalogue, collection, expand_history, sort)
     elif product.get('api_type') == 'graphql_streaming':
         query = product['query']
-        api = GraphQLStreaming(host, query)
+        api = GraphQLStreaming(host, query, product.get('unfold', False))
     else:
         # Use the REST API
         endpoint = product.get('endpoint')
