@@ -53,11 +53,20 @@ def _evaluate_literal_action(action: dict):
     return action.get('value')
 
 
+def _evaluate_fill_action(entity: dict, action: dict):
+    assert all([key in action for key in ['length', 'value', 'character']])
+
+    value = str(get_entity_value(entity, action['value']))
+    return value.rjust(action['length'], action['character'])
+
+
 def evaluate_action(entity: dict, action: dict):
     if action.get('action') == 'concat':
         return _evaluate_concat_action(entity, action)
     elif action.get('action') == 'literal':
         return _evaluate_literal_action(action)
+    elif action.get('action') == 'fill':
+        return _evaluate_fill_action(entity, action)
     else:
         raise NotImplementedError()
 
