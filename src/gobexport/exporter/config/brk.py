@@ -6,6 +6,8 @@ from operator import itemgetter
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
+from gobexport.filters.notempty_filter import NotEmptyFilter
+
 
 FILE_TYPE_MAPPING = {
     'csv': {
@@ -692,7 +694,7 @@ class AardzakelijkerechtenExportConfig:
 
 
 class BrkBagExportConfig:
-    filename = brk_filename("BRKBAG")
+    filename = brk_filename("BRK_BAG")
     format = {
         'BRK_KOT_ID': 'identificatie',
         'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
@@ -701,17 +703,20 @@ class BrkBagExportConfig:
         'KOT_PERCEELNUMMER': 'perceelnummer',
         'KOT_INDEX_LETTER': 'indexletter',
         'KOT_INDEX_NUMMER': 'indexnummer',
+        'KOT_STATUS_CODE': 'status',
+        'KOT_MODIFICATION': 'wijzigingsdatum',
         'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.identificatie',
+        'DIVA_VOT_ID': '',
         'AOT_OPENBARERUIMTENAAM': 'ligtAanOpenbareruimte.naam',
         'AOT_HUISNUMMER': 'heeftHoofdadres.huisnummer',
         'AOT_HUISLETTER': 'heeftHoofdadres.huisletter',
         'AOT_HUISNUMMERTOEVOEGING': 'heeftHoofdadres.huisnummertoevoeging',
         'AOT_POSTCODE': 'heeftHoofdadres.postcode',
+        'AOT_WOONPLAATSNAAM': 'ligtInWoonplaats.naam',
         'BRON_RELATIE': {
             'action': 'literal',
             'value': 'BRK'
-        },
-        'TOESTANDSDATUM_DIVA': 'toestandsdatum'
+        }
     }
 
     query = '''
@@ -726,7 +731,8 @@ class BrkBagExportConfig:
         perceelnummer
         indexletter
         indexnummer
-        toestandsdatum
+        status
+        wijzigingsdatum
         heeftEenRelatieMetVerblijfsobject {
           edges {
             node {
@@ -746,6 +752,13 @@ class BrkBagExportConfig:
                     huisletter
                     huisnummertoevoeging
                     postcode
+                    ligtInWoonplaats {
+                      edges {
+                        node {
+                          naam
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -761,6 +774,9 @@ class BrkBagExportConfig:
     products = {
         'csv': {
             'exporter': csv_exporter,
+            'entity_filters': [
+                NotEmptyFilter('heeftEenRelatieMetVerblijfsobject.identificatie'),
+            ],
             'api_type': 'graphql_streaming',
             'unfold': True,
             'query': query,
