@@ -515,7 +515,12 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'action': 'literal',
                         'value': '-'
                     },
-                    'rustOpKadastraalobject.perceelnummer',
+                    {
+                        'action': 'fill',
+                        'length': 5,
+                        'character': '0',
+                        'value': 'rustOpKadastraalobject.perceelnummer',
+                    },
                     {
                         'action': 'literal',
                         'value': '-'
@@ -525,7 +530,12 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'action': 'literal',
                         'value': '-'
                     },
-                    'rustOpKadastraalobject.indexnummer',
+                    {
+                        'action': 'fill',
+                        'length': 4,
+                        'character': '0',
+                        'value': 'rustOpKadastraalobject.indexnummer',
+                    }
                 ]
             },
             'BRK_KOT_ID': 'rustOpKadastraalobject.identificatie',
