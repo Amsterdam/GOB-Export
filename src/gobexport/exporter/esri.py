@@ -6,6 +6,7 @@ from shapely.geometry import shape
 from gobcore.utils import ProgressTicker
 
 from gobexport.exporter.utils import split_field_reference, get_entity_value
+from gobexport.filters.entity_filter import EntityFilter
 
 
 gdal.UseExceptions()
@@ -44,7 +45,7 @@ def _get_geometry_type(entity):
     return geometry_type
 
 
-def esri_exporter(api, file, format=None, append=False):
+def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=None):
     """ESRI Exporter
 
     This function will transform the output of an API to ESRI shape files. The
@@ -72,6 +73,8 @@ def esri_exporter(api, file, format=None, append=False):
     with ProgressTicker(f"Export entities", 10000) as progress:
         # Get records from the API and build the esri file
         for entity in api:
+            if filter and not filter.filter(entity):
+                continue
 
             # On the first entity determine the type of shapefile we need to export
             if row_count == 0:

@@ -6,6 +6,7 @@ from gobcore.exceptions import GOBException
 from gobcore.utils import ProgressTicker
 
 from gobexport.exporter.utils import split_field_reference, get_entity_value
+from gobexport.filters.entity_filter import EntityFilter
 
 
 def build_mapping_from_format(format):
@@ -40,7 +41,7 @@ def _ensure_fieldnames_match_existing_file(fieldnames, file):
         raise GOBException('Fields from existing file do not match fields to append')
 
 
-def csv_exporter(api, file, format=None, append=False):
+def csv_exporter(api, file, format=None, append=False, filter: EntityFilter=None):
     """CSV Exporter
 
     Exports the output of the API to a ; delimited csv file.
@@ -68,6 +69,7 @@ def csv_exporter(api, file, format=None, append=False):
 
 
 
+    :param filter:
     :param api: the API wrapper which can be iterated through
     :param file: the local file to write to
     :param format: format definition, see above for examples
@@ -90,6 +92,9 @@ def csv_exporter(api, file, format=None, append=False):
             writer.writeheader()
 
         for entity in api:
+            if filter and not filter.filter(entity):
+                continue
+
             row = {}
             for attribute_name, lookup_key in mapping.items():
                 row[attribute_name] = get_entity_value(entity, lookup_key)
