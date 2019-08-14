@@ -474,8 +474,8 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         kvk_field = 'vanKadastraalsubject.heeftKvknummerVoor.bronwaarde'
 
         attrs = {
-            'SJT_NNP_RSIN': 'heeftRsinVoor.bronwaarde',
-            'SJT_NNP_KVKNUMMER': 'heeftKvknummerVoor.bronwaarde',
+            'SJT_NNP_RSIN': 'vanKadastraalsubject.heeftRsinVoor.bronwaarde',
+            'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.heeftKvknummerVoor.bronwaarde',
             'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject'
                                        '.rechtsvorm.code',
             'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject'
@@ -497,8 +497,8 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ZRT_AARDZAKELIJKRECHT_CODE': 'aardZakelijkRecht.code',
             'ZRT_AARDZAKELIJKRECHT_OMS': 'aardZakelijkRecht.omschrijving',
             'ZRT_AARDZAKELIJKRECHT_AKR_CODE': 'akrAardZakelijkRecht',
-            'ZRT_BELAST_AZT': 'belastZakelijkeRechten.akrAardZakelijkRecht',
-            'ZRT_BELAST_MET_AZT': 'belastMetZakelijkeRechten.akrAardZakelijkRecht',
+            'ZRT_BELAST_AZT': 'belastZakelijkerechten.akrAardZakelijkRecht',
+            'ZRT_BELAST_MET_AZT': 'belastMetZakelijkerechten.akrAardZakelijkRecht',
             'ZRT_ONTSTAAN_UIT': 'ontstaanUitAppartementsrechtsplitsing',
             'ZRT_BETROKKEN_BIJ': 'betrokkenBijAppartementsrechtsplitsing',
             'ZRT_ISBEPERKT_TOT_TNG': 'isBeperktTot',
@@ -646,8 +646,8 @@ class ZakelijkerechtenExportConfig:
             }
           }
         }
-        appartementsrechtsplitsingtype,
-        einddatumAppartementsrechtsplitsing,
+        appartementsrechtsplitsingtype
+        einddatumAppartementsrechtsplitsing
         indicatieActueelAppartementsrechtsplitsing
         invVanZakelijkrechtBrkTenaamstellingen {
           edges {
