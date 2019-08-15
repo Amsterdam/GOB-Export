@@ -1,19 +1,20 @@
 import json
 from gobexport.requests import post_stream
 
+from gobexport.formatter.graphql import GraphQLResultFormatter
+
 STREAMING_GRAPHQL_ENDPOINT = '/gob/graphql/streaming/'
 
 
 class GraphQLStreaming:
 
-    def __init__(self, host, query, unfold=False):
+    def __init__(self, host, query, unfold=False, sort=None):
         self.host = host
         self.query = query
-        self.params = {
-            'unfold': str(unfold).lower(),
-        }
+
+        self.formatter = GraphQLResultFormatter(sort, unfold=unfold)
 
     def __iter__(self):
-        items = post_stream(f'{self.host}{STREAMING_GRAPHQL_ENDPOINT}', {'query': self.query}, params=self.params)
+        items = post_stream(f'{self.host}{STREAMING_GRAPHQL_ENDPOINT}', {'query': self.query})
         for item in items:
-            yield json.loads(item)
+            yield from self.formatter.format_item(json.loads(item))

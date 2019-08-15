@@ -348,16 +348,16 @@ class AantekeningenExportConfig:
             'action': 'literal',
             'value': 'Aantekening Zakelijk Recht (R)'
         },
-        'BRK_KOT_ID': 'rustOpKadastraalobject.identificatie',
-        'KOT_KADASTRALEGEMCODE_CODE': 'rustOpKadastraalobject.aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_SECTIE': 'rustOpKadastraalobject.aangeduidDoorKadastralesectie.bronwaarde',
-        'KOT_PERCEELNUMMER': 'rustOpKadastraalobject.perceelnummer',
-        'KOT_INDEX_LETTER': 'rustOpKadastraalobject.indexletter',
-        'KOT_INDEX_NUMMER': 'rustOpKadastraalobject.indexnummer',
-        'BRK_TNG_ID': 'betrokkenTenaamstelling.identificatie',
-        'ZRT_AARD_ZAKELIJKRECHT_CODE': 'vanZakelijkRecht.aardZakelijkRecht.code',
-        'ZRT_AARD_ZAKELIJKRECHT_OMS': 'vanZakelijkRecht.aardZakelijkRecht.omschrijving',
-        'BRK_SJT_ID': 'heeftBetrokkenPersoon.identificatie',
+        'BRK_KOT_ID': 'rustOpKadastraalobject.[0].identificatie',
+        'KOT_KADASTRALEGEMCODE_CODE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_SECTIE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralesectie.bronwaarde',
+        'KOT_PERCEELNUMMER': 'rustOpKadastraalobject.[0].perceelnummer',
+        'KOT_INDEX_LETTER': 'rustOpKadastraalobject.[0].indexletter',
+        'KOT_INDEX_NUMMER': 'rustOpKadastraalobject.[0].indexnummer',
+        'BRK_TNG_ID': 'betrokkenTenaamstelling.[0].identificatie',
+        'ZRT_AARD_ZAKELIJKRECHT_CODE': 'vanZakelijkrecht.[0].aardZakelijkRecht.code',
+        'ZRT_AARD_ZAKELIJKRECHT_OMS': 'vanZakelijkrecht.[0].aardZakelijkRecht.omschrijving',
+        'BRK_SJT_ID': 'heeftBetrokkenPersoon.[0].identificatie',
     }
 
     akt_query = '''
@@ -411,17 +411,17 @@ class AantekeningenExportConfig:
             'action': 'literal',
             'value': 'Aantekening Kadastraal object (O)'
         },
-        'BRK_KOT_ID': 'heeftBetrekkingOpKadastraalObject.identificatie',
+        'BRK_KOT_ID': 'heeftBetrekkingOpKadastraalObject.[0].identificatie',
         'KOT_KADASTRALEGEMCODE_CODE':
-            'heeftBetrekkingOpKadastraalObject.aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_SECTIE': 'heeftBetrekkingOpKadastraalObject.aangeduidDoorKadastralesectie.bronwaarde',
-        'KOT_PERCEELNUMMER': 'heeftBetrekkingOpKadastraalObject.perceelnummer',
-        'KOT_INDEX_LETTER': 'heeftBetrekkingOpKadastraalObject.indexletter',
-        'KOT_INDEX_NUMMER': 'heeftBetrekkingOpKadastraalObject.indexnummer',
+            'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_SECTIE': 'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralesectie.bronwaarde',
+        'KOT_PERCEELNUMMER': 'heeftBetrekkingOpKadastraalObject.[0].perceelnummer',
+        'KOT_INDEX_LETTER': 'heeftBetrekkingOpKadastraalObject.[0].indexletter',
+        'KOT_INDEX_NUMMER': 'heeftBetrekkingOpKadastraalObject.[0].indexnummer',
         'BRK_TNG_ID': '',
         'ZRT_AARD_ZAKELIJKRECHT_CODE': '',
         'ZRT_AARD_ZAKELIJKRECHT_OMS': '',
-        'BRK_SJT_ID': 'heeftBetrokkenPersoon.identificatie',
+        'BRK_SJT_ID': 'heeftBetrokkenPersoon.[0].identificatie',
     }
 
     products = {
@@ -450,19 +450,14 @@ class AantekeningenExportConfig:
 class ZakelijkerechtenCsvFormat(BrkCsvFormat):
 
     def _get_np_attrs(self):
-        bsn_field = "vanKadastraalsubject.heeftBsnVoor.bronwaarde"
+        bsn_field = "vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde"
 
         attrs = {
-            'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject'
-                                    '.geboortedatum',
-            'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject'
-                                     '.geboorteplaats',
-            'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject'
-                                        '.geboorteland.code',
-            'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject'
-                                       '.geboorteland.omschrijving',
-            'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject'
-                                      '.datumOverlijden',
+            'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject.[0].geboortedatum',
+            'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject.[0].geboorteplaats',
+            'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject.[0].geboorteland.code',
+            'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject.[0].geboorteland.omschrijving',
+            'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject.[0].datumOverlijden',
         }
 
         return self._add_condition_to_attrs(
@@ -471,19 +466,15 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         )
 
     def _get_nnp_attrs(self):
-        kvk_field = 'vanKadastraalsubject.heeftKvknummerVoor.bronwaarde'
+        kvk_field = 'vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde'
 
         attrs = {
-            'SJT_NNP_RSIN': 'vanKadastraalsubject.heeftRsinVoor.bronwaarde',
-            'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.heeftKvknummerVoor.bronwaarde',
-            'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject'
-                                       '.rechtsvorm.code',
-            'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject'
-                                      '.rechtsvorm.omschrijving',
-            'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject'
-                                       '.statutaireNaam',
-            'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject'
-                                        '.statutaireZetel'
+            'SJT_NNP_RSIN': 'vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde',
+            'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde',
+            'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject.[0].rechtsvorm.code',
+            'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject.[0].rechtsvorm.omschrijving',
+            'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject.[0].statutaireNaam',
+            'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject.[0].statutaireZetel'
         }
 
         return self._add_condition_to_attrs(
@@ -505,12 +496,12 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ZRT_BETREKKING_OP_KOT': {
                 'action': 'concat',
                 'fields': [
-                    'rustOpKadastraalobject.aangeduidDoorKadastralegemeentecode.bronwaarde',
+                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
                     {
                         'action': 'literal',
                         'value': '-'
                     },
-                    'rustOpKadastraalobject.aangeduidDoorKadastralesectie.bronwaarde',
+                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralesectie.bronwaarde',
                     {
                         'action': 'literal',
                         'value': '-'
@@ -519,13 +510,13 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'action': 'fill',
                         'length': 5,
                         'character': '0',
-                        'value': 'rustOpKadastraalobject.perceelnummer',
+                        'value': 'rustOpKadastraalobject.[0].perceelnummer',
                     },
                     {
                         'action': 'literal',
                         'value': '-'
                     },
-                    'rustOpKadastraalobject.indexletter',
+                    'rustOpKadastraalobject.[0].indexletter',
                     {
                         'action': 'literal',
                         'value': '-'
@@ -534,20 +525,20 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'action': 'fill',
                         'length': 4,
                         'character': '0',
-                        'value': 'rustOpKadastraalobject.indexnummer',
+                        'value': 'rustOpKadastraalobject.[0].indexnummer',
                     }
                 ]
             },
-            'BRK_KOT_ID': 'rustOpKadastraalobject.identificatie',
-            'KOT_STATUS_CODE': 'rustOpKadastraalobject.status',
-            'KOT_MODIFICATION': 'rustOpKadastraalobject.wijzigingsdatum',
-            'BRK_TNG_ID': 'invVanZakelijkrechtBrkTenaamstellingen.identificatie',
-            'TNG_AANDEEL_TELLER': 'invVanZakelijkrechtBrkTenaamstellingen.aandeel.teller',
-            'TNG_AANDEEL_NOEMER': 'invVanZakelijkrechtBrkTenaamstellingen.aandeel.noemer',
-            'TNG_EINDDATUM': 'invVanZakelijkrechtBrkTenaamstellingen.eindGeldigheid',
+            'BRK_KOT_ID': 'rustOpKadastraalobject.[0].identificatie',
+            'KOT_STATUS_CODE': 'rustOpKadastraalobject.[0].status',
+            'KOT_MODIFICATION': 'rustOpKadastraalobject.[0].wijzigingsdatum',
+            'BRK_TNG_ID': 'invVanZakelijkrechtBrkTenaamstellingen.[0].identificatie',
+            'TNG_AANDEEL_TELLER': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
+            'TNG_AANDEEL_NOEMER': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.noemer',
+            'TNG_EINDDATUM': 'invVanZakelijkrechtBrkTenaamstellingen.[0].eindGeldigheid',
             'TNG_ACTUEEL': {
                 'condition': 'isempty',
-                'reference': 'invVanZakelijkrechtBrkTenaamstellingen.eindGeldigheid',
+                'reference': 'invVanZakelijkrechtBrkTenaamstellingen.[0].eindGeldigheid',
                 'trueval': {
                     'action': 'literal',
                     'value': 'TRUE',
@@ -561,42 +552,40 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ASG_APP_RECHTSPLITSTYPE_OMS': 'appartementsrechtsplitsingtype.omschrijving',
             'ASG_EINDDATUM': 'einddatumAppartementsrechtsplitsing',
             'ASG_ACTUEEL': 'indicatieActueelAppartementsrechtsplitsing',
-            'BRK_SJT_ID': 'vanKadastraalsubject.identificatie',
-            'SJT_BSN': 'vanKadastraalsubject.heeftBsnVoor.bronwaarde',
-            'SJT_BESCHIKKINGSBEVOEGDH_CODE': 'vanKadastraalsubject'
-                                             '.beschikkingsbevoegdheid.code',
-            'SJT_BESCHIKKINGSBEVOEGDH_OMS': 'vanKadastraalsubject'
-                                            '.beschikkingsbevoegdheid.omschrijving',
+            'BRK_SJT_ID': 'vanKadastraalsubject.[0].identificatie',
+            'SJT_BSN': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
+            'SJT_BESCHIKKINGSBEVOEGDH_CODE': 'vanKadastraalsubject.[0].beschikkingsbevoegdheid.code',
+            'SJT_BESCHIKKINGSBEVOEGDH_OMS': 'vanKadastraalsubject.[0].beschikkingsbevoegdheid.omschrijving',
             'SJT_NAAM': {
                 'condition': 'isempty',
-                'reference': 'vanKadastraalsubject.heeftBsnVoor.bronwaarde',
+                'reference': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
                 'negate': True,
                 'trueval': {
                     'action': 'concat',
                     'fields': [
-                        'vanKadastraalsubject.geslachtsnaam',
+                        'vanKadastraalsubject.[0].geslachtsnaam',
                         {
                             'action': 'literal',
                             'value': ','
                         },
-                        'vanKadastraalsubject.voornamen',
+                        'vanKadastraalsubject.[0].voornamen',
                         {
                             'action': 'literal',
                             'value': ','
                         },
-                        'vanKadastraalsubject.voorvoegsels',
+                        'vanKadastraalsubject.[0].voorvoegsels',
                         {
                             'action': 'literal',
                             'value': ' ('
                         },
-                        'vanKadastraalsubject.geslacht.code',
+                        'vanKadastraalsubject.[0].geslacht.code',
                         {
                             'action': 'literal',
                             'value': ')'
                         },
                     ]
                 },
-                'falseval': 'vanKadastraalsubject.statutaireNaam'
+                'falseval': 'vanKadastraalsubject.[0].statutaireNaam'
             },
             **self._get_np_attrs(),
             **self._get_nnp_attrs(),
@@ -949,64 +938,64 @@ class KadastraleobjectenExportConfig:
         'KOT_STATUS_CODE': 'status',
         'KOT_TOESTANDSDATUM': 'toestandsdatum',
         'KOT_IND_VOORLOPIGE_KADGRENS': 'indicatieVoorlopigeGeometrie',
-        'BRK_SJT_ID': 'vanKadastraalsubject.identificatie',
+        'BRK_SJT_ID': 'vanKadastraalsubject.[0].identificatie',
         'SJT_NAAM': {
             'condition': 'isempty',
-            'reference': 'vanKadastraalsubject.heeftBsnVoor.bronwaarde',
+            'reference': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
             'negate': True,
             'trueval': {
                 'action': 'concat',
                 'fields': [
-                    'vanKadastraalsubject.geslachtsnaam',
+                    'vanKadastraalsubject.[0].geslachtsnaam',
                     {
                         'action': 'literal',
                         'value': ','
                     },
-                    'vanKadastraalsubject.voornamen',
+                    'vanKadastraalsubject.[0].voornamen',
                     {
                         'action': 'literal',
                         'value': ','
                     },
-                    'vanKadastraalsubject.voorvoegsels',
+                    'vanKadastraalsubject.[0].voorvoegsels',
                     {
                         'action': 'literal',
                         'value': ' ('
                     },
-                    'vanKadastraalsubject.geslacht.code',
+                    'vanKadastraalsubject.[0].geslacht.code',
                     {
                         'action': 'literal',
                         'value': ')'
                     },
                 ]
             },
-            'falseval': 'vanKadastraalsubject.statutaireNaam'
+            'falseval': 'vanKadastraalsubject.[0].statutaireNaam'
         },
-        'SJT_TYPE': 'vanKadastraalsubject.typeSubject',
-        'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject.geboortedatum',
-        'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject.geboorteplaats',
-        'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject.geboorteland.code',
-        'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject.geboorteland.omschrijving',
-        'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject.datumOverlijden',
-        'SJT_NNP_RSIN': 'vanKadastraalsubject.heeftRsinVoor.bronwaarde',
-        'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.heeftKvknummerVoor.bronwaarde',
-        'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject.rechtsvorm.code',
-        'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject.rechtsvorm.omschrijving',
-        'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject.statutaireNaam',
-        'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject.statutaireZetel',
-        'SJT_ZRT': 'invRustOpKadastraalobjectBrkZakelijkerechten.aardZakelijkRecht.code',
+        'SJT_TYPE': 'vanKadastraalsubject.[0].typeSubject',
+        'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject.[0].geboortedatum',
+        'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject.[0].geboorteplaats',
+        'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject.[0].geboorteland.code',
+        'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject.[0].geboorteland.omschrijving',
+        'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject.[0].datumOverlijden',
+        'SJT_NNP_RSIN': 'vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde',
+        'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde',
+        'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject.[0].rechtsvorm.code',
+        'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject.[0].rechtsvorm.omschrijving',
+        'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject.[0].statutaireNaam',
+        'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject.[0].statutaireZetel',
+        'SJT_ZRT': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].aardZakelijkRecht.code',
         'SJT_AANDEEL': {
             'condition': 'isempty',
-            'reference': 'invVanZakelijkrechtBrkTenaamstellingen.aandeel.teller',
+            'reference': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
             'negate': True,
             'trueval': {
                 'action': 'concat',
                 'fields': [
-                    'invVanZakelijkrechtBrkTenaamstellingen.aandeel.teller',
+                    'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
                     {
                         'action': 'literal',
                         'value': '/',
                     },
-                    'invVanZakelijkrechtBrkTenaamstellingen.aandeel.noemer'
+                    'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.noemer'
                 ]
             },
         },
@@ -1103,7 +1092,7 @@ class KadastraleobjectenExportConfig:
     products = {
         'csv': {
             'exporter': csv_exporter,
-            'api_type': 'graphql',
+            'api_type': 'graphql_streaming',
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',

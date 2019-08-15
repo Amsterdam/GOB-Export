@@ -9,8 +9,7 @@ import time
 
 from gobcore.model import GOBModel
 
-from gobexport.converters.history import convert_to_history_rows
-from gobexport.sorter.graphql import GraphQlResultSorter
+from gobexport.formatter.graphql import GraphQLResultFormatter
 
 GRAPHQL_ENDPOINT = '/gob/graphql/'
 NUM_RECORDS = 1  # Initially ask for only one record
@@ -20,7 +19,7 @@ TARGET_DURATION = 30  # Target request duration is 30 seconds
 class GraphQL:
     sorter = None
 
-    def __init__(self, host, query, catalogue, collection, expand_history=False, sort=None):
+    def __init__(self, host, query, catalogue, collection, expand_history=False, sort=None, unfold=False):
         """Constructor
 
         Lazy loading, Just register host and query and wait for the iterator to be called
@@ -35,14 +34,12 @@ class GraphQL:
         self.url = self.host + GRAPHQL_ENDPOINT
         self.catalogue = catalogue
         self.collection = collection
-        self.expand_history = expand_history
         self.end_cursor = ""
         self.query = self._update_query(query, NUM_RECORDS)
         self.has_next_page = True
         self.gob_model = GOBModel().get_collection(self.catalogue, self.collection)
 
-        if sort:
-            self.sorter = GraphQlResultSorter(sort)
+        self.formatter = GraphQLResultFormatter(expand_history, sort=sort, unfold=unfold)
 
     def __repr__(self):
         """Representation
@@ -83,41 +80,7 @@ class GraphQL:
                 self.query = self._update_query(self.query, num_records)
 
             for edge in data['data'][self.collection]['edges']:
-                if self.expand_history:
-                    yield from self._expand_history(edge)
-                else:
-                    if self.sorter:
-                        edge = self.sorter.sort_item(edge)
-                    yield self._flatten_edge(edge)
-
-    def _expand_history(self, edge):
-        history_rows = convert_to_history_rows(self._flatten_edge(edge))
-        for row in history_rows:
-            yield row
-
-    def _flatten_edge(self, edge, main=None):
-        """Flatten edges and nodes from the graphql response, places all nested references
-        as keys in the main dictionary
-
-        :return: a list of dictionaries
-        """
-        flat_edge = {}
-        for key, value in edge['node'].items():
-            # References
-            if isinstance(value, dict) and 'edges' in value:
-                if main:
-                    main.setdefault(key, []).extend([self._flatten_edge(e, main) for e in value['edges']])
-                else:
-                    flat_edge.setdefault(key, []).extend([self._flatten_edge(e, flat_edge) for e in value['edges']])
-            else:
-                flat_edge[key] = value
-
-        # Clear the final reference lists of empty dicts
-        if not main:
-            for key, value in flat_edge.items():
-                if isinstance(value, list):
-                    flat_edge[key] = [v for v in value if v]
-        return flat_edge
+                yield from self.formatter.format_item(edge)
 
     def _update_query(self, query, num_records):
         """Updates a graphql query for pagination
