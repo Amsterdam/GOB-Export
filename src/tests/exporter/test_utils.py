@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock, mock_open, call
 
 from gobexport.exporter.utils import nested_entity_get, split_field_reference, evaluate_condition, \
      evaluate_action, _evaluate_concat_action, _evaluate_literal_action, \
-     _get_entity_value_dict_lookup_key, get_entity_value, _get_value_from_list
+     _get_entity_value_dict_lookup_key, get_entity_value, _get_value_from_list, _evaluate_fill_action
 
 
 class TestUtils(TestCase):
@@ -193,9 +193,33 @@ class TestUtils(TestCase):
 
         self.assertEqual(action['value'], _evaluate_literal_action(action))
 
+    @patch("gobexport.exporter.utils.get_entity_value", lambda entity, lookup_key: lookup_key)
+    def test_evaluate_fill_action(self):
+        entity = {}
+
+        test_cases = [
+            ({'length': 5, 'value': 'a', 'character': '2'}, '2222a'),
+            ({'length': 5, 'value': 'ab', 'character': '0'}, '000ab'),
+            ({'length': 1, 'value': 'ab', 'character': '0'}, 'ab'),
+        ]
+
+        for action, result in test_cases:
+            self.assertEqual(result, _evaluate_fill_action(entity, action))
+
+    def test_evaluate_fill_action_missing_keys(self):
+        valid_action = {'length': '', 'value': '', 'character': ''}
+
+        for key in valid_action.keys():
+            action = valid_action.copy()
+            del action[key]
+
+            with self.assertRaises(AssertionError):
+                _evaluate_fill_action({}, action)
+
     @patch('gobexport.exporter.utils._evaluate_concat_action')
     @patch('gobexport.exporter.utils._evaluate_literal_action')
-    def test_evaluate_action(self, mock_literal, mock_concat):
+    @patch('gobexport.exporter.utils._evaluate_fill_action')
+    def test_evaluate_action(self, mock_fill, mock_literal, mock_concat):
         entity = {}
         action = {'action': 'concat'}
         self.assertEqual(mock_concat.return_value, evaluate_action(entity, action))
@@ -204,6 +228,10 @@ class TestUtils(TestCase):
         action = {'action': 'literal'}
         self.assertEqual(mock_literal.return_value, evaluate_action(entity, action))
         mock_literal.assert_called_with(action)
+
+        action = {'action': 'fill'}
+        self.assertEqual(mock_fill.return_value, evaluate_action(entity, action))
+        mock_fill.assert_called_with(entity, action)
 
         with self.assertRaises(NotImplementedError):
             evaluate_action({}, {})

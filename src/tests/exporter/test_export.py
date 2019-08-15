@@ -158,7 +158,53 @@ class TestExportToFile(TestCase):
             'format': 'the format',
         }
         result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
-        mock_graphql_streaming.assert_called_with('host', product['query'])
+        mock_graphql_streaming.assert_called_with('host', product['query'], False)
 
         mock_buffered_iterable.assert_called_with(mock_graphql_streaming.return_value, 'source', buffer_items=False)
         product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format', append=False)
+
+    @patch("gobexport.exporter.GraphQLStreaming")
+    @patch("gobexport.exporter.BufferedIterable")
+    @patch("gobexport.exporter.product_source", lambda x: 'source')
+    def test_export_to_file_graphql_streaming_with_unfold(self, mock_buffered_iterable, mock_graphql_streaming):
+        from gobexport.exporter import export_to_file
+
+        product = {
+            'api_type': 'graphql_streaming',
+            'query': 'some query',
+            'exporter': MagicMock(),
+            'format': 'the format',
+            'unfold': 'true_or_false',
+        }
+        result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
+        mock_graphql_streaming.assert_called_with('host', product['query'], 'true_or_false')
+
+    @patch("gobexport.exporter.GraphQLStreaming")
+    @patch("gobexport.exporter.BufferedIterable")
+    @patch("gobexport.exporter.GroupFilter")
+    @patch("gobexport.exporter.product_source", lambda x: 'source')
+    def test_export_to_file_entity_filters(self, mock_group_filter, mock_buffered_iterable, mock_graphql_streaming):
+        from gobexport.exporter import export_to_file
+
+        mock_entity_filter = MagicMock()
+        mock_exporter = MagicMock()
+
+        product = {
+            'api_type': 'graphql_streaming',
+            'query': 'some query',
+            'exporter': mock_exporter,
+            'format': 'the format',
+            'unfold': 'true_or_false',
+            'entity_filters': [
+                mock_entity_filter,
+            ]
+        }
+        result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
+
+        mock_group_filter.assert_called_with([mock_entity_filter])
+        mock_exporter.assert_called_with(mock_buffered_iterable.return_value,
+                                         'file',
+                                         'the format',
+                                         append=False,
+                                         filter=mock_group_filter.return_value)
+

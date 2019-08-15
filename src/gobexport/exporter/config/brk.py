@@ -6,6 +6,8 @@ from operator import itemgetter
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
+from gobexport.filters.notempty_filter import NotEmptyFilter
+
 
 FILE_TYPE_MAPPING = {
     'csv': {
@@ -288,7 +290,6 @@ class AantekeningenExportConfig:
         identificatie
         aard
         omschrijving
-        aardZakelijkRecht
         einddatum
         heeftBetrokkenPersoon {
           edges {
@@ -301,6 +302,25 @@ class AantekeningenExportConfig:
           edges {
             node {
               identificatie
+              vanZakelijkrecht {
+                aardZakelijkRecht
+                edges {
+                  node {
+                    rustOpKadastraalobject {
+                      edges {
+                        node {
+                          identificatie
+                          perceelnummer
+                          indexletter
+                          indexnummer
+                          aangeduidDoorKadastralegemeentecode
+                          aangeduidDoorKadastralesectie
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -324,16 +344,19 @@ class AantekeningenExportConfig:
         'ATG_AARDAANTEKENING_OMS': 'aard.omschrijving',
         'ATG_OMSCHRIJVING': 'omschrijving',
         'ATG_EINDDATUM': 'einddatum',
-        'ATG_TYPE': '',
-        'BRK_KOT_ID': '',
-        'KOT_KADASTRALEGEMCODE_CODE': '',
-        'KOT_SECTIE': '',
-        'KOT_PERCEELNUMMER': '',
-        'KOT_INDEX_LETTER': '',
-        'KOT_INDEX_NUMMER': '',
+        'ATG_TYPE': {
+            'action': 'literal',
+            'value': 'Aantekening Zakelijk Recht (R)'
+        },
+        'BRK_KOT_ID': 'rustOpKadastraalobject.identificatie',
+        'KOT_KADASTRALEGEMCODE_CODE': 'rustOpKadastraalobject.aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_SECTIE': 'rustOpKadastraalobject.aangeduidDoorKadastralesectie.bronwaarde',
+        'KOT_PERCEELNUMMER': 'rustOpKadastraalobject.perceelnummer',
+        'KOT_INDEX_LETTER': 'rustOpKadastraalobject.indexletter',
+        'KOT_INDEX_NUMMER': 'rustOpKadastraalobject.indexnummer',
         'BRK_TNG_ID': 'betrokkenTenaamstelling.identificatie',
-        'ZRT_AARD_ZAKELIJKRECHT_CODE': 'aardZakelijkRecht.code',
-        'ZRT_AARD_ZAKELIJKRECHT_OMS': 'aardZakelijkRecht.omschrijving',
+        'ZRT_AARD_ZAKELIJKRECHT_CODE': 'vanZakelijkRecht.aardZakelijkRecht.code',
+        'ZRT_AARD_ZAKELIJKRECHT_OMS': 'vanZakelijkRecht.aardZakelijkRecht.omschrijving',
         'BRK_SJT_ID': 'heeftBetrokkenPersoon.identificatie',
     }
 
@@ -360,6 +383,8 @@ class AantekeningenExportConfig:
               perceelnummer
               indexletter
               indexnummer
+              aangeduidDoorKadastralegemeentecode
+              aangeduidDoorKadastralesectie
             }
           }
         }
@@ -382,10 +407,14 @@ class AantekeningenExportConfig:
         'ATG_AARDAANTEKENING_OMS': 'aard.omschrijving',
         'ATG_OMSCHRIJVING': 'omschrijving',
         'ATG_EINDDATUM': 'einddatum',
-        'ATG_TYPE': '',
+        'ATG_TYPE': {
+            'action': 'literal',
+            'value': 'Aantekening Kadastraal object (O)'
+        },
         'BRK_KOT_ID': 'heeftBetrekkingOpKadastraalObject.identificatie',
-        'KOT_KADASTRALEGEMCODE_CODE': '',
-        'KOT_SECTIE': '',
+        'KOT_KADASTRALEGEMCODE_CODE':
+            'heeftBetrekkingOpKadastraalObject.aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_SECTIE': 'heeftBetrekkingOpKadastraalObject.aangeduidDoorKadastralesectie.bronwaarde',
         'KOT_PERCEELNUMMER': 'heeftBetrekkingOpKadastraalObject.perceelnummer',
         'KOT_INDEX_LETTER': 'heeftBetrekkingOpKadastraalObject.indexletter',
         'KOT_INDEX_NUMMER': 'heeftBetrekkingOpKadastraalObject.indexnummer',
@@ -398,6 +427,7 @@ class AantekeningenExportConfig:
     products = {
         'csv_art': {
             'api_type': 'graphql_streaming',
+            'unfold': True,
             'exporter': csv_exporter,
             'query': art_query,
             'filename': filename,
@@ -406,6 +436,7 @@ class AantekeningenExportConfig:
         },
         'csv_akt': {
             'api_type': 'graphql_streaming',
+            'unfold': True,
             'exporter': csv_exporter,
             'query': akt_query,
             'filename': filename,
@@ -443,8 +474,8 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         kvk_field = 'vanKadastraalsubject.heeftKvknummerVoor.bronwaarde'
 
         attrs = {
-            'SJT_NNP_RSIN': '',
-            'SJT_NNP_KVKNUMMER': '',
+            'SJT_NNP_RSIN': 'vanKadastraalsubject.heeftRsinVoor.bronwaarde',
+            'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.heeftKvknummerVoor.bronwaarde',
             'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject'
                                        '.rechtsvorm.code',
             'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject'
@@ -466,8 +497,8 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ZRT_AARDZAKELIJKRECHT_CODE': 'aardZakelijkRecht.code',
             'ZRT_AARDZAKELIJKRECHT_OMS': 'aardZakelijkRecht.omschrijving',
             'ZRT_AARDZAKELIJKRECHT_AKR_CODE': 'akrAardZakelijkRecht',
-            'ZRT_BELAST_AZT': 'belastZakelijkeRechten.akrAardZakelijkRecht',
-            'ZRT_BELAST_MET_AZT': 'belastMetZakelijkeRechten.akrAardZakelijkRecht',
+            'ZRT_BELAST_AZT': 'belastZakelijkerechten.akrAardZakelijkRecht',
+            'ZRT_BELAST_MET_AZT': 'belastMetZakelijkerechten.akrAardZakelijkRecht',
             'ZRT_ONTSTAAN_UIT': 'ontstaanUitAppartementsrechtsplitsing',
             'ZRT_BETROKKEN_BIJ': 'betrokkenBijAppartementsrechtsplitsing',
             'ZRT_ISBEPERKT_TOT_TNG': 'isBeperktTot',
@@ -477,24 +508,34 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                     'rustOpKadastraalobject.aangeduidDoorKadastralegemeentecode.bronwaarde',
                     {
                         'action': 'literal',
-                        'value': ','
+                        'value': '-'
                     },
                     'rustOpKadastraalobject.aangeduidDoorKadastralesectie.bronwaarde',
                     {
                         'action': 'literal',
-                        'value': ','
+                        'value': '-'
                     },
-                    'rustOpKadastraalobject.perceelnummer',
+                    {
+                        'action': 'fill',
+                        'length': 5,
+                        'character': '0',
+                        'value': 'rustOpKadastraalobject.perceelnummer',
+                    },
                     {
                         'action': 'literal',
-                        'value': ','
+                        'value': '-'
                     },
                     'rustOpKadastraalobject.indexletter',
                     {
                         'action': 'literal',
-                        'value': ','
+                        'value': '-'
                     },
-                    'rustOpKadastraalobject.indexnummer',
+                    {
+                        'action': 'fill',
+                        'length': 4,
+                        'character': '0',
+                        'value': 'rustOpKadastraalobject.indexnummer',
+                    }
                 ]
             },
             'BRK_KOT_ID': 'rustOpKadastraalobject.identificatie',
@@ -563,7 +604,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
 
 
 class ZakelijkerechtenExportConfig:
-    filename = brk_filename("ZakelijkRecht")
+    filename = brk_filename("zakelijk_recht")
     format = ZakelijkerechtenCsvFormat()
 
     query = '''
@@ -605,8 +646,8 @@ class ZakelijkerechtenExportConfig:
             }
           }
         }
-        appartementsrechtsplitsingtype,
-        einddatumAppartementsrechtsplitsing,
+        appartementsrechtsplitsingtype
+        einddatumAppartementsrechtsplitsing
         indicatieActueelAppartementsrechtsplitsing
         invVanZakelijkrechtBrkTenaamstellingen {
           edges {
@@ -632,6 +673,7 @@ class ZakelijkerechtenExportConfig:
                     statutaireZetel
                     heeftBsnVoor
                     heeftKvknummerVoor
+                    heeftRsinVoor
                   }
                 }
               }
@@ -648,6 +690,7 @@ class ZakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'unfold': True,
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
@@ -691,26 +734,29 @@ class AardzakelijkerechtenExportConfig:
 
 
 class BrkBagExportConfig:
-    filename = brk_filename("BRKBAG")
+    filename = brk_filename("BRK_BAG")
     format = {
         'BRK_KOT_ID': 'identificatie',
-        'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_AKRKADGEMEENTECODE_OMS': '',  # TODO when gemeentecode is imported
+        'KOT_AKRKADGEMEENTECODE_CODE': '',  # TODO when gemeentecode is imported
+        'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
         'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
         'KOT_PERCEELNUMMER': 'perceelnummer',
         'KOT_INDEX_LETTER': 'indexletter',
         'KOT_INDEX_NUMMER': 'indexnummer',
-        'BAG_BOT_ID': 'heeftEenRelatieMetVerblijfsobject.identificatie',
+        'KOT_STATUS_CODE': 'status',
+        'KOT_MODIFICATION': 'wijzigingsdatum',
+        'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.identificatie',
+        'DIVA_VOT_ID': '',
         'AOT_OPENBARERUIMTENAAM': 'ligtAanOpenbareruimte.naam',
         'AOT_HUISNUMMER': 'heeftHoofdadres.huisnummer',
         'AOT_HUISLETTER': 'heeftHoofdadres.huisletter',
         'AOT_HUISNUMMERTOEVOEGING': 'heeftHoofdadres.huisnummertoevoeging',
         'AOT_POSTCODE': 'heeftHoofdadres.postcode',
+        'AOT_WOONPLAATSNAAM': 'ligtInWoonplaats.naam',
         'BRON_RELATIE': {
             'action': 'literal',
             'value': 'BRK'
-        },
-        'TOESTANDSDATUM_DIVA': 'toestandsdatum'
+        }
     }
 
     query = '''
@@ -725,7 +771,8 @@ class BrkBagExportConfig:
         perceelnummer
         indexletter
         indexnummer
-        toestandsdatum
+        status
+        wijzigingsdatum
         heeftEenRelatieMetVerblijfsobject {
           edges {
             node {
@@ -745,6 +792,13 @@ class BrkBagExportConfig:
                     huisletter
                     huisnummertoevoeging
                     postcode
+                    ligtInWoonplaats {
+                      edges {
+                        node {
+                          naam
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -760,7 +814,11 @@ class BrkBagExportConfig:
     products = {
         'csv': {
             'exporter': csv_exporter,
+            'entity_filters': [
+                NotEmptyFilter('heeftEenRelatieMetVerblijfsobject.identificatie'),
+            ],
             'api_type': 'graphql_streaming',
+            'unfold': True,
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',

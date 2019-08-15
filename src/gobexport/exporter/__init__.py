@@ -3,6 +3,7 @@ from gobexport.exporter.config import bag, brk, gebieden, meetbouten, nap, test
 from gobexport.graphql import GraphQL
 from gobexport.graphql_streaming import GraphQLStreaming
 from gobexport.buffered_iterable import BufferedIterable
+from gobexport.filters.group_filter import GroupFilter
 
 CONFIG_MAPPING = {
     'test_catalogue': {
@@ -73,7 +74,7 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
         api = GraphQL(host, query, catalogue, collection, expand_history, sort)
     elif product.get('api_type') == 'graphql_streaming':
         query = product['query']
-        api = GraphQLStreaming(host, query)
+        api = GraphQLStreaming(host, query, product.get('unfold', False))
     else:
         # Use the REST API
         endpoint = product.get('endpoint')
@@ -84,6 +85,11 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
 
     buffered_api = BufferedIterable(api, product_source(product), buffer_items=buffer_items)
 
-    row_count = exporter(buffered_api, file, format, append=product.get('append', False))
+    kwargs = {}
+
+    if product.get('entity_filters'):
+        kwargs['filter'] = GroupFilter(product['entity_filters'])
+
+    row_count = exporter(buffered_api, file, format, append=product.get('append', False), **kwargs)
 
     return row_count

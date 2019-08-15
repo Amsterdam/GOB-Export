@@ -58,8 +58,8 @@ def get_stream(url):
     return result.iter_lines()
 
 
-def post_stream(url, json):
-    result = requests.post(url, stream=True, json=json)
+def post_stream(url, json, **kwargs):
+    result = requests.post(url, stream=True, json=json, **kwargs)
     return result.iter_lines()
 
 

@@ -18,6 +18,7 @@ import decimal
 from gobcore.utils import ProgressTicker
 
 from gobexport.exporter.utils import nested_entity_get
+from gobexport.filters.entity_filter import EntityFilter
 
 
 def _to_plain(value, *args):
@@ -173,7 +174,7 @@ def type_convert(type_name, value, *args):
     return converters[type_name](value, *args)
 
 
-def dat_exporter(api, file, format=None, append=False):
+def dat_exporter(api, file, format=None, append=False, filter: EntityFilter=None):
     """Exports a single entity
 
     Headers:       None
@@ -194,6 +195,9 @@ def dat_exporter(api, file, format=None, append=False):
     with open(file, 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
         # Get the headers from the first record in the API
         for entity in api:
+            if filter and not filter.filter(entity):
+                continue
+
             pattern = re.compile('([\[\]\w.]+):(\w+):?({[\d\w\s:",]*}|\w+)?\|?')
             export = []
             for (attr_name, attr_type, args) in re.findall(pattern, format):

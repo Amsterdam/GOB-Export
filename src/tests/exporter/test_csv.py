@@ -52,3 +52,27 @@ class TestCsvExporter(TestCase):
 
         csv_exporter(api, file, append=True)
         mock_match_fieldnames.assert_called_once()
+
+    @patch("gobexport.exporter.csv._ensure_fieldnames_match_existing_file")
+    @patch("gobexport.exporter.csv.build_mapping_from_format")
+    @patch("builtins.open", mock_open())
+    @patch("gobexport.exporter.csv.csv")
+    @patch("gobexport.exporter.csv.shape")
+    @patch("gobexport.exporter.csv.ProgressTicker")
+    def test_csv_exporter_filter(self, mock_progress_ticker, mock_shape, mock_csv, mock_build_mapping,
+                                 mock_match_fieldnames):
+        api = ['a']
+        file = ""
+
+        csv_exporter(api, file)
+        mock_tick = mock_progress_ticker.return_value.__enter__.return_value
+        mock_tick.tick.assert_called_once()
+        mock_tick.tick.reset_mock()
+
+        mock_filter = MagicMock()
+        mock_filter.filter.return_value = False
+        csv_exporter(api, file, filter=mock_filter)
+
+        mock_filter.filter.assert_called_with('a')
+        mock_tick.tick.assert_not_called()
+
