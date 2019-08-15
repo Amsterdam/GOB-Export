@@ -1,7 +1,3 @@
-import copy
-
-from typing import List
-
 
 class GraphQlResultSorter:
     """GraphQlResultSorter
@@ -22,61 +18,6 @@ class GraphQlResultSorter:
         :param sorters:
         """
         self.sorters = sorters
-
-    def _set_value_for_all(self, lst: List[dict], key: str, value):
-        """Sets key to value for all dicts in lst
-
-        :param lst:
-        :param key:
-        :param value:
-        :return:
-        """
-        for item in lst:
-            item[key] = value
-
-    def _box_item(self, item):
-        """Boxes (flattens) an item. The input item is an item with (possibly) multiple nested relations. The result
-        is a list of all possible combinations of relations of the input item.
-
-        For example (simplified):
-
-        input = {a: 1, b: 2, c: [4,5,6]}
-
-        output = [
-            {a: 1, b: 2, c: 4},
-            {a: 1, b: 2, c: 5},
-            {a: 1, b: 2, c: 6},
-        ]
-
-        :param item:
-        :return:
-        """
-
-        # base_item is a reference item, boxed_items are the results
-        base_item = {}
-        duplicated = []
-
-        for key, value in item['node'].items():
-            if isinstance(value, dict) and 'edges' in value:
-                # Nested relation
-                base_item[key] = {'edges': []}
-
-                for edge in value['edges']:
-                    for nested_edge in self._box_item(edge):
-                        # Recursively box nested relations
-                        new_item = copy.deepcopy(base_item)
-                        new_item[key]['edges'] = [nested_edge]
-                        duplicated.append(new_item)
-            else:
-                # Copy key, value to base_item and update boxed_items
-                base_item[key] = value
-                self._set_value_for_all(duplicated, key, value)
-
-        if len(duplicated) == 0:
-            # In case we haven't duplicated base_item into boxed_items
-            duplicated = [base_item]
-
-        return [{'node': item} for item in duplicated]
 
     def _extract_value_from_item(self, item: dict, key: str):
         """Returns value for given key in item
@@ -120,24 +61,21 @@ class GraphQlResultSorter:
                 result = [item]
         return result
 
-    def sort_item(self, item):
+    def sort_items(self, items: list):
         """Sorts (the nested relations in) an item with the sorters defined in self.sorters.
         Self.sort is dictionary with key => sorter pairs, where key is of the form attr.nested.attribute and sorter is
         a function that takes two parameters x and y. Sorter should return True if x ranks higher than y.
 
-        This method first "boxes" the item; an item with relations with multiple values is transformed in a list of
-        multiple copies of the same item, but with relations containing only one element. This makes it easier to sort
-        the relations.
+        Method expects rows to be unfolded (boxed, see GraphQLResultFormatter). Only the top result will be returned.
 
         The sorted version of the item is returned.
 
         :param item:
         :return:
         """
-        boxed_items = self._box_item(item)
 
         for key, sorter in self.sorters.items():
-            boxed_items = self._sort_and_eliminate(boxed_items, key, sorter)
+            items = self._sort_and_eliminate(items, key, sorter)
 
         # Return first item
-        return boxed_items[0]
+        return items[0]
