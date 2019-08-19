@@ -900,6 +900,7 @@ class StukdelenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'unfold': True,
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
@@ -912,8 +913,8 @@ class KadastraleobjectenExportConfig:
     filename = brk_filename('KadastraalObject')
     format = {
         'BRK_KOT_ID': 'identificatie',
-        # TODO Gemeente codes etc after correct import of gemeentes
-        'KOT_GEMEENTENAAM': 'gemeente',
+        'KOT_GEMEENTENAAM': 'aangeduidDoorGemeente.naam',
+        # TODO Gemeente codes etc after correct import of kadastrale gemeentes and codes
         'KOT_AKRKADGEMCODE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
         'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
         'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.bronwaarde',
@@ -999,8 +1000,18 @@ class KadastraleobjectenExportConfig:
                 ]
             },
         },
-        'SJT_VVE_SJT_ID': '',
-        'SJT_VVE_UIT_EIGENDOM': '',
+        'SJT_VVE_SJT_ID': {
+            'condition': 'isempty',
+            'reference': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].betrokkenBijAppartementsrechtsplitsing',
+            'negate': True,
+            'trueval': 'vanKadastraalsubject.[0].identificatie',
+        },
+        'SJT_VVE_UIT_EIGENDOM': {
+            'condition': 'isempty',
+            'reference': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].betrokkenBijAppartementsrechtsplitsing',
+            'negate': True,
+            'trueval': 'vanKadastraalsubject.[0].statutaireNaam',
+        },
         'KOT_INONDERZOEK': 'inOnderzoek',
         'KOT_MODIFICATION': 'wijzigingsdatum',
         'GEOMETRIE': 'geometrie'
@@ -1014,7 +1025,13 @@ class KadastraleobjectenExportConfig:
         identificatie
         volgnummer
         gemeente
-        aangeduidDoorGemeente
+        aangeduidDoorGemeente {
+          edges {
+            node {
+              naam
+            }
+          }
+        }
         aangeduidDoorKadastralegemeentecode
         aangeduidDoorKadastralegemeente
         aangeduidDoorKadastralesectie
@@ -1047,6 +1064,7 @@ class KadastraleobjectenExportConfig:
             node {
               identificatie
               aardZakelijkRecht
+              betrokkenBijAppartementsrechtsplitsing
               invVanZakelijkrechtBrkTenaamstellingen {
                 edges {
                   node {
