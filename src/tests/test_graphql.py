@@ -150,85 +150,19 @@ def test_graphql(monkeypatch):
     # assert(cnt == 2)
 
 
-def test_flatten_edge():
-    api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
-    edge = {
-        'node': {
-            'reference': {
-                'edges': [
-                    {
-                        'node': {
-                            'value': 'value'
-                        }
-                    }
-                ]
-            }
-        }
-    }
-
-    nested_edge = {
-        "node": {
-            "value": "value",
-            "reference": {
-                "edges": [
-                    {
-                        "node": {
-                            "value": "value",
-                            "nested_reference": {
-                                "edges": [
-                                    {
-                                        "node": {
-                                            "nested_value": "value"
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                ]
-            },
-            "empty_reference": {
-                "edges": [
-                    {
-                        "node": {
-                            "empty_nested_reference": {
-                                "edges": []
-                            }
-                        }
-                    }
-                ]
-            }
-        }
-    }
-
-    expected_result = {'reference': [{'value': 'value'}]}
-    result = api._flatten_edge(edge)
-    assert (expected_result == result)
-
-    expected_result = {
-        'value': 'value',
-        'reference': [{'value': 'value'}],
-        'nested_reference': [{'nested_value': 'value'}],
-        'empty_reference': [],
-        'empty_nested_reference': [],
-    }
-    result = api._flatten_edge(nested_edge)
-    assert (expected_result == result)
-
-
 class TestGraphQl(TestCase):
 
     def test_constructor_sorter(self):
         api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
-        self.assertIsNone(api.sorter)
+        self.assertIsNotNone(api.formatter)
 
         api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=MagicMock())
-        self.assertIsNotNone(api.sorter)
+        self.assertIsNotNone(api.formatter)
 
     @patch("gobexport.graphql.requests.post")
-    @patch("gobexport.graphql.GraphQlResultSorter")
+    @patch("gobexport.graphql.GraphQLResultFormatter")
     @patch("gobexport.graphql.time.time")
-    def test_iter_with_sorter(self, mock_time, mock_sorter, mock_post):
+    def test_iter_with_formatter(self, mock_time, mock_formatter, mock_post):
         sort = {"some": "sortdef"}
         api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=sort)
         api._flatten_edge = MagicMock()
@@ -251,9 +185,8 @@ class TestGraphQl(TestCase):
         for a in api:
             pass
 
-        mock_sorter.assert_called_with(sort)
-        mock_sorter.return_value.sort_item.assert_called_once()
-        api._flatten_edge.assert_called_with(mock_sorter.return_value.sort_item.return_value)
+        mock_formatter.assert_called_with(False, sort=sort, unfold=False)
+        mock_formatter.return_value.format_item.assert_called_once()
 
     def test_update_query(self):
         api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
