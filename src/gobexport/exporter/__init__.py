@@ -45,6 +45,8 @@ CONFIG_MAPPING = {
         'stukdelen': brk.StukdelenExportConfig,
         'kadastraleobjecten': brk.KadastraleobjectenExportConfig,
         'gemeentes': brk.GemeentesExportConfig,
+        'bijpijling': brk.BijpijlingExportConfig,
+        'perceelnummer': brk.PerceelnummerExportConfig,
     }
 }
 

@@ -26,9 +26,10 @@ def add_field_definitions(layer, fieldnames):
 
 
 def create_geometry(entity_geometry):
+    # Get geometry from GEOJSON or WKTstring (GraphQLStreaming)
+    geometry_wkt = shape(entity_geometry).wkt if isinstance(entity_geometry, dict) else entity_geometry
     # Add geometrie
-    poly = ogr.CreateGeometryFromWkt(shape(entity_geometry).wkt)
-
+    poly = ogr.CreateGeometryFromWkt(geometry_wkt)
     # Force geometriecollection to polygon
     if poly.GetGeometryType() == ogr.wkbGeometryCollection:
         poly = ogr.ForceToPolygon(poly)
@@ -36,10 +37,10 @@ def create_geometry(entity_geometry):
     return poly
 
 
-def _get_geometry_type(entity):
+def _get_geometry_type(entity_geometry):
     # Try to get the geometry type from the first record
     try:
-        geometry_type = create_geometry(entity['geometrie']).GetGeometryType()
+        geometry_type = create_geometry(entity_geometry).GetGeometryType()
     except (KeyError, AttributeError) as e:
         geometry_type = ogr.wkbPolygon
     return geometry_type
@@ -70,6 +71,8 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
     spatialref = osr.SpatialReference()
     spatialref.ImportFromEPSG(28992)
 
+    geometry_field = format['geometrie'] if 'geometrie' in format.keys() else 'geometrie'
+
     with ProgressTicker(f"Export entities", 10000) as progress:
         # Get records from the API and build the esri file
         for entity in api:
@@ -79,19 +82,19 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
             # On the first entity determine the type of shapefile we need to export
             if row_count == 0:
                 # Please note that it will fail if a file with the same name already exists
-                geometry_type = _get_geometry_type(entity)
+                geometry_type = _get_geometry_type(entity[geometry_field])
                 dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=geometry_type)
 
                 # Add all field definitions
                 add_field_definitions(dstlayer, format.keys())
 
             feature = ogr.Feature(dstlayer.GetLayerDefn())
+            if entity[geometry_field]:
+                feature.SetGeometry(create_geometry(entity[geometry_field]))
 
-            if entity['geometrie']:
-                feature.SetGeometry(create_geometry(entity['geometrie']))
-
-            # Add all fields from the config to the file
-            for attribute_name, source in format.items():
+            # Add all fields from the config to the file, except for geometrie
+            all_fields = {k: v for k, v in format.items() if k is not 'geometrie'}
+            for attribute_name, source in all_fields.items():
                 mapping = split_field_reference(source)
                 value = get_entity_value(entity, mapping)
 
