@@ -46,6 +46,7 @@ CONFIG_MAPPING = {
         'kadastraleobjecten': brk.KadastraleobjectenExportConfig,
         'gemeentes': brk.GemeentesExportConfig,
         'bijpijling': brk.BijpijlingExportConfig,
+        'perceelnummer': brk.PerceelnummerExportConfig,
     }
 }
 
