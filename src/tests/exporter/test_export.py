@@ -84,7 +84,7 @@ class MockFile:
         MockFile.s += s
 
 
-def mock_open(file, mode):
+def mock_open(file, mode, encoding='utf-8-sig'):
     return MockFile()
 
 
@@ -208,4 +208,3 @@ class TestExportToFile(TestCase):
                                          'the format',
                                          append=False,
                                          filter=mock_group_filter.return_value)
-
