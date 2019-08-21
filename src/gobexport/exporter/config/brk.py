@@ -362,7 +362,7 @@ class AantekeningenExportConfig:
 
     akt_query = '''
 {
-  aantekeningenkadastraleobjecten {
+  brkAantekeningenkadastraleobjecten {
     edges {
       node {
         identificatie
@@ -598,7 +598,7 @@ class ZakelijkerechtenExportConfig:
 
     query = '''
 {
-  zakelijkerechten {
+  brkZakelijkerechten {
     edges {
       node {
         identificatie
@@ -698,7 +698,7 @@ class AardzakelijkerechtenExportConfig:
 
     query = '''
 {
-  aardzakelijkerechten(sort:code_asc) {
+  brkAardzakelijkerechten(sort:code_asc) {
     edges {
       node {
         code
@@ -783,7 +783,7 @@ class BrkBagExportConfig:
 
     query = '''
 {
-  kadastraleobjecten {
+  brkKadastraleobjecten {
     edges {
       node {
         identificatie
@@ -883,7 +883,7 @@ class StukdelenExportConfig:
 
     query = '''
 {
-  stukdelen {
+  brkStukdelen {
     edges {
       node {
         identificatie
@@ -1054,7 +1054,7 @@ class KadastraleobjectenExportConfig:
 
     query = '''
 {
-  kadastraleobjecten {
+  brkKadastraleobjecten {
     edges {
       node {
         identificatie
@@ -1169,7 +1169,7 @@ class GemeentesExportConfig:
 
     query = '''
 {
-  gemeentes(sort:naam_asc) {
+  brkGemeentes(sort:naam_asc) {
     edges {
       node {
         identificatie
@@ -1226,7 +1226,7 @@ class BijpijlingExportConfig:
 
     query = '''
 {
-  kadastraleobjecten(indexletter: "G") {
+  brkKadastraleobjecten(indexletter: "G") {
     edges {
       node {
         identificatie
@@ -1260,8 +1260,8 @@ class BijpijlingExportConfig:
             ],
             'mime_type': 'application/octet-stream',
             'format': {
-                'BRK_KOT_ID': 'naam',
-                'GEMEENTE': 'identificatie',
+                'BRK_KOT_ID': 'identificatien',
+                'GEMEENTE': 'naam',
                 'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
                 'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
                 'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
@@ -1293,7 +1293,7 @@ class PerceelnummerExportConfig:
 
     query = '''
 {
-  kadastraleobjecten(indexletter: "G") {
+  brkKadastraleobjecten(indexletter: "G") {
     edges {
       node {
         identificatie
@@ -1328,8 +1328,8 @@ class PerceelnummerExportConfig:
             ],
             'mime_type': 'application/octet-stream',
             'format': {
-                'BRK_KOT_ID': 'naam',
-                'GEMEENTE': 'identificatie',
+                'BRK_KOT_ID': 'identificatie',
+                'GEMEENTE': 'naam',
                 'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
                 'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
                 'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',

@@ -27,7 +27,7 @@ class BeperkingenExportConfig:
 
     query_actueel = '''
 {
-  beperkingen {
+  wkpbBeperkingen {
     edges {
       node {
         identificatie
@@ -42,7 +42,7 @@ class BeperkingenExportConfig:
 
     query_type = '''
 {
-  beperkingen(sort: beperking_asc) {
+  wkpbBeperkingen(sort: beperking_asc) {
     edges {
       node {
         beperking
@@ -54,7 +54,7 @@ class BeperkingenExportConfig:
 
     query_orgaan = '''
 {
-  beperkingen(sort: orgaan_asc) {
+  wkpbBeperkingen(sort: orgaan_asc) {
     edges {
       node {
         orgaan
