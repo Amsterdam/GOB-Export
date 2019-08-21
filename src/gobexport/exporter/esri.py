@@ -85,15 +85,14 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
                 geometry_type = _get_geometry_type(entity[geometry_field])
                 dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=geometry_type)
 
-                # Add all field definitions
-                add_field_definitions(dstlayer, format.keys())
+                # Add all field definitions, but skip geometrie
+                all_fields = {k: v for k, v in format.items() if k is not 'geometrie'}
+                add_field_definitions(dstlayer, all_fields.keys())
 
             feature = ogr.Feature(dstlayer.GetLayerDefn())
             if entity[geometry_field]:
                 feature.SetGeometry(create_geometry(entity[geometry_field]))
 
-            # Add all fields from the config to the file, except for geometrie
-            all_fields = {k: v for k, v in format.items() if k is not 'geometrie'}
             for attribute_name, source in all_fields.items():
                 mapping = split_field_reference(source)
                 value = get_entity_value(entity, mapping)

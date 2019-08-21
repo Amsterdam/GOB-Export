@@ -58,6 +58,7 @@ class StadsdelenExportConfig:
                 'docnummer': 'documentnummer',
                 'gme_id': 'ligtInGemeente.identificatie',
                 'gme_naam': 'ligtInGemeente.naam',
+                'geometrie': 'geometrie'
             },
             'extra_files': [
                 {
@@ -99,7 +100,7 @@ class StadsdelenExportConfig:
             },
             'query': """
 {
-  stadsdelen(sort: [code_asc, volgnummer_asc], active: false) {
+  gebiedenStadsdelen(sort: [code_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -219,7 +220,7 @@ class GGPGebiedenExportConfig:
             },
             'query': '''
 {
-  ggpgebieden(sort: [identificatie_asc, volgnummer_asc], active: false) {
+  gebiedenGgpgebieden(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -350,7 +351,7 @@ class GGWGebiedenExportConfig:
             },
             'query': '''
 {
-  ggwgebieden(sort: [identificatie_asc, volgnummer_asc], active: false) {
+  gebiedenGgwgebieden(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -494,7 +495,7 @@ class WijkenExportConfig:
             },
             'query': '''
 {
-  wijken(sort: [code_asc, volgnummer_asc], active: false) {
+  gebiedenWijken(sort: [code_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -671,7 +672,7 @@ class BuurtenExportConfig:
             },
             'query': '''
 {
-  buurten(sort: [identificatie_asc, volgnummer_asc], active: false) {
+  gebiedenBuurten(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -870,7 +871,7 @@ class BouwblokkenExportConfig:
             },
             'query': '''
 {
-  bouwblokken(sort: [code_asc, volgnummer_asc], active: false) {
+  gebiedenBouwblokken(sort: [code_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
