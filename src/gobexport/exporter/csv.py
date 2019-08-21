@@ -84,7 +84,7 @@ def csv_exporter(api, file, format=None, append=False, filter: EntityFilter=None
     if append:
         _ensure_fieldnames_match_existing_file(fieldnames, file)
 
-    with open(file, 'a' if append else 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
+    with open(file, 'a' if append else 'w', encoding='utf-8-sig') as fp, ProgressTicker(f"Export entities", 10000) as progress:
         # Get the fieldnames from the mapping
         writer = csv.DictWriter(fp, fieldnames=fieldnames, delimiter=';')
 

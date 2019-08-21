@@ -116,6 +116,8 @@ class StadsdelenExportConfig:
             node {
               identificatie
               naam
+              beginGeldigheid
+              eindGeldigheid
             }
           }
         }
@@ -239,6 +241,16 @@ class GGPGebiedenExportConfig:
               naam
               beginGeldigheid
               eindGeldigheid
+              ligtInGemeente(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
             }
           }
         }
@@ -360,6 +372,16 @@ class GGWGebiedenExportConfig:
               naam
               beginGeldigheid
               eindGeldigheid
+              ligtInGemeente(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
             }
           }
         }
@@ -507,6 +529,16 @@ class WijkenExportConfig:
               naam
               beginGeldigheid
               eindGeldigheid
+              ligtInGemeente(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    naam
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
             }
           }
         }
@@ -695,6 +727,16 @@ class BuurtenExportConfig:
                     naam
                     beginGeldigheid
                     eindGeldigheid
+                    ligtInGemeente(active: false) {
+                      edges {
+                        node {
+                          identificatie
+                          naam
+                          beginGeldigheid
+                          eindGeldigheid
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -889,6 +931,16 @@ class BouwblokkenExportConfig:
                           naam
                           beginGeldigheid
                           eindGeldigheid
+                          ligtInGemeente(active: false) {
+                            edges {
+                              node {
+                                identificatie
+                                naam
+                                beginGeldigheid
+                                eindGeldigheid
+                              }
+                            }
+                          }
                         }
                       }
                     }
