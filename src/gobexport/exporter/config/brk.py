@@ -722,31 +722,64 @@ class AardzakelijkerechtenExportConfig:
     }
 
 
+class BrkBagCsvFormat:
+
+    def if_vot_relation(self, trueval: str, falseval: str):
+        return {
+            'condition': 'isempty',
+            'reference': 'heeftEenRelatieMetVerblijfsobject.[0].identificatie',
+            'negate': True,
+            'trueval': trueval,
+            'falseval': falseval,
+        }
+
+    def get_format(self):
+        return {
+            'BRK_KOT_ID': 'identificatie',
+            'KOT_AKRKADGEMEENTECODE_CODE': '',  # TODO when gemeentecode is imported
+            'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+            'KOT_PERCEELNUMMER': 'perceelnummer',
+            'KOT_INDEX_LETTER': 'indexletter',
+            'KOT_INDEX_NUMMER': 'indexnummer',
+            'KOT_STATUS_CODE': 'status',
+            'KOT_MODIFICATION': 'wijzigingsdatum',
+            'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.[0].bronwaarde',
+            'DIVA_VOT_ID': '',
+            'AOT_OPENBARERUIMTENAAM': self.if_vot_relation(
+                trueval='ligtAanOpenbareruimte.naam',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.openbareruimtenaam'
+            ),
+            'AOT_HUISNUMMER': self.if_vot_relation(
+                trueval='heeftHoofdadres.huisnummer',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisnummer'
+            ),
+            'AOT_HUISLETTER': self.if_vot_relation(
+                trueval='heeftHoofdadres.huisletter',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisletter'
+            ),
+            'AOT_HUISNUMMERTOEVOEGING': self.if_vot_relation(
+                trueval='heeftHoofdadres.huisnummertoevoeging',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisnummertoevoeging'
+            ),
+            'AOT_POSTCODE': self.if_vot_relation(
+                trueval='heeftHoofdadres.postcode',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.postcode'
+            ),
+            'AOT_WOONPLAATSNAAM': self.if_vot_relation(
+                trueval='ligtInWoonplaats.naam',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam'
+            ),
+            'BRON_RELATIE': {
+                'action': 'literal',
+                'value': 'BRK'
+            }
+        }
+
+
 class BrkBagExportConfig:
     filename = brk_filename("BRK_BAG")
-    format = {
-        'BRK_KOT_ID': 'identificatie',
-        'KOT_AKRKADGEMEENTECODE_CODE': '',  # TODO when gemeentecode is imported
-        'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
-        'KOT_PERCEELNUMMER': 'perceelnummer',
-        'KOT_INDEX_LETTER': 'indexletter',
-        'KOT_INDEX_NUMMER': 'indexnummer',
-        'KOT_STATUS_CODE': 'status',
-        'KOT_MODIFICATION': 'wijzigingsdatum',
-        'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.identificatie',
-        'DIVA_VOT_ID': '',
-        'AOT_OPENBARERUIMTENAAM': 'ligtAanOpenbareruimte.naam',
-        'AOT_HUISNUMMER': 'heeftHoofdadres.huisnummer',
-        'AOT_HUISLETTER': 'heeftHoofdadres.huisletter',
-        'AOT_HUISNUMMERTOEVOEGING': 'heeftHoofdadres.huisnummertoevoeging',
-        'AOT_POSTCODE': 'heeftHoofdadres.postcode',
-        'AOT_WOONPLAATSNAAM': 'ligtInWoonplaats.naam',
-        'BRON_RELATIE': {
-            'action': 'literal',
-            'value': 'BRK'
-        }
-    }
+    format = BrkBagCsvFormat()
 
     query = '''
 {
@@ -766,6 +799,8 @@ class BrkBagExportConfig:
           edges {
             node {
               identificatie
+              bronwaarde
+              broninfo
                 heeftHoofdadres {
                 edges {
                   node {
@@ -804,14 +839,14 @@ class BrkBagExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'entity_filters': [
-                NotEmptyFilter('heeftEenRelatieMetVerblijfsobject.identificatie'),
+                NotEmptyFilter('heeftEenRelatieMetVerblijfsobject.[0].bronwaarde'),
             ],
             'api_type': 'graphql_streaming',
             'unfold': True,
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
-            'format': format,
+            'format': format.get_format(),
         }
     }
 
