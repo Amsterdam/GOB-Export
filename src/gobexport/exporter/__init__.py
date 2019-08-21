@@ -1,5 +1,5 @@
 from gobexport.api import API
-from gobexport.exporter.config import bag, brk, gebieden, meetbouten, nap, test
+from gobexport.exporter.config import bag, brk, gebieden, meetbouten, nap, test, wkpb
 from gobexport.graphql import GraphQL
 from gobexport.graphql_streaming import GraphQLStreaming
 from gobexport.buffered_iterable import BufferedIterable
@@ -47,6 +47,9 @@ CONFIG_MAPPING = {
         'gemeentes': brk.GemeentesExportConfig,
         'bijpijling': brk.BijpijlingExportConfig,
         'perceelnummer': brk.PerceelnummerExportConfig,
+    },
+    'wkpb': {
+        'beperkingen': wkpb.BeperkingenExportConfig,
     }
 }
 
