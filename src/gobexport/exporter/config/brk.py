@@ -1,4 +1,5 @@
 import datetime
+import dateutil.parser as dt_parser
 
 from fractions import Fraction
 from operator import itemgetter
@@ -46,6 +47,20 @@ def sort_attributes(attrs: dict, ordering: list):
     assert set(attrs.keys()) == set(ordering), "Attribute keys don't match the items to sort"
 
     return {k: attrs[k] for k in ordering}
+
+
+def format_atg_timestamp(datetimestr: str) -> str:
+    """Transforms the datetimestr from ISO-format to the format used in the ATG export: yyyymmddhhmmss
+
+    :param datetimestr:
+    :return:
+    """
+    try:
+        dt = dt_parser.parse(datetimestr)
+        return dt.strftime('%Y%m%d%H%M%S')
+    except ValueError:
+        # If invalid datetimestr, just return the original string so that no data is lost
+        return datetimestr
 
 
 class BrkCsvFormat:
@@ -343,7 +358,11 @@ class AantekeningenExportConfig:
         'ATG_AARDAANTEKENING_CODE': 'aard.code',
         'ATG_AARDAANTEKENING_OMS': 'aard.omschrijving',
         'ATG_OMSCHRIJVING': 'omschrijving',
-        'ATG_EINDDATUM': 'einddatum',
+        'ATG_EINDDATUM': {
+            'action': 'format',
+            'formatter': format_atg_timestamp,
+            'value': 'einddatum',
+        },
         'ATG_TYPE': {
             'action': 'literal',
             'value': 'Aantekening Zakelijk Recht (R)'
@@ -406,7 +425,11 @@ class AantekeningenExportConfig:
         'ATG_AARDAANTEKENING_CODE': 'aard.code',
         'ATG_AARDAANTEKENING_OMS': 'aard.omschrijving',
         'ATG_OMSCHRIJVING': 'omschrijving',
-        'ATG_EINDDATUM': 'einddatum',
+        'ATG_EINDDATUM': {
+            'action': 'format',
+            'formatter': format_atg_timestamp,
+            'value': 'einddatum',
+        },
         'ATG_TYPE': {
             'action': 'literal',
             'value': 'Aantekening Kadastraal object (O)'
