@@ -109,3 +109,64 @@ class BeperkingenExportConfig:
             'query': query_orgaan
         },
     }
+
+
+class BrondocumentenExportConfig:
+
+    query_actueel = '''
+{
+  wkpbBrondocumenten {
+    edges {
+      node {
+        documentnummer
+        invHeeftBrondocumentenWkpbDossiers {
+          edges {
+            node {
+              dossier
+              invHeeftDossierWkpbBeperkingen {
+                edges {
+                  node {
+                    identificatie
+                    persoonsgegevensAfschermen
+                    orgaan
+                    aard
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'csv_actueel': {
+            'api_type': 'graphql',
+            'entity_filters': [
+                NotEmptyFilter('invHeeftDossierWkpbBeperkingen.identificatie'),
+            ],
+            'exporter': csv_exporter,
+            'filename': 'CSV_Actueel/WKPB_brondocument.csv',
+            'format': {
+                'identificatie': 'invHeeftDossierWkpbBeperkingen.[0].identificatie',
+                'orgaanCode': 'invHeeftDossierWkpbBeperkingen.[0].orgaan.code',
+                'documentnummer': 'documentnummer',
+                'persoonsgegevensAfschermen': {
+                    'condition': 'isempty',
+                    'trueval': {
+                        'action': 'literal',
+                        'value': 'N',
+                    },
+                    'falseval': 'invHeeftDossierWkpbBeperkingen.[0].persoonsgegevensAfschermen',
+                    'reference': 'invHeeftDossierWkpbBeperkingen.[0].persoonsgegevensAfschermen',
+                },
+                'aard': 'invHeeftDossierWkpbBeperkingen.[0].aard.omschrijving'
+            },
+            'mime_type': 'plain/text',
+            'query': query_actueel,
+            'unfold': True
+        },
+    }

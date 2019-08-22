@@ -50,6 +50,7 @@ CONFIG_MAPPING = {
     },
     'wkpb': {
         'beperkingen': wkpb.BeperkingenExportConfig,
+        'brondocumenten': wkpb.BrondocumentenExportConfig,
     }
 }
 
