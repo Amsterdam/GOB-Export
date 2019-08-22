@@ -1254,13 +1254,13 @@ class BijpijlingExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'filename': brk_filename('Bijpijling', 'shp'),
+            'filename': 'BRK_bijpijling.shp',
             'entity_filters': [
                 NotEmptyFilter('bijpijlingGeometrie'),
             ],
             'mime_type': 'application/octet-stream',
             'format': {
-                'BRK_KOT_ID': 'identificatien',
+                'BRK_KOT_ID': 'identificatie',
                 'GEMEENTE': 'naam',
                 'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
                 'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
@@ -1272,15 +1272,15 @@ class BijpijlingExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': brk_filename('Bijpijling', 'dbf'),
+                    'filename': 'BRK_bijpijling.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Bijpijling', 'shx'),
+                    'filename': 'BRK_bijpijling.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Bijpijling', 'prj'),
+                    'filename': 'BRK_bijpijling.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1322,7 +1322,7 @@ class PerceelnummerExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'filename': brk_filename('Perceelnummer', 'shp'),
+            'filename': 'BRK_perceelnummer.shp',
             'entity_filters': [
                 NotEmptyFilter('plaatscoordinaten'),
             ],
@@ -1341,15 +1341,15 @@ class PerceelnummerExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': brk_filename('Perceelnummer', 'dbf'),
+                    'filename': 'BRK_perceelnummer.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Perceelnummer', 'shx'),
+                    'filename': 'BRK_perceelnummer.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Perceelnummer', 'prj'),
+                    'filename': 'BRK_perceelnummer.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
