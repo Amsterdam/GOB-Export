@@ -362,7 +362,7 @@ class AantekeningenExportConfig:
 
     akt_query = '''
 {
-  aantekeningenkadastraleobjecten {
+  brkAantekeningenkadastraleobjecten {
     edges {
       node {
         identificatie
@@ -598,7 +598,7 @@ class ZakelijkerechtenExportConfig:
 
     query = '''
 {
-  zakelijkerechten {
+  brkZakelijkerechten {
     edges {
       node {
         identificatie
@@ -698,7 +698,7 @@ class AardzakelijkerechtenExportConfig:
 
     query = '''
 {
-  aardzakelijkerechten(sort:code_asc) {
+  brkAardzakelijkerechten(sort:code_asc) {
     edges {
       node {
         code
@@ -722,35 +722,68 @@ class AardzakelijkerechtenExportConfig:
     }
 
 
+class BrkBagCsvFormat:
+
+    def if_vot_relation(self, trueval: str, falseval: str):
+        return {
+            'condition': 'isempty',
+            'reference': 'heeftEenRelatieMetVerblijfsobject.[0].identificatie',
+            'negate': True,
+            'trueval': trueval,
+            'falseval': falseval,
+        }
+
+    def get_format(self):
+        return {
+            'BRK_KOT_ID': 'identificatie',
+            'KOT_AKRKADGEMEENTECODE_CODE': '',  # TODO when gemeentecode is imported
+            'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+            'KOT_PERCEELNUMMER': 'perceelnummer',
+            'KOT_INDEX_LETTER': 'indexletter',
+            'KOT_INDEX_NUMMER': 'indexnummer',
+            'KOT_STATUS_CODE': 'status',
+            'KOT_MODIFICATION': 'wijzigingsdatum',
+            'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.[0].bronwaarde',
+            'DIVA_VOT_ID': '',
+            'AOT_OPENBARERUIMTENAAM': self.if_vot_relation(
+                trueval='ligtAanOpenbareruimte.naam',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.openbareruimtenaam'
+            ),
+            'AOT_HUISNUMMER': self.if_vot_relation(
+                trueval='heeftHoofdadres.huisnummer',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisnummer'
+            ),
+            'AOT_HUISLETTER': self.if_vot_relation(
+                trueval='heeftHoofdadres.huisletter',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisletter'
+            ),
+            'AOT_HUISNUMMERTOEVOEGING': self.if_vot_relation(
+                trueval='heeftHoofdadres.huisnummertoevoeging',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisnummertoevoeging'
+            ),
+            'AOT_POSTCODE': self.if_vot_relation(
+                trueval='heeftHoofdadres.postcode',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.postcode'
+            ),
+            'AOT_WOONPLAATSNAAM': self.if_vot_relation(
+                trueval='ligtInWoonplaats.naam',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam'
+            ),
+            'BRON_RELATIE': {
+                'action': 'literal',
+                'value': 'BRK'
+            }
+        }
+
+
 class BrkBagExportConfig:
     filename = brk_filename("BRK_BAG")
-    format = {
-        'BRK_KOT_ID': 'identificatie',
-        'KOT_AKRKADGEMEENTECODE_CODE': '',  # TODO when gemeentecode is imported
-        'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
-        'KOT_PERCEELNUMMER': 'perceelnummer',
-        'KOT_INDEX_LETTER': 'indexletter',
-        'KOT_INDEX_NUMMER': 'indexnummer',
-        'KOT_STATUS_CODE': 'status',
-        'KOT_MODIFICATION': 'wijzigingsdatum',
-        'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.identificatie',
-        'DIVA_VOT_ID': '',
-        'AOT_OPENBARERUIMTENAAM': 'ligtAanOpenbareruimte.naam',
-        'AOT_HUISNUMMER': 'heeftHoofdadres.huisnummer',
-        'AOT_HUISLETTER': 'heeftHoofdadres.huisletter',
-        'AOT_HUISNUMMERTOEVOEGING': 'heeftHoofdadres.huisnummertoevoeging',
-        'AOT_POSTCODE': 'heeftHoofdadres.postcode',
-        'AOT_WOONPLAATSNAAM': 'ligtInWoonplaats.naam',
-        'BRON_RELATIE': {
-            'action': 'literal',
-            'value': 'BRK'
-        }
-    }
+    format = BrkBagCsvFormat()
 
     query = '''
 {
-  kadastraleobjecten {
+  brkKadastraleobjecten {
     edges {
       node {
         identificatie
@@ -766,6 +799,8 @@ class BrkBagExportConfig:
           edges {
             node {
               identificatie
+              bronwaarde
+              broninfo
                 heeftHoofdadres {
                 edges {
                   node {
@@ -804,14 +839,14 @@ class BrkBagExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'entity_filters': [
-                NotEmptyFilter('heeftEenRelatieMetVerblijfsobject.identificatie'),
+                NotEmptyFilter('heeftEenRelatieMetVerblijfsobject.[0].bronwaarde'),
             ],
             'api_type': 'graphql_streaming',
             'unfold': True,
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
-            'format': format,
+            'format': format.get_format(),
         }
     }
 
@@ -848,7 +883,7 @@ class StukdelenExportConfig:
 
     query = '''
 {
-  stukdelen {
+  brkStukdelen {
     edges {
       node {
         identificatie
@@ -1019,7 +1054,7 @@ class KadastraleobjectenExportConfig:
 
     query = '''
 {
-  kadastraleobjecten {
+  brkKadastraleobjecten {
     edges {
       node {
         identificatie
@@ -1134,7 +1169,7 @@ class GemeentesExportConfig:
 
     query = '''
 {
-  gemeentes(sort:naam_asc) {
+  brkGemeentes(sort:naam_asc) {
     edges {
       node {
         identificatie
@@ -1191,7 +1226,7 @@ class BijpijlingExportConfig:
 
     query = '''
 {
-  kadastraleobjecten(indexletter: "G") {
+  brkKadastraleobjecten(indexletter: "G") {
     edges {
       node {
         identificatie
@@ -1219,14 +1254,14 @@ class BijpijlingExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'filename': brk_filename('Bijpijling', 'shp'),
+            'filename': 'BRK_bijpijling.shp',
             'entity_filters': [
                 NotEmptyFilter('bijpijlingGeometrie'),
             ],
             'mime_type': 'application/octet-stream',
             'format': {
-                'BRK_KOT_ID': 'naam',
-                'GEMEENTE': 'identificatie',
+                'BRK_KOT_ID': 'identificatie',
+                'GEMEENTE': 'naam',
                 'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
                 'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
                 'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
@@ -1237,15 +1272,15 @@ class BijpijlingExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': brk_filename('Bijpijling', 'dbf'),
+                    'filename': 'BRK_bijpijling.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Bijpijling', 'shx'),
+                    'filename': 'BRK_bijpijling.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Bijpijling', 'prj'),
+                    'filename': 'BRK_bijpijling.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1258,7 +1293,7 @@ class PerceelnummerExportConfig:
 
     query = '''
 {
-  kadastraleobjecten(indexletter: "G") {
+  brkKadastraleobjecten(indexletter: "G") {
     edges {
       node {
         identificatie
@@ -1287,14 +1322,14 @@ class PerceelnummerExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'filename': brk_filename('Perceelnummer', 'shp'),
+            'filename': 'BRK_perceelnummer.shp',
             'entity_filters': [
                 NotEmptyFilter('plaatscoordinaten'),
             ],
             'mime_type': 'application/octet-stream',
             'format': {
-                'BRK_KOT_ID': 'naam',
-                'GEMEENTE': 'identificatie',
+                'BRK_KOT_ID': 'identificatie',
+                'GEMEENTE': 'naam',
                 'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
                 'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
                 'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
@@ -1306,15 +1341,15 @@ class PerceelnummerExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': brk_filename('Perceelnummer', 'dbf'),
+                    'filename': 'BRK_perceelnummer.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Perceelnummer', 'shx'),
+                    'filename': 'BRK_perceelnummer.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Perceelnummer', 'prj'),
+                    'filename': 'BRK_perceelnummer.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],

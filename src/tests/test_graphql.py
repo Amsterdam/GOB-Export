@@ -63,7 +63,7 @@ class MockResponse:
         global next
         result = {
             'data': {
-                'woonplaatsen': {
+                'bagWoonplaatsen': {
                     'edges': self.results,
                     'pageInfo': {
                         'endCursor': 'YXJyYXljb25uZWN0aW9uOjU=',
@@ -86,10 +86,10 @@ def test_graphql(monkeypatch):
 
     from gobexport.graphql import GraphQL
 
-    query = '{woonplaatsen {edges {node { id}}}}'
+    query = '{bagWoonplaatsen {edges {node { id}}}}'
 
     api = GraphQL('host', query, 'bag', 'woonplaatsen')
-    assert (str(api) == 'GraphQL woonplaatsen')
+    assert (str(api) == 'GraphQL bagWoonplaatsen')
 
     # # Expect first, after and pageInfo to be present the query
     # expected_query = '{woonplaatsen(first: 100, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
@@ -153,10 +153,10 @@ def test_graphql(monkeypatch):
 class TestGraphQl(TestCase):
 
     def test_constructor_sorter(self):
-        api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
+        api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
         self.assertIsNotNone(api.formatter)
 
-        api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=MagicMock())
+        api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=MagicMock())
         self.assertIsNotNone(api.formatter)
 
     @patch("gobexport.graphql.requests.post")
@@ -164,13 +164,13 @@ class TestGraphQl(TestCase):
     @patch("gobexport.graphql.time.time")
     def test_iter_with_formatter(self, mock_time, mock_formatter, mock_post):
         sort = {"some": "sortdef"}
-        api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=sort)
+        api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=sort)
         api._flatten_edge = MagicMock()
         mock_time.side_effect = [2, 1]  # Prevent division by zero
         mock_post.return_value = MagicMock()
         mock_post.return_value.json.return_value = {
             'data': {
-                'woonplaatsen': {
+                'bagWoonplaatsen': {
                     'pageInfo': {
                         'endCursor': True,
                         'hasNextPage': False,
@@ -189,8 +189,8 @@ class TestGraphQl(TestCase):
         mock_formatter.return_value.format_item.assert_called_once()
 
     def test_update_query(self):
-        api = GraphQL('host', '{woonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
+        api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
         new_query = api._update_query(api.query, 100)
-        expected_query = '{woonplaatsen(first: 100, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
+        expected_query = '{bagWoonplaatsen(first: 100, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
 
         self.assertEqual(new_query, expected_query)

@@ -34,6 +34,7 @@ class GraphQL:
         self.url = self.host + GRAPHQL_ENDPOINT
         self.catalogue = catalogue
         self.collection = collection
+        self.schema_collection_name = f'{self.catalogue}{self.collection.title()}'
         self.end_cursor = ""
         self.query = self._update_query(query, NUM_RECORDS)
         self.has_next_page = True
@@ -46,7 +47,7 @@ class GraphQL:
 
         Provide for a readable representation
         """
-        return f'GraphQL {self.collection}'
+        return f'GraphQL {self.schema_collection_name}'
 
     def __iter__(self):
         """Iteration method
@@ -73,13 +74,13 @@ class GraphQL:
             data = response.json()
 
             # Update the cursor and has_next_page
-            self.end_cursor = data['data'][self.collection]['pageInfo']['endCursor']
-            self.has_next_page = data['data'][self.collection]['pageInfo']['hasNextPage']
+            self.end_cursor = data['data'][self.schema_collection_name]['pageInfo']['endCursor']
+            self.has_next_page = data['data'][self.schema_collection_name]['pageInfo']['hasNextPage']
 
             if self.has_next_page:
                 self.query = self._update_query(self.query, num_records)
 
-            for edge in data['data'][self.collection]['edges']:
+            for edge in data['data'][self.schema_collection_name]['edges']:
                 yield from self.formatter.format_item(edge)
 
     def _update_query(self, query, num_records):
@@ -90,7 +91,7 @@ class GraphQL:
         :return: updated query
         """
         # First check if the query has a filter
-        filters = re.search(f'{self.collection}\((.+)?\)', query)
+        filters = re.search(f'{self.schema_collection_name}\((.+)?\)', query)
         if filters:
             # adjust number of records to request
             match = re.search('first:\s?(([\d]+)?)', query)
@@ -108,8 +109,8 @@ class GraphQL:
                 query = query[:filters_end-1] + append_string + query[filters_end:]
         else:
             # Add first and after parameter after the main collection
-            query = query.replace(self.collection,
-                                  f'{self.collection}(first: {num_records}, after: "{self.end_cursor}")')
+            query = query.replace(self.schema_collection_name,
+                                  f'{self.schema_collection_name}(first: {num_records}, after: "{self.end_cursor}")')
 
         # Add pageInfo if it doesn't exist
         if not re.search('pageInfo', query):

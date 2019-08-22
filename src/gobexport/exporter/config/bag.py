@@ -57,7 +57,7 @@ class WoonplaatsenExportConfig:
 
     query_actueel = '''
 {
-  woonplaatsen {
+  bagWoonplaatsen {
     edges {
       node {
         identificatie
@@ -168,7 +168,7 @@ class OpenbareruimtesExportConfig:
 
     query_actueel = '''
 {
-  openbareruimtes {
+  bagOpenbareruimtes {
     edges {
       node {
         identificatie
@@ -294,7 +294,7 @@ class OpenbareruimtesExportConfig:
             },
             'query': '''
 {
-  openbareruimtes(active: true) {
+  bagOpenbareruimtes(active: true) {
     edges {
       node {
         identificatie
@@ -603,7 +603,7 @@ class StandplaatsenExportConfig:
 
     query_actueel = '''
 {
-  standplaatsen {
+  bagStandplaatsen {
     edges {
       node {
         identificatie
@@ -870,7 +870,7 @@ class LigplaatsenExportConfig:
 
     query_actueel = '''
 {
-  ligplaatsen {
+  bagLigplaatsen {
     edges {
       node {
         identificatie
@@ -1286,7 +1286,7 @@ class BrondocumentenExportConfig:
 
     query_actueel = '''
 {
-  brondocumenten {
+  bagBrondocumenten {
     edges {
       node {
         documentnummer
