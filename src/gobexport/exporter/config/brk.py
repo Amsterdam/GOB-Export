@@ -281,7 +281,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
 
 class KadastralesubjectenExportConfig:
     format = KadastralesubjectenCsvFormat()
-    filename = brk_filename("KadastraalSubject")
+    filename = brk_filename("kadastraal_subject")
 
     products = {
         'csv': {
@@ -295,11 +295,11 @@ class KadastralesubjectenExportConfig:
 
 
 class AantekeningenExportConfig:
-    filename = brk_filename("Aantekening")
+    filename = brk_filename("aantekening")
 
     art_query = '''
 {
-  aantekeningenrechten {
+  brkAantekeningenrechten {
     edges {
       node {
         identificatie
@@ -712,7 +712,7 @@ class ZakelijkerechtenExportConfig:
 
 
 class AardzakelijkerechtenExportConfig:
-    filename = brk_filename("CAardZakelijkRecht")
+    filename = brk_filename("c_aard_zakelijkrecht")
     format = {
         'AZT_CODE': 'code',
         'AZT_OMSCHRIJVING': 'waarde',
@@ -875,7 +875,7 @@ class BrkBagExportConfig:
 
 
 class StukdelenExportConfig:
-    filename = brk_filename('Stukdeel')
+    filename = brk_filename('stukdeel')
     format = {
         'BRK_SDL_ID': 'identificatie',
         'SDL_AARDSTUKDEEL_CODE': 'aard.code',
@@ -968,7 +968,7 @@ class StukdelenExportConfig:
 
 
 class KadastraleobjectenExportConfig:
-    filename = brk_filename('KadastraalObject')
+    filename = brk_filename('kadastraal_object')
     format = {
         'BRK_KOT_ID': 'identificatie',
         'KOT_GEMEENTENAAM': 'aangeduidDoorGemeente.naam',
