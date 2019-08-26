@@ -55,8 +55,10 @@ class TestBrkConfigHelpers(TestCase):
         outp = '20350331010203'
         self.assertEqual(outp, format_atg_timestamp(inp))
 
-        inp = 'invalid_str'
-        self.assertEqual(inp, format_atg_timestamp(inp))
+        for inp in ['invalid_str', None]:
+            # These inputs should not change
+            self.assertEqual(inp, format_atg_timestamp(inp))
+
 
 
 class TestBrkCsvFormat(TestCase):

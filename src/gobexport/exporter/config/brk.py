@@ -3,6 +3,7 @@ import dateutil.parser as dt_parser
 
 from fractions import Fraction
 from operator import itemgetter
+from typing import Optional
 
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
@@ -49,12 +50,16 @@ def sort_attributes(attrs: dict, ordering: list):
     return {k: attrs[k] for k in ordering}
 
 
-def format_atg_timestamp(datetimestr: str) -> str:
+def format_atg_timestamp(datetimestr: str) -> Optional[str]:
     """Transforms the datetimestr from ISO-format to the format used in the ATG export: yyyymmddhhmmss
 
     :param datetimestr:
     :return:
     """
+    if not datetimestr:
+        # Input variable may be empty
+        return None
+
     try:
         dt = dt_parser.parse(datetimestr)
         return dt.strftime('%Y%m%d%H%M%S')
@@ -318,9 +323,9 @@ class AantekeningenExportConfig:
             node {
               identificatie
               vanZakelijkrecht {
-                aardZakelijkRecht
                 edges {
                   node {
+                    aardZakelijkRecht
                     rustOpKadastraalobject {
                       edges {
                         node {
