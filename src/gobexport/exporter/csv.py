@@ -28,9 +28,12 @@ def _get_headers_from_file(file: str) -> list:
     :param file:
     :return:
     """
-    with open(file, 'r') as fp:
+
+    # utf-8-sig encoding handles UTF-8 BOM character correctly
+    with open(file, 'r', encoding='utf-8-sig') as fp:
         reader = csv.DictReader(fp, delimiter=';')
         headers = reader.fieldnames
+
     return headers
 
 
