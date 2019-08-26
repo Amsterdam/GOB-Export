@@ -13,9 +13,8 @@ class TestCsvExporter(TestCase):
         with patch("builtins.open", mock_open(read_data="SOME;DATA")) as mock_file, \
                 patch('gobexport.exporter.csv.csv') as mock_csv:
             res = _get_headers_from_file('somefile')
-
             mock_csv.DictReader.assert_called_with(mock_file.return_value, delimiter=';')
-            mock_file.assert_called_with('somefile', 'r')
+            mock_file.assert_called_with('somefile', 'r', encoding='utf-8-sig')
             self.assertEqual(mock_csv.DictReader().fieldnames, res)
 
     @patch("gobexport.exporter.csv._get_headers_from_file")

@@ -3,6 +3,7 @@ import dateutil.parser as dt_parser
 
 from fractions import Fraction
 from operator import itemgetter
+from typing import Optional
 
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
@@ -49,12 +50,16 @@ def sort_attributes(attrs: dict, ordering: list):
     return {k: attrs[k] for k in ordering}
 
 
-def format_atg_timestamp(datetimestr: str) -> str:
+def format_atg_timestamp(datetimestr: str) -> Optional[str]:
     """Transforms the datetimestr from ISO-format to the format used in the ATG export: yyyymmddhhmmss
 
     :param datetimestr:
     :return:
     """
+    if not datetimestr:
+        # Input variable may be empty
+        return None
+
     try:
         dt = dt_parser.parse(datetimestr)
         return dt.strftime('%Y%m%d%H%M%S')
@@ -281,7 +286,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
 
 class KadastralesubjectenExportConfig:
     format = KadastralesubjectenCsvFormat()
-    filename = brk_filename("KadastraalSubject")
+    filename = brk_filename("kadastraal_subject")
 
     products = {
         'csv': {
@@ -295,11 +300,11 @@ class KadastralesubjectenExportConfig:
 
 
 class AantekeningenExportConfig:
-    filename = brk_filename("Aantekening")
+    filename = brk_filename("aantekening")
 
     art_query = '''
 {
-  aantekeningenrechten {
+  brkAantekeningenrechten {
     edges {
       node {
         identificatie
@@ -318,9 +323,9 @@ class AantekeningenExportConfig:
             node {
               identificatie
               vanZakelijkrecht {
-                aardZakelijkRecht
                 edges {
                   node {
+                    aardZakelijkRecht
                     rustOpKadastraalobject {
                       edges {
                         node {
@@ -712,7 +717,7 @@ class ZakelijkerechtenExportConfig:
 
 
 class AardzakelijkerechtenExportConfig:
-    filename = brk_filename("CAardZakelijkRecht")
+    filename = brk_filename("c_aard_zakelijkrecht")
     format = {
         'AZT_CODE': 'code',
         'AZT_OMSCHRIJVING': 'waarde',
@@ -875,7 +880,7 @@ class BrkBagExportConfig:
 
 
 class StukdelenExportConfig:
-    filename = brk_filename('Stukdeel')
+    filename = brk_filename('stukdeel')
     format = {
         'BRK_SDL_ID': 'identificatie',
         'SDL_AARDSTUKDEEL_CODE': 'aard.code',
@@ -968,7 +973,7 @@ class StukdelenExportConfig:
 
 
 class KadastraleobjectenExportConfig:
-    filename = brk_filename('KadastraalObject')
+    filename = brk_filename('kadastraal_object')
     format = {
         'BRK_KOT_ID': 'identificatie',
         'KOT_GEMEENTENAAM': 'aangeduidDoorGemeente.naam',
