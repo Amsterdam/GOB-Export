@@ -11,11 +11,14 @@ class TestBrkConfigHelpers(TestCase):
                          brk_filename('FileName'))
 
         self.assertEqual(f"AmsterdamRegio/SHP_Actueel/BRK_FileName_{datetime.now().strftime('%Y%m%d')}.shp",
-                         brk_filename('FileName', 'shp'))
+                         brk_filename('FileName', type='shp'))
+
+        self.assertEqual(f"AmsterdamRegio/SHP_Actueel/BRK_FileName.prj",
+                         brk_filename('FileName', type='prj', append_date=False,))
 
         # Assert undefined file type raises error
         with self.assertRaises(AssertionError):
-            brk_filename('FileName', 'xxx')
+            brk_filename('FileName', type='xxx')
 
     def test_sort_attributes(self):
         attrs = {
