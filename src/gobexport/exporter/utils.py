@@ -62,7 +62,12 @@ def _evaluate_fill_action(entity: dict, action: dict):
 
 def _evaluate_format_action(entity: dict, action: dict):
     assert all([key in action for key in ['formatter', 'value']])
-    return action['formatter'](get_entity_value(entity, action['value']))
+
+    value = get_entity_value(entity, action['value'])
+
+    if value:
+        return action['formatter'](value)
+    return None
 
 
 def _evaluate_case_action(entity: dict, action: dict):

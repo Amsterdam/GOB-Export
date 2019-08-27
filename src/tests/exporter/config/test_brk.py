@@ -1,7 +1,8 @@
 from unittest import TestCase
 from datetime import datetime
 
-from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_filename, sort_attributes, format_timestamp
+from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_filename, sort_attributes, \
+    format_timestamp, ZakelijkerechtenCsvFormat
 
 
 class TestBrkConfigHelpers(TestCase):
@@ -63,7 +64,6 @@ class TestBrkConfigHelpers(TestCase):
             self.assertEqual(inp, format_timestamp(inp))
 
 
-
 class TestBrkCsvFormat(TestCase):
 
     def setUp(self) -> None:
@@ -115,3 +115,33 @@ class TestBrkCsvFormat(TestCase):
         }
 
         self.assertEqual(expected, self.format.show_when_field_empty_condition('FIELDREF'))
+
+
+class TestBrkZakelijkerechtenCsvFormat(TestCase):
+
+    def setUp(self) -> None:
+        self.format = ZakelijkerechtenCsvFormat()
+
+    def test_zrt_belast_met_azt_formatter(self):
+        testcases = [
+            ('A', '[A]'),
+            ('A|B', '[A]+[B]'),
+        ]
+
+        for inp, outp in testcases:
+            self.assertEqual(outp, self.format.zrt_belast_met_azt_formatter(inp))
+
+        testcases = ['', None, 1]
+
+        for testcase in testcases:
+            with self.assertRaises(AssertionError):
+                self.format.zrt_belast_met_azt_formatter(testcase)
+
+    def test_zrt_belast_azt_formatter(self):
+        self.assertEqual('[A]', self.format.zrt_belast_azt_formatter('A'))
+
+        errors = ['', None, 1]
+
+        for testcase in errors:
+            with self.assertRaises(AssertionError):
+                self.format.zrt_belast_azt_formatter(testcase)

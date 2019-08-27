@@ -232,6 +232,22 @@ class TestUtils(TestCase):
         mock_get_entity_value.assert_called_with(entity, 'the_value')
         formatter.assert_called_with(mock_get_entity_value.return_value)
 
+    @patch("gobexport.exporter.utils.get_entity_value")
+    def test_evaluate_format_action_empty_value(self, mock_get_entity_value):
+        entity = MagicMock()
+        formatter = MagicMock()
+        mock_get_entity_value.return_value = None
+        action = {
+            'action': 'format',
+            'value': 'the_value',
+            'formatter': formatter,
+        }
+
+        res = _evaluate_format_action(entity, action)
+        self.assertIsNone(res)
+        mock_get_entity_value.assert_called_with(entity, 'the_value')
+        formatter.assert_not_called()
+
     def test_evaluate_format_action_missing_keys(self):
         valid_action = {'formatter': '', 'value': ''}
 
