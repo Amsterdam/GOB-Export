@@ -34,12 +34,12 @@ FILE_TYPE_MAPPING = {
 }
 
 
-def brk_filename(name, type='csv'):
+def brk_filename(name, type='csv', append_date=True,):
     assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
     type_dir, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
     now = datetime.datetime.now()
-    datestr = now.strftime('%Y%m%d')
-    return f'AmsterdamRegio/{type_dir}/BRK_{name}_{datestr}.{extension}'
+    datestr = f"_{now.strftime('%Y%m%d')}" if append_date else ""
+    return f'AmsterdamRegio/{type_dir}/BRK_{name}{datestr}.{extension}'
 
 
 def sort_attributes(attrs: dict, ordering: list):
@@ -1296,7 +1296,7 @@ class GemeentesExportConfig:
             'exporter': csv_exporter,
             'api_type': 'graphql',
             'query': query,
-            'filename': brk_filename('Gemeente', 'csv'),
+            'filename': brk_filename('Gemeente', type='csv'),
             'mime_type': 'plain/text',
             'format': {
                 'naam': 'naam',
@@ -1307,7 +1307,7 @@ class GemeentesExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql',
-            'filename': brk_filename('Gemeente', 'shp'),
+            'filename': brk_filename('Gemeente', type='shp'),
             'mime_type': 'application/octet-stream',
             'format': {
                 'GEMEENTE': 'naam',
@@ -1315,15 +1315,15 @@ class GemeentesExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': brk_filename('Gemeente', 'dbf'),
+                    'filename': brk_filename('Gemeente', type='dbf'),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Gemeente', 'shx'),
+                    'filename': brk_filename('Gemeente', type='shx'),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Gemeente', 'prj'),
+                    'filename': brk_filename('Gemeente', type='prj'),
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1363,14 +1363,14 @@ class BijpijlingExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'filename': 'BRK_bijpijling.shp',
+            'filename': brk_filename('bijpijling', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('bijpijlingGeometrie'),
             ],
             'mime_type': 'application/octet-stream',
             'format': {
                 'BRK_KOT_ID': 'identificatie',
-                'GEMEENTE': 'naam',
+                'GEMEENTE': 'aangeduidDoorGemeente.naam',
                 'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
                 'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
                 'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
@@ -1381,15 +1381,15 @@ class BijpijlingExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': 'BRK_bijpijling.dbf',
+                    'filename': brk_filename('bijpijling', type='dbf', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'BRK_bijpijling.shx',
+                    'filename': brk_filename('bijpijling', type='shx', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'BRK_bijpijling.prj',
+                    'filename': brk_filename('bijpijling', type='prj', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1430,14 +1430,14 @@ class PerceelnummerExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'filename': 'BRK_perceelnummer.shp',
+            'filename': brk_filename('perceelnummer', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('plaatscoordinaten'),
             ],
             'mime_type': 'application/octet-stream',
             'format': {
                 'BRK_KOT_ID': 'identificatie',
-                'GEMEENTE': 'naam',
+                'GEMEENTE': 'aangeduidDoorGemeente.naam',
                 'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
                 'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
                 'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
@@ -1449,15 +1449,15 @@ class PerceelnummerExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': 'BRK_perceelnummer.dbf',
+                    'filename': brk_filename('perceelnummer', type='dbf', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'BRK_perceelnummer.shx',
+                    'filename': brk_filename('perceelnummer', type='shx', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'BRK_perceelnummer.prj',
+                    'filename': brk_filename('perceelnummer', type='prj', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
             ],
