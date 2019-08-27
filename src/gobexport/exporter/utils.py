@@ -65,6 +65,14 @@ def _evaluate_format_action(entity: dict, action: dict):
     return action['formatter'](get_entity_value(entity, action['value']))
 
 
+def _evaluate_case_action(entity: dict, action: dict):
+    assert all([key in action for key in ['reference', 'values']])
+    assert isinstance(action['values'], dict)
+
+    value = get_entity_value(entity, action['reference'])
+    return action['values'].get(value)
+
+
 def evaluate_action(entity: dict, action: dict):
     if action.get('action') == 'concat':
         return _evaluate_concat_action(entity, action)
@@ -74,6 +82,8 @@ def evaluate_action(entity: dict, action: dict):
         return _evaluate_fill_action(entity, action)
     elif action.get('action') == 'format':
         return _evaluate_format_action(entity, action)
+    elif action.get('action') == 'case':
+        return _evaluate_case_action(entity, action)
     else:
         raise NotImplementedError()
 
