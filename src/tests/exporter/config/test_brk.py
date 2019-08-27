@@ -1,7 +1,7 @@
 from unittest import TestCase
 from datetime import datetime
 
-from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_filename, sort_attributes, format_atg_timestamp
+from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_filename, sort_attributes, format_timestamp
 
 
 class TestBrkConfigHelpers(TestCase):
@@ -50,14 +50,14 @@ class TestBrkConfigHelpers(TestCase):
         with self.assertRaises(AssertionError):
             sort_attributes(attrs, ['c' 'a', 'b'])
 
-    def test_atg_timestamp_format(self):
+    def test_format_timestamp(self):
         inp = '2035-03-31T01:02:03.000000'
         outp = '20350331010203'
-        self.assertEqual(outp, format_atg_timestamp(inp))
+        self.assertEqual(outp, format_timestamp(inp))
 
         for inp in ['invalid_str', None]:
             # These inputs should not change
-            self.assertEqual(inp, format_atg_timestamp(inp))
+            self.assertEqual(inp, format_timestamp(inp))
 
 
 
