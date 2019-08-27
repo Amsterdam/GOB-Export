@@ -475,6 +475,17 @@ class AantekeningenExportConfig:
 
 class ZakelijkerechtenCsvFormat(BrkCsvFormat):
 
+    def zrt_belast_met_azt_formatter(self, value):
+        assert value and isinstance(value, str)
+
+        splitvalue = value.split('|')
+        return "+".join([f"[{v}]" for v in splitvalue])
+
+    def zrt_belast_azt_formatter(self, value):
+        assert value and isinstance(value, str)
+
+        return f"[{value}]"
+
     def _get_np_attrs(self):
         bsn_field = "vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde"
 
@@ -509,13 +520,22 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         )
 
     def get_format(self):
+
         return {
             'BRK_ZRT_ID': 'identificatie',
             'ZRT_AARDZAKELIJKRECHT_CODE': 'aardZakelijkRecht.code',
             'ZRT_AARDZAKELIJKRECHT_OMS': 'aardZakelijkRecht.omschrijving',
             'ZRT_AARDZAKELIJKRECHT_AKR_CODE': 'akrAardZakelijkRecht',
-            'ZRT_BELAST_AZT': 'belastZakelijkerechten.akrAardZakelijkRecht',
-            'ZRT_BELAST_MET_AZT': 'belastMetZakelijkerechten.akrAardZakelijkRecht',
+            'ZRT_BELAST_AZT': {
+                'action': 'format',
+                'formatter': self.zrt_belast_azt_formatter,
+                'value': 'belastZakelijkerechten.akrAardZakelijkRecht'
+            },
+            'ZRT_BELAST_MET_AZT': {
+                'action': 'format',
+                'formatter': self.zrt_belast_met_azt_formatter,
+                'value': 'belastMetZakelijkerechten.akrAardZakelijkRecht',
+            },
             'ZRT_ONTSTAAN_UIT': 'ontstaanUitAppartementsrechtsplitsingVve.[0].identificatie',
             'ZRT_BETROKKEN_BIJ': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
             'ZRT_ISBEPERKT_TOT_TNG': 'isBeperktTot',
@@ -717,7 +737,6 @@ class ZakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'unfold': True,
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
