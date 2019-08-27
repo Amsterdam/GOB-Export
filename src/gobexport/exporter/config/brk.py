@@ -10,7 +10,6 @@ from gobexport.exporter.esri import esri_exporter
 
 from gobexport.filters.notempty_filter import NotEmptyFilter
 
-
 FILE_TYPE_MAPPING = {
     'csv': {
         'dir': 'CSV_Actueel',
@@ -35,12 +34,12 @@ FILE_TYPE_MAPPING = {
 }
 
 
-def brk_filename(name, type='csv'):
+def brk_filename(name, type='csv', append_date=True,):
     assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
     type_dir, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
     now = datetime.datetime.now()
-    datestr = now.strftime('%Y%m%d')
-    return f'AmsterdamRegio/{type_dir}/BRK_{name}_{datestr}.{extension}'
+    datestr = f"_{now.strftime('%Y%m%d')}" if append_date else ""
+    return f'AmsterdamRegio/{type_dir}/BRK_{name}{datestr}.{extension}'
 
 
 def sort_attributes(attrs: dict, ordering: list):
@@ -50,8 +49,8 @@ def sort_attributes(attrs: dict, ordering: list):
     return {k: attrs[k] for k in ordering}
 
 
-def format_atg_timestamp(datetimestr: str) -> Optional[str]:
-    """Transforms the datetimestr from ISO-format to the format used in the ATG export: yyyymmddhhmmss
+def format_timestamp(datetimestr: str) -> Optional[str]:
+    """Transforms the datetimestr from ISO-format to the format used in the BRK exports: yyyymmddhhmmss
 
     :param datetimestr:
     :return:
@@ -90,7 +89,6 @@ class BrkCsvFormat:
 
 
 class KadastralesubjectenCsvFormat(BrkCsvFormat):
-
     ordering = [
         'BRK_SJT_ID',
         'SJT_TYPE',
@@ -365,7 +363,7 @@ class AantekeningenExportConfig:
         'ATG_OMSCHRIJVING': 'omschrijving',
         'ATG_EINDDATUM': {
             'action': 'format',
-            'formatter': format_atg_timestamp,
+            'formatter': format_timestamp,
             'value': 'einddatum',
         },
         'ATG_TYPE': {
@@ -432,7 +430,7 @@ class AantekeningenExportConfig:
         'ATG_OMSCHRIJVING': 'omschrijving',
         'ATG_EINDDATUM': {
             'action': 'format',
-            'formatter': format_atg_timestamp,
+            'formatter': format_timestamp,
             'value': 'einddatum',
         },
         'ATG_TYPE': {
@@ -477,6 +475,17 @@ class AantekeningenExportConfig:
 
 class ZakelijkerechtenCsvFormat(BrkCsvFormat):
 
+    def zrt_belast_met_azt_formatter(self, value):
+        assert value and isinstance(value, str)
+
+        splitvalue = value.split('|')
+        return "+".join([f"[{v}]" for v in splitvalue])
+
+    def zrt_belast_azt_formatter(self, value):
+        assert value and isinstance(value, str)
+
+        return f"[{value}]"
+
     def _get_np_attrs(self):
         bsn_field = "vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde"
 
@@ -511,15 +520,24 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         )
 
     def get_format(self):
+
         return {
             'BRK_ZRT_ID': 'identificatie',
             'ZRT_AARDZAKELIJKRECHT_CODE': 'aardZakelijkRecht.code',
             'ZRT_AARDZAKELIJKRECHT_OMS': 'aardZakelijkRecht.omschrijving',
             'ZRT_AARDZAKELIJKRECHT_AKR_CODE': 'akrAardZakelijkRecht',
-            'ZRT_BELAST_AZT': 'belastZakelijkerechten.akrAardZakelijkRecht',
-            'ZRT_BELAST_MET_AZT': 'belastMetZakelijkerechten.akrAardZakelijkRecht',
-            'ZRT_ONTSTAAN_UIT': 'ontstaanUitAppartementsrechtsplitsing',
-            'ZRT_BETROKKEN_BIJ': 'betrokkenBijAppartementsrechtsplitsing',
+            'ZRT_BELAST_AZT': {
+                'action': 'format',
+                'formatter': self.zrt_belast_azt_formatter,
+                'value': 'belastZakelijkerechten.akrAardZakelijkRecht'
+            },
+            'ZRT_BELAST_MET_AZT': {
+                'action': 'format',
+                'formatter': self.zrt_belast_met_azt_formatter,
+                'value': 'belastMetZakelijkerechten.akrAardZakelijkRecht',
+            },
+            'ZRT_ONTSTAAN_UIT': 'ontstaanUitAppartementsrechtsplitsingVve.[0].identificatie',
+            'ZRT_BETROKKEN_BIJ': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
             'ZRT_ISBEPERKT_TOT_TNG': 'isBeperktTot',
             'ZRT_BETREKKING_OP_KOT': {
                 'action': 'concat',
@@ -646,8 +664,20 @@ class ZakelijkerechtenExportConfig:
             }
           }
         }
-        ontstaanUitAppartementsrechtsplitsing
-        betrokkenBijAppartementsrechtsplitsing
+        ontstaanUitAppartementsrechtsplitsingVve {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        betrokkenBijAppartementsrechtsplitsingVve {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         isBeperktTot
         rustOpKadastraalobject {
           edges {
@@ -707,7 +737,6 @@ class ZakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'unfold': True,
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
@@ -972,113 +1001,172 @@ class StukdelenExportConfig:
     }
 
 
+class KadastraleobjectenCsvFormat:
+
+    def if_vve(self, trueval, falseval):
+        return {
+            'condition': 'isempty',
+            'reference': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+            'negate': True,
+            'trueval': trueval,
+            'falseval': falseval,
+        }
+
+    def if_empty_geenWaarde(self, reference):
+        return {
+            'condition': 'isempty',
+            'reference': reference,
+            'negate': True,
+            'trueval': reference,
+            'falseval': {
+                'action': 'literal',
+                'value': 'geenWaarde'
+            }
+        }
+
+    def get_format(self):
+        return {
+            'BRK_KOT_ID': 'identificatie',
+            'KOT_GEMEENTENAAM': 'aangeduidDoorGemeente.naam',
+            # TODO Gemeente codes etc after correct import of kadastrale gemeentes and codes
+            'KOT_AKRKADGEMCODE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+            'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+            'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.bronwaarde',
+            'KOT_KAD_GEMEENTE_OMS': '',
+            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+            'KOT_PERCEELNUMMER': 'perceelnummer',
+            'KOT_INDEX_LETTER': 'indexletter',
+            'KOT_INDEX_NUMMER': 'indexnummer',
+            'KOT_SOORTGROOTTE_CODE': 'soortGrootte.code',
+            'KOT_SOORTGROOTTE_OMS': 'soortGrootte.omschrijving',
+            'KOT_KADGROOTTE': 'grootte',
+            'KOT_RELATIE_G_PERCEEL': 'isOntstaanUitGPerceel.identificatie',
+            'KOT_KOOPSOM': 'koopsom',
+            'KOT_KOOPSOM_VALUTA': 'koopsomValutacode',
+            'KOT_KOOPJAAR': 'koopjaar',
+            'KOT_INDICATIE_MEER_OBJECTEN': 'indicatieMeerObjecten',
+            'KOT_CULTUURCODEONBEBOUWD_CODE': 'soortCultuurOnbebouwd.code',
+            'KOT_CULTUURCODEONBEBOUWD_OMS': 'soortCultuurOnbebouwd.omschrijving',
+            'KOT_CULTUURCODEBEBOUWD_CODE': self.if_empty_geenWaarde('soortCultuurBebouwd.code'),
+            'KOT_CULTUURCODEBEBOUWD_OMS': self.if_empty_geenWaarde('soortCultuurBebouwd.omschrijving'),
+            'KOT_AKRREGISTER9TEKST': '',
+            'KOT_STATUS_CODE': 'status',
+            'KOT_TOESTANDSDATUM': {
+                'action': 'format',
+                'formatter': format_timestamp,
+                'value': 'toestandsdatum',
+            },
+            'KOT_IND_VOORLOPIGE_KADGRENS': {
+                'reference': 'indicatieVoorlopigeGeometrie',
+                'action': 'case',
+                'values': {
+                    'J': 'Voorlopige grens',
+                    'N': 'Definitieve grens',
+                },
+            },
+            'BRK_SJT_ID': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+                falseval='vanKadastraalsubject.[0].identificatie'
+            ),
+            'SJT_NAAM': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
+                falseval={
+                    'condition': 'isempty',
+                    'reference': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
+                    'negate': True,
+                    'trueval': {
+                        'action': 'concat',
+                        'fields': [
+                            'vanKadastraalsubject.[0].geslachtsnaam',
+                            {
+                                'action': 'literal',
+                                'value': ','
+                            },
+                            'vanKadastraalsubject.[0].voornamen',
+                            {
+                                'action': 'literal',
+                                'value': ','
+                            },
+                            'vanKadastraalsubject.[0].voorvoegsels',
+                            {
+                                'action': 'literal',
+                                'value': ' ('
+                            },
+                            'vanKadastraalsubject.[0].geslacht.code',
+                            {
+                                'action': 'literal',
+                                'value': ')'
+                            },
+                        ]
+                    },
+                    'falseval': 'vanKadastraalsubject.[0].statutaireNaam'
+                }
+            ),
+            'SJT_TYPE': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].typeSubject',
+                falseval='vanKadastraalsubject.[0].typeSubject',
+            ),
+            'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject.[0].geboortedatum',
+            'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject.[0].geboorteplaats',
+            'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject.[0].geboorteland.code',
+            'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject.[0].geboorteland.omschrijving',
+            'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject.[0].datumOverlijden',
+            'SJT_NNP_RSIN': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].heeftRsinVoor.bronwaarde',
+                falseval='vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde'
+            ),
+            'SJT_NNP_KVKNUMMER': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+                falseval='vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde'
+            ),
+            'SJT_NNP_RECHTSVORM_CODE': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].rechtsvorm.code',
+                falseval='vanKadastraalsubject.[0].rechtsvorm.code'),
+            'SJT_NNP_RECHTSVORM_OMS': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].rechtsvorm.omschrijving',
+                falseval='vanKadastraalsubject.[0].rechtsvorm.omschrijving'),
+            'SJT_NNP_STATUTAIRE_NAAM': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
+                falseval='vanKadastraalsubject.[0].statutaireNaam'
+            ),
+            'SJT_NNP_STATUTAIRE_ZETEL': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireZetel',
+                falseval='vanKadastraalsubject.[0].statutaireZetel'
+            ),
+            'SJT_ZRT': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].aardZakelijkRecht.omschrijving',
+            'SJT_AANDEEL': self.if_vve(
+                trueval={
+                    'action': 'literal',
+                    'value': '1/1'
+                },
+                falseval={
+                    'condition': 'isempty',
+                    'reference': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
+                    'negate': True,
+                    'trueval': {
+                        'action': 'concat',
+                        'fields': [
+                            'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
+                            {
+                                'action': 'literal',
+                                'value': '/',
+                            },
+                            'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.noemer'
+                        ]
+                    },
+                }
+            ),
+            'SJT_VVE_SJT_ID': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+            'SJT_VVE_UIT_EIGENDOM': 'betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
+            'KOT_INONDERZOEK': 'inOnderzoek',
+            'KOT_MODIFICATION': 'wijzigingsdatum',
+            'GEOMETRIE': 'geometrie'
+        }
+
+
 class KadastraleobjectenExportConfig:
     filename = brk_filename('kadastraal_object')
-    format = {
-        'BRK_KOT_ID': 'identificatie',
-        'KOT_GEMEENTENAAM': 'aangeduidDoorGemeente.naam',
-        # TODO Gemeente codes etc after correct import of kadastrale gemeentes and codes
-        'KOT_AKRKADGEMCODE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.bronwaarde',
-        'KOT_KAD_GEMEENTE_OMS': '',
-        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
-        'KOT_PERCEELNUMMER': 'perceelnummer',
-        'KOT_INDEX_LETTER': 'indexletter',
-        'KOT_INDEX_NUMMER': 'indexnummer',
-        'KOT_SOORTGROOTTE_CODE': 'soortGrootte.code',
-        'KOT_SOORTGROOTTE_OMS': 'soortGrootte.omschrijving',
-        'KOT_KADGROOTTE': 'grootte',
-        'KOT_RELATIE_G_PERCEEL': 'isOntstaanUitGPerceel.identificatie',
-        'KOT_KOOPSOM': 'koopsom',
-        'KOT_KOOPSOM_VALUTA': 'koopsomValutacode',
-        'KOT_KOOPJAAR': 'koopjaar',
-        'KOT_INDICATIE_MEER_OBJECTEN': 'indicatieMeerObjecten',
-        'KOT_CULTUURCODEONBEBOUWD_CODE': 'soortCultuurOnbebouwd.code',
-        'KOT_CULTUURCODEONBEBOUWD_OMS': 'soortCultuurOnbebouwd.omschrijving',
-        'KOT_CULTUURCODEBEBOUWD_CODE': 'soortCultuurBebouwd.code',
-        'KOT_CULTUURCODEBEBOUWD_OMS': 'soortCultuurBebouwd.omschrijving',
-        'KOT_AKRREGISTER9TEKST': '',
-        'KOT_STATUS_CODE': 'status',
-        'KOT_TOESTANDSDATUM': 'toestandsdatum',
-        'KOT_IND_VOORLOPIGE_KADGRENS': 'indicatieVoorlopigeGeometrie',
-        'BRK_SJT_ID': 'vanKadastraalsubject.[0].identificatie',
-        'SJT_NAAM': {
-            'condition': 'isempty',
-            'reference': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
-            'negate': True,
-            'trueval': {
-                'action': 'concat',
-                'fields': [
-                    'vanKadastraalsubject.[0].geslachtsnaam',
-                    {
-                        'action': 'literal',
-                        'value': ','
-                    },
-                    'vanKadastraalsubject.[0].voornamen',
-                    {
-                        'action': 'literal',
-                        'value': ','
-                    },
-                    'vanKadastraalsubject.[0].voorvoegsels',
-                    {
-                        'action': 'literal',
-                        'value': ' ('
-                    },
-                    'vanKadastraalsubject.[0].geslacht.code',
-                    {
-                        'action': 'literal',
-                        'value': ')'
-                    },
-                ]
-            },
-            'falseval': 'vanKadastraalsubject.[0].statutaireNaam'
-        },
-        'SJT_TYPE': 'vanKadastraalsubject.[0].typeSubject',
-        'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject.[0].geboortedatum',
-        'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject.[0].geboorteplaats',
-        'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject.[0].geboorteland.code',
-        'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject.[0].geboorteland.omschrijving',
-        'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject.[0].datumOverlijden',
-        'SJT_NNP_RSIN': 'vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde',
-        'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde',
-        'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject.[0].rechtsvorm.code',
-        'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject.[0].rechtsvorm.omschrijving',
-        'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject.[0].statutaireNaam',
-        'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject.[0].statutaireZetel',
-        'SJT_ZRT': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].aardZakelijkRecht.code',
-        'SJT_AANDEEL': {
-            'condition': 'isempty',
-            'reference': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
-            'negate': True,
-            'trueval': {
-                'action': 'concat',
-                'fields': [
-                    'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
-                    {
-                        'action': 'literal',
-                        'value': '/',
-                    },
-                    'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.noemer'
-                ]
-            },
-        },
-        'SJT_VVE_SJT_ID': {
-            'condition': 'isempty',
-            'reference': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].betrokkenBijAppartementsrechtsplitsing',
-            'negate': True,
-            'trueval': 'vanKadastraalsubject.[0].identificatie',
-        },
-        'SJT_VVE_UIT_EIGENDOM': {
-            'condition': 'isempty',
-            'reference': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].betrokkenBijAppartementsrechtsplitsing',
-            'negate': True,
-            'trueval': 'vanKadastraalsubject.[0].statutaireNaam',
-        },
-        'KOT_INONDERZOEK': 'inOnderzoek',
-        'KOT_MODIFICATION': 'wijzigingsdatum',
-        'GEOMETRIE': 'geometrie'
-    }
+    format = KadastraleobjectenCsvFormat()
 
     query = '''
 {
@@ -1127,7 +1215,21 @@ class KadastraleobjectenExportConfig:
             node {
               identificatie
               aardZakelijkRecht
-              betrokkenBijAppartementsrechtsplitsing
+              betrokkenBijAppartementsrechtsplitsingVve {
+                edges {
+                  node {
+                    identificatie
+                    statutaireNaam
+                    typeSubject
+                    heeftRsinVoor
+                    heeftKvknummerVoor
+                    heeftBsnVoor
+                    rechtsvorm
+                    statutaireNaam
+                    statutaireZetel
+                  }
+                }
+              }
               invVanZakelijkrechtBrkTenaamstellingen {
                 edges {
                   node {
@@ -1177,7 +1279,7 @@ class KadastraleobjectenExportConfig:
             'query': query,
             'filename': filename,
             'mime_type': 'plain/text',
-            'format': format,
+            'format': format.get_format(),
             'sort': {
                 'invRustOpKadastraalobjectBrkZakelijkerechten'
                 '.invVanZakelijkrechtBrkTenaamstellingen'
@@ -1194,7 +1296,6 @@ class KadastraleobjectenExportConfig:
 
 
 class GemeentesExportConfig:
-
     query = '''
 {
   brkGemeentes(sort:naam_asc) {
@@ -1214,7 +1315,7 @@ class GemeentesExportConfig:
             'exporter': csv_exporter,
             'api_type': 'graphql',
             'query': query,
-            'filename': brk_filename('Gemeente', 'csv'),
+            'filename': brk_filename('Gemeente', type='csv'),
             'mime_type': 'plain/text',
             'format': {
                 'naam': 'naam',
@@ -1225,7 +1326,7 @@ class GemeentesExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql',
-            'filename': brk_filename('Gemeente', 'shp'),
+            'filename': brk_filename('Gemeente', type='shp'),
             'mime_type': 'application/octet-stream',
             'format': {
                 'GEMEENTE': 'naam',
@@ -1233,15 +1334,15 @@ class GemeentesExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': brk_filename('Gemeente', 'dbf'),
+                    'filename': brk_filename('Gemeente', type='dbf'),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Gemeente', 'shx'),
+                    'filename': brk_filename('Gemeente', type='shx'),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': brk_filename('Gemeente', 'prj'),
+                    'filename': brk_filename('Gemeente', type='prj'),
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1251,7 +1352,6 @@ class GemeentesExportConfig:
 
 
 class BijpijlingExportConfig:
-
     query = '''
 {
   brkKadastraleobjecten(indexletter: "G") {
@@ -1282,14 +1382,14 @@ class BijpijlingExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'filename': 'BRK_bijpijling.shp',
+            'filename': brk_filename('bijpijling', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('bijpijlingGeometrie'),
             ],
             'mime_type': 'application/octet-stream',
             'format': {
                 'BRK_KOT_ID': 'identificatie',
-                'GEMEENTE': 'naam',
+                'GEMEENTE': 'aangeduidDoorGemeente.naam',
                 'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
                 'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
                 'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
@@ -1300,15 +1400,15 @@ class BijpijlingExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': 'BRK_bijpijling.dbf',
+                    'filename': brk_filename('bijpijling', type='dbf', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'BRK_bijpijling.shx',
+                    'filename': brk_filename('bijpijling', type='shx', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'BRK_bijpijling.prj',
+                    'filename': brk_filename('bijpijling', type='prj', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1318,7 +1418,6 @@ class BijpijlingExportConfig:
 
 
 class PerceelnummerExportConfig:
-
     query = '''
 {
   brkKadastraleobjecten(indexletter: "G") {
@@ -1350,14 +1449,14 @@ class PerceelnummerExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'filename': 'BRK_perceelnummer.shp',
+            'filename': brk_filename('perceelnummer', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('plaatscoordinaten'),
             ],
             'mime_type': 'application/octet-stream',
             'format': {
                 'BRK_KOT_ID': 'identificatie',
-                'GEMEENTE': 'naam',
+                'GEMEENTE': 'aangeduidDoorGemeente.naam',
                 'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
                 'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
                 'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
@@ -1369,15 +1468,15 @@ class PerceelnummerExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': 'BRK_perceelnummer.dbf',
+                    'filename': brk_filename('perceelnummer', type='dbf', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'BRK_perceelnummer.shx',
+                    'filename': brk_filename('perceelnummer', type='shx', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'BRK_perceelnummer.prj',
+                    'filename': brk_filename('perceelnummer', type='prj', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
             ],

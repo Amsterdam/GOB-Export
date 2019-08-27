@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock, mock_open, call
 from gobexport.exporter.utils import nested_entity_get, split_field_reference, evaluate_condition, \
      evaluate_action, _evaluate_concat_action, _evaluate_literal_action, \
      _get_entity_value_dict_lookup_key, get_entity_value, _get_value_from_list, _evaluate_fill_action, \
-    _evaluate_format_action
+    _evaluate_format_action, _evaluate_case_action
 
 
 class TestUtils(TestCase):
@@ -232,6 +232,22 @@ class TestUtils(TestCase):
         mock_get_entity_value.assert_called_with(entity, 'the_value')
         formatter.assert_called_with(mock_get_entity_value.return_value)
 
+    @patch("gobexport.exporter.utils.get_entity_value")
+    def test_evaluate_format_action_empty_value(self, mock_get_entity_value):
+        entity = MagicMock()
+        formatter = MagicMock()
+        mock_get_entity_value.return_value = None
+        action = {
+            'action': 'format',
+            'value': 'the_value',
+            'formatter': formatter,
+        }
+
+        res = _evaluate_format_action(entity, action)
+        self.assertIsNone(res)
+        mock_get_entity_value.assert_called_with(entity, 'the_value')
+        formatter.assert_not_called()
+
     def test_evaluate_format_action_missing_keys(self):
         valid_action = {'formatter': '', 'value': ''}
 
@@ -242,11 +258,46 @@ class TestUtils(TestCase):
             with self.assertRaises(AssertionError):
                 _evaluate_format_action({}, action)
 
+    @patch("gobexport.exporter.utils.get_entity_value")
+    def test_evaluate_case_action(self, mock_get_entity_value):
+        entity = MagicMock()
+        action = {
+            'action': 'case',
+            'reference': 'some.reference',
+            'values': {
+                'A': 'valA',
+                'B': 'valB'
+            }
+        }
+
+        testcases = [('A', 'valA'), ('B', 'valB'), ('C', None)]
+
+        for reference_value, expected_value in testcases:
+            mock_get_entity_value.return_value = reference_value
+            res = _evaluate_case_action(entity, action)
+
+            mock_get_entity_value.assert_called_with(entity, 'some.reference')
+            self.assertEqual(expected_value, res)
+
+    def test_evaluate_case_action_invalid_keys(self):
+        entity = MagicMock()
+        testcases = [
+            {},
+            {'reference': 'some.reference'},
+            {'values': {}},
+            {'reference': 'some.reference', 'values': ''},
+        ]
+
+        for testcase in testcases:
+            with self.assertRaises(AssertionError):
+                _evaluate_case_action(entity, testcase)
+
     @patch('gobexport.exporter.utils._evaluate_concat_action')
     @patch('gobexport.exporter.utils._evaluate_literal_action')
     @patch('gobexport.exporter.utils._evaluate_fill_action')
     @patch('gobexport.exporter.utils._evaluate_format_action')
-    def test_evaluate_action(self, mock_format, mock_fill, mock_literal, mock_concat):
+    @patch('gobexport.exporter.utils._evaluate_case_action')
+    def test_evaluate_action(self, mock_case, mock_format, mock_fill, mock_literal, mock_concat):
         entity = {}
         action = {'action': 'concat'}
         self.assertEqual(mock_concat.return_value, evaluate_action(entity, action))
@@ -263,6 +314,10 @@ class TestUtils(TestCase):
         action = {'action': 'format'}
         self.assertEqual(mock_format.return_value, evaluate_action(entity, action))
         mock_format.assert_called_with(entity, action)
+
+        action = {'action': 'case'}
+        self.assertEqual(mock_case.return_value, evaluate_action(entity, action))
+        mock_case.assert_called_with(entity, action)
 
         with self.assertRaises(NotImplementedError):
             evaluate_action({}, {})
