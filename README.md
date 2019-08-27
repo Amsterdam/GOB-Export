@@ -23,10 +23,6 @@ is required to run this component.
 ```bash
 docker-compose build
 docker-compose up &
-
-# Start a single import
-docker exec gobexport python -m gobexport.start catalog collection file
-# e.g. meetbouten meetbouten MBT_MEETBOUT.dat
 ```
 
 ## Tests
@@ -42,6 +38,8 @@ docker-compose -f src/.jenkins/test/docker-compose.yml run test
 
 * python >= 3.6
 * gdal-dev
+
+See the docker file for help on installing gdal
 
 ## Initialisation
 
@@ -61,20 +59,17 @@ source venv/bin/activate
 
 # Run
 
-Start the service:
+Optional: Set environment if GOB-Export should connect to Objectstore:
 
 ```bash
 export $(cat .env | xargs)  # Copy from .env.example if missing
-cd src
-python -m gobexport
 ```
 
-Start a single import in another window:
+Start the service:
 
 ```bash
 cd src
-python -m gobexport.start catalog collection file
-# e.g. meetbouten meetbouten MBT_MEETBOUT.dat
+python -m gobexport
 ```
 
 ## Tests
@@ -87,6 +82,12 @@ sh test.sh
 ```
 
 # Remarks
+
+## Trigger exports
+
+Exports are triggered by the GOB-Workflow module. See the GOB-Workflow README for more details
+
+## Objectstore exports
 
 The output files are placed on the configured objectstore under {CONTAINER_BASE}/{catalog}/{file}
 CONTAINER_BASE default value is `distributie`.

@@ -111,7 +111,7 @@ def _get_file(conn_info, filename):
                 obj_info = dict(item)
                 obj = get_object(conn_info['connection'], item, conn_info['container'])
                 return obj_info, obj
-    except StopIteration:
+    except Exception:
         return None, None
 
 
