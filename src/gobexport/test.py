@@ -244,7 +244,6 @@ def _check_file(filename, stats, checks):
         total_result = total_result and result
 
         # Report any errors for the given filename as a group
-        print("Value", value, type(value))
         str_value = f"{value:,.2f}".replace(".00", "") if type(value) in [float, int] else value
         extra_data = {
             'id': filename,
