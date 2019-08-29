@@ -1284,43 +1284,20 @@ class PandenExportConfig:
 
 class BrondocumentenExportConfig:
 
-    query_actueel = '''
-{
-  bagBrondocumenten {
-    edges {
-      node {
-        documentnummer
-        invHeeftBrondocumentenBagDossiers {
-          edges {
-            node {
-              dossier
-            }
-          }
-        }
-        registratiedatum
-        bronleverancier
-        typeDossier
-        typeBrondocument
-      }
-    }
-  }
-}
-'''
     products = {
         'csv_actueel': {
-            'api_type': 'graphql',
+            'endpoint': '/gob/bag/brondocumenten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_brondocument.csv',
             'mime_type': 'plain/text',
             'format': {
-                'dossier': 'invHeeftBrondocumentenBagDossiers.[0].dossier',
+                'dossier': 'dossier',
                 'documentnummer': 'documentnummer',
                 'documentdatum': 'registratiedatum',
-                'bronleverancier': 'bronleverancier.omschrijving',
-                'typeDossier': 'typeDossier.omschrijving',
-                'typeBrondocument': 'typeBrondocument.omschrijving',
-            },
-            'query': query_actueel
+                'bronleverancier': 'bronleverancier',
+                'typeDossier': 'typeDossier',
+                'typeBrondocument': 'typeBrondocument',
+            }
         },
     }
 
