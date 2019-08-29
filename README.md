@@ -87,8 +87,13 @@ sh test.sh
 
 Exports are triggered by the GOB-Workflow module. See the GOB-Workflow README for more details
 
+## Configuration
+
+The exports are highly data driven. The configurations are stored in gobexport/exporter/config.
+
 ## Objectstore exports
 
 The output files are placed on the configured objectstore under {CONTAINER_BASE}/{catalog}/{file}
 CONTAINER_BASE default value is `distributie`.
-It is recommended to change this value in development to `development/distributie` using the .env file.
+
+It is recommended to change this value in development to **`development`** in the .env file.

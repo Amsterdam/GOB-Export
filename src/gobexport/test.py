@@ -15,6 +15,7 @@ For text exports only:
 first line   hash on the first line
 first lines  hash on the first 10 lines
 chars        Total number of characters in the file
+lines        Total number of lines in the file
 empty lines  Number of empty lines
 max line     maximum line length
 min line     minimum line length
@@ -175,7 +176,7 @@ def _propose_check_file(filename, obj_info, obj):
         if key in ["age_hours"]:
             # Maximum value
             proposal[key] = [0, value]
-        elif key in ["bytes", "chars"]:
+        elif key in ["bytes", "chars", "lines"]:
             # Minimum value
             proposal[key] = [value, None]
         elif key in ["empty_lines", "first_bytes", "first_line", "first_lines"]:
@@ -228,6 +229,9 @@ def _check_file(filename, stats, checks):
     total_result = True
     for key, margin in check.items():
         # Get corresponding value for check
+        if key not in stats:
+            logger.warning(f"Value missing for {key} check in {filename}")
+            continue
         value = stats[key]
         if len(margin) == 1:
             result = value == margin[0]
@@ -240,7 +244,7 @@ def _check_file(filename, stats, checks):
         total_result = total_result and result
 
         # Report any errors for the given filename as a group
-        str_value = f"{value:.2f}".replace(".00", "") if type(value) == float else value
+        str_value = f"{value:,.2f}".replace(".00", "") if type(value) in [float, int] else value
         extra_data = {
             'id': filename,
             'data': {
@@ -307,6 +311,7 @@ def _get_analysis(obj_info, obj):
         "first_line": hashlib.md5(first_line.encode(ENCODING)).hexdigest(),
         "first_lines": hashlib.md5(first_lines.encode(ENCODING)).hexdigest(),
         "chars": chars,
+        "lines": len(lines),
         "empty_lines": len(zero_line_lengths),
         "max_line": max(other_line_lengths),
         "min_line": min(other_line_lengths),
