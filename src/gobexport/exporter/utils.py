@@ -65,7 +65,9 @@ def _evaluate_format_action(entity: dict, action: dict):
 
     value = get_entity_value(entity, action['value'])
 
-    if value:
+    # Override none can be used to format a None value e.g. 0 -> '0.000'
+    override_none = action.get('override_none', False)
+    if value or override_none:
         return action['formatter'](value)
     return None
 
