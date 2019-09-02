@@ -1445,6 +1445,10 @@ class PerceelnummerExportConfig:
 }
 '''
 
+    def format_rotatie(value):
+        # Return rotatie with three decimal places
+        return f'{value:.3f}'
+
     products = {
         'shape': {
             'exporter': esri_exporter,
@@ -1463,7 +1467,12 @@ class PerceelnummerExportConfig:
                 'PERCEELNR': 'perceelnummer',
                 'INDEXLTR': 'indexletter',
                 'INDEXNR': 'indexnummer',
-                'ROTATIE': 'perceelnummerRotatie',
+                'ROTATIE': {
+                    'action': 'format',
+                    'formatter': format_rotatie,
+                    'override_none': True,
+                    'value': 'perceelnummerRotatie',
+                },
                 'geometrie': 'plaatscoordinaten',
             },
             'extra_files': [

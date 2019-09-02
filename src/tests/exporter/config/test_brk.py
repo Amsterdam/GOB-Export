@@ -2,7 +2,7 @@ from unittest import TestCase
 from datetime import datetime
 
 from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_filename, sort_attributes, \
-    format_timestamp, ZakelijkerechtenCsvFormat
+    format_timestamp, ZakelijkerechtenCsvFormat, PerceelnummerExportConfig
 
 
 class TestBrkConfigHelpers(TestCase):
@@ -62,6 +62,16 @@ class TestBrkConfigHelpers(TestCase):
         for inp in ['invalid_str', None]:
             # These inputs should not change
             self.assertEqual(inp, format_timestamp(inp))
+
+    def test_format_rotatie(self):
+        testcases = [
+            (0, '0.000'),
+            (-0.234435345, '-0.234'),
+            (0.1299999999, '0.130'),
+        ]
+
+        for inp, outp in testcases:
+            self.assertEqual(PerceelnummerExportConfig.format_rotatie(inp), outp)
 
 
 class TestBrkCsvFormat(TestCase):
