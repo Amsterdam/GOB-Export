@@ -1417,7 +1417,43 @@ class BijpijlingExportConfig:
     }
 
 
+class PerceelnummerEsriFormat:
+
+    def format_rotatie(self, value):
+        assert not None and isinstance(value, (int, float))
+        # Return rotatie with three decimal places
+        return f'{value:.3f}'
+
+    def get_format(self):
+        return {
+            'BRK_KOT_ID': 'identificatie',
+            'GEMEENTE': 'aangeduidDoorGemeente.naam',
+            'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+            'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
+            'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+            'PERCEELNR': 'perceelnummer',
+            'INDEXLTR': 'indexletter',
+            'INDEXNR': 'indexnummer',
+            'ROTATIE': {
+                'condition': 'isempty',
+                'reference': 'perceelnummerRotatie',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': self.format_rotatie,
+                    'value': 'perceelnummerRotatie',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': '0.000',
+                }
+            },
+            'geometrie': 'plaatscoordinaten',
+        }
+
+
 class PerceelnummerExportConfig:
+    format = PerceelnummerEsriFormat()
+
     query = '''
 {
   brkKadastraleobjecten(indexletter: "G") {
@@ -1445,10 +1481,6 @@ class PerceelnummerExportConfig:
 }
 '''
 
-    def format_rotatie(value):
-        # Return rotatie with three decimal places
-        return f'{value:.3f}'
-
     products = {
         'shape': {
             'exporter': esri_exporter,
@@ -1458,23 +1490,7 @@ class PerceelnummerExportConfig:
                 NotEmptyFilter('plaatscoordinaten'),
             ],
             'mime_type': 'application/octet-stream',
-            'format': {
-                'BRK_KOT_ID': 'identificatie',
-                'GEMEENTE': 'aangeduidDoorGemeente.naam',
-                'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-                'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
-                'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
-                'PERCEELNR': 'perceelnummer',
-                'INDEXLTR': 'indexletter',
-                'INDEXNR': 'indexnummer',
-                'ROTATIE': {
-                    'action': 'format',
-                    'formatter': format_rotatie,
-                    'override_none': True,
-                    'value': 'perceelnummerRotatie',
-                },
-                'geometrie': 'plaatscoordinaten',
-            },
+            'format': format.get_format(),
             'extra_files': [
                 {
                     'filename': brk_filename('perceelnummer', type='dbf', append_date=False),
