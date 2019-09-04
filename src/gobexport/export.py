@@ -57,7 +57,8 @@ def _export_collection(host, catalogue, collection, destination):
         logger.info(f"Export to file '{name}' started.")
 
         # Get name of local file to write results to
-        results_file = _get_filename(product['filename']) if destination == "Objectstore" else product['filename']
+        filename = product['filename']() if callable(product['filename']) else product['filename']
+        results_file = _get_filename(filename) if destination == "Objectstore" else filename
 
         # Buffer items if they are used multiple times. This prevents calling API multiple times for same data
         source = product_source(product)
