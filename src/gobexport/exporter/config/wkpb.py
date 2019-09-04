@@ -108,6 +108,21 @@ class BeperkingenExportConfig:
             },
             'query': query_orgaan
         },
+        'csv_kadastraal_object': {
+            'endpoint': '/gob/wkpb/beperkingen/?view=enhanced&ndjson=true',
+            'exporter': csv_exporter,
+            'filename': 'CSV_Actueel/WKPB_beperking_kadastraalobject.csv',
+            'mime_type': 'plain/text',
+            'format': {
+                'identificatie': 'identificatie',
+                'belast:BRK.KOT.identificatie': 'kadastraalObject',
+                'belast:BRK.KOT.gemeentecode': 'aangeduidDoorKadastralegemeente',
+                'belast:BRK.KOT.sectie': 'aangeduidDoorKadastralesectie',
+                'belast:BRK.KOT.perceelnummer': 'perceelnummer',
+                'belast:BRK.KOT.indexletter': 'indexletter',
+                'belast:BRK.KOT.indexnummer': 'indexnummer',
+            }
+        }
     }
 
 

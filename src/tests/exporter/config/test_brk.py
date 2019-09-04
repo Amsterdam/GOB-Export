@@ -1,12 +1,14 @@
 from unittest import TestCase
+from unittest.mock import patch
 from datetime import datetime
 
 from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_filename, sort_attributes, \
-    format_timestamp, ZakelijkerechtenCsvFormat, PerceelnummerEsriFormat
+    format_timestamp, ZakelijkerechtenCsvFormat, PerceelnummerEsriFormat, _get_filename_date
 
 
 class TestBrkConfigHelpers(TestCase):
 
+    @patch("gobexport.exporter.config.brk._get_filename_date", datetime.now)
     def test_brk_filename(self):
         self.assertEqual(f"AmsterdamRegio/CSV_Actueel/BRK_FileName_{datetime.now().strftime('%Y%m%d')}.csv",
                          brk_filename('FileName'))
@@ -62,6 +64,16 @@ class TestBrkConfigHelpers(TestCase):
         for inp in ['invalid_str', None]:
             # These inputs should not change
             self.assertEqual(inp, format_timestamp(inp))
+
+    @patch("gobexport.exporter.config.brk.requests.get")
+    def test_get_filename_date(self, mock_request_get):
+        mock_request_get.return_value.json.return_value = {
+            'id': 1,
+            'kennisgevingsdatum': "2019-09-03T00:00:00",
+        }
+
+        expected_date = datetime(year=2019, month=9, day=3)
+        self.assertEqual(expected_date, _get_filename_date())
 
 
 class TestBrkCsvFormat(TestCase):
