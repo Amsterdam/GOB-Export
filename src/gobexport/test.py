@@ -79,6 +79,8 @@ def test(catalogue):
     for config in _export_config[catalogue]:
         for name, product in config.products.items():
             filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
+            filenames = [f() if callable(f) else f for f in filenames]
+
             for filename in filenames:
                 obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
                 if checks.get(filename):
