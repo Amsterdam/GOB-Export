@@ -375,7 +375,7 @@ class AantekeningenExportConfig:
             'value': 'Aantekening Zakelijk Recht (R)'
         },
         'BRK_KOT_ID': 'rustOpKadastraalobject.[0].identificatie',
-        'KOT_KADASTRALEGEMCODE_CODE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_KADASTRALEGEMCODE_CODE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.broninfo.code',
         'KOT_SECTIE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralesectie.bronwaarde',
         'KOT_PERCEELNUMMER': 'rustOpKadastraalobject.[0].perceelnummer',
         'KOT_INDEX_LETTER': 'rustOpKadastraalobject.[0].indexletter',
@@ -443,7 +443,7 @@ class AantekeningenExportConfig:
         },
         'BRK_KOT_ID': 'heeftBetrekkingOpKadastraalObject.[0].identificatie',
         'KOT_KADASTRALEGEMCODE_CODE':
-            'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
+            'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralegemeentecode.broninfo.code',
         'KOT_SECTIE': 'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralesectie.bronwaarde',
         'KOT_PERCEELNUMMER': 'heeftBetrekkingOpKadastraalObject.[0].perceelnummer',
         'KOT_INDEX_LETTER': 'heeftBetrekkingOpKadastraalObject.[0].indexletter',
@@ -795,8 +795,8 @@ class BrkBagCsvFormat:
     def get_format(self):
         return {
             'BRK_KOT_ID': 'identificatie',
-            'KOT_AKRKADGEMEENTECODE_CODE': '',  # TODO when gemeentecode is imported
-            'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
+            'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorkadastralegemeentecode.broninfo.code',
+            'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
             'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
             'KOT_PERCEELNUMMER': 'perceelnummer',
             'KOT_INDEX_LETTER': 'indexletter',
@@ -1028,11 +1028,10 @@ class KadastraleobjectenCsvFormat:
         return {
             'BRK_KOT_ID': 'identificatie',
             'KOT_GEMEENTENAAM': 'aangeduidDoorGemeente.naam',
-            # TODO Gemeente codes etc after correct import of kadastrale gemeentes and codes
-            'KOT_AKRKADGEMCODE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-            'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-            'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.bronwaarde',
-            'KOT_KAD_GEMEENTE_OMS': '',
+            'KOT_AKRKADGEMCODE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.code',
+            'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.bronwaarde',
+            'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.broninfo.code',
+            'KOT_KAD_GEMEENTE_OMS': 'aangeduidDoorKadastralegemeente.broninfo.omschrijving',
             'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
             'KOT_PERCEELNUMMER': 'perceelnummer',
             'KOT_INDEX_LETTER': 'indexletter',
