@@ -77,7 +77,7 @@ def _export_collection(host, catalogue, collection, destination):
                 # Do not add file to files again when appending
                 files.append({
                     'temp_location': results_file,
-                    'distribution': filename,
+                    'distribution': product['filename'],
                     'mime_type': product['mime_type']})
 
             # Add extra result files (e.g. .prj file)
