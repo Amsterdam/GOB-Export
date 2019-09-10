@@ -70,6 +70,11 @@ def _evaluate_format_action(entity: dict, action: dict):
     return None
 
 
+def _evaluate_build_value_action(entity: dict, action: dict):
+    assert 'valuebuilder' in action
+    return action['valuebuilder'](entity)
+
+
 def _evaluate_case_action(entity: dict, action: dict):
     assert all([key in action for key in ['reference', 'values']])
     assert isinstance(action['values'], dict)
@@ -89,6 +94,8 @@ def evaluate_action(entity: dict, action: dict):
         return _evaluate_format_action(entity, action)
     elif action.get('action') == 'case':
         return _evaluate_case_action(entity, action)
+    elif action.get('action') == 'build_value':
+        return _evaluate_build_value_action(entity, action)
     else:
         raise NotImplementedError()
 

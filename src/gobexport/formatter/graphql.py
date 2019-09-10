@@ -23,7 +23,8 @@ class GraphQLResultFormatter:
 
     def _flatten_edge(self, edge, main=None):
         """Flatten edges and nodes from the graphql response, places all nested references
-        as keys in the main dictionary
+        as keys in the main dictionary, as well as keeping them in their original place to still be able to find
+        values 2-dimensionally.
 
         :return: a list of dictionaries
         """
@@ -33,8 +34,8 @@ class GraphQLResultFormatter:
             if isinstance(value, dict) and 'edges' in value:
                 if main:
                     main.setdefault(key, []).extend([self._flatten_edge(e, main) for e in value['edges']])
-                else:
-                    flat_edge.setdefault(key, []).extend([self._flatten_edge(e, flat_edge) for e in value['edges']])
+
+                flat_edge.setdefault(key, []).extend([self._flatten_edge(e, flat_edge) for e in value['edges'] if e])
             else:
                 flat_edge[key] = value
 
