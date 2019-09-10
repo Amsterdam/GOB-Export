@@ -5,12 +5,15 @@ from fractions import Fraction
 from operator import itemgetter
 from typing import Optional
 
+from gobexport.config import get_host
+
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
 from gobexport.filters.notempty_filter import NotEmptyFilter
 
-from gobexport.config import get_host
+from gobexport.formatter.geometry import format_geometry
+
 
 FILE_TYPE_MAPPING = {
     'csv': {
@@ -1159,7 +1162,11 @@ class KadastraleobjectenCsvFormat:
             'SJT_VVE_UIT_EIGENDOM': 'betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
             'KOT_INONDERZOEK': 'inOnderzoek',
             'KOT_MODIFICATION': 'wijzigingsdatum',
-            'GEOMETRIE': 'geometrie'
+            'GEOMETRIE': {
+                'action': 'format',
+                'formatter': format_geometry,
+                'value': 'geometrie'
+            },
         }
 
 
@@ -1318,7 +1325,11 @@ class GemeentesExportConfig:
             'format': {
                 'naam': 'naam',
                 'identificatie': 'identificatie',
-                'geometrie': 'geometrie'
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             }
         },
         'shape': {
@@ -1394,7 +1405,11 @@ class BijpijlingExportConfig:
                 'PERCEELNR': 'perceelnummer',
                 'INDEXLTR': 'indexletter',
                 'INDEXNR': 'indexnummer',
-                'geometrie': 'bijpijlingGeometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'bijpijlingGeometrie'
+                },
             },
             'extra_files': [
                 {
@@ -1445,7 +1460,11 @@ class PerceelnummerEsriFormat:
                     'value': '0.000',
                 }
             },
-            'geometrie': 'plaatscoordinaten',
+            'geometrie': {
+                'action': 'format',
+                'formatter': format_geometry,
+                'value': 'plaatscoordinaten'
+            },
         }
 
 
