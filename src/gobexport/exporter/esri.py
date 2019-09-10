@@ -86,7 +86,7 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
                 dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=geometry_type)
 
                 # Add all field definitions, but skip geometrie
-                all_fields = {k: v for k, v in format.items() if k is not 'geometrie'}
+                all_fields = {k: v for k, v in format.items() if k is not geometry_field}
                 add_field_definitions(dstlayer, all_fields.keys())
 
             feature = ogr.Feature(dstlayer.GetLayerDefn())

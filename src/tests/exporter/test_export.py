@@ -10,6 +10,8 @@ from gobexport.exporter.dat import dat_exporter
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
+from gobexport.formatter.geometry import format_geometry
+
 
 def before_each(monkeypatch):
     import gobexport.exporter
@@ -51,7 +53,11 @@ class MockConfig:
             'format': {
                 'identificatie': 'identificatie',
                 'boolean': 'boolean',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             },
             'query': 'any query'
         },

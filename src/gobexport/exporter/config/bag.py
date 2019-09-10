@@ -1,6 +1,8 @@
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
+from gobexport.formatter.geometry import format_geometry
+
 
 """BAG export config
 
@@ -84,6 +86,36 @@ class WoonplaatsenExportConfig:
 }
 '''
 
+    query_history = '''
+{
+  bagWoonplaatsen(active: false) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        aanduidingInOnderzoek
+        geconstateerd
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        status
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
+            }
+          }
+        }
+        geometrie
+      }
+    }
+  }
+}
+'''
+
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
@@ -96,7 +128,11 @@ class WoonplaatsenExportConfig:
         'status': 'status.omschrijving',
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-        'geometrie': 'geometrie',
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     esri_format = BAGDefaultFormat({
@@ -126,8 +162,13 @@ class WoonplaatsenExportConfig:
         'documentnummer': 'documentnummer',
         'status': 'status.omschrijving',
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
+        'ligtIn:BRK.GME.volgnummer': '',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-        'geometrie': 'geometrie',
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     products = {
@@ -160,6 +201,14 @@ class WoonplaatsenExportConfig:
                 },
             ],
             'query': query_actueel
+        },
+        'csv_history': {
+            'api_type': 'graphql_streaming',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_woonplaats_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': query_history
         },
     }
 
@@ -210,7 +259,11 @@ class OpenbareruimtesExportConfig:
         'status': 'status.omschrijving',
         'ligtIn:BAG.WPS.identificatie': 'ligtInWoonplaats.identificatie',
         'ligtIn:BAG.WPS.naam': 'ligtInWoonplaats.naam',
-        'geometrie': 'geometrie',
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     esri_format = BAGDefaultFormat({
@@ -248,7 +301,11 @@ class OpenbareruimtesExportConfig:
         'ligtIn:BAG.WPS.naam': 'ligtInWoonplaats.naam',
         'beginTijdvak': 'beginTijdvak',
         'eindTijdvak': 'eindTijdvak',
-        'geometrie': 'geometrie',
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     products = {
@@ -435,7 +492,11 @@ class VerblijfsobjectenExportConfig:
         'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
         'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-        'geometrie': 'geometrie'
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     esri_format = BAGDefaultFormat({
@@ -564,7 +625,11 @@ class VerblijfsobjectenExportConfig:
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
         'beginTijdvak': 'beginTijdvak',
         'eindTijdvak': 'eindTijdvak',
-        'geometrie': 'geometrie'
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     products = {
@@ -738,7 +803,11 @@ class StandplaatsenExportConfig:
         'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
         'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-        'geometrie': 'geometrie'
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     esri_format = BAGDefaultFormat({
@@ -829,7 +898,11 @@ class StandplaatsenExportConfig:
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
         'beginTijdvak': 'beginTijdvak',
         'eindTijdvak': 'eindTijdvak',
-        'geometrie': 'geometrie'
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     products = {
@@ -1005,7 +1078,11 @@ class LigplaatsenExportConfig:
         'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
         'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-        'geometrie': 'geometrie'
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     esri_format = BAGDefaultFormat({
@@ -1096,7 +1173,11 @@ class LigplaatsenExportConfig:
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
         'beginTijdvak': 'beginTijdvak',
         'eindTijdvak': 'eindTijdvak',
-        'geometrie': 'geometrie'
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     products = {
@@ -1168,7 +1249,11 @@ class PandenExportConfig:
         'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
         'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-        'geometrie': 'geometrie'
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     esri_format = BAGDefaultFormat({
@@ -1247,7 +1332,11 @@ class PandenExportConfig:
         'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
         'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-        'geometrie': 'geometrie'
+        'geometrie': {
+            'action': 'format',
+            'formatter': format_geometry,
+            'value': 'geometrie'
+        },
     })
 
     products = {
@@ -1288,7 +1377,7 @@ class BrondocumentenExportConfig:
         'csv_actueel': {
             'endpoint': '/gob/bag/brondocumenten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
-            'filename': 'CSV_Actueel/BAG_brondocument.csv',
+            'filename': 'CSV_Actueel/BAG_brondocument_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
                 'dossier': 'dossier',
