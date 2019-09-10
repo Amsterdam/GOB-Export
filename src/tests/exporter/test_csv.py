@@ -56,9 +56,8 @@ class TestCsvExporter(TestCase):
     @patch("gobexport.exporter.csv.build_mapping_from_format")
     @patch("builtins.open", mock_open())
     @patch("gobexport.exporter.csv.csv")
-    @patch("gobexport.exporter.csv.shape")
     @patch("gobexport.exporter.csv.ProgressTicker")
-    def test_csv_exporter_filter(self, mock_progress_ticker, mock_shape, mock_csv, mock_build_mapping,
+    def test_csv_exporter_filter(self, mock_progress_ticker, mock_csv, mock_build_mapping,
                                  mock_match_fieldnames):
         api = ['a']
         file = ""
@@ -74,4 +73,3 @@ class TestCsvExporter(TestCase):
 
         mock_filter.filter.assert_called_with('a')
         mock_tick.tick.assert_not_called()
-

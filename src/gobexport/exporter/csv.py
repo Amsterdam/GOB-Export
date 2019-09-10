@@ -1,7 +1,5 @@
 import csv
 
-from shapely.geometry import shape
-
 from gobcore.exceptions import GOBException
 from gobcore.utils import ProgressTicker
 
@@ -102,10 +100,6 @@ def csv_exporter(api, file, format=None, append=False, filter: EntityFilter=None
             row = {}
             for attribute_name, lookup_key in mapping.items():
                 row[attribute_name] = get_entity_value(entity, lookup_key)
-
-            # Convert geojson to wkt
-            if 'geometrie' in row:
-                row['geometrie'] = shape(entity['geometrie']).wkt if entity['geometrie'] else ''
 
             writer.writerow(row)
             row_count += 1

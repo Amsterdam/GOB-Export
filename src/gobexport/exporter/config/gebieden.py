@@ -1,6 +1,8 @@
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
+from gobexport.formatter.geometry import format_geometry
+
 
 """Gebieden export config
 
@@ -40,7 +42,11 @@ class StadsdelenExportConfig:
                 'documentnummer': 'documentnummer',
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             }
         },
         'esri_actueel': {
@@ -58,7 +64,6 @@ class StadsdelenExportConfig:
                 'docnummer': 'documentnummer',
                 'gme_id': 'ligtInGemeente.identificatie',
                 'gme_naam': 'ligtInGemeente.naam',
-                'geometrie': 'geometrie'
             },
             'extra_files': [
                 {
@@ -96,7 +101,11 @@ class StadsdelenExportConfig:
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'beginTijdvak': 'beginTijdvak',
                 'eindTijdvak': 'eindTijdvak',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             },
             'query': """
 {
@@ -153,7 +162,11 @@ class GGPGebiedenExportConfig:
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
 
             }
         },
@@ -216,7 +229,11 @@ class GGPGebiedenExportConfig:
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'beginTijdvak': 'beginTijdvak',
                 'eindTijdvak': 'eindTijdvak',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             },
             'query': '''
 {
@@ -285,7 +302,11 @@ class GGWGebiedenExportConfig:
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             }
         },
         'esri_actueel': {
@@ -347,7 +368,11 @@ class GGWGebiedenExportConfig:
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'beginTijdvak': 'beginTijdvak',
                 'eindTijdvak': 'eindTijdvak',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             },
             'query': '''
 {
@@ -420,7 +445,11 @@ class WijkenExportConfig:
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             }
         },
         'esri_actueel': {
@@ -491,7 +520,11 @@ class WijkenExportConfig:
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'beginTijdvak': 'beginTijdvak',
                 'eindTijdvak': 'eindTijdvak',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             },
             'query': '''
 {
@@ -583,7 +616,11 @@ class BuurtenExportConfig:
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             }
         },
         'esri_actueel': {
@@ -668,7 +705,11 @@ class BuurtenExportConfig:
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'beginTijdvak': 'beginTijdvak',
                 'eindTijdvak': 'eindTijdvak',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             },
             'query': '''
 {
@@ -783,7 +824,11 @@ class BouwblokkenExportConfig:
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             }
         },
         'esri_actueel': {
@@ -867,7 +912,11 @@ class BouwblokkenExportConfig:
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
                 'beginTijdvak': 'beginTijdvak',
                 'eindTijdvak': 'eindTijdvak',
-                'geometrie': 'geometrie',
+                'geometrie': {
+                    'action': 'format',
+                    'formatter': format_geometry,
+                    'value': 'geometrie'
+                },
             },
             'query': '''
 {

@@ -112,9 +112,12 @@ class TestGraphQLResultFormatter(TestCase):
 
         expected_result = {
             'value': 'value',
-            'reference': [{'value': 'value'}],
+            'reference': [{
+                'value': 'value',
+                'nested_reference': [{'nested_value': 'value'}]
+            }],
             'nested_reference': [{'nested_value': 'value'}],
-            'empty_reference': [],
+            'empty_reference': [{'empty_nested_reference': []}],
             'empty_nested_reference': [],
         }
         result = formatter._flatten_edge(nested_edge)

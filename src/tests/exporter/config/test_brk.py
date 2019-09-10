@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from datetime import datetime
 
 from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_filename, sort_attributes, \
@@ -17,7 +17,7 @@ class TestBrkConfigHelpers(TestCase):
                          brk_filename('FileName', type='shp'))
 
         self.assertEqual(f"AmsterdamRegio/SHP_Actueel/BRK_FileName.prj",
-                         brk_filename('FileName', type='prj', append_date=False,))
+                         brk_filename('FileName', type='prj', append_date=False, ))
 
         # Assert undefined file type raises error
         with self.assertRaises(AssertionError):
@@ -134,30 +134,110 @@ class TestBrkZakelijkerechtenCsvFormat(TestCase):
     def setUp(self) -> None:
         self.format = ZakelijkerechtenCsvFormat()
 
-    def test_zrt_belast_met_azt_formatter(self):
-        testcases = [
-            ('A', '[A]'),
-            ('A|B', '[A]+[B]'),
+    def test_take_nested(self):
+        entity = {
+            'relA': [
+                {
+                    'requestedFieldA': 'requestedValueA1',
+                    'relB': [
+                        {
+                            'requestedFieldB': 'requestedValueB1',
+                            'relC': [
+                                {
+                                    'requestedFieldC': 'requestedValueC1',
+
+                                },
+                            ]
+                        },
+                    ]
+                },
+                {
+                    'requestedFieldA': 'requestedValueA2',
+                    'relB': [
+                        {
+                            'requestedFieldB': 'requestedValueB2',
+                            'relC': [
+                                {
+                                    'requestedFieldC': 'requestedValueC2'
+                                },
+                            ]
+                        }
+                    ]
+                },
+                {
+                    'requestedFieldA': 'requestedValueA3',
+                },
+                {
+                    'requestedFieldA': 'requestedValueA4',
+                    'relB': [
+                        {
+                            'requestedFieldB': 'requestedValueB3',
+                            'relC': [
+                                {
+                                    'requestedFieldC': 'requestedValueC3',
+                                },
+                                {
+                                    'requestedFieldC': 'requestedValueC4',
+                                }
+                            ]
+                        },
+                        {
+                            'requestedFieldB': 'requestedValueB4',
+                            'relC': [
+                                {
+                                    'requestedFieldC': 'requestedValueC5',
+                                },
+                                {
+                                    'requestedFieldC': 'requestedValueC6',
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+
+        take = [
+            ('relA', 'requestedFieldA'),
+            ('relB', 'requestedFieldB'),
+            ('relC', 'requestedFieldC'),
         ]
 
-        for inp, outp in testcases:
-            self.assertEqual(outp, self.format.zrt_belast_met_azt_formatter(inp))
+        expected_result = [
+            ['requestedValueA1', ['requestedValueB1', ['requestedValueC1']]],
+            ['requestedValueA2', ['requestedValueB2', ['requestedValueC2']]],
+            ['requestedValueA3'],
+            ['requestedValueA4', ['requestedValueB3', ['requestedValueC3'], ['requestedValueC4']],
+                                 ['requestedValueB4', ['requestedValueC5'], ['requestedValueC6']]]
+        ]
 
-        testcases = ['', None, 1]
+        result = self.format._take_nested(take, entity)
+        self.assertEqual(expected_result, result)
 
-        for testcase in testcases:
-            with self.assertRaises(AssertionError):
-                self.format.zrt_belast_met_azt_formatter(testcase)
+    def test_format_azt_values(self):
+        testcases = [
+            ([['A1', ['B1', ['C1']]]], '[A1-B1-C1]'),
+            ([['A1', ['B1', ['C1']]], ['A2', ['B2', ['C2']]]], '[A1-B1-C1]+[A2-B2-C2]'),
+            ([['A1', ['B1', ['C1'], ['C2']]], ['A2']], '[* A1-B1-C1-C2]+[A2]')
+        ]
 
-    def test_zrt_belast_azt_formatter(self):
-        self.assertEqual('[A]', self.format.zrt_belast_azt_formatter('A'))
+        for testcase, expected_result in testcases:
 
-        errors = ['', None, 1]
+            result = self.format._format_azt_values(testcase)
 
-        for testcase in errors:
-            with self.assertRaises(AssertionError):
-                self.format.zrt_belast_azt_formatter(testcase)
+            self.assertEqual(expected_result, result)
 
+    def test_zrt_belast_met_azt_valuebuilder(self):
+        self.format._take_nested = lambda take, entity: 'taken_' + entity
+        self.format._format_azt_values = lambda x: 'formatted_' + x
+
+        self.assertEqual('formatted_taken_entity', self.format.zrt_belast_met_azt_valuebuilder('entity'))
+
+    def test_zrt_belast_azt_valuebuilder(self):
+        self.format._take_nested = lambda take, entity: 'taken_' + entity
+        self.format._format_azt_values = lambda x: 'formatted_' + x
+
+        self.assertEqual('formatted_taken_entity', self.format.zrt_belast_azt_valuebuilder('entity'))
 
 class TestPerceelnummerEsriFormat(TestCase):
 

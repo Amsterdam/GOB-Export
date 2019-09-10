@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock, mock_open, call
 from gobexport.exporter.utils import nested_entity_get, split_field_reference, evaluate_condition, \
      evaluate_action, _evaluate_concat_action, _evaluate_literal_action, \
      _get_entity_value_dict_lookup_key, get_entity_value, _get_value_from_list, _evaluate_fill_action, \
-    _evaluate_format_action, _evaluate_case_action
+    _evaluate_format_action, _evaluate_case_action, _evaluate_build_value_action
 
 
 class TestUtils(TestCase):
@@ -258,6 +258,21 @@ class TestUtils(TestCase):
             with self.assertRaises(AssertionError):
                 _evaluate_format_action({}, action)
 
+    def test_evaluate_valuebuilder_action(self):
+        entity = MagicMock()
+        action = {
+            'valuebuilder': MagicMock()
+        }
+
+        res = _evaluate_build_value_action(entity, action)
+
+        action['valuebuilder'].assert_called_with(entity)
+        self.assertEqual(action['valuebuilder'].return_value, res)
+
+        with self.assertRaises(AssertionError):
+            _evaluate_build_value_action({}, {})
+
+
     @patch("gobexport.exporter.utils.get_entity_value")
     def test_evaluate_case_action(self, mock_get_entity_value):
         entity = MagicMock()
@@ -297,7 +312,8 @@ class TestUtils(TestCase):
     @patch('gobexport.exporter.utils._evaluate_fill_action')
     @patch('gobexport.exporter.utils._evaluate_format_action')
     @patch('gobexport.exporter.utils._evaluate_case_action')
-    def test_evaluate_action(self, mock_case, mock_format, mock_fill, mock_literal, mock_concat):
+    @patch('gobexport.exporter.utils._evaluate_build_value_action')
+    def test_evaluate_action(self, mock_valuebuilder, mock_case, mock_format, mock_fill, mock_literal, mock_concat):
         entity = {}
         action = {'action': 'concat'}
         self.assertEqual(mock_concat.return_value, evaluate_action(entity, action))
@@ -318,6 +334,10 @@ class TestUtils(TestCase):
         action = {'action': 'case'}
         self.assertEqual(mock_case.return_value, evaluate_action(entity, action))
         mock_case.assert_called_with(entity, action)
+
+        action = {'action': 'build_value'}
+        self.assertEqual(mock_valuebuilder.return_value, evaluate_action(entity, action))
+        mock_valuebuilder.assert_called_with(entity, action)
 
         with self.assertRaises(NotImplementedError):
             evaluate_action({}, {})
