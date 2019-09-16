@@ -26,23 +26,22 @@ def add_field_definitions(layer, fieldnames):
 
 
 def create_geometry(entity_geometry):
+    assert entity_geometry is not None
     # Get geometry from GEOJSON or WKTstring (GraphQLStreaming)
     geometry_wkt = shape(entity_geometry).wkt if isinstance(entity_geometry, dict) else entity_geometry
     # Add geometrie
     poly = ogr.CreateGeometryFromWkt(geometry_wkt)
+
     # Force geometriecollection to polygon
-    if poly.GetGeometryType() == ogr.wkbGeometryCollection:
+    if poly and poly.GetGeometryType() == ogr.wkbGeometryCollection:
         poly = ogr.ForceToPolygon(poly)
 
     return poly
 
 
 def _get_geometry_type(entity_geometry):
-    # Try to get the geometry type from the first record
-    try:
-        geometry_type = create_geometry(entity_geometry).GetGeometryType()
-    except (KeyError, AttributeError) as e:
-        geometry_type = ogr.wkbPolygon
+    # Try to get the geometry type from the first record, default to Polygon
+    geometry_type = create_geometry(entity_geometry).GetGeometryType()
     return geometry_type
 
 
@@ -79,10 +78,12 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
             if filter and not filter.filter(entity):
                 continue
 
+            entity_geometry = get_entity_value(entity, geometry_field)
+
             # On the first entity determine the type of shapefile we need to export
             if row_count == 0:
                 # Please note that it will fail if a file with the same name already exists
-                geometry_type = _get_geometry_type(entity[geometry_field])
+                geometry_type = _get_geometry_type(entity_geometry)
                 dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=geometry_type)
 
                 # Add all field definitions, but skip geometrie
@@ -90,8 +91,8 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
                 add_field_definitions(dstlayer, all_fields.keys())
 
             feature = ogr.Feature(dstlayer.GetLayerDefn())
-            if entity[geometry_field]:
-                feature.SetGeometry(create_geometry(entity[geometry_field]))
+            if entity_geometry:
+                feature.SetGeometry(create_geometry(entity_geometry))
 
             for attribute_name, source in all_fields.items():
                 mapping = split_field_reference(source)

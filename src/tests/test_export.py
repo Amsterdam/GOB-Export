@@ -134,3 +134,20 @@ def test_export_without_connection(monkeypatch):
 
     export.export("meetbouten", "meetbouten", "Objectstore")
     export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")
+
+
+def test_export_exception(monkeypatch):
+    # Test logger.error is called when an export fails
+    monkeypatch.setitem(__builtins__, 'open', mock_open)
+    monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
+    monkeypatch.setattr(gobexport.exporter, 'export_to_file', lambda h, en, ex, f, fo, b: Exception())
+
+    importlib.reload(gobexport.export)
+
+    from gobexport import export
+    mock_error = mock.MagicMock()
+    export.logger = mock.MagicMock()
+    export.logger.error = mock_error
+
+    export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")
+    mock_error.assert_called()
