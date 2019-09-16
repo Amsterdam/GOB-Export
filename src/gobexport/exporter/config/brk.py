@@ -949,7 +949,7 @@ class BrkBagCsvFormat:
     def get_format(self):
         return {
             'BRK_KOT_ID': 'identificatie',
-            'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorkadastralegemeentecode.broninfo.code',
+            'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.code',
             'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
             'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
             'KOT_PERCEELNUMMER': 'perceelnummer',
