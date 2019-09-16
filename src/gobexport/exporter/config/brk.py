@@ -1178,12 +1178,22 @@ class KadastraleobjectenCsvFormat:
             }
         }
 
+    def comma_concatter(self, value):
+        return value.replace('|', ', ')
+
+    def concat_with_comma(self, reference):
+        return {
+            'action': 'format',
+            'value': reference,
+            'formatter': self.comma_concatter
+        }
+
     def get_format(self):
         return {
             'BRK_KOT_ID': 'identificatie',
             'KOT_GEMEENTENAAM': 'aangeduidDoorGemeente.naam',
             'KOT_AKRKADGEMCODE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.code',
-            'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.bronwaarde',
+            'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
             'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.broninfo.code',
             'KOT_KAD_GEMEENTE_OMS': 'aangeduidDoorKadastralegemeente.broninfo.omschrijving',
             'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
@@ -1193,15 +1203,19 @@ class KadastraleobjectenCsvFormat:
             'KOT_SOORTGROOTTE_CODE': 'soortGrootte.code',
             'KOT_SOORTGROOTTE_OMS': 'soortGrootte.omschrijving',
             'KOT_KADGROOTTE': 'grootte',
-            'KOT_RELATIE_G_PERCEEL': 'isOntstaanUitGPerceel.identificatie',
+            'KOT_RELATIE_G_PERCEEL': self.concat_with_comma('isOntstaanUitGPerceel.identificatie'),
             'KOT_KOOPSOM': 'koopsom',
             'KOT_KOOPSOM_VALUTA': 'koopsomValutacode',
             'KOT_KOOPJAAR': 'koopjaar',
             'KOT_INDICATIE_MEER_OBJECTEN': 'indicatieMeerObjecten',
             'KOT_CULTUURCODEONBEBOUWD_CODE': 'soortCultuurOnbebouwd.code',
             'KOT_CULTUURCODEONBEBOUWD_OMS': 'soortCultuurOnbebouwd.omschrijving',
-            'KOT_CULTUURCODEBEBOUWD_CODE': self.if_empty_geenWaarde('soortCultuurBebouwd.code'),
-            'KOT_CULTUURCODEBEBOUWD_OMS': self.if_empty_geenWaarde('soortCultuurBebouwd.omschrijving'),
+            'KOT_CULTUURCODEBEBOUWD_CODE': self.if_empty_geenWaarde(
+                self.concat_with_comma('soortCultuurBebouwd.code')
+            ),
+            'KOT_CULTUURCODEBEBOUWD_OMS': self.if_empty_geenWaarde(
+                self.concat_with_comma('soortCultuurBebouwd.omschrijving')
+            ),
             'KOT_AKRREGISTER9TEKST': '',
             'KOT_STATUS_CODE': 'status',
             'KOT_TOESTANDSDATUM': {
@@ -1269,7 +1283,7 @@ class KadastraleobjectenCsvFormat:
                 falseval='vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde'
             ),
             'SJT_NNP_KVKNUMMER': self.if_vve(
-                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].heeftKvknummerVoor.bronwaarde',
                 falseval='vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde'
             ),
             'SJT_NNP_RECHTSVORM_CODE': self.if_vve(
