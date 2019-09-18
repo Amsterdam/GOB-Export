@@ -894,6 +894,7 @@ class ZakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'unfold': True,
             'query': query,
             'filename': lambda: brk_filename("zakelijk_recht"),
             'mime_type': 'plain/text',
