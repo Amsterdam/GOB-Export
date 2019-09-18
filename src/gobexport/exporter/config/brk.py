@@ -665,7 +665,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ZRT_BETREKKING_OP_KOT': {
                 'action': 'concat',
                 'fields': [
-                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
+                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
                     {
                         'action': 'literal',
                         'value': '-'
