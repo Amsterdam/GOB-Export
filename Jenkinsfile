@@ -24,7 +24,7 @@ node {
 
     stage('Test') {
         tryStep "test", {
-            sh "docker-compose -p gob_export_service -f src/.jenkins/test/docker-compose.yml build && " +
+            sh "docker-compose -p gob_export_service -f src/.jenkins/test/docker-compose.yml build --no-cache && " +
                "docker-compose -p gob_export_service -f src/.jenkins/test/docker-compose.yml run -u root --rm test"
 
         }, {
@@ -36,6 +36,7 @@ node {
         tryStep "build", {
             docker.withRegistry('https://repo.data.amsterdam.nl','docker-registry') {
                 def image = docker.build("datapunt/gob_export:${env.BUILD_NUMBER}",
+                    "--no-cache " +
                     "--shm-size 1G " +
                     "--build-arg BUILD_ENV=acc" +
                     " src")
