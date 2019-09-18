@@ -665,7 +665,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ZRT_BETREKKING_OP_KOT': {
                 'action': 'concat',
                 'fields': [
-                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
+                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
                     {
                         'action': 'literal',
                         'value': '-'
@@ -894,6 +894,7 @@ class ZakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'unfold': True,
             'query': query,
             'filename': lambda: brk_filename("zakelijk_recht"),
             'mime_type': 'plain/text',
