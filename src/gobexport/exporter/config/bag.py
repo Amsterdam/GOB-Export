@@ -691,7 +691,7 @@ class VerblijfsobjectenExportConfig:
             ],
         },
         'csv_history': {
-            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced_history&ndjson=true',
+            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced_history&page_size=50000',
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/BAG_verblijfsobject_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -1357,7 +1357,7 @@ class PandenExportConfig:
         'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
         'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
         'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
-        'ligtIn:GBD.GGW.voglnummer': 'ligtInGgwgebied.volgnummer',
+        'ligtIn:GBD.GGW.volgnummer': 'ligtInGgwgebied.volgnummer',
         'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
         'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
         'ligtIn:GBD.GGP.identificatie': 'ligtInGgpgebied.identificatie',
