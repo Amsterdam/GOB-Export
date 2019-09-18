@@ -116,7 +116,7 @@ class BeperkingenExportConfig:
             'format': {
                 'identificatie': 'identificatie',
                 'belast:BRK.KOT.identificatie': 'kadastraalObject',
-                'belast:BRK.KOT.gemeentecode': 'aangeduidDoorKadastralegemeente',
+                'belast:BRK.KOT.gemeentecode': 'aangeduidDoorKadastralegemeentecode',
                 'belast:BRK.KOT.sectie': 'aangeduidDoorKadastralesectie',
                 'belast:BRK.KOT.perceelnummer': 'perceelnummer',
                 'belast:BRK.KOT.indexletter': 'indexletter',
