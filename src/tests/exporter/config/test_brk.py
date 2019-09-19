@@ -3,7 +3,8 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime
 
 from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_filename, sort_attributes, \
-    format_timestamp, ZakelijkerechtenCsvFormat, PerceelnummerEsriFormat, _get_filename_date
+    format_timestamp, ZakelijkerechtenCsvFormat, PerceelnummerEsriFormat, _get_filename_date, \
+    KadastraleobjectenCsvFormat
 
 
 class TestBrkConfigHelpers(TestCase):
@@ -239,6 +240,7 @@ class TestBrkZakelijkerechtenCsvFormat(TestCase):
 
         self.assertEqual('formatted_taken_entity', self.format.zrt_belast_azt_valuebuilder('entity'))
 
+
 class TestPerceelnummerEsriFormat(TestCase):
 
     def setUp(self) -> None:
@@ -259,3 +261,52 @@ class TestPerceelnummerEsriFormat(TestCase):
         for testcase in invalid_testcases:
             with self.assertRaises(AssertionError):
                 self.format.format_rotatie(testcase)
+
+
+class TestKadastraleobjectenCsvFormat(TestCase):
+
+    def setUp(self) -> None:
+        self.format = KadastraleobjectenCsvFormat()
+
+    def test_comma_concatter(self):
+        testcases = [
+            ('A|B', 'A, B'),
+            ('A', 'A'),
+        ]
+
+        for inp, outp in testcases:
+            self.assertEqual(outp, self.format.comma_concatter(inp))
+
+    def test_comma_no_space_concatter(self):
+        testcases = [
+            ('A|B', 'A,B'),
+            ('A', 'A'),
+        ]
+
+        for inp, outp in testcases:
+            self.assertEqual(outp, self.format.comma_no_space_concatter(inp))
+
+    def test_concat_with_comma(self):
+
+        self.assertEqual({
+            'action': 'format',
+            'value': 'the reference',
+            'formatter': self.format.comma_concatter,
+        }, self.format.concat_with_comma('the reference'))
+
+        self.assertEqual({
+            'action': 'format',
+            'value': 'the reference',
+            'formatter': self.format.comma_no_space_concatter,
+        }, self.format.concat_with_comma('the reference', False))
+
+    def test_format_kadgrootte(self):
+        testcases = [
+            ('1.0', '1'),
+            ('10.0', '10'),
+            ('0.1', '0.1'),
+            ('10', '10'),
+        ]
+
+        for inp, outp in testcases:
+            self.assertEqual(outp, self.format.format_kadgrootte(inp))
