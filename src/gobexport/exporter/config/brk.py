@@ -869,6 +869,11 @@ class ZakelijkerechtenExportConfig:
           edges {
             node {
               identificatie
+              rechtsvorm
+              statutaireNaam
+              statutaireZetel
+              heeftKvknummerVoor
+              heeftRsinVoor
             }
           }
         }
