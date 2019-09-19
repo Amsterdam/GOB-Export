@@ -1180,12 +1180,23 @@ class KadastraleobjectenCsvFormat:
     def comma_concatter(self, value):
         return value.replace('|', ', ')
 
-    def concat_with_comma(self, reference):
+    def comma_no_space_concatter(self, value):
+        return value.replace('|', ',')
+
+    def concat_with_comma(self, reference, with_space=True):
         return {
             'action': 'format',
             'value': reference,
-            'formatter': self.comma_concatter
+            'formatter': self.comma_concatter if with_space else self.comma_no_space_concatter
         }
+
+    def format_kadgrootte(self, value):
+        floatval = float(value)
+
+        if floatval < 1:
+            return str(floatval)
+        else:
+            return str(int(floatval))
 
     def get_format(self):
         return {
@@ -1201,8 +1212,12 @@ class KadastraleobjectenCsvFormat:
             'KOT_INDEX_NUMMER': 'indexnummer',
             'KOT_SOORTGROOTTE_CODE': 'soortGrootte.code',
             'KOT_SOORTGROOTTE_OMS': 'soortGrootte.omschrijving',
-            'KOT_KADGROOTTE': 'grootte',
-            'KOT_RELATIE_G_PERCEEL': self.concat_with_comma('isOntstaanUitGPerceel.identificatie'),
+            'KOT_KADGROOTTE': {
+                'action': 'format',
+                'value': 'grootte',
+                'formatter': self.format_kadgrootte,
+            },
+            'KOT_RELATIE_G_PERCEEL': self.concat_with_comma('isOntstaanUitGPerceel.identificatie', False),
             'KOT_KOOPSOM': 'koopsom',
             'KOT_KOOPSOM_VALUTA': 'koopsomValutacode',
             'KOT_KOOPJAAR': 'koopjaar',
