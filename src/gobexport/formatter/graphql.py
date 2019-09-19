@@ -8,10 +8,11 @@ from gobexport.formatter.sorter.graphql import GraphQlResultSorter
 
 class GraphQLResultFormatter:
 
-    def __init__(self, expand_history=False, sort=None, unfold=False):
+    def __init__(self, expand_history=False, sort=None, unfold=False, row_formatter=None):
         self.sorter = None
         self.expand_history = expand_history
         self.unfold = unfold
+        self.row_formatter = row_formatter
 
         if sort:
             self.sorter = GraphQlResultSorter(sort)
@@ -47,6 +48,9 @@ class GraphQLResultFormatter:
         return flat_edge
 
     def format_item(self, item):
+        if self.row_formatter:
+            item = self.row_formatter(item)
+
         if self.expand_history:
             yield from self._expand_history(item)
         else:

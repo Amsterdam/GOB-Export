@@ -137,65 +137,111 @@ class TestBrkZakelijkerechtenCsvFormat(TestCase):
 
     def test_take_nested(self):
         entity = {
-            'relA': [
-                {
-                    'requestedFieldA': 'requestedValueA1',
-                    'relB': [
+            'node': {
+                'relA': {
+                    'edges': [
                         {
-                            'requestedFieldB': 'requestedValueB1',
-                            'relC': [
-                                {
-                                    'requestedFieldC': 'requestedValueC1',
+                            'node': {
+                                'requestedFieldA': 'requestedValueA1',
+                                'relB': {
+                                    'edges': [
+                                        {
+                                            'node': {
+                                                'requestedFieldB': 'requestedValueB1',
+                                                'relC': {
+                                                    'edges': [
+                                                        {
+                                                            'node': {
+                                                                'requestedFieldC': 'requestedValueC1',
+                                                            }
+                                                        },
+                                                    ]
+                                                }
+                                            },
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            'node': {
+                                'requestedFieldA': 'requestedValueA2',
+                                'relB': {
+                                    'edges': [
+                                        {
+                                            'node': {
+                                                'requestedFieldB': 'requestedValueB2',
+                                                'relC': {
+                                                    'edges': [
+                                                        {
+                                                            'node': {
+                                                                'requestedFieldC': 'requestedValueC2'
+                                                            }
+                                                        },
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            'node': {
+                                'requestedFieldA': 'requestedValueA3',
+                            }
+                        },
+                        {
+                            'node': {
+                                'requestedFieldA': 'requestedValueA4',
+                                'relB': {
+                                    'edges': [
+                                        {
+                                            'node': {
+                                                'requestedFieldB': 'requestedValueB3',
+                                                'relC': {
+                                                    'edges': [
+                                                        {
+                                                            'node': {
+                                                                'requestedFieldC': 'requestedValueC3',
+                                                            }
+                                                        },
+                                                        {
+                                                            'node': {
+                                                                'requestedFieldC': 'requestedValueC4',
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            'node': {
+                                                'requestedFieldB': 'requestedValueB4',
+                                                'relC': {
 
-                                },
-                            ]
-                        },
-                    ]
-                },
-                {
-                    'requestedFieldA': 'requestedValueA2',
-                    'relB': [
-                        {
-                            'requestedFieldB': 'requestedValueB2',
-                            'relC': [
-                                {
-                                    'requestedFieldC': 'requestedValueC2'
-                                },
-                            ]
-                        }
-                    ]
-                },
-                {
-                    'requestedFieldA': 'requestedValueA3',
-                },
-                {
-                    'requestedFieldA': 'requestedValueA4',
-                    'relB': [
-                        {
-                            'requestedFieldB': 'requestedValueB3',
-                            'relC': [
-                                {
-                                    'requestedFieldC': 'requestedValueC3',
-                                },
-                                {
-                                    'requestedFieldC': 'requestedValueC4',
+                                                    'edges': [
+                                                        {
+                                                            'node': {
+                                                                'requestedFieldC': 'requestedValueC5',
+                                                            }
+                                                        },
+                                                        {
+                                                            'node': {
+                                                                'requestedFieldC': 'requestedValueC6',
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
                                 }
-                            ]
-                        },
-                        {
-                            'requestedFieldB': 'requestedValueB4',
-                            'relC': [
-                                {
-                                    'requestedFieldC': 'requestedValueC5',
-                                },
-                                {
-                                    'requestedFieldC': 'requestedValueC6',
-                                }
-                            ]
+                            }
                         }
                     ]
                 }
-            ]
+            }
         }
 
         take = [
@@ -209,7 +255,7 @@ class TestBrkZakelijkerechtenCsvFormat(TestCase):
             ['requestedValueA2', ['requestedValueB2', ['requestedValueC2']]],
             ['requestedValueA3'],
             ['requestedValueA4', ['requestedValueB3', ['requestedValueC3'], ['requestedValueC4']],
-                                 ['requestedValueB4', ['requestedValueC5'], ['requestedValueC6']]]
+             ['requestedValueB4', ['requestedValueC5'], ['requestedValueC6']]]
         ]
 
         result = self.format._take_nested(take, entity)
@@ -223,7 +269,6 @@ class TestBrkZakelijkerechtenCsvFormat(TestCase):
         ]
 
         for testcase, expected_result in testcases:
-
             result = self.format._format_azt_values(testcase)
 
             self.assertEqual(expected_result, result)
@@ -239,6 +284,35 @@ class TestBrkZakelijkerechtenCsvFormat(TestCase):
         self.format._format_azt_values = lambda x: 'formatted_' + x
 
         self.assertEqual('formatted_taken_entity', self.format.zrt_belast_azt_valuebuilder('entity'))
+
+    def test_row_formatter(self):
+        row = {
+            'node': {
+                'belastMetZrt1': 'something',
+                'belastZrt1': 'something else',
+            },
+        }
+
+        self.format.zrt_belast_azt_valuebuilder = lambda x: 'new belastAzt value'
+        self.format.zrt_belast_met_azt_valuebuilder = lambda x: 'new belastMetAzt value'
+
+        self.assertEqual({
+            'node': {
+                'belastAzt': 'new belastAzt value',
+                'belastMetAzt': 'new belastMetAzt value',
+            }
+        }, self.format.row_formatter(row))
+
+        emptyrow = {
+            'node': {}
+        }
+        self.assertEqual({
+            'node': {
+                'belastAzt': 'new belastAzt value',
+                'belastMetAzt': 'new belastMetAzt value',
+            }
+        }, self.format.row_formatter(emptyrow))
+
 
 
 class TestPerceelnummerEsriFormat(TestCase):

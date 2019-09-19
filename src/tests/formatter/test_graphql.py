@@ -55,6 +55,13 @@ class TestGraphQLResultFormatter(TestCase):
         self.assertEqual(['a', 'b'], result)
         formatter._expand_history.assert_called_with('item')
 
+    def test_format_item_with_row_formatter(self):
+        row_formatter = lambda x: 'formatted_row(' + x + ')'
+        formatter = GraphQLResultFormatter(row_formatter=row_formatter)
+        formatter._flatten_edge = lambda x: 'flattened(' + x + ')'
+
+        self.assertEqual(['flattened(formatted_row(a))'], list(formatter.format_item('a')))
+
     def test_flatten_edge(self):
         formatter = GraphQLResultFormatter()
         edge = {
