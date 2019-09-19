@@ -33,7 +33,7 @@ class MockAPI:
 
 class MockGraphQL:
     def __init__(self, host=None, query=None, catalogue=None, collection=None, expand_history=None, sort=None,
-                 unfold=False):
+                 unfold=False, row_formatter=None):
         pass
 
     def __iter__(self):
@@ -165,7 +165,8 @@ class TestExportToFile(TestCase):
             'format': 'the format',
         }
         result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
-        mock_graphql_streaming.assert_called_with('host', product['query'], False)
+        mock_graphql_streaming.assert_called_with('host', product['query'], row_formatter=None, sort=None,
+                                                  unfold=False)
 
         mock_buffered_iterable.assert_called_with(mock_graphql_streaming.return_value, 'source', buffer_items=False)
         product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format', append=False)
@@ -182,9 +183,12 @@ class TestExportToFile(TestCase):
             'exporter': MagicMock(),
             'format': 'the format',
             'unfold': 'true_or_false',
+            'sort': 'sorter',
+            'row_formatter': 'row_form',
         }
         result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
-        mock_graphql_streaming.assert_called_with('host', product['query'], 'true_or_false')
+        mock_graphql_streaming.assert_called_with('host', product['query'], unfold='true_or_false', sort='sorter',
+                                                  row_formatter='row_form')
 
     @patch("gobexport.exporter.GraphQLStreaming")
     @patch("gobexport.exporter.BufferedIterable")
@@ -206,7 +210,7 @@ class TestExportToFile(TestCase):
                 mock_entity_filter,
             ]
         }
-        result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
+        result = export_to_file('host', product, 'file', 'catalogue', 'collection')
 
         mock_group_filter.assert_called_with([mock_entity_filter])
         mock_exporter.assert_called_with(mock_buffered_iterable.return_value,
