@@ -14,7 +14,6 @@ from gobexport.filters.notempty_filter import NotEmptyFilter
 
 from gobexport.formatter.geometry import format_geometry
 
-
 FILE_TYPE_MAPPING = {
     'csv': {
         'dir': 'CSV_Actueel',
@@ -44,7 +43,7 @@ def _get_filename_date():
     return dt_parser.parse(meta.get('kennisgevingsdatum'))
 
 
-def brk_filename(name, type='csv', append_date=True,):
+def brk_filename(name, type='csv', append_date=True):
     assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
     type_dir, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
     date = _get_filename_date()
@@ -482,6 +481,15 @@ class AantekeningenExportConfig:
 
 class ZakelijkerechtenCsvFormat(BrkCsvFormat):
 
+    def if_vve(self, trueval, falseval):
+        return {
+            'condition': 'isempty',
+            'reference': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+            'negate': True,
+            'trueval': trueval,
+            'falseval': falseval,
+        }
+
     def zrt_belast_met_azt_valuebuilder(self, entity: dict):
         take = [
             ('belastMetZrt1', 'akrAardZakelijkRecht'),
@@ -629,21 +637,35 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         )
 
     def _get_nnp_attrs(self):
-        kvk_field = 'vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde'
 
         attrs = {
-            'SJT_NNP_RSIN': 'vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde',
-            'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde',
-            'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject.[0].rechtsvorm.code',
-            'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject.[0].rechtsvorm.omschrijving',
-            'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject.[0].statutaireNaam',
-            'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject.[0].statutaireZetel'
+            'SJT_NNP_RSIN': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].heeftRsinVoor.bronwaarde',
+                falseval='vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde'
+            ),
+            'SJT_NNP_KVKNUMMER': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].heeftKvknummerVoor.bronwaarde',
+                falseval='vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde'
+            ),
+            'SJT_NNP_RECHTSVORM_CODE': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].rechtsvorm.code',
+                falseval='vanKadastraalsubject.[0].rechtsvorm.code'
+            ),
+            'SJT_NNP_RECHTSVORM_OMS': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].rechtsvorm.omschrijving',
+                falseval='vanKadastraalsubject.[0].rechtsvorm.omschrijving'
+            ),
+            'SJT_NNP_STATUTAIRE_NAAM': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
+                falseval='vanKadastraalsubject.[0].statutaireNaam'
+            ),
+            'SJT_NNP_STATUTAIRE_ZETEL': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireZetel',
+                falseval='vanKadastraalsubject.[0].statutaireZetel'
+            )
         }
 
-        return self._add_condition_to_attrs(
-            self.show_when_field_notempty_condition(kvk_field),
-            attrs,
-        )
+        return attrs
 
     def row_formatter(self, row):
         """Creates belastMet and belast keys in row from belastMetZrtN and belastZrtN relations.
@@ -737,37 +759,40 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'SJT_BSN': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
             'SJT_BESCHIKKINGSBEVOEGDH_CODE': 'vanKadastraalsubject.[0].beschikkingsbevoegdheid.code',
             'SJT_BESCHIKKINGSBEVOEGDH_OMS': 'vanKadastraalsubject.[0].beschikkingsbevoegdheid.omschrijving',
-            'SJT_NAAM': {
-                'condition': 'isempty',
-                'reference': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
-                'negate': True,
-                'trueval': {
-                    'action': 'concat',
-                    'fields': [
-                        'vanKadastraalsubject.[0].geslachtsnaam',
-                        {
-                            'action': 'literal',
-                            'value': ','
-                        },
-                        'vanKadastraalsubject.[0].voornamen',
-                        {
-                            'action': 'literal',
-                            'value': ','
-                        },
-                        'vanKadastraalsubject.[0].voorvoegsels',
-                        {
-                            'action': 'literal',
-                            'value': ' ('
-                        },
-                        'vanKadastraalsubject.[0].geslacht.code',
-                        {
-                            'action': 'literal',
-                            'value': ')'
-                        },
-                    ]
-                },
-                'falseval': 'vanKadastraalsubject.[0].statutaireNaam'
-            },
+            'SJT_NAAM': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
+                falseval={
+                    'condition': 'isempty',
+                    'reference': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
+                    'negate': True,
+                    'trueval': {
+                        'action': 'concat',
+                        'fields': [
+                            'vanKadastraalsubject.[0].geslachtsnaam',
+                            {
+                                'action': 'literal',
+                                'value': ','
+                            },
+                            'vanKadastraalsubject.[0].voornamen',
+                            {
+                                'action': 'literal',
+                                'value': ','
+                            },
+                            'vanKadastraalsubject.[0].voorvoegsels',
+                            {
+                                'action': 'literal',
+                                'value': ' ('
+                            },
+                            'vanKadastraalsubject.[0].geslacht.code',
+                            {
+                                'action': 'literal',
+                                'value': ')'
+                            },
+                        ]
+                    },
+                    'falseval': 'vanKadastraalsubject.[0].statutaireNaam'
+                }
+            ),
             **self._get_np_attrs(),
             **self._get_nnp_attrs(),
         }
