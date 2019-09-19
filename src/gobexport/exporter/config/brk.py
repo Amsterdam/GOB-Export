@@ -547,19 +547,20 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         :return:
         """
         result = []
+        node = entity.get('node')
 
         if depth > 0:
             # Add value of requested field to result
             field = take[depth - 1][1]
-            value = entity.get(field)
+            value = node.get(field)
             result = [value] if value else []
 
         if depth < len(take):
             relation = take[depth][0]
 
-            if relation in entity and len(entity[relation]) > 0:
+            if relation in node and len(node[relation]['edges']) > 0:
                 # Add any nested relations as list to result
-                result += [self._take_nested(take, e, depth + 1) for e in entity[relation]]
+                result += [self._take_nested(take, e, depth + 1) for e in node[relation]['edges']]
 
         return result
 
@@ -644,6 +645,23 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             attrs,
         )
 
+    def row_formatter(self, row):
+        """Creates belastMet and belast keys in row from belastMetZrtN and belastZrtN relations.
+
+        :param row:
+        :return:
+        """
+        row['node']['belastMetAzt'] = self.zrt_belast_met_azt_valuebuilder(row)
+        row['node']['belastAzt'] = self.zrt_belast_azt_valuebuilder(row)
+
+        if 'belastMetZrt1' in row['node']:
+            del row['node']['belastMetZrt1']
+
+        if 'belastZrt1' in row['node']:
+            del row['node']['belastZrt1']
+
+        return row
+
     def get_format(self):
 
         return {
@@ -651,14 +669,8 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ZRT_AARDZAKELIJKRECHT_CODE': 'aardZakelijkRecht.code',
             'ZRT_AARDZAKELIJKRECHT_OMS': 'aardZakelijkRecht.omschrijving',
             'ZRT_AARDZAKELIJKRECHT_AKR_CODE': 'akrAardZakelijkRecht',
-            'ZRT_BELAST_AZT': {
-                'action': 'build_value',
-                'valuebuilder': self.zrt_belast_azt_valuebuilder,
-            },
-            'ZRT_BELAST_MET_AZT': {
-                'action': 'build_value',
-                'valuebuilder': self.zrt_belast_met_azt_valuebuilder
-            },
+            'ZRT_BELAST_AZT': 'belastAzt',
+            'ZRT_BELAST_MET_AZT': 'belastMetAzt',
             'ZRT_ONTSTAAN_UIT': 'ontstaanUitAppartementsrechtsplitsingVve.[0].identificatie',
             'ZRT_BETROKKEN_BIJ': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
             'ZRT_ISBEPERKT_TOT_TNG': 'isBeperktTot',
@@ -894,6 +906,7 @@ class ZakelijkerechtenExportConfig:
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
             'unfold': True,
+            'row_formatter': format.row_formatter,
             'query': query,
             'filename': lambda: brk_filename("zakelijk_recht"),
             'mime_type': 'plain/text',
