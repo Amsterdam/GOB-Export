@@ -111,6 +111,9 @@ class BeperkingenExportConfig:
         'csv_kadastraal_object': {
             'endpoint': '/gob/wkpb/beperkingen/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
+            'entity_filters': [
+                NotEmptyFilter('kadastraalObject'),
+            ],
             'filename': 'CSV_Actueel/WKPB_beperking_kadastraalobject.csv',
             'mime_type': 'plain/text',
             'format': {
