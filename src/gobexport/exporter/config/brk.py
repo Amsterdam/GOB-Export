@@ -700,7 +700,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             },
             'BRK_KOT_ID': 'rustOpKadastraalobject.[0].identificatie',
             'KOT_STATUS_CODE': 'rustOpKadastraalobject.[0].status',
-            'KOT_MODIFICATION': 'rustOpKadastraalobject.[0].wijzigingsdatum',
+            'KOT_MODIFICATION': '',
             'BRK_TNG_ID': 'invVanZakelijkrechtBrkTenaamstellingen.[0].identificatie',
             'TNG_AANDEEL_TELLER': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
             'TNG_AANDEEL_NOEMER': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.noemer',
@@ -844,7 +844,6 @@ class ZakelijkerechtenExportConfig:
               indexnummer
               identificatie
               status
-              wijzigingsdatum
               aangeduidDoorKadastralegemeentecode
               aangeduidDoorKadastralesectie
             }
@@ -957,7 +956,7 @@ class BrkBagCsvFormat:
             'KOT_INDEX_LETTER': 'indexletter',
             'KOT_INDEX_NUMMER': 'indexnummer',
             'KOT_STATUS_CODE': 'status',
-            'KOT_MODIFICATION': 'wijzigingsdatum',
+            'KOT_MODIFICATION': '',
             'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.[0].bronwaarde',
             'DIVA_VOT_ID': '',
             'AOT_OPENBARERUIMTENAAM': self.if_vot_relation(
@@ -1007,7 +1006,6 @@ class BrkBagExportConfig:
         indexletter
         indexnummer
         status
-        wijzigingsdatum
         heeftEenRelatieMetVerblijfsobject {
           edges {
             node {
@@ -1327,7 +1325,7 @@ class KadastraleobjectenCsvFormat:
             'SJT_VVE_SJT_ID': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
             'SJT_VVE_UIT_EIGENDOM': 'betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
             'KOT_INONDERZOEK': 'inOnderzoek',
-            'KOT_MODIFICATION': 'wijzigingsdatum',
+            'KOT_MODIFICATION': '',
             'GEOMETRIE': {
                 'action': 'format',
                 'formatter': format_geometry,
@@ -1379,7 +1377,6 @@ class KadastraleobjectenExportConfig:
         toestandsdatum
         indicatieVoorlopigeGeometrie
         inOnderzoek
-        wijzigingsdatum
         geometrie
         invRustOpKadastraalobjectBrkZakelijkerechten(akrAardZakelijkRecht:"VE") {
           edges {
