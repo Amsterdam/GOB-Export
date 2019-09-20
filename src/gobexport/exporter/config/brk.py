@@ -741,21 +741,21 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'TNG_EINDDATUM': 'invVanZakelijkrechtBrkTenaamstellingen.[0].eindGeldigheid',
             'TNG_ACTUEEL': {
                 'condition': 'isempty',
-                'reference': 'invVanZakelijkrechtBrkTenaamstellingen.[0].eindGeldigheid',
+                'reference': 'invVanZakelijkrechtBrkTenaamstellingen.[0].identificatie',
+                'negate': True,
                 'trueval': {
                     'action': 'literal',
                     'value': 'TRUE',
                 },
-                'falseval': {
-                    'action': 'literal',
-                    'value': 'FALSE',
-                }
             },
             'ASG_APP_RECHTSPLITSTYPE_CODE': 'appartementsrechtsplitsingtype.code',
             'ASG_APP_RECHTSPLITSTYPE_OMS': 'appartementsrechtsplitsingtype.omschrijving',
             'ASG_EINDDATUM': 'einddatumAppartementsrechtsplitsing',
             'ASG_ACTUEEL': 'indicatieActueelAppartementsrechtsplitsing',
-            'BRK_SJT_ID': 'vanKadastraalsubject.[0].identificatie',
+            'BRK_SJT_ID': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+                falseval='vanKadastraalsubject.[0].identificatie',
+            ),
             'SJT_BSN': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
             'SJT_BESCHIKKINGSBEVOEGDH_CODE': 'vanKadastraalsubject.[0].beschikkingsbevoegdheid.code',
             'SJT_BESCHIKKINGSBEVOEGDH_OMS': 'vanKadastraalsubject.[0].beschikkingsbevoegdheid.omschrijving',
