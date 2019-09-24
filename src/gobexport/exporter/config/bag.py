@@ -289,7 +289,7 @@ class OpenbareruimtesExportConfig:
         naamNen
         beginGeldigheid
         eindGeldigheid
-        ligtInWoonplaats {
+        ligtInWoonplaats(active: false) {
           edges {
             node {
               identificatie
@@ -851,7 +851,7 @@ class StandplaatsenExportConfig:
         registratiedatum
         aanduidingInOnderzoek
         geconstateerd
-        heeftHoofdadres {
+        heeftHoofdadres(active: false) {
           edges {
             node {
               identificatie
@@ -860,7 +860,7 @@ class StandplaatsenExportConfig:
               huisletter
               huisnummertoevoeging
               postcode
-              ligtAanOpenbareruimte {
+              ligtAanOpenbareruimte(active: false) {
                 edges {
                   node {
                     identificatie
@@ -869,13 +869,13 @@ class StandplaatsenExportConfig:
                   }
                 }
               }
-              ligtInWoonplaats {
+              ligtInWoonplaats(active: false) {
                 edges {
                   node {
                     identificatie
                     volgnummer
                     naam
-                    ligtInGemeente {
+                    ligtInGemeente(active: false) {
                       edges {
                         node {
                           identificatie
@@ -889,7 +889,7 @@ class StandplaatsenExportConfig:
             }
           }
         }
-        heeftNevenadres {
+        heeftNevenadres(active: false) {
           edges {
             node {
               identificatie
@@ -897,21 +897,21 @@ class StandplaatsenExportConfig:
             }
           }
         }
-        ligtInBuurt {
+        ligtInBuurt(active: false) {
           edges {
             node {
               identificatie
               volgnummer
               naam
               code
-              ligtInWijk {
+              ligtInWijk(active: false) {
                 edges {
                   node {
                     identificatie
                     volgnummer
                     naam
                     code
-                    ligtInStadsdeel {
+                    ligtInStadsdeel(active: false) {
                       edges {
                         node {
                           identificatie
@@ -924,7 +924,7 @@ class StandplaatsenExportConfig:
                   }
                 }
               }
-              LigtInGgpgebied {
+              LigtInGgpgebied(active: false) {
                 edges {
                   node {
                     identificatie
@@ -934,7 +934,7 @@ class StandplaatsenExportConfig:
                   }
                 }
               }
-              LigtInGgwgebied {
+              LigtInGgwgebied(active: false) {
                 edges {
                   node {
                     identificatie
