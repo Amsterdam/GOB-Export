@@ -1,5 +1,6 @@
 import dateutil.parser as dt_parser
 import requests
+import copy
 
 from fractions import Fraction
 from operator import itemgetter
@@ -668,7 +669,11 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         return attrs
 
     def row_formatter(self, row):
-        """Creates belastMet and belast keys in row from belastMetZrtN and belastZrtN relations.
+        """Performs actions:
+        1. Creates belastMet and belast keys in row from belastMetZrtN and belastZrtN relations.
+        2. Creates betrokkenBij key
+        3. Creates separate rows for TNG relations and VVE relations (so that TNG data is not linked with VVE data in
+        the export)
 
         :param row:
         :return:
@@ -682,6 +687,27 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         if 'belastZrt1' in row['node']:
             del row['node']['belastZrt1']
 
+        asg_vve_key = 'betrokkenBijAppartementsrechtsplitsingVve'
+        tng_key = 'invVanZakelijkrechtBrkTenaamstellingen'
+
+        # Set betrokkenBij
+        if asg_vve_key in row['node'] and len(row['node'][asg_vve_key]['edges']):
+            row['node']['betrokkenBij'] = row['node'][asg_vve_key]['edges'][0]['node']['identificatie']
+        else:
+            row['node']['betrokkenBij'] = None
+
+        if asg_vve_key in row['node'] and tng_key in row['node'] and \
+                len(row['node'][asg_vve_key]['edges']) and len(row['node'][tng_key]['edges']):
+
+            # Both relations asg_vve_key and tng_key exist in row. Split row into two rows, with in one row only the
+            # asg objects and the other row with only the tng objects.
+            asg_row = copy.deepcopy(row)
+            asg_row['node'][asg_vve_key]['edges'] = []
+
+            row['node'][tng_key]['edges'] = []
+
+            return [row, asg_row]
+
         return row
 
     def get_format(self):
@@ -694,7 +720,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ZRT_BELAST_AZT': 'belastAzt',
             'ZRT_BELAST_MET_AZT': 'belastMetAzt',
             'ZRT_ONTSTAAN_UIT': 'ontstaanUitAppartementsrechtsplitsingVve.[0].identificatie',
-            'ZRT_BETROKKEN_BIJ': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+            'ZRT_BETROKKEN_BIJ': 'betrokkenBij',
             'ZRT_ISBEPERKT_TOT_TNG': 'isBeperktTot',
             'ZRT_BETREKKING_OP_KOT': {
                 'action': 'concat',
