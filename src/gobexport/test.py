@@ -117,7 +117,9 @@ def _get_file(conn_info, filename):
                 obj = get_object(conn_info['connection'], item, conn_info['container'])
                 return obj_info, obj
     except Exception:
-        return None, None
+        pass
+
+    return None, None
 
 
 def _get_checks(conn_info, catalogue):
