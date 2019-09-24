@@ -22,6 +22,10 @@ class GraphQLResultFormatter:
         for row in history_rows:
             yield row
 
+    def _expand_history_items(self, items: list):
+        for item in items:
+            yield from self._expand_history(item)
+
     def _flatten_edge(self, edge, main=None):
         """Flatten edges and nodes from the graphql response, places all nested references
         as keys in the main dictionary, as well as keeping them in their original place to still be able to find
@@ -47,24 +51,45 @@ class GraphQLResultFormatter:
                     flat_edge[key] = [v for v in value if v]
         return flat_edge
 
+    def _flatten_edges(self, edges: list):
+        for edge in edges:
+            yield self._flatten_edge(edge)
+
+    def _unfold_items(self, items):
+        for item in items:
+            yield from self._unfold(item)
+
+    def _unfold(self, item):
+        items = self._box_item(item)
+
+        for item in items:
+            yield self._flatten_edge(item)
+
+    def _sort_items(self, items):
+        for item in items:
+            yield from self._sort(item)
+
+    def _sort(self, item):
+        items = self._box_item(item)
+        sorted_item = self.sorter.sort_items(items)
+
+        yield self._flatten_edge(sorted_item)
+
     def format_item(self, item):
         if self.row_formatter:
             item = self.row_formatter(item)
 
-        if self.expand_history:
-            yield from self._expand_history(item)
-        else:
-            if self.unfold or self.sorter:
-                items = self._box_item(item)
+        # Convert to list
+        items = item if isinstance(item, list) else [item]
 
-                if self.unfold:
-                    for item in items:
-                        yield self._flatten_edge(item)
-                elif self.sorter:
-                    item = self.sorter.sort_items(items)
-                    yield self._flatten_edge(item)
-            else:
-                yield self._flatten_edge(item)
+        if self.expand_history:
+            yield from self._expand_history_items(items)
+        elif self.unfold:
+            yield from self._unfold_items(items)
+        elif self.sorter:
+            yield from self._sort_items(items)
+        else:
+            yield from self._flatten_edges(items)
 
     def _box_item(self, item):
         """Boxes (flattens) an item. The input item is an item with (possibly) multiple nested relations. The result

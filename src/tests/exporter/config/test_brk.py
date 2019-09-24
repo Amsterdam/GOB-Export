@@ -290,6 +290,12 @@ class TestBrkZakelijkerechtenCsvFormat(TestCase):
             'node': {
                 'belastMetZrt1': 'something',
                 'belastZrt1': 'something else',
+                'betrokkenBijAppartementsrechtsplitsingVve': {
+                    'edges': [],
+                },
+                'invVanZakelijkrechtBrkTenaamstellingen': {
+                    'edges': [],
+                }
             },
         }
 
@@ -300,6 +306,13 @@ class TestBrkZakelijkerechtenCsvFormat(TestCase):
             'node': {
                 'belastAzt': 'new belastAzt value',
                 'belastMetAzt': 'new belastMetAzt value',
+                'betrokkenBijAppartementsrechtsplitsingVve': {
+                    'edges': [],
+                },
+                'invVanZakelijkrechtBrkTenaamstellingen': {
+                    'edges': [],
+                },
+                'betrokkenBij': None,
             }
         }, self.format.row_formatter(row))
 
@@ -310,9 +323,61 @@ class TestBrkZakelijkerechtenCsvFormat(TestCase):
             'node': {
                 'belastAzt': 'new belastAzt value',
                 'belastMetAzt': 'new belastMetAzt value',
+                'betrokkenBij': None,
             }
         }, self.format.row_formatter(emptyrow))
 
+        row_tng_asg = {
+            'node': {
+                'belastMetZrt1': 'something',
+                'belastZrt1': 'something else',
+                'betrokkenBijAppartementsrechtsplitsingVve': {
+                    'edges': [
+                        {'node': {'identificatie': 'vve 1'}},
+                    ],
+                },
+                'invVanZakelijkrechtBrkTenaamstellingen': {
+                    'edges': [
+                        {'node': {'identificatie': 'tng 1'}},
+                        {'node': {'identificatie': 'tng 2'}},
+                        {'node': {'identificatie': 'tng 3'}},
+                    ],
+                }
+            },
+        }
+
+        self.assertEqual([{
+            'node': {
+                'belastAzt': 'new belastAzt value',
+                'belastMetAzt': 'new belastMetAzt value',
+                'betrokkenBijAppartementsrechtsplitsingVve': {
+                    'edges': [
+                        {'node': {'identificatie': 'vve 1'}},
+                    ],
+                },
+                'invVanZakelijkrechtBrkTenaamstellingen': {
+                    'edges': [],
+                },
+                'betrokkenBij': 'vve 1',
+            }
+        }, {
+            'node': {
+                'belastAzt': 'new belastAzt value',
+                'belastMetAzt': 'new belastMetAzt value',
+                'betrokkenBijAppartementsrechtsplitsingVve': {
+                    'edges': [],
+                },
+                'invVanZakelijkrechtBrkTenaamstellingen': {
+                    'edges': [
+                        {'node': {'identificatie': 'tng 1'}},
+                        {'node': {'identificatie': 'tng 2'}},
+                        {'node': {'identificatie': 'tng 3'}},
+                    ],
+                },
+                'betrokkenBij': 'vve 1',
+            }
+        }
+        ], self.format.row_formatter(row_tng_asg), "Row with both ASG and TNG should be split in two rows")
 
 
 class TestPerceelnummerEsriFormat(TestCase):

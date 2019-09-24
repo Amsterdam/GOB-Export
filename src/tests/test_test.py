@@ -10,12 +10,12 @@ class MockConfig:
     products = {}
 
 
-@patch('gobexport.test.logger', MagicMock())
 class TestExportTest(TestCase):
 
     def setUp(self):
         pass
 
+    @patch('gobexport.test.logger', MagicMock())
     def test_low_high(self):
         low, high = test._get_low_high(0.5)
         self.assertEqual(low, 0.47)
@@ -33,6 +33,7 @@ class TestExportTest(TestCase):
         self.assertEqual(low, 95)
         self.assertEqual(high, 105)
 
+    @patch('gobexport.test.logger', MagicMock())
     def test_get_analysis(self):
         iso_now = datetime.datetime.now().isoformat()
         obj = b"1234567890"
@@ -104,6 +105,7 @@ class TestExportTest(TestCase):
             'uppers': 0.0
         })
 
+    @patch('gobexport.test.logger', MagicMock())
     def test_check_file(self):
         filename = 'any filename'
         stats = {
@@ -156,6 +158,20 @@ class TestExportTest(TestCase):
         stats['between'] = -1
         self.assertEqual(test._check_file(filename, stats, checks), False)
 
+    @patch('gobexport.test.logger')
+    def test_check_file_warning(self, mock_logger):
+        filename = 'fname'
+        checks = {
+            'fname': {
+                'k1': 'margin',
+            }
+        }
+        stats = []
+
+        test._check_file(filename, stats, checks)
+        mock_logger.warning.assert_called_with('Value missing for k1 check in fname')
+
+    @patch('gobexport.test.logger', MagicMock())
     @patch('gobexport.test._get_analysis')
     def test_propose_check_file(self, mock_analysis):
         mock_analysis.return_value = {
@@ -175,7 +191,6 @@ class TestExportTest(TestCase):
         }
         filename = 'any file'
         result = test._propose_check_file(filename, None, None)
-        print(result)
         self.assertEqual(result, {
             'age_hours': [0, 24],
             'bytes': [100, None],
@@ -192,6 +207,7 @@ class TestExportTest(TestCase):
             'uppers': [-0.01, 0.01]
         })
 
+    @patch('gobexport.test.logger', MagicMock())
     @patch('gobexport.test.put_object')
     def test_write_proposals(self, mock_put_object):
         conn_info = {
@@ -221,6 +237,7 @@ class TestExportTest(TestCase):
             contents=json.dumps(proposals, indent=4)
         )
 
+    @patch('gobexport.test.logger', MagicMock())
     @patch('gobexport.test._get_file')
     def test_get_checks(self, mock_get_file):
         conn_info = {
@@ -241,7 +258,7 @@ class TestExportTest(TestCase):
         result = test._get_checks(conn_info, catalogue)
         self.assertEqual(result, {})
 
-
+    @patch('gobexport.test.logger', MagicMock())
     @patch('gobexport.test.get_object')
     @patch('gobexport.test.get_full_container_list')
     def test_get_file(self, mock_get_full_container_list, mock_get_object):
@@ -264,6 +281,7 @@ class TestExportTest(TestCase):
         self.assertEqual(obj, "get object")
         mock_get_object.assert_called_with('any connection', {'name': filename}, 'any container')
 
+    @patch('gobexport.test.logger', MagicMock())
     @patch('gobexport.test._get_file')
     @patch('gobexport.test._write_proposals')
     @patch('gobexport.test._get_checks')
