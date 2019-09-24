@@ -194,3 +194,14 @@ class TestGraphQl(TestCase):
         expected_query = '{bagWoonplaatsen(first: 100, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
 
         self.assertEqual(new_query, expected_query)
+
+    def test_update_query_with_filters(self):
+        api = GraphQL('host', '{bagWoonplaatsen(id: "test") {edges {node { id}}}}', 'bag', 'woonplaatsen')
+        # Expect the query to contain 'first' and 'after' after initilization
+        expected_query = '{bagWoonplaatsen(id: "test", first: 1, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
+        self.assertEqual(api.query, expected_query)
+
+        new_query = api._update_query(api.query, 100)
+        expected_query = '{bagWoonplaatsen(id: "test", first: 100, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
+
+        self.assertEqual(new_query, expected_query)
