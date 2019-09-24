@@ -274,6 +274,41 @@ class OpenbareruimtesExportConfig:
   }
 }
 '''
+
+    query_history = '''
+{
+  bagOpenbareruimtes(active: false) {
+    edges {
+      node {
+        identificatie
+        registratiedatum
+        volgnummer
+        aanduidingInOnderzoek
+        geconstateerd
+        naam
+        naamNen
+        beginGeldigheid
+        eindGeldigheid
+        ligtInWoonplaats {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
+            }
+          }
+        }
+        type
+        documentdatum
+        documentnummer
+        status
+        geometrie
+      }
+    }
+  }
+}
+'''
+
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
@@ -328,8 +363,6 @@ class OpenbareruimtesExportConfig:
         'ligtIn:BAG.WPS.identificatie': 'ligtInWoonplaats.identificatie',
         'ligtIn:BAG.WPS.volgnummer': 'ligtInWoonplaats.volgnummer',
         'ligtIn:BAG.WPS.naam': 'ligtInWoonplaats.naam',
-        'beginTijdvak': 'beginTijdvak',
-        'eindTijdvak': 'eindTijdvak',
         'geometrie': {
             'action': 'format',
             'formatter': format_geometry,
@@ -367,6 +400,14 @@ class OpenbareruimtesExportConfig:
                 },
             ],
             'query': query_actueel
+        },
+        'csv_history': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_openbare_ruimte_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': query_history
         },
         'csv_beschrijving_actueel': {
             'api_type': 'graphql',
