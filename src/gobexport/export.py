@@ -53,6 +53,7 @@ def _with_retries(method, n_tries, exc=Exception):
         except exc as e:
             if n_tries == 0:
                 raise e
+            print("Retry method")
 
 
 @with_buffered_iterable  # noqa: C901
