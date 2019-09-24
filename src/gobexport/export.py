@@ -36,6 +36,25 @@ def _get_filename(name):
     return temp_filename
 
 
+def _with_retries(method, n_tries, exc=Exception):
+    """
+    Run method, retry n_tries times if any exception is raised
+
+    :param method: any method to execute
+    :param n_tries: number of tries, if <=0 method will not be executed and None is returned
+    :param exc: Exception class to catch (eg KeyError)
+    :raises: exc if method fails n_tries time
+    :return: result of method()
+    """
+    while n_tries > 0:
+        n_tries -= 1
+        try:
+            return method()
+        except exc as e:
+            if n_tries == 0:
+                raise e
+
+
 @with_buffered_iterable  # noqa: C901
 def _export_collection(host, catalogue, collection, destination):
     """Export a collection from a catalog
@@ -66,8 +85,14 @@ def _export_collection(host, catalogue, collection, destination):
         buffer_items = len(list(filter(lambda p: product_source(p) == source, config.products.values()))) > 1
 
         try:
-            row_count = export_to_file(host, product, results_file, catalogue, product.get('collection', collection),
-                                       buffer_items=buffer_items)
+            N_TRIES = 2
+            row_count = _with_retries(lambda: export_to_file(
+                host,
+                product,
+                results_file,
+                catalogue,
+                product.get('collection', collection),
+                buffer_items=buffer_items), n_tries=N_TRIES)
         except Exception as e:
             logger.error(f"Exported to local file {name} failed: {str(e)}.")
         else:
