@@ -93,6 +93,26 @@ class TestBuffer(TestCase):
 
             self.assertEqual(items, read_items)
 
+    def test_context_manager_exception(self):
+        Buffer.clear_all()
+
+        items = [
+            {'a': 'b'}, "any string", ['a'], 5
+        ]
+        name = "any name"
+
+        self.assertFalse(Buffer.exists(name))
+
+        try:
+            with Buffer(name, Buffer.WRITE) as buffer:
+                for item in items:
+                    buffer.write(item)
+                raise Exception("Test exception")
+        except Exception:
+            pass
+
+        self.assertFalse(Buffer.exists(name))
+
     def test_pass_through(self):
         Buffer.clear_all()
 
