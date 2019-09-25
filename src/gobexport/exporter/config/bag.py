@@ -1,6 +1,3 @@
-import dateutil.parser as dt_parser
-from typing import Optional
-
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
