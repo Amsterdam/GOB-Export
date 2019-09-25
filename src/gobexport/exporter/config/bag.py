@@ -58,24 +58,6 @@ class BAGDefaultFormat:
         return self.format
 
 
-def format_timestamp(datetimestr: str) -> Optional[str]:
-    """Transforms the datetimestr from ISO-format to the format used in the BAG exports: yyyy-mm-dd
-
-    :param datetimestr:
-    :return:
-    """
-    if not datetimestr:
-        # Input variable may be empty
-        return None
-
-    try:
-        dt = dt_parser.parse(datetimestr)
-        return dt.strftime('%Y-%m-%d')
-    except ValueError:
-        # If invalid datetimestr, just return the original string so that no data is lost
-        return datetimestr
-
-
 class WoonplaatsenExportConfig:
 
     query_actueel = '''
@@ -177,16 +159,8 @@ class WoonplaatsenExportConfig:
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
         'naam': 'naam',
-        'beginGeldigheid': {
-            'action': 'format',
-            'formatter': format_timestamp,
-            'value': 'beginGeldigheid',
-        },
-        'eindGeldigheid': {
-            'action': 'format',
-            'formatter': format_timestamp,
-            'value': 'eindGeldigheid',
-        },
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
         'documentnummer': 'documentnummer',
         'status': 'status.omschrijving',
