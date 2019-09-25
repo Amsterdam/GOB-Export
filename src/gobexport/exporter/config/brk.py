@@ -963,6 +963,10 @@ class ZakelijkerechtenExportConfig:
             'api_type': 'graphql_streaming',
             'unfold': True,
             'row_formatter': format.row_formatter,
+            'entity_filters': [
+                NotEmptyFilter('invVanZakelijkrechtBrkTenaamstellingen.[0].identificatie',
+                               'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie'),
+            ],
             'query': query,
             'filename': lambda: brk_filename("zakelijk_recht"),
             'mime_type': 'plain/text',

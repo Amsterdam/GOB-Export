@@ -26,6 +26,7 @@ class Buffer:
         self.name = name
         self.mode = mode
         self.file = None
+        self.filename = None
 
     @classmethod
     def _get_dirname(cls):
@@ -63,6 +64,12 @@ class Buffer:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+        if exc_type is not None:
+            # Buffered contents might be wrong; remove any buffered contents
+            try:
+                os.remove(self.filename)
+            except (OSError, TypeError):
+                pass
 
     def close(self):
         if self.file is not None:
@@ -90,12 +97,12 @@ class Buffer:
     def open(self):
         if self.mode == self.PASS_THROUGH:
             return
-        filename = self._get_filename(self.name)
+        self.filename = self._get_filename(self.name)
         if self.mode == self.READ:
-            self.file = open(filename, 'r')
+            self.file = open(self.filename, 'r')
         elif self.mode == self.WRITE:
             # Record data in an array [..., ..., ]
-            self.file = open(filename, 'w')
+            self.file = open(self.filename, 'w')
             self.empty = True
             self.file.write("[\n")
 

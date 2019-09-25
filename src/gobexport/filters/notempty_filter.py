@@ -5,11 +5,12 @@ from gobexport.exporter.utils import get_entity_value
 class NotEmptyFilter(EntityFilter):
     """NotEmptyFilter
 
-    EntityFilter that check if the value of the specified field is not empty
+    EntityFilter that checks if not all supplied fields are empty. At least one of the input fields should have a value
+    defined.
     """
 
-    def __init__(self, field: str):
-        self.field = field
+    def __init__(self, *fields):
+        self.fields = fields
 
     def filter(self, entity: dict):
-        return not not get_entity_value(entity, self.field)
+        return all([get_entity_value(entity, field) for field in self.fields])

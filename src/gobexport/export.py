@@ -51,9 +51,10 @@ def _with_retries(method, n_tries, exc=Exception):
         try:
             return method()
         except exc as e:
+            logger.warning(f"Failed, {n_tries} tries left")
             if n_tries == 0:
                 raise e
-            print("Retry method")
+            logger.warning("Start automatic retry")
 
 
 @with_buffered_iterable  # noqa: C901

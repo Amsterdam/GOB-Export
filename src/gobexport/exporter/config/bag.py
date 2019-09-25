@@ -1,6 +1,3 @@
-import dateutil.parser as dt_parser
-from typing import Optional
-
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
@@ -58,24 +55,6 @@ class BAGDefaultFormat:
         return self.format
 
 
-def format_timestamp(datetimestr: str) -> Optional[str]:
-    """Transforms the datetimestr from ISO-format to the format used in the BAG exports: yyyy-mm-dd
-
-    :param datetimestr:
-    :return:
-    """
-    if not datetimestr:
-        # Input variable may be empty
-        return None
-
-    try:
-        dt = dt_parser.parse(datetimestr)
-        return dt.strftime('%Y-%m-%d')
-    except ValueError:
-        # If invalid datetimestr, just return the original string so that no data is lost
-        return datetimestr
-
-
 class WoonplaatsenExportConfig:
 
     query_actueel = '''
@@ -109,7 +88,7 @@ class WoonplaatsenExportConfig:
 
     query_history = '''
 {
-  bagWoonplaatsen(active: false) {
+  bagWoonplaatsen(active: false, sort: [identificatie_asc, volgnummer_asc]) {
     edges {
       node {
         identificatie
@@ -177,16 +156,8 @@ class WoonplaatsenExportConfig:
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
         'naam': 'naam',
-        'beginGeldigheid': {
-            'action': 'format',
-            'formatter': format_timestamp,
-            'value': 'beginGeldigheid',
-        },
-        'eindGeldigheid': {
-            'action': 'format',
-            'formatter': format_timestamp,
-            'value': 'eindGeldigheid',
-        },
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
         'documentnummer': 'documentnummer',
         'status': 'status.omschrijving',
@@ -256,7 +227,7 @@ class OpenbareruimtesExportConfig:
         naamNen
         beginGeldigheid
         eindGeldigheid
-        ligtInWoonplaats {
+        ligtInWoonplaats(active: false) {
           edges {
             node {
               identificatie
@@ -277,7 +248,7 @@ class OpenbareruimtesExportConfig:
 
     query_history = '''
 {
-  bagOpenbareruimtes(active: false) {
+  bagOpenbareruimtes(active: false, sort: [identificatie_asc, volgnummer_asc]) {
     edges {
       node {
         identificatie
@@ -843,7 +814,7 @@ class StandplaatsenExportConfig:
 
     query_history = '''
 {
-  bagStandplaatsen(active: false) {
+  bagStandplaatsen(active: false, sort: [identificatie_asc, volgnummer_asc]) {
     edges {
       node {
         identificatie
@@ -1243,6 +1214,125 @@ class LigplaatsenExportConfig:
 }
 '''
 
+    query_history = '''
+{
+  bagLigplaatsen(active: false, sort: [identificatie_asc, volgnummer_asc]) {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        registratiedatum
+        aanduidingInOnderzoek
+        geconstateerd
+        heeftHoofdadres(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              huisnummer
+              huisletter
+              huisnummertoevoeging
+              postcode
+              ligtAanOpenbareruimte(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                  }
+                }
+              }
+              ligtInWoonplaats(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    ligtInGemeente(active: false) {
+                      edges {
+                        node {
+                          identificatie
+                          naam
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        heeftNevenadres(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+            }
+          }
+        }
+        ligtInBuurt(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
+              code
+              ligtInWijk(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                    ligtInStadsdeel(active: false) {
+                      edges {
+                        node {
+                          identificatie
+                          volgnummer
+                          naam
+                          code
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              LigtInGgpgebied(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                  }
+                }
+              }
+              LigtInGgwgebied(active: false) {
+                edges {
+                  node {
+                    identificatie
+                    volgnummer
+                    naam
+                    code
+                  }
+                }
+              }
+            }
+          }
+        }
+        feitelijkGebruik
+        status
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        geometrie
+      }
+    }
+  }
+}
+'''
+
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
@@ -1328,6 +1418,8 @@ class LigplaatsenExportConfig:
 
     history_format = BAGDefaultFormat({
         'identificatie': 'identificatie',
+        'volgnummer': 'volgnummer',
+        'registratiedatum': 'registratiedatum',
         'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
         'geconstateerd': 'geconstateerd',
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
@@ -1373,8 +1465,6 @@ class LigplaatsenExportConfig:
         'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
         'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
         'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-        'beginTijdvak': 'beginTijdvak',
-        'eindTijdvak': 'eindTijdvak',
         'geometrie': {
             'action': 'format',
             'formatter': format_geometry,
@@ -1412,6 +1502,14 @@ class LigplaatsenExportConfig:
                 },
             ],
             'query': query_actueel
+        },
+        'csv_history': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_ligplaats_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': query_history
         },
     }
 
