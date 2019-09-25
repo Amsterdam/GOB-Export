@@ -26,3 +26,22 @@ class TestNotEmptyFilter(TestCase):
 
         for entity, result in test_cases:
             self.assertEqual(result, notempty_filter.filter(entity))
+
+    @patch("gobexport.filters.notempty_filter.get_entity_value", mock_get_entity_value)
+    def test_filter_multiple_values(self):
+        field = 'some_field'
+        field2 = 'some_other_field'
+
+        test_cases = [
+            ({field: None, field2: True}, False),
+            ({field: '', field2: True}, False),
+            ({field: [], field2: True}, False),
+            ({field: 'value', field2: True}, True),
+            ({field: 42, field2: True}, True),
+            ({field: False, field2: False}, False)
+        ]
+
+        notempty_filter = NotEmptyFilter(field, field2)
+
+        for entity, result in test_cases:
+            self.assertEqual(result, notempty_filter.filter(entity))
