@@ -68,7 +68,7 @@ class Buffer:
             # Buffered contents might be wrong; remove any buffered contents
             try:
                 os.remove(self.filename)
-            except OSError:
+            except (OSError, TypeError):
                 pass
 
     def close(self):
