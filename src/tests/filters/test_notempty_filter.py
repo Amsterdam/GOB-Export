@@ -33,12 +33,13 @@ class TestNotEmptyFilter(TestCase):
         field2 = 'some_other_field'
 
         test_cases = [
-            ({field: None, field2: True}, False),
-            ({field: '', field2: True}, False),
-            ({field: [], field2: True}, False),
+            ({field: None, field2: True}, True),
+            ({field: '', field2: True}, True),
+            ({field: [], field2: True}, True),
             ({field: 'value', field2: True}, True),
             ({field: 42, field2: True}, True),
-            ({field: False, field2: False}, False)
+            ({field: False, field2: False}, False),
+            ({field: None, field2: ''}, False),
         ]
 
         notempty_filter = NotEmptyFilter(field, field2)

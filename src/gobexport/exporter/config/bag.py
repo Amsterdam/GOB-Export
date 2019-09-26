@@ -474,6 +474,13 @@ class NummeraanduidingenExportConfig:
             'mime_type': 'plain/text',
             'format': format.get_format(),
         },
+        'csv_history': {
+            'endpoint': '/gob/bag/nummeraanduidingen/?view=enhanced_history&page_size=50000',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_nummeraanduiding_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+        },
     }
 
 
@@ -741,6 +748,14 @@ class StandplaatsenExportConfig:
                   node {
                     identificatie
                     naam
+                    ligtInGemeente {
+                      edges {
+                        node {
+                          identificatie
+                          naam
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -1143,6 +1158,14 @@ class LigplaatsenExportConfig:
                   node {
                     identificatie
                     naam
+                    ligtInGemeente {
+                      edges {
+                        node {
+                          identificatie
+                          naam
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -1685,6 +1708,20 @@ class BrondocumentenExportConfig:
             'endpoint': '/gob/bag/brondocumenten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_brondocument_Actueel.csv',
+            'mime_type': 'plain/text',
+            'format': {
+                'dossier': 'dossier',
+                'documentnummer': 'documentnummer',
+                'documentdatum': 'registratiedatum',
+                'bronleverancier': 'bronleverancier',
+                'typeDossier': 'typeDossier',
+                'typeBrondocument': 'typeBrondocument',
+            }
+        },
+        'csv_history': {
+            'endpoint': '/gob/bag/brondocumenten/?view=enhanced_history&ndjson=true',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_brondocument_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
             'format': {
                 'dossier': 'dossier',

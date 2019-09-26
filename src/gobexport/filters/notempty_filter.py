@@ -13,4 +13,4 @@ class NotEmptyFilter(EntityFilter):
         self.fields = fields
 
     def filter(self, entity: dict):
-        return all([get_entity_value(entity, field) for field in self.fields])
+        return any([get_entity_value(entity, field) for field in self.fields])
