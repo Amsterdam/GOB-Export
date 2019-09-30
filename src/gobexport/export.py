@@ -91,6 +91,7 @@ def _export_collection(host, catalogue, collection, destination):
         source = product_source(product)
         buffer_items = len(list(filter(lambda p: product_source(p) == source, config.products.values()))) > 1
 
+        logger.info(f"Buffering API output {'enabled' if buffer_items else 'disabled'}")
         try:
             row_count = _with_retries(lambda: export_to_file(
                 host,
