@@ -100,7 +100,7 @@ def _export_collection(host, catalogue, collection, destination):
                 product.get('collection', collection),
                 buffer_items=buffer_items))
         except Exception as e:
-            logger.error(f"Exported to local file {name} failed: {str(e)}.")
+            logger.error(f"Export to local file {name} failed: {str(e)}.")
         else:
             logger.info(f"{row_count} records exported to local file {name}.")
 
