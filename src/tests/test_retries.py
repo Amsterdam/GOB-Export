@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from gobexport.export import _with_retries
 
@@ -35,6 +35,7 @@ class TestRetries(TestCase):
         result = _with_retries(lambda: 0, 2, 0, Exception)
         self.assertEqual(result, 0)
 
+    @mock.patch('gobexport.export.logger', mock.MagicMock())
     def test_exception(self):
         # retries is sufficient
         test_retry = SucceedAfterNTimes(2)
