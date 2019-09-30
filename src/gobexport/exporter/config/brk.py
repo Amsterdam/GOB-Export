@@ -622,8 +622,6 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         return "+".join([self._format_branch(branch) for branch in values])
 
     def _get_np_attrs(self):
-        bsn_field = "vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde"
-
         attrs = {
             'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject.[0].geboortedatum',
             'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject.[0].geboorteplaats',
@@ -633,7 +631,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         }
 
         return self._add_condition_to_attrs(
-            self.show_when_field_notempty_condition(bsn_field),
+            self.show_when_field_empty_condition("vanKadastraalsubject.[0].statutaireNaam"),
             attrs,
         )
 
@@ -782,15 +780,20 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                 trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
                 falseval='vanKadastraalsubject.[0].identificatie',
             ),
-            'SJT_BSN': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
-            'SJT_BESCHIKKINGSBEVOEGDH_CODE': 'vanKadastraalsubject.[0].beschikkingsbevoegdheid.code',
-            'SJT_BESCHIKKINGSBEVOEGDH_OMS': 'vanKadastraalsubject.[0].beschikkingsbevoegdheid.omschrijving',
+            'SJT_BSN': '',
+            'SJT_BESCHIKKINGSBEVOEGDH_CODE': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].beschikkingsbevoegdheid.code',
+                falseval='vanKadastraalsubject.[0].beschikkingsbevoegdheid.code',
+            ),
+            'SJT_BESCHIKKINGSBEVOEGDH_OMS': self.if_vve(
+                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].beschikkingsbevoegdheid.omschrijving',
+                falseval='vanKadastraalsubject.[0].beschikkingsbevoegdheid.omschrijving',
+            ),
             'SJT_NAAM': self.if_vve(
                 trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
                 falseval={
                     'condition': 'isempty',
-                    'reference': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
-                    'negate': True,
+                    'reference': 'vanKadastraalsubject.[0].statutaireNaam',
                     'trueval': {
                         'action': 'concat',
                         'fields': [
@@ -900,6 +903,7 @@ class ZakelijkerechtenExportConfig:
               statutaireZetel
               heeftKvknummerVoor
               heeftRsinVoor
+              beschikkingsbevoegdheid
             }
           }
         }
