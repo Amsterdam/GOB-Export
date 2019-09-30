@@ -3,9 +3,14 @@ import time
 
 import urllib.request
 
-_MAX_TRIES = 60          # Maximum number of times to try the request
-_RETRY_TIMEOUT = 60     # Seconds between consecetive retries
-_REQUEST_TIMEOUT = 300  # Request timout to 300 seconds to get a response
+_MAX_TRIES = 60                # Maximum number of times to try the request
+_RETRY_TIMEOUT = 60            # Seconds between consecetive retries
+
+# Pass a tuple to timeout with the first element being a connect timeout
+# - the time it allows for the client to establish a connection to the server
+# and the second being a read timeout
+# - the time it will wait on a response once your client has established a connection
+_REQUEST_TIMEOUT = (60, 7200)  # Request timout to 60 seconds to connect and 2 hours for the data
 
 
 class APIException(IOError):
