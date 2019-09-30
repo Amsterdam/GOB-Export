@@ -5,6 +5,11 @@ import os
 
 from gobexport.buffered_iterable import Buffer, BufferedIterable
 
+os_remove = os.remove
+def _os_remove_exception(f):
+    os_remove(f)
+    raise OSError("file could not be removed")
+
 class TestBuffer(TestCase):
     def setUp(self):
         pass
@@ -94,6 +99,27 @@ class TestBuffer(TestCase):
             self.assertEqual(items, read_items)
 
     def test_context_manager_exception(self):
+        Buffer.clear_all()
+
+        items = [
+            {'a': 'b'}, "any string", ['a'], 5
+        ]
+        name = "any name"
+
+        self.assertFalse(Buffer.exists(name))
+
+        try:
+            with Buffer(name, Buffer.WRITE) as buffer:
+                for item in items:
+                    buffer.write(item)
+                raise Exception("Test exception")
+        except Exception:
+            pass
+
+        self.assertFalse(Buffer.exists(name))
+
+    @patch('gobexport.buffered_iterable.os.remove', _os_remove_exception)
+    def test_context_manager_remove_exception(self):
         Buffer.clear_all()
 
         items = [

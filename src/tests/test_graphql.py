@@ -91,64 +91,24 @@ def test_graphql(monkeypatch):
     api = GraphQL('host', query, 'bag', 'woonplaatsen')
     assert (str(api) == 'GraphQL bagWoonplaatsen')
 
-    # # Expect first, after and pageInfo to be present the query
-    # expected_query = '{woonplaatsen(first: 100, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
-    # assert(expected_query == api.query)
-    #
-    # new_query = api._update_query('{woonplaatsen(filter: "value") {edges {node { id}}}}')
-    # # Expect filter to be in the qeuery
-    # expected_query = '{woonplaatsen(filter: "value", first: 100, after: "") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
-    # assert(expected_query == new_query)
-    #
-    # api.end_cursor = "abcde"
-    # new_query = api._update_query('{woonplaatsen(filter: "value") {edges {node { id}}}}')
-    # # Expect the endCursor to be filled
-    # expected_query = '{woonplaatsen(filter: "value", first: 100, after: "abcde") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
-    # assert(expected_query == new_query)
-    #
-    # api.end_cursor = "edcba"
-    # new_query = api._update_query('{woonplaatsen(filter: "value", first: 100, after: "abcde") {edges {node { id}}}}')
-    # # Expect the endCursor to be updated
-    # expected_query = '{woonplaatsen(filter: "value", first: 100, after: "edcba") {edges {node { id}}pageInfo { endCursor, hasNextPage }}}'
-    # assert(expected_query == new_query)
-    #
-    # # Expect record to be flattened and count is 1
-    # expected_record = {'id': 0, 'ligtInGemeente': [], 'heeftBrondocumenten': [{'id': 0}, {'id': 1}]}
-    # cnt = 0
-    # for e in api:
-    #     cnt += 1
-    #     assert(e == expected_record)
-    # assert(cnt == 1)
-    #
-    # monkeypatch.setattr(requests, 'post', mock_post(ok=True, results=3))
-    # api = GraphQL('host', query, 'bag', 'woonplaatsen')
-    #
-    # # Expect count is 3
-    # cnt = 0
-    # for e in api:
-    #     cnt += 1
-    # assert(cnt == 3)
-    #
-    # global next
-    # next = True
-    #
-    # api = GraphQL('host', query, 'bag', 'woonplaatsen')
-    # # Expect count is 6 (two pages of 3)
-    # cnt = 0
-    # for e in api:
-    #     cnt += 1
-    # assert(cnt == 6)
-    #
-    # # Test expansion of history
-    # monkeypatch.setattr(requests, 'post', mock_post(ok=True, results=1, with_history=True))
-    # api = GraphQL('host', query, 'bag', 'woonplaatsen', expand_history=True)
-    #
-    # # Expect count is 2 (two combined states)
-    # cnt = 0
-    # for e in api:
-    #     cnt += 1
-    # assert(cnt == 2)
-
+hasNextPage = True
+def response():
+    global hasNextPage
+    result = {
+        'data': {
+            'bagWoonplaatsen': {
+                'pageInfo': {
+                    'endCursor': True,
+                    'hasNextPage': hasNextPage,
+                },
+                'edges': [
+                    'THE EDGE'
+                ]
+            }
+        }
+    }
+    hasNextPage = not hasNextPage
+    return result
 
 class TestGraphQl(TestCase):
 
@@ -166,27 +126,16 @@ class TestGraphQl(TestCase):
         sort = {"some": "sortdef"}
         api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=sort)
         api._flatten_edge = MagicMock()
-        mock_time.side_effect = [2, 1]  # Prevent division by zero
+        mock_time.side_effect = [5, 4, 3, 2, 1]  # Prevent division by zero
         mock_post.return_value = MagicMock()
-        mock_post.return_value.json.return_value = {
-            'data': {
-                'bagWoonplaatsen': {
-                    'pageInfo': {
-                        'endCursor': True,
-                        'hasNextPage': False,
-                    },
-                    'edges': [
-                        'THE EDGE'
-                    ]
-                }
-            }
-        }
+        mock_post.return_value._update_query = lambda q, n: q
+        mock_post.return_value.json = response
 
         for a in api:
             pass
 
         mock_formatter.assert_called_with(False, sort=sort, unfold=False, row_formatter=None)
-        mock_formatter.return_value.format_item.assert_called_once()
+        self.assertEqual(mock_formatter.return_value.format_item.call_count, 2)
 
     def test_update_query(self):
         api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')

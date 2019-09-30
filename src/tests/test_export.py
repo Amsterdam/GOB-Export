@@ -1,153 +1,61 @@
-import importlib
-import os
-import pytest
-import tempfile
-import time
+from unittest import mock, TestCase
+from unittest.mock import mock_open, patch
 
-import swiftclient
+from gobexport.export import export, _export_collection
 
-from unittest import mock
-
-from gobcore.exceptions import GOBException
-
-import gobexport
-import gobexport.config
-import gobexport.exporter
-import gobexport.connector.objectstore
+def fail(msg):
+    raise Exception(msg)
 
 
-class MockLogger:
+class TestExport(TestCase):
 
-    def __init__(self):
+    def setUp(self):
         pass
 
-    def info(self, *args, **kwargs):
+    def tearDown(self):
         pass
 
-    def error(self, *args, **kwargs):
-        pass
+    @patch('gobexport.export.logger', mock.MagicMock())
+    @patch('gobexport.export.time.sleep', lambda n: None)
+    @patch('gobexport.export.export_to_file')
+    def test_export_exception(self, mock_export_to_file):
+        mock_export_to_file.side_effect = lambda *args: fail("Export failed")
+        result = _export_collection("host", "meetbouten", "meetbouten", "Objectstore")
+        self.assertEqual(result, None)
+        self.assertEqual(mock_export_to_file.call_count, 3)
 
+    @patch('gobexport.export.logger', mock.MagicMock())
+    @patch('gobexport.export.time.sleep', lambda n: None)
+    @patch('gobexport.export.export_to_file')
+    @patch("builtins.open", mock_open())
+    def test_export_objectstore_exception(self, mock_export_to_file):
+        mock_export_to_file.side_effect = lambda *args, **kwargs: True
+        result = _export_collection("host", "meetbouten", "meetbouten", "Objectstore")
+        self.assertEqual(result, False)
 
-def mock_get_logger(name):
-    return MockLogger()
+    @patch('gobexport.export.logger', mock.MagicMock())
+    @patch('gobexport.export.time.sleep', lambda n: None)
+    @mock.patch('builtins.open', mock_open())
+    @mock.patch('gobexport.export.os.remove', lambda f: None)
+    @patch('gobexport.export.distribute_to_objectstore')
+    @patch('gobexport.export.export_to_file')
+    def test_export_objectstore(self, mock_export_to_file, mock_distribute):
+        mock_export_to_file.side_effect = lambda *args, **kwargs: True
+        result = _export_collection("host", "meetbouten", "meetbouten", "Objectstore")
+        self.assertEqual(result, None)
+        mock_distribute.assert_called()
 
+    @patch('gobexport.export.logger', mock.MagicMock())
+    @patch('gobexport.export.time.sleep', lambda n: None)
+    @patch('gobexport.export.export_to_file', mock.MagicMock())
+    @patch('gobexport.export.connect_to_objectstore')
+    def test_export_file(self, mock_connect_to_objectstore):
+        result = _export_collection("host", "meetbouten", "meetbouten", "File")
+        self.assertEqual(result, None)
+        mock_connect_to_objectstore.assert_not_called()
 
-class MockArgs:
-
-    def __init__(self, catalog, collection, file_name):
-        self.catalog = catalog
-        self.collection = collection
-        self.file_name = file_name
-
-
-class MockFile:
-    s = ''
-
-    def __iter__(self, file, mode):
-        pass
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        pass
-
-    def write(self, s):
-        MockFile.s = s
-
-
-def mock_open(file, mode):
-    return MockFile()
-
-
-class MockConnection:
-
-    def put_object(container, object_name, contents, content_type, proxy=None):
-        if object_name == None:
-            raise swiftclient.exceptions.ClientException()
-        else:
-            return None
-
-    def _retry(*args):
-        return None
-
-
-def mock_connection(config):
-    return MockConnection
-
-
-def mock_put_object(connection, container, object_name, contents, content_type, proxy=None):
-    if connection == None:
-        raise GOBException('Error')
-    else:
-        return True
-
-
-host = None
-file_name = None
-
-
-def export_entity(h, en, ex, f, fo, buffer_items=False):
-    global host, file_name
-    host = h
-    file_name = f
-
-
-def mock_sleep(t):
-    gobexport.export.keep_alive = False
-
-
-def test_export(monkeypatch):
-    monkeypatch.setitem(__builtins__, 'open', mock_open)
-    monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
-    monkeypatch.setattr(gobexport.exporter, 'export_to_file', export_entity)
-    monkeypatch.setattr(gobexport.connector.objectstore, 'get_connection', mock_connection)
-    monkeypatch.setattr(os, 'remove', lambda file: True)
-
-    from gobexport import export
-    export.logger = mock.MagicMock()
-    export.logger.info = mock.MagicMock()
-
-    temporary_file = export._get_filename("test")
-    tmp_dir = tempfile.gettempdir()
-    assert(temporary_file == f"{tmp_dir}/test")
-
-    export.export("meetbouten", "meetbouten", "Objectstore")
-    export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")
-
-    export._export_collection("host", "meetbouten", "meetbouten", "File")
-
-
-def test_export_without_connection(monkeypatch):
-    monkeypatch.setitem(__builtins__, 'open', mock_open)
-    monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
-    monkeypatch.setattr(gobexport.exporter, 'export_to_file', export_entity)
-    monkeypatch.setattr(gobexport.connector.objectstore, 'get_connection', lambda config: None)
-    monkeypatch.setattr(gobexport.distributor.objectstore, 'put_object', mock_put_object)
-    monkeypatch.setattr(os, 'remove', lambda file: True)
-
-    importlib.reload(gobexport.export)
-
-    from gobexport import export
-    export.logger = mock.MagicMock()
-    export.logger.info = mock.MagicMock()
-
-    export.export("meetbouten", "meetbouten", "Objectstore")
-    export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")
-
-
-def test_export_exception(monkeypatch):
-    # Test logger.error is called when an export fails
-    monkeypatch.setitem(__builtins__, 'open', mock_open)
-    monkeypatch.setattr(gobexport.config, 'get_host', lambda: 'host')
-    monkeypatch.setattr(gobexport.exporter, 'export_to_file', lambda h, en, ex, f, fo, b: Exception())
-
-    importlib.reload(gobexport.export)
-
-    from gobexport import export
-    mock_error = mock.MagicMock()
-    export.logger = mock.MagicMock()
-    export.logger.error = mock_error
-
-    export._export_collection("host", "meetbouten", "meetbouten", "Objectstore")
-    mock_error.assert_called()
+    @patch('gobexport.export.logger', mock.MagicMock())
+    @patch('gobexport.export.time.sleep', lambda n: None)
+    def test_export(self):
+        result = export("meetbouten", "meetbouten", "File")
+        self.assertEqual(result, None)

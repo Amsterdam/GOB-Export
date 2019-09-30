@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from gobexport.export import _with_retries
 
@@ -25,21 +25,22 @@ class TestRetries(TestCase):
 
     def test_no_exec(self):
         # No execution
-        result = _with_retries(lambda: 0, 0, Exception)
+        result = _with_retries(lambda: 0, 0, 0, Exception)
         self.assertIsNone(result)
 
     def test_no_exception(self):
-        result = _with_retries(lambda: 0, 1, Exception)
+        result = _with_retries(lambda: 0, 1, 0, Exception)
         self.assertEqual(result, 0)
 
-        result = _with_retries(lambda: 0, 2, Exception)
+        result = _with_retries(lambda: 0, 2, 0, Exception)
         self.assertEqual(result, 0)
 
+    @mock.patch('gobexport.export.logger', mock.MagicMock())
     def test_exception(self):
         # retries is sufficient
         test_retry = SucceedAfterNTimes(2)
         method = lambda: test_retry.f("result", KeyError)
-        result = _with_retries(method, 2, KeyError)
+        result = _with_retries(method, 2, 0, KeyError)
         self.assertEqual(result, "result")
         self.assertEqual(test_retry.n_exec, 2)
 
@@ -47,12 +48,12 @@ class TestRetries(TestCase):
         test_retry = SucceedAfterNTimes(2)
         method = lambda: test_retry.f("result", KeyError)
         with self.assertRaises(KeyError):
-            result = _with_retries(method, 1, KeyError)
+            result = _with_retries(method, 1, 0, KeyError)
         self.assertEqual(test_retry.n_exec, 1)
 
         # Only catch the given exception
         test_retry = SucceedAfterNTimes(2)
         method = lambda: test_retry.f("result", AttributeError)
         with self.assertRaises(AttributeError):
-            result = _with_retries(method, 1, KeyError)
+            result = _with_retries(method, 1, 0, KeyError)
         self.assertEqual(test_retry.n_exec, 1)

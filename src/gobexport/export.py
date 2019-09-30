@@ -5,6 +5,7 @@ This module contains the export entries for the meetbouten catalog
 """
 import os
 import tempfile
+import time
 
 from gobcore.exceptions import GOBException
 from gobcore.logging.logger import logger
@@ -15,6 +16,9 @@ from gobexport.distributor.objectstore import distribute_to_objectstore
 from gobexport.exporter import CONFIG_MAPPING, export_to_file, product_source
 from gobexport.buffered_iterable import with_buffered_iterable
 from gobexport.utils import resolve_config_filenames
+
+_MAX_TRIES = 3          # Default number of times to try the export
+_RETRY_TIMEOUT = 300    # Default seconds between consecutive retries
 
 
 # TODO: Should be fetched from GOBCore in next iterations
@@ -36,25 +40,26 @@ def _get_filename(name):
     return temp_filename
 
 
-def _with_retries(method, n_tries, exc=Exception):
+def _with_retries(method, max_tries=_MAX_TRIES, retry_timeout=_RETRY_TIMEOUT, exc=Exception):
     """
     Run method, retry n_tries times if any exception is raised
 
     :param method: any method to execute
-    :param n_tries: number of tries, if <=0 method will not be executed and None is returned
+    :param max_tries: number of tries, if <=0 method will not be executed and None is returned
     :param exc: Exception class to catch (eg KeyError)
     :raises: exc if method fails n_tries time
     :return: result of method()
     """
-    while n_tries > 0:
-        n_tries -= 1
+    while max_tries > 0:
+        max_tries -= 1
         try:
             return method()
         except exc as e:
-            logger.warning(f"Failed, {n_tries} tries left")
-            if n_tries == 0:
+            if max_tries == 0:
+                logger.warning(f"Operation failed, no retries left")
                 raise e
-            logger.warning("Start automatic retry")
+            logger.warning(f"Operation failed, retry in {retry_timeout} seconds. Retries left: {max_tries}")
+            time.sleep(retry_timeout)
 
 
 @with_buffered_iterable  # noqa: C901
@@ -77,7 +82,7 @@ def _export_collection(host, catalogue, collection, destination):
 
     # Start exporting each product
     for name, product in config.products.items():
-        logger.info(f"Export to file '{name}' started.")
+        logger.info(f"Export to file '{name}' started, API type: {product.get('api_type', 'REST')}")
 
         # Get name of local file to write results to
         results_file = _get_filename(product['filename']) if destination == "Objectstore" else product['filename']
@@ -86,17 +91,17 @@ def _export_collection(host, catalogue, collection, destination):
         source = product_source(product)
         buffer_items = len(list(filter(lambda p: product_source(p) == source, config.products.values()))) > 1
 
+        logger.info(f"Buffering API output {'enabled' if buffer_items else 'disabled'}")
         try:
-            N_TRIES = 2
             row_count = _with_retries(lambda: export_to_file(
                 host,
                 product,
                 results_file,
                 catalogue,
                 product.get('collection', collection),
-                buffer_items=buffer_items), n_tries=N_TRIES)
+                buffer_items=buffer_items))
         except Exception as e:
-            logger.error(f"Exported to local file {name} failed: {str(e)}.")
+            logger.error(f"Export to local file {name} failed: {str(e)}.")
         else:
             logger.info(f"{row_count} records exported to local file {name}.")
 
