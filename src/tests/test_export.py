@@ -3,6 +3,10 @@ from unittest.mock import mock_open, patch
 
 from gobexport.export import export, _export_collection
 
+def fail(msg):
+    raise Exception(msg)
+
+
 class TestExport(TestCase):
 
     def setUp(self):
@@ -12,35 +16,46 @@ class TestExport(TestCase):
         pass
 
     @patch('gobexport.export.logger', mock.MagicMock())
-    @patch('gobexport.export._with_retries', lambda m: 1/0)
-    def test_export_exception(self):
+    @patch('gobexport.export.time.sleep', lambda n: None)
+    @patch('gobexport.export.export_to_file')
+    def test_export_exception(self, mock_export_to_file):
+        mock_export_to_file.side_effect = lambda *args: fail("Export failed")
         result = _export_collection("host", "meetbouten", "meetbouten", "Objectstore")
         self.assertEqual(result, None)
+        self.assertEqual(mock_export_to_file.call_count, 3)
 
     @patch('gobexport.export.logger', mock.MagicMock())
-    @patch('gobexport.export._with_retries', lambda m: m)
+    @patch('gobexport.export.time.sleep', lambda n: None)
+    @patch('gobexport.export.export_to_file')
     @patch("builtins.open", mock_open())
-    def test_export_objectstore_exception(self):
+    def test_export_objectstore_exception(self, mock_export_to_file):
+        mock_export_to_file.side_effect = lambda *args, **kwargs: True
         result = _export_collection("host", "meetbouten", "meetbouten", "Objectstore")
         self.assertEqual(result, False)
 
     @patch('gobexport.export.logger', mock.MagicMock())
-    @patch('gobexport.export._with_retries', lambda m: m)
-    @patch('gobexport.export.distribute_to_objectstore', mock.MagicMock())
+    @patch('gobexport.export.time.sleep', lambda n: None)
     @mock.patch('builtins.open', mock_open())
     @mock.patch('gobexport.export.os.remove', lambda f: None)
-    def test_export_objectstore(self):
+    @patch('gobexport.export.distribute_to_objectstore')
+    @patch('gobexport.export.export_to_file')
+    def test_export_objectstore(self, mock_export_to_file, mock_distribute):
+        mock_export_to_file.side_effect = lambda *args, **kwargs: True
         result = _export_collection("host", "meetbouten", "meetbouten", "Objectstore")
         self.assertEqual(result, None)
+        mock_distribute.assert_called()
 
     @patch('gobexport.export.logger', mock.MagicMock())
-    @patch('gobexport.export._with_retries', lambda m: m)
-    def test_export_file(self):
+    @patch('gobexport.export.time.sleep', lambda n: None)
+    @patch('gobexport.export.export_to_file', mock.MagicMock())
+    @patch('gobexport.export.connect_to_objectstore')
+    def test_export_file(self, mock_connect_to_objectstore):
         result = _export_collection("host", "meetbouten", "meetbouten", "File")
         self.assertEqual(result, None)
+        mock_connect_to_objectstore.assert_not_called()
 
     @patch('gobexport.export.logger', mock.MagicMock())
-    @patch('gobexport.export._with_retries', lambda m: m)
+    @patch('gobexport.export.time.sleep', lambda n: None)
     def test_export(self):
         result = export("meetbouten", "meetbouten", "File")
         self.assertEqual(result, None)
