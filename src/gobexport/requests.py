@@ -60,11 +60,21 @@ def post(url, json):
 
 def get_stream(url):
     result = requests.get(url, stream=True)
+
+    try:
+        result.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        raise APIException(f"Request failed due to API exception, response code {result.status_code}")
     return result.iter_lines()
 
 
 def post_stream(url, json, **kwargs):
     result = requests.post(url, stream=True, json=json, **kwargs)
+
+    try:
+        result.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        raise APIException(f"Request failed due to API exception, response code {result.status_code}")
     return result.iter_lines()
 
 

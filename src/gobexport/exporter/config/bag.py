@@ -203,7 +203,7 @@ class WoonplaatsenExportConfig:
             'query': query_actueel
         },
         'csv_history': {
-            'api_type': 'graphql_streaming',
+            'api_type': 'graphql',
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/BAG_woonplaats_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -462,8 +462,6 @@ class NummeraanduidingenExportConfig:
         'adresseert:BAG.VOT.volgnummer': 'adresseertVerblijfsobject.volgnummer',
         'adresseert:BAG.LPS.volgnummer': 'adresseertLigplaats.volgnummer',
         'adresseert:BAG.SPS.volgnummer': 'adresseertStandplaats.volgnummer',
-        'beginTijdvak': 'beginTijdvak',
-        'eindTijdvak': 'eindTijdvak',
     })
 
     products = {

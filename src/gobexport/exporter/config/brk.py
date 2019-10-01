@@ -762,7 +762,11 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'BRK_TNG_ID': 'invVanZakelijkrechtBrkTenaamstellingen.[0].identificatie',
             'TNG_AANDEEL_TELLER': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
             'TNG_AANDEEL_NOEMER': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.noemer',
-            'TNG_EINDDATUM': 'invVanZakelijkrechtBrkTenaamstellingen.[0].eindGeldigheid',
+            'TNG_EINDDATUM': {
+                'action': 'format',
+                'formatter': format_timestamp,
+                'value': 'invVanZakelijkrechtBrkTenaamstellingen.[0].eindGeldigheid',
+            },
             'TNG_ACTUEEL': {
                 'condition': 'isempty',
                 'reference': 'invVanZakelijkrechtBrkTenaamstellingen.[0].identificatie',

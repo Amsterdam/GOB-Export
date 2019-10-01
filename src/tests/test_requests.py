@@ -17,7 +17,10 @@ class MockResponse:
 
 
 class MockGet:
-    pass
+    status_code = 123
+
+    def raise_for_status(self):
+        pass
 
 
 class TestRequests(TestCase):
@@ -53,6 +56,15 @@ class TestRequests(TestCase):
         result = gobexport.requests.get_stream('any url')
         mock_get.iter_lines.assert_called()
 
+    @patch("gobexport.requests.requests.get")
+    def test_get_stream_exception(self, mock_requests_get):
+        mock_get = MockGet()
+        mock_get.raise_for_status = MagicMock(side_effect=RequestException)
+        mock_requests_get.return_value = mock_get
+
+        with self.assertRaisesRegexp(gobexport.requests.APIException, 'Request failed due to API exception'):
+            gobexport.requests.get_stream('any url')
+
     @patch("gobexport.requests.requests")
     def test_post(self, mock_requests):
         result = gobexport.requests.post_stream('url', 'some json')
@@ -64,6 +76,15 @@ class TestRequests(TestCase):
         kwargs = {'abc': 'def', 'ghi': 'jkl'}
         result = gobexport.requests.post_stream('url', 'some json', **kwargs)
         mock_requests.post.assert_called_with('url', stream=True, json='some json', **kwargs)
+
+    @patch("gobexport.requests.requests.post")
+    def test_post_stream_exception(self, mock_requests_post):
+        mock_get = MockGet()
+        mock_get.raise_for_status = MagicMock(side_effect=RequestException)
+        mock_requests_post.return_value = mock_get
+
+        with self.assertRaisesRegexp(gobexport.requests.APIException, 'Request failed due to API exception'):
+            gobexport.requests.post_stream('any url', True)
 
     @patch('gobexport.requests.urllib.request.urlopen')
     def test_urlopen(self, mock_open):
