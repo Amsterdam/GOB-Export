@@ -1,6 +1,8 @@
 from unittest import mock, TestCase
 from unittest.mock import mock_open, patch
 
+from gobcore.exceptions import GOBException
+
 from gobexport.export import export, _export_collection
 
 def fail(msg):
@@ -27,9 +29,11 @@ class TestExport(TestCase):
     @patch('gobexport.export.logger', mock.MagicMock())
     @patch('gobexport.export.time.sleep', lambda n: None)
     @patch('gobexport.export.export_to_file')
+    @patch('gobexport.export.distribute_to_objectstore')
     @patch("builtins.open", mock_open())
-    def test_export_objectstore_exception(self, mock_export_to_file):
+    def test_export_objectstore_exception(self, mock_distribute, mock_export_to_file):
         mock_export_to_file.side_effect = lambda *args, **kwargs: True
+        mock_distribute.side_effect = GOBException
         result = _export_collection("host", "meetbouten", "meetbouten", "Objectstore")
         self.assertEqual(result, False)
 
