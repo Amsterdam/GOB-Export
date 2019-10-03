@@ -457,10 +457,10 @@ class NummeraanduidingenExportConfig:
         'documentnummer': 'documentnummer',
         'status': 'status.omschrijving',
         'adresseert:BAG.VOT.identificatie': 'adresseertVerblijfsobject.identificatie',
-        'adresseert:BAG.LPS.identificatie': 'adresseertLigplaats.identificatie',
-        'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
         'adresseert:BAG.VOT.volgnummer': 'adresseertVerblijfsobject.volgnummer',
+        'adresseert:BAG.LPS.identificatie': 'adresseertLigplaats.identificatie',
         'adresseert:BAG.LPS.volgnummer': 'adresseertLigplaats.volgnummer',
+        'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
         'adresseert:BAG.SPS.volgnummer': 'adresseertStandplaats.volgnummer',
     })
 
