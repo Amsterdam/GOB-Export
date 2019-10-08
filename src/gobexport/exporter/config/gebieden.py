@@ -82,7 +82,6 @@ class StadsdelenExportConfig:
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
-            'expand_history': True,
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/GBD_stadsdeel_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -99,8 +98,6 @@ class StadsdelenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'beginTijdvak': 'beginTijdvak',
-                'eindTijdvak': 'eindTijdvak',
                 'geometrie': {
                     'action': 'format',
                     'formatter': format_geometry,
@@ -109,7 +106,7 @@ class StadsdelenExportConfig:
             },
             'query': """
 {
-  gebiedenStadsdelen(sort: [code_asc, volgnummer_asc], active: false) {
+  gebiedenStadsdelen(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -206,7 +203,6 @@ class GGPGebiedenExportConfig:
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
-            'expand_history': True,
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/GBD_ggw_praktijkgebied_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -227,8 +223,6 @@ class GGPGebiedenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'beginTijdvak': 'beginTijdvak',
-                'eindTijdvak': 'eindTijdvak',
                 'geometrie': {
                     'action': 'format',
                     'formatter': format_geometry,
@@ -345,7 +339,6 @@ class GGWGebiedenExportConfig:
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
-            'expand_history': True,
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/GBD_ggw_gebied_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -366,8 +359,6 @@ class GGWGebiedenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'beginTijdvak': 'beginTijdvak',
-                'eindTijdvak': 'eindTijdvak',
                 'geometrie': {
                     'action': 'format',
                     'formatter': format_geometry,
@@ -492,7 +483,6 @@ class WijkenExportConfig:
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
-            'expand_history': True,
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/GBD_wijk_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -518,8 +508,6 @@ class WijkenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'beginTijdvak': 'beginTijdvak',
-                'eindTijdvak': 'eindTijdvak',
                 'geometrie': {
                     'action': 'format',
                     'formatter': format_geometry,
@@ -528,7 +516,7 @@ class WijkenExportConfig:
             },
             'query': '''
 {
-  gebiedenWijken(sort: [code_asc, volgnummer_asc], active: false) {
+  gebiedenWijken(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
@@ -669,7 +657,6 @@ class BuurtenExportConfig:
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
-            'expand_history': True,
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/GBD_buurt_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -703,8 +690,6 @@ class BuurtenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'beginTijdvak': 'beginTijdvak',
-                'eindTijdvak': 'eindTijdvak',
                 'geometrie': {
                     'action': 'format',
                     'formatter': format_geometry,
@@ -876,7 +861,6 @@ class BouwblokkenExportConfig:
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
-            'expand_history': True,
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/GBD_bouwblok_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -910,8 +894,6 @@ class BouwblokkenExportConfig:
                 'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
                 'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
                 'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'beginTijdvak': 'beginTijdvak',
-                'eindTijdvak': 'eindTijdvak',
                 'geometrie': {
                     'action': 'format',
                     'formatter': format_geometry,
@@ -920,7 +902,7 @@ class BouwblokkenExportConfig:
             },
             'query': '''
 {
-  gebiedenBouwblokken(sort: [code_asc, volgnummer_asc], active: false) {
+  gebiedenBouwblokken(sort: [identificatie_asc, volgnummer_asc], active: false) {
     edges {
       node {
         identificatie
