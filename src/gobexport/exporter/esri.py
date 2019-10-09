@@ -109,6 +109,9 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
             row_count += 1
             progress.tick()
 
+    # When no rows are returned no layer has been made, so create it afterwards to make sure files exist
+    dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=ogr.wkbPolygon) if row_count == 0 else dstlayer
+
     dstfile.Destroy()
 
     return row_count
