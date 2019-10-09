@@ -2,9 +2,17 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from datetime import datetime
 
-from gobexport.exporter.config.brk import KadastralesubjectenCsvFormat, brk_filename, sort_attributes, \
-    format_timestamp, ZakelijkerechtenCsvFormat, PerceelnummerEsriFormat, _get_filename_date, \
-    KadastraleobjectenCsvFormat
+from gobexport.exporter.config.brk import (
+    KadastralesubjectenCsvFormat,
+    brk_filename,
+    sort_attributes,
+    format_timestamp,
+    ZakelijkerechtenCsvFormat,
+    PerceelnummerEsriFormat,
+    _get_filename_date,
+    KadastraleobjectenEsriFormat,
+    KadastraleobjectenCsvFormat,
+)
 
 
 class TestBrkConfigHelpers(TestCase):
@@ -449,3 +457,17 @@ class TestKadastraleobjectenCsvFormat(TestCase):
 
         for inp, outp in testcases:
             self.assertEqual(outp, self.format.format_kadgrootte(inp))
+
+
+class TestKadastraleobjectenEsriFormat(TestCase):
+
+    def setUp(self) -> None:
+        self.format = KadastraleobjectenEsriFormat()
+
+    @patch("gobexport.exporter.config.brk.KadastraleobjectenCsvFormat.get_format",
+           return_value={"a": "A", "b": {"x": "X"}, "c": "C"})
+    @patch("gobexport.exporter.config.brk.KadastraleobjectenEsriFormat.esri_to_csv_mapping",
+           {"A": "a", "B": "b"})
+    def test_get_format(self, get_format_mock):
+        output = {"A": "A", "B": {"x": "X"}}
+        self.assertEqual(self.format.get_format(), output)

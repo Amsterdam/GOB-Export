@@ -10,6 +10,7 @@ from gobexport.config import get_host
 
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
+from gobexport.exporter.utils import convert_format
 
 from gobexport.filters.notempty_filter import NotEmptyFilter
 
@@ -1430,10 +1431,57 @@ class KadastraleobjectenCsvFormat:
         }
 
 
-class KadastraleobjectenExportConfig:
-    format = KadastraleobjectenCsvFormat()
+class KadastraleobjectenEsriFormat(KadastraleobjectenCsvFormat):
+    esri_to_csv_mapping = {
+        'BRK_KOT_ID': 'BRK_KOT_ID',
+        'GEMEENTE': 'KOT_GEMEENTENAAM',
+        'KADGEMCODE': 'KOT_KADASTRALEGEMEENTE_CODE',
+        'KADGEM': 'KOT_KAD_GEMEENTE_OMS',
+        'SECTIE': 'KOT_SECTIE',
+        'PERCEELNR': 'KOT_PERCEELNUMMER',
+        'INDEXLTR': 'KOT_INDEX_LETTER',
+        'INDEXNR': 'KOT_INDEX_NUMMER',
+        'SOORTGCOD': 'KOT_SOORTGROOTTE_CODE',
+        'SOORTGOMS': 'KOT_SOORTGROOTTE_OMS',
+        'KADGROOTTE': 'KOT_KADGROOTTE',
+        'REL_GPCL': 'KOT_RELATIE_G_PERCEEL',
+        'KOOPSOM': 'KOT_KOOPSOM',
+        'KOOPSOMVAL': 'KOT_KOOPSOM_VALUTA',
+        'KOOPJAAR': 'KOT_KOOPJAAR',
+        'MEEROB_IND': 'KOT_INDICATIE_MEER_OBJECTEN',
+        'CULTONBCOD': 'KOT_CULTUURCODEONBEBOUWD_CODE',
+        'CULTONBOMS': 'KOT_CULTUURCODEONBEBOUWD_OMS',
+        'CULTBCOD': 'KOT_CULTUURCODEBEBOUWD_CODE',
+        'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
+        'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
+        'STATUSCOD': 'KOT_STATUS_CODE',
+        'TOESTD_DAT': 'KOT_TOESTANDSDATUM',
+        'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
+        'SJT_VVE_NAAM': 'BRK_SJT_ID',
+        'BRK_SJT_ID': 'BRK_SJT_ID',
+        'SJT_NAAM': 'SJT_NAAM',
+        'SJT_TYPE': 'SJT_TYPE',
+        'RSIN': 'SJT_NNP_RSIN',
+        'KVKNUMMER': 'SJT_NNP_KVKNUMMER',
+        'RECHTSVCOD': 'SJT_NNP_RECHTSVORM_CODE',
+        'RECHTSVOMS': 'SJT_NNP_RECHTSVORM_OMS',
+        'STAT_NAAM': 'SJT_NNP_STATUTAIRE_NAAM',
+        'STAT_ZETEL': 'SJT_NNP_STATUTAIRE_ZETEL',
+        'SJT_ZRT': 'SJT_ZRT',
+        'SJT_AANDEEL': 'SJT_AANDEEL',
+        'INONDERZK': 'KOT_INONDERZOEK',
+    }
 
-    query = '''
+    def get_format(self):
+        csv_format = super().get_format()
+        return convert_format(csv_format, self.esri_to_csv_mapping)
+
+
+class KadastraleobjectenExportConfig:
+    csv_format = KadastraleobjectenCsvFormat()
+    esri_format = KadastraleobjectenEsriFormat()
+
+    csv_query = '''
 {
   brkKadastraleobjecten {
     edges {
@@ -1532,6 +1580,107 @@ class KadastraleobjectenExportConfig:
   }
 }
 '''
+
+    esri_query = '''
+{
+  brkKadastraleobjecten(indexletter:"G") {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        gemeente
+        aangeduidDoorGemeente {
+          edges {
+            node {
+              naam
+            }
+          }
+        }
+        aangeduidDoorKadastralegemeentecode
+        aangeduidDoorKadastralegemeente
+        aangeduidDoorKadastralesectie
+        perceelnummer
+        indexletter
+        indexnummer
+        soortGrootte
+        grootte
+        isOntstaanUitGPerceel {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        koopsom
+        koopsomValutacode
+        koopjaar
+        indicatieMeerObjecten
+        soortCultuurOnbebouwd
+        soortCultuurBebouwd
+        status
+        toestandsdatum
+        indicatieVoorlopigeGeometrie
+        inOnderzoek
+        geometrie
+        invRustOpKadastraalobjectBrkZakelijkerechten(akrAardZakelijkRecht:"VE") {
+          edges {
+            node {
+              identificatie
+              aardZakelijkRecht
+              betrokkenBijAppartementsrechtsplitsingVve {
+                edges {
+                  node {
+                    identificatie
+                    statutaireNaam
+                    typeSubject
+                    heeftRsinVoor
+                    heeftKvknummerVoor
+                    heeftBsnVoor
+                    rechtsvorm
+                    statutaireNaam
+                    statutaireZetel
+                  }
+                }
+              }
+              invVanZakelijkrechtBrkTenaamstellingen {
+                edges {
+                  node {
+                    aandeel
+                    vanKadastraalsubject {
+                      edges {
+                        node {
+                          identificatie
+                          voornamen
+                          voorvoegsels
+                          geslachtsnaam
+                          geslacht
+                          statutaireNaam
+                          typeSubject
+                          geboortedatum
+                          geboorteplaats
+                          geboorteland
+                          datumOverlijden
+                          heeftRsinVoor
+                          heeftKvknummerVoor
+                          heeftBsnVoor
+                          rechtsvorm
+                          statutaireNaam
+                          statutaireZetel
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
     """
     Tenaamstellingen/Subject: Return the tenaamstelling with the largest aandeel (teller/noemer). When multiple
     tenaamstellingen have an even aandeel, sort the tenaamstellingen by its subject's geslachtsnaam.
@@ -1540,10 +1689,10 @@ class KadastraleobjectenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'query': query,
+            'query': csv_query,
             'filename': lambda: brk_filename('kadastraal_object'),
             'mime_type': 'plain/text',
-            'format': format.get_format(),
+            'format': csv_format.get_format(),
             'sort': {
                 'invRustOpKadastraalobjectBrkZakelijkerechten'
                 '.invVanZakelijkrechtBrkTenaamstellingen'
@@ -1555,6 +1704,28 @@ class KadastraleobjectenExportConfig:
                 '.geslachtsnaam':
                     lambda x, y: str(x).lower() > str(y).lower(),
             }
+        },
+        'esri_actueel': {
+            'api_type': 'graphql_streaming',
+            'exporter': esri_exporter,
+            'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shp',
+            'mime_type': 'application/octet-stream',
+            'format': esri_format.get_format(),
+            'extra_files': [
+                {
+                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.dbf',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shx',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+            ],
+            'query': esri_query
         }
     }
 
