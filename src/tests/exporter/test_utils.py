@@ -1,10 +1,23 @@
+import pytest
 from unittest import TestCase
 from unittest.mock import patch, MagicMock, mock_open, call
 
-from gobexport.exporter.utils import nested_entity_get, split_field_reference, evaluate_condition, \
-     evaluate_action, _evaluate_concat_action, _evaluate_literal_action, \
-     _get_entity_value_dict_lookup_key, get_entity_value, _get_value_from_list, _evaluate_fill_action, \
-    _evaluate_format_action, _evaluate_case_action, _evaluate_build_value_action
+from gobexport.exporter.utils import (
+    convert_format,
+    nested_entity_get,
+    split_field_reference,
+    evaluate_condition,
+    evaluate_action,
+    _evaluate_concat_action,
+    _evaluate_literal_action,
+    _get_entity_value_dict_lookup_key,
+    get_entity_value,
+    _get_value_from_list,
+    _evaluate_fill_action,
+    _evaluate_format_action,
+    _evaluate_case_action,
+    _evaluate_build_value_action,
+)
 
 
 class TestUtils(TestCase):
@@ -389,3 +402,21 @@ class TestUtils(TestCase):
         result = _get_value_from_list(entity, key, None)
         self.assertEqual('|keyC', result)
 
+def foo(x):
+    return x
+
+@pytest.mark.parametrize(
+    "input_format, mapping, output_format, success",
+    [
+        ({"a": "A", "b": "B"}, {"A": "a"}, {"A": "A"}, True),
+        ({"a": "A", "b": {"x": "X"}, "c": "C"}, {"A": "a", "B": "b"}, {"A": "A", "B": {"x": "X"}}, True),
+        ({"a": "A", "b": foo(1)}, {"A": "a", "B": "b"}, {"A": "A", "B": foo(1)}, True),
+        ({"a": "A", "b": "B"}, {"A": "c"}, None, False),
+    ],
+)
+def test_convert_format(input_format, mapping, output_format, success):
+    if success:
+        assert convert_format(input_format, mapping) == output_format
+    else:
+        with pytest.raises(KeyError):
+            convert_format(input_format, mapping)
