@@ -461,6 +461,9 @@ class AantekeningenExportConfig:
         'csv_art': {
             'api_type': 'graphql_streaming',
             'unfold': True,
+            'entity_filters': [
+                NotEmptyFilter('betrokkenTenaamstelling.[0].identificatie'),
+            ],
             'exporter': csv_exporter,
             'query': art_query,
             'filename': lambda: brk_filename("aantekening"),
