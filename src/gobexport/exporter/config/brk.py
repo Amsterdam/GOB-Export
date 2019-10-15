@@ -1480,9 +1480,40 @@ class KadastraleobjectenEsriFormat(KadastraleobjectenCsvFormat):
         return convert_format(csv_format, self.esri_to_csv_mapping)
 
 
+class KadastraleobjectenEsriNoSubjectsFormat(KadastraleobjectenEsriFormat):
+    esri_to_csv_mapping = {
+        'BRK_KOT_ID': 'BRK_KOT_ID',
+        'GEMEENTE': 'KOT_GEMEENTENAAM',
+        'KADGEMCODE': 'KOT_KADASTRALEGEMEENTE_CODE',
+        'KADGEM': 'KOT_KAD_GEMEENTE_OMS',
+        'SECTIE': 'KOT_SECTIE',
+        'PERCEELNR': 'KOT_PERCEELNUMMER',
+        'INDEXLTR': 'KOT_INDEX_LETTER',
+        'INDEXNR': 'KOT_INDEX_NUMMER',
+        'SOORTGCOD': 'KOT_SOORTGROOTTE_CODE',
+        'SOORTGOMS': 'KOT_SOORTGROOTTE_OMS',
+        'KADGROOTTE': 'KOT_KADGROOTTE',
+        'REL_GPCL': 'KOT_RELATIE_G_PERCEEL',
+        'KOOPSOM': 'KOT_KOOPSOM',
+        'KOOPSOMVAL': 'KOT_KOOPSOM_VALUTA',
+        'KOOPJAAR': 'KOT_KOOPJAAR',
+        'MEEROB_IND': 'KOT_INDICATIE_MEER_OBJECTEN',
+        'CULTONBCOD': 'KOT_CULTUURCODEONBEBOUWD_CODE',
+        'CULTONBOMS': 'KOT_CULTUURCODEONBEBOUWD_OMS',
+        'CULTBCOD': 'KOT_CULTUURCODEBEBOUWD_CODE',
+        'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
+        'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
+        'STATUSCOD': 'KOT_STATUS_CODE',
+        'TOESTD_DAT': 'KOT_TOESTANDSDATUM',
+        'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
+        'INONDERZK': 'KOT_INONDERZOEK',
+    }
+
+
 class KadastraleobjectenExportConfig:
     csv_format = KadastraleobjectenCsvFormat()
     esri_format = KadastraleobjectenEsriFormat()
+    esri_format_no_subjects = KadastraleobjectenEsriNoSubjectsFormat()
 
     csv_query = '''
 {
@@ -1725,6 +1756,28 @@ class KadastraleobjectenExportConfig:
                 },
                 {
                     'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+            ],
+            'query': esri_query
+        },
+        'esri_actueel_no_subjects': {
+            'api_type': 'graphql_streaming',
+            'exporter': esri_exporter,
+            'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shp',
+            'mime_type': 'application/octet-stream',
+            'format': esri_format_no_subjects.get_format(),
+            'extra_files': [
+                {
+                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.dbf',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shx',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
