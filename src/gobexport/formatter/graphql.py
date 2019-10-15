@@ -189,7 +189,7 @@ class GraphQLResultFormatter:
                     base_item[key] = {'edges': [childs[0]]}
 
                     self._add_child_to_duplicates(duplicates, childs[0], key)
-                elif self.cross_relations and duplicates:
+                elif len(childs) > 1 and self.cross_relations and duplicates:
                     # Already have duplicated rows. Set first child to already duplicated rows and duplicate the
                     # duplicates for the other childs
                     # If cross_relations is True, but no duplicates are set yet, we should reach the 'else' statement,
