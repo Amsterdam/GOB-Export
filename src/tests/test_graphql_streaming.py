@@ -21,7 +21,7 @@ class TestGraphQLStreaming(TestCase):
 
         result = [item for item in graphql_streaming]
         self.assertEqual(expected_result, result)
-        mock_formatter.assert_called_with('sort', unfold=False, row_formatter=None, cross_relations=False)
+        mock_formatter.assert_called_with(sort='sort', unfold=False, row_formatter=None, cross_relations=False)
 
     @patch("gobexport.graphql_streaming.post_stream")
     @patch("gobexport.graphql_streaming.GraphQLResultFormatter")

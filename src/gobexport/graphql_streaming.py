@@ -12,7 +12,7 @@ class GraphQLStreaming:
         self.host = host
         self.query = query
 
-        self.formatter = GraphQLResultFormatter(sort, unfold=unfold, row_formatter=row_formatter,
+        self.formatter = GraphQLResultFormatter(sort=sort, unfold=unfold, row_formatter=row_formatter,
                                                 cross_relations=cross_relations)
 
     def __iter__(self):
