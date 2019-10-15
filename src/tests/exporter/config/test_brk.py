@@ -12,6 +12,7 @@ from gobexport.exporter.config.brk import (
     _get_filename_date,
     KadastraleobjectenEsriFormat,
     KadastraleobjectenCsvFormat,
+    BrkBagExportConfig
 )
 
 
@@ -136,6 +137,41 @@ class TestBrkCsvFormat(TestCase):
         }
 
         self.assertEqual(expected, self.format.show_when_field_empty_condition('FIELDREF'))
+
+
+@patch("gobexport.exporter.config.brk.NotEmptyFilter", MagicMock())
+@patch("gobexport.exporter.config.brk.BrkBagCsvFormat", MagicMock())
+class TestBrkBagExportConfig(TestCase):
+
+    @patch("gobexport.exporter.config.brk.get_entity_value", lambda entity, field: entity[field])
+    def test_vot_filter(self):
+        config = BrkBagExportConfig()
+        vot_filter = config.VotFilter()
+
+        entity = {
+            'heeftEenRelatieMetVerblijfsobject.[0].identificatie': None,
+            'heeftEenRelatieMetVerblijfsobject.[0].status.code': 20,
+        }
+
+        self.assertTrue(vot_filter.filter(entity), 'Should return True when no VOT identification set')
+
+        entity = {
+            'heeftEenRelatieMetVerblijfsobject.[0].identificatie': 'some id',
+            'heeftEenRelatieMetVerblijfsobject.[0].status.code': 20,
+        }
+        self.assertFalse(vot_filter.filter(entity),
+                         'Should return False when VOT identification set and status code is included in '
+                         'valid_status_codes')
+
+        status_codes = [2, 3, 4, 6]
+
+        for status_code in status_codes:
+            entity = {
+                'heeftEenRelatieMetVerblijfsobject.[0].identificatie': 'some id',
+                'heeftEenRelatieMetVerblijfsobject.[0].status.code': status_code,
+            }
+
+            self.assertTrue(vot_filter.filter(entity))
 
 
 class TestBrkZakelijkerechtenCsvFormat(TestCase):
