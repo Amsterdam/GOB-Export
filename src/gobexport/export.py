@@ -58,7 +58,7 @@ def _with_retries(method, max_tries=_MAX_TRIES, retry_timeout=_RETRY_TIMEOUT, ex
             if max_tries == 0:
                 logger.warning(f"Operation failed, no retries left")
                 raise e
-            logger.warning(f"Operation failed, retry in {retry_timeout} seconds. Retries left: {max_tries}")
+            logger.warning(f"Operation failed: {str(e)}, retry in {retry_timeout} seconds. Retries left: {max_tries}")
             time.sleep(retry_timeout)
 
 
