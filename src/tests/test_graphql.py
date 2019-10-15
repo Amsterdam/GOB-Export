@@ -134,7 +134,7 @@ class TestGraphQl(TestCase):
         for a in api:
             pass
 
-        mock_formatter.assert_called_with(False, sort=sort, unfold=False, row_formatter=None)
+        mock_formatter.assert_called_with(False, sort=sort, unfold=False, row_formatter=None, cross_relations=False)
         self.assertEqual(mock_formatter.return_value.format_item.call_count, 2)
 
     def test_update_query(self):

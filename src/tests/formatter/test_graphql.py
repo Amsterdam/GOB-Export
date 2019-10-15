@@ -558,6 +558,212 @@ class TestGraphQLResultFormatter(TestCase):
         result = formatter._box_item(item)
         self.assertEqual(expected_result, result)
 
+    def test_box_item_nested_references_same_level_cross_relations(self):
+        item = {
+            'node': {
+                'k1': 'v1',
+                'k2': 'v2',
+                'reference': {
+                    'edges': [
+                        {
+                            'node': {
+                                'rk1': 'rv1',
+                                'rk2': 'rv2',
+                                'sortkey': 'B',
+                                'reference': {
+                                    'edges': [
+                                        {
+                                            'node': {
+                                                'rrk1': 'rrv1',
+                                                'rrk2': 'rrv2',
+                                                'sortkey': 'rrB',
+                                            }
+                                        },
+                                        {
+                                            'node': {
+                                                'rrk1': 'rrv1',
+                                                'rrk2': 'rrv2',
+                                                'sortkey': 'rrA',
+                                            }
+                                        }
+                                    ]
+                                },
+                                'reference2': {
+                                    'edges': [
+                                        {
+                                            'node': {
+                                                'r2k1': 'r2v1'
+                                            }
+                                        },
+                                        {
+                                            'node': {
+                                                'r2k2': 'r2v2',
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                        },
+                    ]
+                }
+            }
+        }
+
+        expected_result = [
+            {
+                'node': {
+                    'k1': 'v1',
+                    'k2': 'v2',
+                    'reference': {
+                        'edges': [
+                            {
+                                'node': {
+                                    'rk1': 'rv1',
+                                    'rk2': 'rv2',
+                                    'sortkey': 'B',
+                                    'reference': {
+                                        'edges': [
+                                            {
+                                                'node': {
+                                                    'rrk1': 'rrv1',
+                                                    'rrk2': 'rrv2',
+                                                    'sortkey': 'rrB',
+                                                }
+                                            },
+                                        ]
+                                    },
+                                    'reference2': {
+                                        'edges': [
+                                            {
+                                                'node': {
+                                                    'r2k1': 'r2v1'
+                                                }
+                                            },
+                                        ]
+                                    }
+                                },
+                            },
+                        ]
+                    }
+                }
+            },
+            {
+                'node': {
+                    'k1': 'v1',
+                    'k2': 'v2',
+                    'reference': {
+                        'edges': [
+                            {
+                                'node': {
+                                    'rk1': 'rv1',
+                                    'rk2': 'rv2',
+                                    'sortkey': 'B',
+                                    'reference': {
+                                        'edges': [
+                                            {
+                                                'node': {
+                                                    'rrk1': 'rrv1',
+                                                    'rrk2': 'rrv2',
+                                                    'sortkey': 'rrA',
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    'reference2': {
+                                        'edges': [
+                                            {
+                                                'node': {
+                                                    'r2k1': 'r2v1'
+                                                }
+                                            },
+                                        ]
+                                    }
+                                },
+                            },
+                        ]
+                    }
+                }
+            },
+            {
+                'node': {
+                    'k1': 'v1',
+                    'k2': 'v2',
+                    'reference': {
+                        'edges': [
+                            {
+                                'node': {
+                                    'rk1': 'rv1',
+                                    'rk2': 'rv2',
+                                    'sortkey': 'B',
+                                    'reference': {
+                                        'edges': [
+                                            {
+                                                'node': {
+                                                    'rrk1': 'rrv1',
+                                                    'rrk2': 'rrv2',
+                                                    'sortkey': 'rrB',
+                                                }
+                                            },
+                                        ]
+                                    },
+                                    'reference2': {
+                                        'edges': [
+                                            {
+                                                'node': {
+                                                    'r2k2': 'r2v2',
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                            },
+                        ]
+                    }
+                }
+            },
+            {
+                'node': {
+                    'k1': 'v1',
+                    'k2': 'v2',
+                    'reference': {
+                        'edges': [
+                            {
+                                'node': {
+                                    'rk1': 'rv1',
+                                    'rk2': 'rv2',
+                                    'sortkey': 'B',
+                                    'reference': {
+                                        'edges': [
+                                            {
+                                                'node': {
+                                                    'rrk1': 'rrv1',
+                                                    'rrk2': 'rrv2',
+                                                    'sortkey': 'rrA',
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    'reference2': {
+                                        'edges': [
+                                            {
+                                                'node': {
+                                                    'r2k2': 'r2v2',
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                            },
+                        ]
+                    }
+                }
+            },
+
+        ]
+        formatter = GraphQLResultFormatter(cross_relations=True)
+        result = formatter._box_item(item)
+        self.assertEqual(expected_result, result)
+
     def test_set_value_for_all(self):
         formatter = GraphQLResultFormatter()
         lst = [{
