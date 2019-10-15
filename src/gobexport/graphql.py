@@ -20,7 +20,7 @@ class GraphQL:
     sorter = None
 
     def __init__(self, host, query, catalogue, collection, expand_history=False, sort=None, unfold=False,
-                 row_formatter=None):
+                 row_formatter=None, cross_relations=False):
         """Constructor
 
         Lazy loading, Just register host and query and wait for the iterator to be called
@@ -41,7 +41,8 @@ class GraphQL:
         self.has_next_page = True
         self.gob_model = GOBModel().get_collection(self.catalogue, self.collection)
 
-        self.formatter = GraphQLResultFormatter(expand_history, sort=sort, unfold=unfold, row_formatter=row_formatter)
+        self.formatter = GraphQLResultFormatter(expand_history, sort=sort, unfold=unfold, row_formatter=row_formatter,
+                                                cross_relations=cross_relations)
 
     def __repr__(self):
         """Representation

@@ -448,6 +448,7 @@ class AantekeningenExportConfig:
         'csv_art': {
             'api_type': 'graphql_streaming',
             'unfold': True,
+            'cross_relations': True,
             'entity_filters': [
                 NotEmptyFilter('betrokkenTenaamstelling.[0].identificatie'),
                 NotEmptyFilter('rustOpKadastraalobject.[0].identificatie'),
