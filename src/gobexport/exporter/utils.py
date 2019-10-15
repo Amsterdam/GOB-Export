@@ -192,3 +192,10 @@ def _get_value_from_list(entity, key, default):
         entity = '|'.join([str(d[key]) if d[key] else "" for d in entity if key in d])
 
     return entity
+
+
+def convert_format(format, mapping):
+    """
+    Converts one format to another one using mapping.
+    """
+    return {key: format[value] for key, value in mapping.items()}
