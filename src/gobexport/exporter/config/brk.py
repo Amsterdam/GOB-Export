@@ -10,9 +10,10 @@ from gobexport.config import get_host
 
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
-from gobexport.exporter.utils import convert_format
+from gobexport.exporter.utils import convert_format, get_entity_value
 
 from gobexport.filters.notempty_filter import NotEmptyFilter
+from gobexport.filters.entity_filter import EntityFilter
 
 from gobexport.formatter.geometry import format_geometry
 
@@ -350,14 +351,6 @@ class AantekeningenExportConfig:
             }
           }
         }
-        isGebaseerdOpStukdeel {
-          edges {
-            node {
-              identificatie
-              id
-            }
-          }
-        }
       }
     }
   }
@@ -418,13 +411,6 @@ class AantekeningenExportConfig:
             }
           }
         }
-        isGebaseerdOpStukdeel {
-          edges {
-            node {
-              identificatie
-            }
-          }
-        }
       }
     }
   }
@@ -462,8 +448,10 @@ class AantekeningenExportConfig:
         'csv_art': {
             'api_type': 'graphql_streaming',
             'unfold': True,
+            'cross_relations': True,
             'entity_filters': [
                 NotEmptyFilter('betrokkenTenaamstelling.[0].identificatie'),
+                NotEmptyFilter('rustOpKadastraalobject.[0].identificatie'),
             ],
             'exporter': csv_exporter,
             'query': art_query,
@@ -474,6 +462,9 @@ class AantekeningenExportConfig:
         'csv_akt': {
             'api_type': 'graphql_streaming',
             'unfold': True,
+            'entity_filters': [
+                NotEmptyFilter('heeftBetrekkingOpKadastraalObject.[0].identificatie'),
+            ],
             'exporter': csv_exporter,
             'query': akt_query,
             'filename': lambda: brk_filename("aantekening"),
@@ -1096,6 +1087,7 @@ class BrkBagExportConfig:
             node {
               identificatie
               bronwaarde
+              status
               broninfo
                 heeftHoofdadres {
                 edges {
@@ -1131,11 +1123,31 @@ class BrkBagExportConfig:
 }
 '''
 
+    class VotFilter(EntityFilter):
+        """Only include rows with VOT statuses, for VOT's where status is defined:
+        2   Niet gerealiseerd verblijfsobject
+        3   Verblijfsobject in gebruik (niet ingemeten)
+        4   Verblijfsobject in gebruik
+        6   Verblijfsobject buiten gebruik
+
+        """
+        valid_status_codes = [2, 3, 4, 6]
+        vot_identificatie = 'heeftEenRelatieMetVerblijfsobject.[0].identificatie'
+        status_code = 'heeftEenRelatieMetVerblijfsobject.[0].status.code'
+
+        def filter(self, entity: dict):
+            if get_entity_value(entity, self.vot_identificatie):
+                status_code = get_entity_value(entity, self.status_code)
+                return status_code and int(status_code) in self.valid_status_codes
+
+            return True
+
     products = {
         'csv': {
             'exporter': csv_exporter,
             'entity_filters': [
                 NotEmptyFilter('heeftEenRelatieMetVerblijfsobject.[0].bronwaarde'),
+                VotFilter(),
             ],
             'api_type': 'graphql_streaming',
             'unfold': True,

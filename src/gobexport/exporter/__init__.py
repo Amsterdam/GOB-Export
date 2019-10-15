@@ -80,11 +80,13 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
         expand_history = product.get('expand_history')
         sort = product.get('sort')
         api = GraphQL(host, query, catalogue, collection, expand_history, sort=sort, unfold=unfold,
-                      row_formatter=product.get('row_formatter'))
+                      row_formatter=product.get('row_formatter'),
+                      cross_relations=product.get('cross_relations', False))
     elif product.get('api_type') == 'graphql_streaming':
         query = product['query']
         api = GraphQLStreaming(host, query, unfold=unfold, sort=product.get('sort'),
-                               row_formatter=product.get('row_formatter'))
+                               row_formatter=product.get('row_formatter'),
+                               cross_relations=product.get('cross_relations', False))
     else:
         # Use the REST API
         endpoint = product.get('endpoint')

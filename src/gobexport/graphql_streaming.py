@@ -8,11 +8,12 @@ STREAMING_GRAPHQL_ENDPOINT = '/gob/graphql/streaming/'
 
 class GraphQLStreaming:
 
-    def __init__(self, host, query, unfold=False, sort=None, row_formatter=None):
+    def __init__(self, host, query, unfold=False, sort=None, row_formatter=None, cross_relations=False):
         self.host = host
         self.query = query
 
-        self.formatter = GraphQLResultFormatter(sort, unfold=unfold, row_formatter=row_formatter)
+        self.formatter = GraphQLResultFormatter(sort=sort, unfold=unfold, row_formatter=row_formatter,
+                                                cross_relations=cross_relations)
 
     def __iter__(self):
         items = post_stream(f'{self.host}{STREAMING_GRAPHQL_ENDPOINT}', {'query': self.query})

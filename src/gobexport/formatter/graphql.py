@@ -8,11 +8,25 @@ from gobexport.formatter.sorter.graphql import GraphQlResultSorter
 
 class GraphQLResultFormatter:
 
-    def __init__(self, expand_history=False, sort=None, unfold=False, row_formatter=None):
+    def __init__(self, expand_history=False, sort=None, unfold=False, row_formatter=None, cross_relations=False):
+        """
+        :param expand_history:
+        :param sort:
+        :param unfold:
+        :param row_formatter:
+        :param cross_relations:  When set to True, all relations are combined in the result rows. If an item, for
+        example, has 2 relations A and B of length 2, this will result in 2*2=4 result rows, where each row contains
+        a combination of these relations: A1-B1, A1-B2, A2-B1, A2-B2. The default behaviour for when cross_relations is
+        set to False is to create separate rows for both relations, so that relations A and B are never combined. This
+        would result in two rows where only relation A is present and two rows where only relation B is present. This
+        parameter can only be used in combination with unfold=True (otherwise crossing relations would not make any
+        sense).
+        """
         self.sorter = None
         self.expand_history = expand_history
         self.unfold = unfold
         self.row_formatter = row_formatter
+        self.cross_relations = cross_relations
 
         if sort:
             self.sorter = GraphQlResultSorter(sort)
@@ -91,6 +105,57 @@ class GraphQLResultFormatter:
         else:
             yield from self._flatten_edges(items)
 
+    def _box_cross_relations_duplicates(self, duplicates: list, childs: list, relation_key: str):
+        """Generates duplicates for childs of relation with relation_key.
+
+        Given a list of duplicates, add the first child to all the existing duplicates. Create new duplicates for the
+        other childs.
+
+        :param duplicates:
+        :param childs:
+        :param relation_key:
+        :return:
+        """
+        new_duplicates = []
+
+        self._add_child_to_duplicates(duplicates, childs[0], relation_key)
+
+        for child in childs[1:]:
+            for dup in duplicates:
+                new_item = copy.deepcopy(dup)
+                new_item[relation_key]['edges'] = [child]
+                new_duplicates.append(new_item)
+        return new_duplicates
+
+    def _add_child_to_duplicates(self, duplicates: list, child: dict, relation_key: str):
+        """Adds child to each of the duplicates
+
+        :param duplicates:
+        :param child:
+        :param relation_key:
+        :return:
+        """
+
+        for duplicate in duplicates:
+            duplicate[relation_key] = {'edges': [child]}
+
+    def _create_duplicates_for_childs(self, item: dict, childs: list, relation_key: str):
+        """Duplicates base_item and adds each child to one of the duplicates.
+
+        :param item:
+        :param childs:
+        :param relation_key:
+        :return:
+        """
+        duplicates = []
+        for child in childs:
+            # Recursively box nested relations
+            new_item = copy.deepcopy(item)
+            new_item[relation_key]['edges'] = [child]
+            duplicates.append(new_item)
+
+        return duplicates
+
     def _box_item(self, item):
         """Boxes (flattens) an item. The input item is an item with (possibly) multiple nested relations. The result
         is a list of all possible combinations of relations of the input item.
@@ -111,7 +176,7 @@ class GraphQLResultFormatter:
 
         # base_item is a reference item, boxed_items are the results
         base_item = {}
-        duplicated = []
+        duplicates = []
 
         for key, value in item['node'].items():
             if isinstance(value, dict) and 'edges' in value:
@@ -123,26 +188,28 @@ class GraphQLResultFormatter:
                     # If only one child, do not duplicate. Only update base_item and duplicates
                     base_item[key] = {'edges': [childs[0]]}
 
-                    for dup in duplicated:
-                        dup[key] = {'edges': [childs[0]]}
-                else:
+                    self._add_child_to_duplicates(duplicates, childs[0], key)
+                elif len(childs) > 1 and self.cross_relations and duplicates:
+                    # Already have duplicated rows. Set first child to already duplicated rows and duplicate the
+                    # duplicates for the other childs
+                    # If cross_relations is True, but no duplicates are set yet, we should reach the 'else' statement,
+                    # which just creates duplicates for the current object.
                     base_item[key] = {'edges': []}
-
-                    for child in childs:
-                        # Recursively box nested relations
-                        new_item = copy.deepcopy(base_item)
-                        new_item[key]['edges'] = [child]
-                        duplicated.append(new_item)
+                    duplicates += self._box_cross_relations_duplicates(duplicates, childs, key)
+                else:
+                    # Have multiple childs for this relation. Create separate objects for all childs.
+                    base_item[key] = {'edges': []}
+                    duplicates += self._create_duplicates_for_childs(base_item, childs, key)
             else:
                 # Copy key, value to base_item and update boxed_items
                 base_item[key] = value
-                self._set_value_for_all(duplicated, key, value)
+                self._set_value_for_all(duplicates, key, value)
 
-        if len(duplicated) == 0:
+        if len(duplicates) == 0:
             # In case we haven't duplicated base_item into boxed_items
-            duplicated = [base_item]
+            duplicates = [base_item]
 
-        return [{'node': item} for item in duplicated]
+        return [{'node': item} for item in duplicates]
 
     def _get_children(self, edges: list):
         childs = []
