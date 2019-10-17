@@ -27,7 +27,10 @@ class GraphQlResultSorter:
         """
         head, *tail = key.split('.')
 
-        val = item['node'][head]
+        val = item['node'].get(head)
+
+        if not val:
+            return None
 
         if len(tail) > 0:
             if len(val['edges']) > 0:
