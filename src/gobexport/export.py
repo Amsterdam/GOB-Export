@@ -6,6 +6,8 @@ This module contains the export entries for the meetbouten catalog
 import os
 import tempfile
 import time
+import sys
+import traceback
 
 from gobcore.exceptions import GOBException
 from gobcore.logging.logger import logger
@@ -58,6 +60,11 @@ def _with_retries(method, max_tries=_MAX_TRIES, retry_timeout=_RETRY_TIMEOUT, ex
             if max_tries == 0:
                 logger.warning(f"Operation failed, no retries left")
                 raise e
+
+            print("Caught exception:")
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+
             logger.warning(f"Operation failed: {str(e)}, retry in {retry_timeout} seconds. Retries left: {max_tries}")
             time.sleep(retry_timeout)
 
