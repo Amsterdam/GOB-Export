@@ -61,7 +61,7 @@ def sort_attributes(attrs: dict, ordering: list):
     return {k: attrs[k] for k in ordering}
 
 
-def format_timestamp(datetimestr: str) -> Optional[str]:
+def format_timestamp(datetimestr: str, format: str='%Y%m%d%H%M%S') -> Optional[str]:
     """Transforms the datetimestr from ISO-format to the format used in the BRK exports: yyyymmddhhmmss
 
     :param datetimestr:
@@ -73,7 +73,7 @@ def format_timestamp(datetimestr: str) -> Optional[str]:
 
     try:
         dt = dt_parser.parse(datetimestr)
-        return dt.strftime('%Y%m%d%H%M%S')
+        return dt.strftime(format)
     except ValueError:
         # If invalid datetimestr, just return the original string so that no data is lost
         return datetimestr
@@ -1494,9 +1494,14 @@ class KadastraleobjectenEsriFormat(KadastraleobjectenCsvFormat):
         'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
         'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
         'STATUSCOD': 'KOT_STATUS_CODE',
-        'TOESTD_DAT': 'KOT_TOESTANDSDATUM',
+        'TOESTD_DAT': {
+            'action': 'format',
+            'formatter': format_timestamp,
+            'value': 'toestandsdatum',
+            'kwargs': {'format': '%Y-%m-%d'},
+        },
         'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
-        'SJT_VVE_NAAM': 'BRK_SJT_ID',
+        'SJT_VVE_ID': 'BRK_SJT_ID',
         'BRK_SJT_ID': 'BRK_SJT_ID',
         'SJT_NAAM': 'SJT_NAAM',
         'SJT_TYPE': 'SJT_TYPE',
@@ -1540,7 +1545,12 @@ class KadastraleobjectenEsriNoSubjectsFormat(KadastraleobjectenEsriFormat):
         'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
         'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
         'STATUSCOD': 'KOT_STATUS_CODE',
-        'TOESTD_DAT': 'KOT_TOESTANDSDATUM',
+        'TOESTD_DAT': {
+            'action': 'format',
+            'formatter': format_timestamp,
+            'value': 'toestandsdatum',
+            'kwargs': {'format': '%Y-%m-%d'},
+        },
         'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
         'INONDERZK': 'KOT_INONDERZOEK',
     }

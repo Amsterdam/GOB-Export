@@ -75,6 +75,16 @@ class TestBrkConfigHelpers(TestCase):
             # These inputs should not change
             self.assertEqual(inp, format_timestamp(inp))
 
+    def test_format_timestamp_with_format(self):
+        inp = '2035-03-31T01:02:03.000000'
+        format = '%Y-%m-%d'
+        outp = '2035-03-31'
+        self.assertEqual(outp, format_timestamp(inp, format=format))
+
+        for inp in ['invalid_str', None]:
+            # These inputs should not change
+            self.assertEqual(inp, format_timestamp(inp, format=format))
+
     @patch("gobexport.exporter.config.brk.requests.get")
     def test_get_filename_date(self, mock_request_get):
         mock_request_get.return_value.json.return_value = {
@@ -501,9 +511,9 @@ class TestKadastraleobjectenEsriFormat(TestCase):
         self.format = KadastraleobjectenEsriFormat()
 
     @patch("gobexport.exporter.config.brk.KadastraleobjectenCsvFormat.get_format",
-           return_value={"a": "A", "b": {"x": "X"}, "c": "C"})
+           return_value={"a": "A", "b": {"x": "X"}, "c": "C", "d": "D"})
     @patch("gobexport.exporter.config.brk.KadastraleobjectenEsriFormat.esri_to_csv_mapping",
-           {"A": "a", "B": "b"})
+           {"A": "a", "B": "b", "C": {"y": "Y"}})
     def test_get_format(self, get_format_mock):
-        output = {"A": "A", "B": {"x": "X"}}
+        output = {"A": "A", "B": {"x": "X"}, "C": {"y": "Y"}}
         self.assertEqual(self.format.get_format(), output)
