@@ -65,9 +65,10 @@ def _evaluate_format_action(entity: dict, action: dict):
 
     value = get_entity_value(entity, action['value'])
 
-    if value:
-        return action['formatter'](value)
-    return None
+    if not value:
+        return
+
+    return action['formatter'](value, **action.get('kwargs', {}))
 
 
 def _evaluate_build_value_action(entity: dict, action: dict):
@@ -198,4 +199,12 @@ def convert_format(format, mapping):
     """
     Converts one format to another one using mapping.
     """
-    return {key: format[value] for key, value in mapping.items()}
+    output_format = {}
+
+    for key, value in mapping.items():
+        if isinstance(value, str):
+            output_format[key] = format[value]
+        else:
+            output_format[key] = value
+
+    return output_format

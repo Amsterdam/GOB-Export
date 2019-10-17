@@ -246,6 +246,23 @@ class TestUtils(TestCase):
         formatter.assert_called_with(mock_get_entity_value.return_value)
 
     @patch("gobexport.exporter.utils.get_entity_value")
+    def test_evaluate_format_action_with_kwargs(self, mock_get_entity_value):
+        entity = MagicMock()
+        formatter = MagicMock()
+        action = {
+            'action': 'format',
+            'value': 'the_value',
+            'formatter': formatter,
+            'kwargs': {'a': 'A', 'b': 'B'},
+        }
+
+        res = _evaluate_format_action(entity, action)
+        self.assertEquals(formatter.return_value, res)
+        mock_get_entity_value.assert_called_with(entity, 'the_value')
+        formatter.assert_called_with(mock_get_entity_value.return_value, a='A', b='B')
+
+
+    @patch("gobexport.exporter.utils.get_entity_value")
     def test_evaluate_format_action_empty_value(self, mock_get_entity_value):
         entity = MagicMock()
         formatter = MagicMock()
@@ -411,6 +428,8 @@ def foo(x):
         ({"a": "A", "b": "B"}, {"A": "a"}, {"A": "A"}, True),
         ({"a": "A", "b": {"x": "X"}, "c": "C"}, {"A": "a", "B": "b"}, {"A": "A", "B": {"x": "X"}}, True),
         ({"a": "A", "b": foo(1)}, {"A": "a", "B": "b"}, {"A": "A", "B": foo(1)}, True),
+        ({"a": "A", "b": {"x": "X"}, "c": "C"}, {"A": "a", "B": {"y": "Y"}}, {"A": "A", "B": {"y": "Y"}}, True),
+        ({"a": "A", "b": {"x": "X"}, "c": "C"}, {"A": "a", "B": foo(1)}, {"A": "A", "B": foo(1)}, True),
         ({"a": "A", "b": "B"}, {"A": "c"}, None, False),
     ],
 )
