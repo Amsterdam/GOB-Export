@@ -379,7 +379,7 @@ class AantekeningenExportConfig:
         },
         'BRK_KOT_ID': 'rustOpKadastraalobject.[0].identificatie',
         'KOT_KADASTRALEGEMCODE_CODE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_SECTIE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralesectie.[0].code',
+        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
         'KOT_PERCEELNUMMER': 'rustOpKadastraalobject.[0].perceelnummer',
         'KOT_INDEX_LETTER': 'rustOpKadastraalobject.[0].indexletter',
         'KOT_INDEX_NUMMER': 'rustOpKadastraalobject.[0].indexnummer',
@@ -446,7 +446,7 @@ class AantekeningenExportConfig:
         'BRK_KOT_ID': 'heeftBetrekkingOpKadastraalObject.[0].identificatie',
         'KOT_KADASTRALEGEMCODE_CODE':
             'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_SECTIE': 'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralesectie.[0].code',
+        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
         'KOT_PERCEELNUMMER': 'heeftBetrekkingOpKadastraalObject.[0].perceelnummer',
         'KOT_INDEX_LETTER': 'heeftBetrekkingOpKadastraalObject.[0].indexletter',
         'KOT_INDEX_NUMMER': 'heeftBetrekkingOpKadastraalObject.[0].indexnummer',
@@ -735,7 +735,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'action': 'literal',
                         'value': '-'
                     },
-                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralesectie.[0].code',
+                    'aangeduidDoorKadastralesectie.[0].code',
                     {
                         'action': 'literal',
                         'value': '-'
