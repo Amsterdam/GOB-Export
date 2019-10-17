@@ -339,3 +339,18 @@ class TestGraphQlResultSorter(TestCase):
 
         sorter = GraphQlResultSorter({})
         self.assertEqual(None, sorter._extract_value_from_item(item, key))
+
+    def test_extract_value_missing_key(self):
+        key = 'a.b'
+        item = {
+            'node': {
+                'a': {
+                    'edges': [{
+                        'node': {}
+                    }]
+                }
+            }
+        }
+
+        sorter = GraphQlResultSorter({})
+        self.assertEqual(None, sorter._extract_value_from_item(item, key))
