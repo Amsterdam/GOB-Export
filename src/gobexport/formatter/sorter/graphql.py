@@ -58,7 +58,7 @@ class GraphQlResultSorter:
             if value == highest:
                 # If both values equal, add to result
                 result.append(item)
-            elif highest is None or sorter(value, highest):
+            elif highest is None or (value is not None and sorter(value, highest)):
                 # Replace existing value
                 highest = value
                 result = [item]

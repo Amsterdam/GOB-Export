@@ -61,7 +61,7 @@ def sort_attributes(attrs: dict, ordering: list):
     return {k: attrs[k] for k in ordering}
 
 
-def format_timestamp(datetimestr: str) -> Optional[str]:
+def format_timestamp(datetimestr: str, format: str='%Y%m%d%H%M%S') -> Optional[str]:
     """Transforms the datetimestr from ISO-format to the format used in the BRK exports: yyyymmddhhmmss
 
     :param datetimestr:
@@ -73,7 +73,7 @@ def format_timestamp(datetimestr: str) -> Optional[str]:
 
     try:
         dt = dt_parser.parse(datetimestr)
-        return dt.strftime('%Y%m%d%H%M%S')
+        return dt.strftime(format)
     except ValueError:
         # If invalid datetimestr, just return the original string so that no data is lost
         return datetimestr
@@ -341,7 +341,13 @@ class AantekeningenExportConfig:
                           indexletter
                           indexnummer
                           aangeduidDoorKadastralegemeentecode
-                          aangeduidDoorKadastralesectie
+                          aangeduidDoorKadastralesectie {
+                            edges {
+                              node {
+                                code
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -372,8 +378,8 @@ class AantekeningenExportConfig:
             'value': 'Aantekening Zakelijk Recht (R)'
         },
         'BRK_KOT_ID': 'rustOpKadastraalobject.[0].identificatie',
-        'KOT_KADASTRALEGEMCODE_CODE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.broninfo.code',
-        'KOT_SECTIE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralesectie.bronwaarde',
+        'KOT_KADASTRALEGEMCODE_CODE': 'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
         'KOT_PERCEELNUMMER': 'rustOpKadastraalobject.[0].perceelnummer',
         'KOT_INDEX_LETTER': 'rustOpKadastraalobject.[0].indexletter',
         'KOT_INDEX_NUMMER': 'rustOpKadastraalobject.[0].indexnummer',
@@ -407,7 +413,13 @@ class AantekeningenExportConfig:
               indexletter
               indexnummer
               aangeduidDoorKadastralegemeentecode
-              aangeduidDoorKadastralesectie
+              aangeduidDoorKadastralesectie {
+                edges {
+                  node {
+                    code
+                  }
+                }
+              }
             }
           }
         }
@@ -433,8 +445,8 @@ class AantekeningenExportConfig:
         },
         'BRK_KOT_ID': 'heeftBetrekkingOpKadastraalObject.[0].identificatie',
         'KOT_KADASTRALEGEMCODE_CODE':
-            'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralegemeentecode.broninfo.code',
-        'KOT_SECTIE': 'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralesectie.bronwaarde',
+            'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
+        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
         'KOT_PERCEELNUMMER': 'heeftBetrekkingOpKadastraalObject.[0].perceelnummer',
         'KOT_INDEX_LETTER': 'heeftBetrekkingOpKadastraalObject.[0].indexletter',
         'KOT_INDEX_NUMMER': 'heeftBetrekkingOpKadastraalObject.[0].indexnummer',
@@ -718,12 +730,12 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ZRT_BETREKKING_OP_KOT': {
                 'action': 'concat',
                 'fields': [
-                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
+                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
                     {
                         'action': 'literal',
                         'value': '-'
                     },
-                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralesectie.bronwaarde',
+                    'aangeduidDoorKadastralesectie.[0].code',
                     {
                         'action': 'literal',
                         'value': '-'
@@ -916,7 +928,13 @@ class ZakelijkerechtenExportConfig:
               identificatie
               status
               aangeduidDoorKadastralegemeentecode
-              aangeduidDoorKadastralesectie
+              aangeduidDoorKadastralesectie {
+                edges {
+                  node {
+                    code
+                  }
+                }
+              }
             }
           }
         }
@@ -1027,7 +1045,7 @@ class BrkBagCsvFormat:
             'BRK_KOT_ID': 'identificatie',
             'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.code',
             'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
-            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
             'KOT_PERCEELNUMMER': 'perceelnummer',
             'KOT_INDEX_LETTER': 'indexletter',
             'KOT_INDEX_NUMMER': 'indexnummer',
@@ -1077,7 +1095,13 @@ class BrkBagExportConfig:
         identificatie
         aangeduidDoorKadastralegemeente
         aangeduidDoorKadastralegemeentecode
-        aangeduidDoorKadastralesectie
+        aangeduidDoorKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -1303,7 +1327,7 @@ class KadastraleobjectenCsvFormat:
             'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
             'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.broninfo.code',
             'KOT_KAD_GEMEENTE_OMS': 'aangeduidDoorKadastralegemeente.broninfo.omschrijving',
-            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
             'KOT_PERCEELNUMMER': 'perceelnummer',
             'KOT_INDEX_LETTER': 'indexletter',
             'KOT_INDEX_NUMMER': 'indexnummer',
@@ -1470,9 +1494,14 @@ class KadastraleobjectenEsriFormat(KadastraleobjectenCsvFormat):
         'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
         'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
         'STATUSCOD': 'KOT_STATUS_CODE',
-        'TOESTD_DAT': 'KOT_TOESTANDSDATUM',
+        'TOESTD_DAT': {
+            'action': 'format',
+            'formatter': format_timestamp,
+            'value': 'toestandsdatum',
+            'kwargs': {'format': '%Y-%m-%d'},
+        },
         'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
-        'SJT_VVE_NAAM': 'BRK_SJT_ID',
+        'SJT_VVE_ID': 'BRK_SJT_ID',
         'BRK_SJT_ID': 'BRK_SJT_ID',
         'SJT_NAAM': 'SJT_NAAM',
         'SJT_TYPE': 'SJT_TYPE',
@@ -1516,7 +1545,12 @@ class KadastraleobjectenEsriNoSubjectsFormat(KadastraleobjectenEsriFormat):
         'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
         'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
         'STATUSCOD': 'KOT_STATUS_CODE',
-        'TOESTD_DAT': 'KOT_TOESTANDSDATUM',
+        'TOESTD_DAT': {
+            'action': 'format',
+            'formatter': format_timestamp,
+            'value': 'toestandsdatum',
+            'kwargs': {'format': '%Y-%m-%d'},
+        },
         'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
         'INONDERZK': 'KOT_INONDERZOEK',
     }
@@ -1544,7 +1578,13 @@ class KadastraleobjectenExportConfig:
         }
         aangeduidDoorKadastralegemeentecode
         aangeduidDoorKadastralegemeente
-        aangeduidDoorKadastralesectie
+        aangeduidDoorKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -1644,7 +1684,13 @@ class KadastraleobjectenExportConfig:
         }
         aangeduidDoorKadastralegemeentecode
         aangeduidDoorKadastralegemeente
-        aangeduidDoorKadastralesectie
+        aangeduidDoorKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -1874,7 +1920,13 @@ class BijpijlingExportConfig:
         }
         aangeduidDoorKadastralegemeentecode
         aangeduidDoorKadastralegemeente
-        aangeduidDoorKadastralesectie
+        aangeduidDoorKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -1897,9 +1949,9 @@ class BijpijlingExportConfig:
             'format': {
                 'BRK_KOT_ID': 'identificatie',
                 'GEMEENTE': 'aangeduidDoorGemeente.naam',
-                'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-                'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
-                'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+                'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
+                'KADGEM': 'aangeduidDoorKadastralegemeente.broninfo.omschrijving',
+                'SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
                 'PERCEELNR': 'perceelnummer',
                 'INDEXLTR': 'indexletter',
                 'INDEXNR': 'indexnummer',
@@ -1941,7 +1993,7 @@ class PerceelnummerEsriFormat:
             'GEMEENTE': 'aangeduidDoorGemeente.naam',
             'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
             'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
-            'SECTIE': 'aangeduidDoorKadastralesectie.bronwaarde',
+            'SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
             'PERCEELNR': 'perceelnummer',
             'INDEXLTR': 'indexletter',
             'INDEXNR': 'indexnummer',
@@ -1984,7 +2036,13 @@ class PerceelnummerExportConfig:
         }
         aangeduidDoorKadastralegemeentecode
         aangeduidDoorKadastralegemeente
-        aangeduidDoorKadastralesectie
+        aangeduidDoorKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer

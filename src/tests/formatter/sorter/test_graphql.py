@@ -1,4 +1,5 @@
 from unittest import TestCase
+from unittest.mock import MagicMock
 from gobexport.formatter.sorter.graphql import GraphQlResultSorter
 from gobexport.formatter.graphql import GraphQLResultFormatter
 
@@ -354,3 +355,12 @@ class TestGraphQlResultSorter(TestCase):
 
         sorter = GraphQlResultSorter({})
         self.assertEqual(None, sorter._extract_value_from_item(item, key))
+
+    def test_sort_and_eliminate_non_values(self):
+        sorter_func = MagicMock()
+        sorter = GraphQlResultSorter({})
+        sorter._extract_value_from_item = MagicMock(return_value=None)
+        res = sorter._sort_and_eliminate([1, 2, 3], 'a.b.c.', sorter_func)
+
+        sorter_func.assert_not_called()
+        self.assertEqual([1, 2, 3], res)
