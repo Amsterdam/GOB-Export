@@ -12,7 +12,8 @@ from gobexport.exporter.config.brk import (
     _get_filename_date,
     KadastraleobjectenEsriFormat,
     KadastraleobjectenCsvFormat,
-    BrkBagExportConfig
+    BrkBagExportConfig,
+    aandeel_sort
 )
 
 
@@ -161,17 +162,38 @@ class TestBrkBagExportConfig(TestCase):
         entity = {
             'heeftEenRelatieMetVerblijfsobject.[0].identificatie': None,
             'heeftEenRelatieMetVerblijfsobject.[0].status.code': 20,
+            'heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam': 'not Amsterdam'
         }
 
-        self.assertTrue(vot_filter.filter(entity), 'Should return True when no VOT identification set')
+        self.assertTrue(vot_filter.filter(entity), 'Should return True when no VOT identification set and not '
+                                                   'Amsterdam')
+
+        entity = {
+            'heeftEenRelatieMetVerblijfsobject.[0].identificatie': None,
+            'heeftEenRelatieMetVerblijfsobject.[0].status.code': 20,
+            'heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam': 'Amsterdam'
+        }
+
+        self.assertFalse(vot_filter.filter(entity), 'Should return False when VOT identification not set '
+                                                    'and Amsterdam')
 
         entity = {
             'heeftEenRelatieMetVerblijfsobject.[0].identificatie': 'some id',
             'heeftEenRelatieMetVerblijfsobject.[0].status.code': 20,
+            'heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam': 'not Amsterdam'
         }
-        self.assertFalse(vot_filter.filter(entity),
-                         'Should return False when VOT identification set and status code is included in '
-                         'valid_status_codes')
+
+        self.assertFalse(vot_filter.filter(entity), 'Should return False when VOT identification set and status code '
+                                                    'is not included in valid_status_codes')
+
+        entity = {
+            'heeftEenRelatieMetVerblijfsobject.[0].identificatie': None,
+            'heeftEenRelatieMetVerblijfsobject.[0].status.code': 20,
+            'heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam': None,
+        }
+
+        self.assertTrue(vot_filter.filter(entity), 'Should return True when VOT identification not set and city '
+                                                   'not set')
 
         status_codes = [2, 3, 4, 6]
 
@@ -179,9 +201,11 @@ class TestBrkBagExportConfig(TestCase):
             entity = {
                 'heeftEenRelatieMetVerblijfsobject.[0].identificatie': 'some id',
                 'heeftEenRelatieMetVerblijfsobject.[0].status.code': status_code,
+                'heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam': 'not Amsterdam'
             }
 
-            self.assertTrue(vot_filter.filter(entity))
+            self.assertTrue(vot_filter.filter(entity), 'Should return True when VOT identification set and code '
+                                                       'incluced in valid_status_codes')
 
 
 class TestBrkZakelijkerechtenCsvFormat(TestCase):
@@ -512,8 +536,28 @@ class TestKadastraleobjectenEsriFormat(TestCase):
 
     @patch("gobexport.exporter.config.brk.KadastraleobjectenCsvFormat.get_format",
            return_value={"a": "A", "b": {"x": "X"}, "c": "C", "d": "D"})
-    @patch("gobexport.exporter.config.brk.KadastraleobjectenEsriFormat.esri_to_csv_mapping",
-           {"A": "a", "B": "b", "C": {"y": "Y"}})
-    def test_get_format(self, get_format_mock):
+    @patch("gobexport.exporter.config.brk.KadastraleobjectenEsriFormat.get_mapping",
+           return_value={"A": "a", "B": "b", "C": {"y": "Y"}})
+    def test_get_format(self, get_mapping_mock, get_format_mock):
         output = {"A": "A", "B": {"x": "X"}, "C": {"y": "Y"}}
         self.assertEqual(self.format.get_format(), output)
+
+
+class TestKadastraleobjectenExportConfig(TestCase):
+
+    def test_aandeel_sort(self):
+
+        testcases = [
+            (None, None, False),
+            (None, {'noemer': 3, 'teller': 1}, False),
+            ({'noemer': 2, 'teller': 1}, None, True),
+            ({'noemer': 2, 'teller': 1}, {'noemer': None, 'teller': None}, True),
+            ({'noemer': None, 'teller': None}, {'noemer': 3, 'teller': 1}, False),
+            ({'noemer': None, 'teller': None}, {'noemer': None, 'teller': None}, False),
+            ({'noemer': 2, 'teller': 1}, {'noemer': 3, 'teller': 1}, True),
+            ({'noemer': 3, 'teller': 1}, {'noemer': 2, 'teller': 1}, False),
+            ({'noemer': 2, 'teller': 1}, {'noemer': 2, 'teller': 1}, False),
+        ]
+
+        for a, b, result in testcases:
+            self.assertEqual(result, aandeel_sort(a, b))
