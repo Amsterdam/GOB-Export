@@ -61,7 +61,7 @@ def sort_attributes(attrs: dict, ordering: list):
     return {k: attrs[k] for k in ordering}
 
 
-def format_timestamp(datetimestr: str, format: str='%Y%m%d%H%M%S') -> Optional[str]:
+def format_timestamp(datetimestr: str, format: str = '%Y%m%d%H%M%S') -> Optional[str]:
     """Transforms the datetimestr from ISO-format to the format used in the BRK exports: yyyymmddhhmmss
 
     :param datetimestr:
@@ -703,7 +703,6 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
 
         if asg_vve_key in row['node'] and tng_key in row['node'] and \
                 len(row['node'][asg_vve_key]['edges']) and len(row['node'][tng_key]['edges']):
-
             # Both relations asg_vve_key and tng_key exist in row. Split row into two rows, with in one row only the
             # asg objects and the other row with only the tng objects.
             asg_row = copy.deepcopy(row)
@@ -1045,7 +1044,7 @@ class BrkBagCsvFormat:
             'BRK_KOT_ID': 'identificatie',
             'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.code',
             'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
-            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
+            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].bronwaarde',
             'KOT_PERCEELNUMMER': 'perceelnummer',
             'KOT_INDEX_LETTER': 'indexletter',
             'KOT_INDEX_NUMMER': 'indexnummer',
@@ -1098,7 +1097,7 @@ class BrkBagExportConfig:
         aangeduidDoorKadastralesectie {
           edges {
             node {
-              code
+              bronwaarde
             }
           }
         }
@@ -1158,11 +1157,14 @@ class BrkBagExportConfig:
         valid_status_codes = [2, 3, 4, 6]
         vot_identificatie = 'heeftEenRelatieMetVerblijfsobject.[0].identificatie'
         status_code = 'heeftEenRelatieMetVerblijfsobject.[0].status.code'
+        city = 'heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam'
 
         def filter(self, entity: dict):
             if get_entity_value(entity, self.vot_identificatie):
                 status_code = get_entity_value(entity, self.status_code)
                 return status_code and int(status_code) in self.valid_status_codes
+            elif get_entity_value(entity, self.city):
+                return not get_entity_value(entity, self.city).lower().startswith('amsterdam')
 
             return True
 
@@ -1327,7 +1329,7 @@ class KadastraleobjectenCsvFormat:
             'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
             'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.broninfo.code',
             'KOT_KAD_GEMEENTE_OMS': 'aangeduidDoorKadastralegemeente.broninfo.omschrijving',
-            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
+            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].bronwaarde',
             'KOT_PERCEELNUMMER': 'perceelnummer',
             'KOT_INDEX_LETTER': 'indexletter',
             'KOT_INDEX_NUMMER': 'indexnummer',
@@ -1471,89 +1473,121 @@ class KadastraleobjectenCsvFormat:
 
 
 class KadastraleobjectenEsriFormat(KadastraleobjectenCsvFormat):
-    esri_to_csv_mapping = {
-        'BRK_KOT_ID': 'BRK_KOT_ID',
-        'GEMEENTE': 'KOT_GEMEENTENAAM',
-        'KADGEMCODE': 'KOT_KADASTRALEGEMEENTE_CODE',
-        'KADGEM': 'KOT_KAD_GEMEENTE_OMS',
-        'SECTIE': 'KOT_SECTIE',
-        'PERCEELNR': 'KOT_PERCEELNUMMER',
-        'INDEXLTR': 'KOT_INDEX_LETTER',
-        'INDEXNR': 'KOT_INDEX_NUMMER',
-        'SOORTGCOD': 'KOT_SOORTGROOTTE_CODE',
-        'SOORTGOMS': 'KOT_SOORTGROOTTE_OMS',
-        'KADGROOTTE': 'KOT_KADGROOTTE',
-        'REL_GPCL': 'KOT_RELATIE_G_PERCEEL',
-        'KOOPSOM': 'KOT_KOOPSOM',
-        'KOOPSOMVAL': 'KOT_KOOPSOM_VALUTA',
-        'KOOPJAAR': 'KOT_KOOPJAAR',
-        'MEEROB_IND': 'KOT_INDICATIE_MEER_OBJECTEN',
-        'CULTONBCOD': 'KOT_CULTUURCODEONBEBOUWD_CODE',
-        'CULTONBOMS': 'KOT_CULTUURCODEONBEBOUWD_OMS',
-        'CULTBCOD': 'KOT_CULTUURCODEBEBOUWD_CODE',
-        'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
-        'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
-        'STATUSCOD': 'KOT_STATUS_CODE',
-        'TOESTD_DAT': {
-            'action': 'format',
-            'formatter': format_timestamp,
-            'value': 'toestandsdatum',
-            'kwargs': {'format': '%Y-%m-%d'},
+    inonderzk = {
+        'condition': 'isempty',
+        'reference': 'inOnderzoek',
+        'trueval': {
+            'action': 'literal',
+            'value': 'N',
         },
-        'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
-        'SJT_VVE_ID': 'BRK_SJT_ID',
-        'BRK_SJT_ID': 'BRK_SJT_ID',
-        'SJT_NAAM': 'SJT_NAAM',
-        'SJT_TYPE': 'SJT_TYPE',
-        'RSIN': 'SJT_NNP_RSIN',
-        'KVKNUMMER': 'SJT_NNP_KVKNUMMER',
-        'RECHTSVCOD': 'SJT_NNP_RECHTSVORM_CODE',
-        'RECHTSVOMS': 'SJT_NNP_RECHTSVORM_OMS',
-        'STAT_NAAM': 'SJT_NNP_STATUTAIRE_NAAM',
-        'STAT_ZETEL': 'SJT_NNP_STATUTAIRE_ZETEL',
-        'SJT_ZRT': 'SJT_ZRT',
-        'SJT_AANDEEL': 'SJT_AANDEEL',
-        'INONDERZK': 'KOT_INONDERZOEK',
+        'falseval': {
+            'action': 'literal',
+            'value': 'J',
+        }
     }
+
+    toestd_dat = {
+        'action': 'format',
+        'formatter': format_timestamp,
+        'value': 'toestandsdatum',
+        'kwargs': {'format': '%Y-%m-%d'},
+    }
+
+    def get_mapping(self):
+        return {
+            'BRK_KOT_ID': 'BRK_KOT_ID',
+            'GEMEENTE': 'KOT_GEMEENTENAAM',
+            'KADGEMCODE': 'KOT_KADASTRALEGEMEENTE_CODE',
+            'KADGEM': 'KOT_KAD_GEMEENTE_OMS',
+            'SECTIE': 'KOT_SECTIE',
+            'PERCEELNR': 'KOT_PERCEELNUMMER',
+            'INDEXLTR': 'KOT_INDEX_LETTER',
+            'INDEXNR': 'KOT_INDEX_NUMMER',
+            'SOORTGCOD': 'KOT_SOORTGROOTTE_CODE',
+            'SOORTGOMS': 'KOT_SOORTGROOTTE_OMS',
+            'KADGROOTTE': 'KOT_KADGROOTTE',
+            'REL_GPCL': 'KOT_RELATIE_G_PERCEEL',
+            'KOOPSOM': 'KOT_KOOPSOM',
+            'KOOPSOMVAL': 'KOT_KOOPSOM_VALUTA',
+            'KOOPJAAR': 'KOT_KOOPJAAR',
+            'MEEROB_IND': 'KOT_INDICATIE_MEER_OBJECTEN',
+            'CULTONBCOD': 'KOT_CULTUURCODEONBEBOUWD_CODE',
+            'CULTONBOMS': 'KOT_CULTUURCODEONBEBOUWD_OMS',
+            'CULTBCOD': 'KOT_CULTUURCODEBEBOUWD_CODE',
+            'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
+            'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
+            'STATUSCOD': 'KOT_STATUS_CODE',
+            'TOESTD_DAT': self.toestd_dat,
+            'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
+            'SJT_VVE_ID': 'BRK_SJT_ID',
+            'BRK_SJT_ID': 'BRK_SJT_ID',
+            'SJT_NAAM': 'SJT_NAAM',
+            'SJT_TYPE': 'SJT_TYPE',
+            'RSIN': 'SJT_NNP_RSIN',
+            'KVKNUMMER': 'SJT_NNP_KVKNUMMER',
+            'RECHTSVCOD': 'SJT_NNP_RECHTSVORM_CODE',
+            'RECHTSVOMS': 'SJT_NNP_RECHTSVORM_OMS',
+            'STAT_NAAM': 'SJT_NNP_STATUTAIRE_NAAM',
+            'STAT_ZETEL': 'SJT_NNP_STATUTAIRE_ZETEL',
+            'SJT_ZRT': 'SJT_ZRT',
+            'SJT_AANDEEL': 'SJT_AANDEEL',
+            'INONDERZK': self.inonderzk,
+        }
 
     def get_format(self):
         csv_format = super().get_format()
-        return convert_format(csv_format, self.esri_to_csv_mapping)
+        return convert_format(csv_format, self.get_mapping())
 
 
 class KadastraleobjectenEsriNoSubjectsFormat(KadastraleobjectenEsriFormat):
-    esri_to_csv_mapping = {
-        'BRK_KOT_ID': 'BRK_KOT_ID',
-        'GEMEENTE': 'KOT_GEMEENTENAAM',
-        'KADGEMCODE': 'KOT_KADASTRALEGEMEENTE_CODE',
-        'KADGEM': 'KOT_KAD_GEMEENTE_OMS',
-        'SECTIE': 'KOT_SECTIE',
-        'PERCEELNR': 'KOT_PERCEELNUMMER',
-        'INDEXLTR': 'KOT_INDEX_LETTER',
-        'INDEXNR': 'KOT_INDEX_NUMMER',
-        'SOORTGCOD': 'KOT_SOORTGROOTTE_CODE',
-        'SOORTGOMS': 'KOT_SOORTGROOTTE_OMS',
-        'KADGROOTTE': 'KOT_KADGROOTTE',
-        'REL_GPCL': 'KOT_RELATIE_G_PERCEEL',
-        'KOOPSOM': 'KOT_KOOPSOM',
-        'KOOPSOMVAL': 'KOT_KOOPSOM_VALUTA',
-        'KOOPJAAR': 'KOT_KOOPJAAR',
-        'MEEROB_IND': 'KOT_INDICATIE_MEER_OBJECTEN',
-        'CULTONBCOD': 'KOT_CULTUURCODEONBEBOUWD_CODE',
-        'CULTONBOMS': 'KOT_CULTUURCODEONBEBOUWD_OMS',
-        'CULTBCOD': 'KOT_CULTUURCODEBEBOUWD_CODE',
-        'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
-        'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
-        'STATUSCOD': 'KOT_STATUS_CODE',
-        'TOESTD_DAT': {
-            'action': 'format',
-            'formatter': format_timestamp,
-            'value': 'toestandsdatum',
-            'kwargs': {'format': '%Y-%m-%d'},
-        },
-        'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
-        'INONDERZK': 'KOT_INONDERZOEK',
-    }
+    def get_mapping(self):
+        return {
+            'BRK_KOT_ID': 'BRK_KOT_ID',
+            'GEMEENTE': 'KOT_GEMEENTENAAM',
+            'KADGEMCODE': 'KOT_KADASTRALEGEMEENTE_CODE',
+            'KADGEM': 'KOT_KAD_GEMEENTE_OMS',
+            'SECTIE': 'KOT_SECTIE',
+            'PERCEELNR': 'KOT_PERCEELNUMMER',
+            'INDEXLTR': 'KOT_INDEX_LETTER',
+            'INDEXNR': 'KOT_INDEX_NUMMER',
+            'SOORTGCOD': 'KOT_SOORTGROOTTE_CODE',
+            'SOORTGOMS': 'KOT_SOORTGROOTTE_OMS',
+            'KADGROOTTE': 'KOT_KADGROOTTE',
+            'REL_GPCL': 'KOT_RELATIE_G_PERCEEL',
+            'KOOPSOM': 'KOT_KOOPSOM',
+            'KOOPSOMVAL': 'KOT_KOOPSOM_VALUTA',
+            'KOOPJAAR': 'KOT_KOOPJAAR',
+            'MEEROB_IND': 'KOT_INDICATIE_MEER_OBJECTEN',
+            'CULTONBCOD': 'KOT_CULTUURCODEONBEBOUWD_CODE',
+            'CULTONBOMS': 'KOT_CULTUURCODEONBEBOUWD_OMS',
+            'CULTBCOD': 'KOT_CULTUURCODEBEBOUWD_CODE',
+            'CULTBOMS': 'KOT_CULTUURCODEBEBOUWD_OMS',
+            'AKRREG9T': 'KOT_AKRREGISTER9TEKST',
+            'STATUSCOD': 'KOT_STATUS_CODE',
+            'TOESTD_DAT': self.toestd_dat,
+            'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
+            'INONDERZK': self.inonderzk,
+        }
+
+
+def aandeel_sort(a: dict, b: dict):
+    """Returns True if a takes preference over b
+
+    :param a:
+    :param b:
+    :return:
+    """
+    def is_valid(aandeel: dict):
+        return aandeel is not None and isinstance(aandeel, dict) and aandeel.get('teller') is not None \
+               and aandeel.get('noemer') is not None
+
+    if not is_valid(a):
+        return False
+
+    if not is_valid(b):
+        return True
+
+    return Fraction(a['teller'], a['noemer']) > Fraction(b['teller'], b['noemer'])
 
 
 class KadastraleobjectenExportConfig:
@@ -1773,6 +1807,18 @@ class KadastraleobjectenExportConfig:
 }
 '''
 
+    sort = {
+        'invRustOpKadastraalobjectBrkZakelijkerechten'
+        '.invVanZakelijkrechtBrkTenaamstellingen'
+        '.aandeel': aandeel_sort,
+        'invRustOpKadastraalobjectBrkZakelijkerechten'
+        '.invVanZakelijkrechtBrkTenaamstellingen'
+        '.vanKadastraalsubject'
+        '.identificatie':
+        # Take subject ID with highest number (which is the last part of the . separated string)
+            lambda x, y: int(x.split('.')[-1]) > int(y.split('.')[-1])
+    }
+
     """
     Tenaamstellingen/Subject: Return the tenaamstelling with the largest aandeel (teller/noemer). When multiple
     tenaamstellingen have an even aandeel, sort the tenaamstellingen by its subject's geslachtsnaam.
@@ -1785,17 +1831,7 @@ class KadastraleobjectenExportConfig:
             'filename': lambda: brk_filename('kadastraal_object'),
             'mime_type': 'plain/text',
             'format': csv_format.get_format(),
-            'sort': {
-                'invRustOpKadastraalobjectBrkZakelijkerechten'
-                '.invVanZakelijkrechtBrkTenaamstellingen'
-                '.aandeel':
-                    lambda x, y: Fraction(x['teller'], x['noemer']) > Fraction(y['teller'], y['noemer']),
-                'invRustOpKadastraalobjectBrkZakelijkerechten'
-                '.invVanZakelijkrechtBrkTenaamstellingen'
-                '.vanKadastraalsubject'
-                '.geslachtsnaam':
-                    lambda x, y: str(x).lower() > str(y).lower(),
-            }
+            'sort': sort,
         },
         'esri_actueel': {
             'api_type': 'graphql_streaming',
@@ -1803,6 +1839,7 @@ class KadastraleobjectenExportConfig:
             'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shp',
             'mime_type': 'application/octet-stream',
             'format': esri_format.get_format(),
+            'sort': sort,
             'extra_files': [
                 {
                     'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.dbf',
@@ -1825,6 +1862,7 @@ class KadastraleobjectenExportConfig:
             'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shp',
             'mime_type': 'application/octet-stream',
             'format': esri_format_no_subjects.get_format(),
+            'sort': sort,
             'extra_files': [
                 {
                     'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.dbf',
