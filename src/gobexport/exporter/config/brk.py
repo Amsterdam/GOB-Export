@@ -1377,8 +1377,7 @@ class KadastraleobjectenCsvFormat:
                 trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
                 falseval={
                     'condition': 'isempty',
-                    'reference': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
-                    'negate': True,
+                    'reference': 'vanKadastraalsubject.[0].statutaireNaam',
                     'trueval': {
                         'action': 'concat',
                         'fields': [
@@ -1416,28 +1415,12 @@ class KadastraleobjectenCsvFormat:
             'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject.[0].geboorteland.code',
             'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject.[0].geboorteland.omschrijving',
             'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject.[0].datumOverlijden',
-            'SJT_NNP_RSIN': self.if_vve(
-                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].heeftRsinVoor.bronwaarde',
-                falseval='vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde'
-            ),
-            'SJT_NNP_KVKNUMMER': self.if_vve(
-                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].heeftKvknummerVoor.bronwaarde',
-                falseval='vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde'
-            ),
-            'SJT_NNP_RECHTSVORM_CODE': self.if_vve(
-                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].rechtsvorm.code',
-                falseval='vanKadastraalsubject.[0].rechtsvorm.code'),
-            'SJT_NNP_RECHTSVORM_OMS': self.if_vve(
-                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].rechtsvorm.omschrijving',
-                falseval='vanKadastraalsubject.[0].rechtsvorm.omschrijving'),
-            'SJT_NNP_STATUTAIRE_NAAM': self.if_vve(
-                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
-                falseval='vanKadastraalsubject.[0].statutaireNaam'
-            ),
-            'SJT_NNP_STATUTAIRE_ZETEL': self.if_vve(
-                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireZetel',
-                falseval='vanKadastraalsubject.[0].statutaireZetel'
-            ),
+            'SJT_NNP_RSIN': 'vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde',
+            'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde',
+            'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject.[0].rechtsvorm.code',
+            'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject.[0].rechtsvorm.omschrijving',
+            'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject.[0].statutaireNaam',
+            'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject.[0].statutaireZetel',
             'SJT_ZRT': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].aardZakelijkRecht.omschrijving',
             'SJT_AANDEEL': self.if_vve(
                 trueval={
