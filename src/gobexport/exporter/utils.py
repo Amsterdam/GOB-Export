@@ -54,10 +54,15 @@ def _evaluate_literal_action(action: dict):
 
 
 def _evaluate_fill_action(entity: dict, action: dict):
-    assert all([key in action for key in ['length', 'value', 'character']])
+    assert all([key in action for key in ['length', 'value', 'character', 'fill_type']])
+    assert action['fill_type'] in ['rjust', 'ljust'], "A valid fill type must be supplied (rjust, ljust)"
 
     value = str(get_entity_value(entity, action['value']))
-    return value.rjust(action['length'], action['character'])
+
+    if action['fill_type'] == 'rjust':
+        return value.rjust(action['length'], action['character'])
+    elif action['fill_type'] == 'ljust':
+        return value.ljust(action['length'], action['character'])
 
 
 def _evaluate_format_action(entity: dict, action: dict):

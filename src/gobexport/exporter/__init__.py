@@ -1,5 +1,6 @@
 from gobexport.api import API
 from gobexport.exporter.config import bag, brk, gebieden, meetbouten, nap, test, wkpb
+from gobexport.exporter.config.uva2 import add_uva2_products
 from gobexport.graphql import GraphQL
 from gobexport.graphql_streaming import GraphQLStreaming
 from gobexport.buffered_iterable import BufferedIterable
@@ -53,6 +54,9 @@ CONFIG_MAPPING = {
         'brondocumenten': wkpb.BrondocumentenExportConfig,
     }
 }
+
+# Add UVA2 product to BAG exports
+add_uva2_products()
 
 
 def product_source(product):
