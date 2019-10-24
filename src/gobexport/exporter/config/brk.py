@@ -745,6 +745,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'length': 5,
                         'character': '0',
                         'value': 'rustOpKadastraalobject.[0].perceelnummer',
+                        'fill_type': 'rjust',
                     },
                     {
                         'action': 'literal',
@@ -760,6 +761,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'length': 4,
                         'character': '0',
                         'value': 'rustOpKadastraalobject.[0].indexnummer',
+                        'fill_type': 'rjust',
                     }
                 ]
             },
