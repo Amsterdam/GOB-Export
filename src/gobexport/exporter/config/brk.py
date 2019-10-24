@@ -1803,6 +1803,13 @@ class KadastraleobjectenExportConfig:
             lambda x, y: int(x.split('.')[-1]) > int(y.split('.')[-1])
     }
 
+    entity_filters = [
+        NotEmptyFilter(
+            'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+            'vanKadastraalsubject.[0].identificatie'
+        ),
+    ]
+
     """
     Tenaamstellingen/Subject: Return the tenaamstelling with the largest aandeel (teller/noemer). When multiple
     tenaamstellingen have an even aandeel, sort the tenaamstellingen by its subject's geslachtsnaam.
@@ -1816,6 +1823,7 @@ class KadastraleobjectenExportConfig:
             'mime_type': 'plain/text',
             'format': csv_format.get_format(),
             'sort': sort,
+            'entity_filters': entity_filters,
         },
         'esri_actueel': {
             'api_type': 'graphql_streaming',
@@ -1824,6 +1832,7 @@ class KadastraleobjectenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': esri_format.get_format(),
             'sort': sort,
+            'entity_filters': entity_filters,
             'extra_files': [
                 {
                     'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.dbf',
@@ -1846,7 +1855,6 @@ class KadastraleobjectenExportConfig:
             'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shp',
             'mime_type': 'application/octet-stream',
             'format': esri_format_no_subjects.get_format(),
-            'sort': sort,
             'extra_files': [
                 {
                     'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.dbf',
