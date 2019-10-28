@@ -84,7 +84,7 @@ def _add_woonplaatsen_uva2_config():
         'filename': get_uva2_filename("WPL"),
         'mime_type': 'plain/text',
         'format': {
-            'sleutelverzendend': 'amsterdamseSleutel',
+            'sleutelVerzendend': 'amsterdamseSleutel',
             'Woonplaatsidentificatie': 'identificatie',
             'Woonplaatsnaam': 'naam',
             'DocumentdatumMutatieWoonplaats': {
@@ -160,7 +160,7 @@ def _add_openbareruimtes_uva2_config():
 """
 
     bag.OpenbareruimtesExportConfig.products['uva2'] = {
-        'api_type': 'graphql',
+        'api_type': 'graphql_streaming',
         'exporter': uva2_exporter,
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
@@ -169,7 +169,7 @@ def _add_openbareruimtes_uva2_config():
         'filename': get_uva2_filename("OPR"),
         'mime_type': 'plain/text',
         'format': {
-            'sleutelverzendend': 'amsterdamseSleutel',
+            'sleutelVerzendend': 'amsterdamseSleutel',
             'TypeOpenbareRuimteDomein': 'type.code',
             'OmschrijvingTypeOpenbareRuimteDomein': '',
             'NaamOpenbareRuimte': 'naam',
