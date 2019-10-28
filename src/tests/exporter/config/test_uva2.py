@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from datetime import date
 
-from gobexport.exporter.config.uva2 import get_uva2_filename, format_uva2_date
+from gobexport.exporter.config.uva2 import get_uva2_filename, format_uva2_date, format_uva2_status
 
 
 class TestUVA2ConfigHelpers(TestCase):
@@ -24,3 +24,22 @@ class TestUVA2ConfigHelpers(TestCase):
         for inp in ['invalid_str', None]:
             # These inputs should not change
             self.assertEqual(inp, format_uva2_date(inp))
+
+    def test_format_uva2_status_invalid(self):
+        # Test invalid entity names
+        with self.assertRaises(AssertionError):
+            format_uva2_status('1', 'invalid')
+
+    def test_format_uva2_status_openbareruimtes(self):
+        # Status 1 and 2 should be mapped to 35, 36 for openbareruimtes
+        status = [('1', '35'), ('2', '36'), (1, '35')]
+
+        for input, expected in status:
+            self.assertEqual(expected, format_uva2_status(input, "openbareruimtes"))
+
+        # Test invalid status for openbareruimtes
+        status = [3, '4', 'a', None]
+
+        for input in status:
+            with self.assertRaises(AssertionError):
+                format_uva2_status(input, "openbareruimtes")
