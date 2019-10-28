@@ -212,16 +212,29 @@ class TestUtils(TestCase):
         entity = {}
 
         test_cases = [
-            ({'length': 5, 'value': 'a', 'character': '2'}, '2222a'),
-            ({'length': 5, 'value': 'ab', 'character': '0'}, '000ab'),
-            ({'length': 1, 'value': 'ab', 'character': '0'}, 'ab'),
+            ({'length': 5, 'value': 'a', 'character': '2', 'fill_type': 'rjust'}, '2222a'),
+            ({'length': 5, 'value': 'ab', 'character': '0', 'fill_type': 'rjust'}, '000ab'),
+            ({'length': 1, 'value': 'ab', 'character': '0', 'fill_type': 'rjust'}, 'ab'),
+        ]
+
+        for action, result in test_cases:
+            self.assertEqual(result, _evaluate_fill_action(entity, action))
+
+    @patch("gobexport.exporter.utils.get_entity_value", lambda entity, lookup_key: lookup_key)
+    def test_evaluate_fill_action_ljust(self):
+        entity = {}
+
+        test_cases = [
+            ({'length': 5, 'value': 'a', 'character': '2', 'fill_type': 'ljust'}, 'a2222'),
+            ({'length': 5, 'value': 'ab', 'character': '0', 'fill_type': 'ljust'}, 'ab000'),
+            ({'length': 1, 'value': 'ab', 'character': '0', 'fill_type': 'ljust'}, 'ab'),
         ]
 
         for action, result in test_cases:
             self.assertEqual(result, _evaluate_fill_action(entity, action))
 
     def test_evaluate_fill_action_missing_keys(self):
-        valid_action = {'length': '', 'value': '', 'character': ''}
+        valid_action = {'length': '', 'value': '', 'character': '', 'fill_type': ''}
 
         for key in valid_action.keys():
             action = valid_action.copy()
@@ -229,6 +242,12 @@ class TestUtils(TestCase):
 
             with self.assertRaises(AssertionError):
                 _evaluate_fill_action({}, action)
+
+    def test_evaluate_fill_action_invalid_fill_type(self):
+        invalid_action = {'length': '', 'value': '', 'character': '', 'fill_type': 'invalid'}
+
+        with self.assertRaises(AssertionError):
+            _evaluate_fill_action({}, invalid_action)
 
     @patch("gobexport.exporter.utils.get_entity_value")
     def test_evaluate_format_action(self, mock_get_entity_value):

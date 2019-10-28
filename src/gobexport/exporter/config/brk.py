@@ -745,6 +745,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'length': 5,
                         'character': '0',
                         'value': 'rustOpKadastraalobject.[0].perceelnummer',
+                        'fill_type': 'rjust',
                     },
                     {
                         'action': 'literal',
@@ -760,6 +761,7 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                         'length': 4,
                         'character': '0',
                         'value': 'rustOpKadastraalobject.[0].indexnummer',
+                        'fill_type': 'rjust',
                     }
                 ]
             },
@@ -1514,7 +1516,8 @@ class KadastraleobjectenEsriFormat(KadastraleobjectenCsvFormat):
             'STAT_NAAM': 'SJT_NNP_STATUTAIRE_NAAM',
             'STAT_ZETEL': 'SJT_NNP_STATUTAIRE_ZETEL',
             'SJT_ZRT': 'SJT_ZRT',
-            'SJT_AANDEEL': 'SJT_AANDEEL',
+            # SJT_AANDEE is not a typo. Will be truncated by GDAL, which breaks the mapping.
+            'SJT_AANDEE': 'SJT_AANDEEL',
             'INONDERZK': self.inonderzk,
         }
 
