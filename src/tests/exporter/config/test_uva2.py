@@ -9,8 +9,10 @@ class TestUVA2ConfigHelpers(TestCase):
 
     def test_get_uva2_filename(self):
         publish_date = date.today().strftime('%Y%m%d')
-        self.assertEqual(f"UVA2_Actueel/ABC_{publish_date}_N_{publish_date}_{publish_date}.UVA2",
-                         get_uva2_filename('ABC'))
+
+        # Get uva2 filename return a callable
+        filename_function = get_uva2_filename('ABC')
+        self.assertEqual(f"UVA2_Actueel/ABC_{publish_date}_N_{publish_date}_{publish_date}.UVA2", filename_function())
 
         # Assert undefined file name raises error
         with self.assertRaises(AssertionError):
@@ -43,3 +45,17 @@ class TestUVA2ConfigHelpers(TestCase):
         for input in status:
             with self.assertRaises(AssertionError):
                 format_uva2_status(input, "openbareruimtes")
+
+    def test_format_uva2_status_nummeraanduidingen(self):
+        # Status 1 and 2 should be mapped to 16, 17 for nummeraanduidingen
+        status = [('1', '16'), ('2', '17'), (1, '16')]
+
+        for input, expected in status:
+            self.assertEqual(expected, format_uva2_status(input, "nummeraanduidingen"))
+
+        # Test invalid status for nummeraanduidingen
+        status = [3, '4', 'a', None]
+
+        for input in status:
+            with self.assertRaises(AssertionError):
+                format_uva2_status(input, "nummeraanduidingen")
