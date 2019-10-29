@@ -76,7 +76,7 @@ def uva2_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
             if filter and not filter.filter(entity):
                 continue
 
-            row = f"{DELIMITER}".join([get_entity_value(entity, mapping[fieldname])
+            row = f"{DELIMITER}".join([str(get_entity_value(entity, mapping[fieldname]))
                                        if get_entity_value(entity, mapping[fieldname]) else ''
                                        for fieldname in fieldnames])
             row += CRLF
