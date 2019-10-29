@@ -8,16 +8,21 @@ from gobexport.filters.notempty_filter import NotEmptyFilter
 
 UVA2_DATE_FORMAT = '%Y%m%d'
 UVA2_STATUS_CODES = {
+    'nummeraanduidingen': {
+        '1': '16',
+        '2': '17',
+    },
     'openbareruimtes': {
         '1': '35',
         '2': '36',
-    }
+    },
 }
 
 
 def add_uva2_products():
     _add_woonplaatsen_uva2_config()
     _add_openbareruimtes_uva2_config()
+    _add_nummeraanduidingen_uva2_config()
 
 
 def format_uva2_date(datetimestr):
@@ -45,8 +50,11 @@ def format_uva2_status(value, entity_name=None):
 def get_uva2_filename(abbreviation):
     assert abbreviation, "UVA2 requires an abbreviation"
 
-    publish_date = date.today().strftime(UVA2_DATE_FORMAT)
-    return f"UVA2_Actueel/{abbreviation}_{publish_date}_N_{publish_date}_{publish_date}.UVA2"
+    def uva2_filename():
+        publish_date = date.today().strftime(UVA2_DATE_FORMAT)
+        return f"UVA2_Actueel/{abbreviation}_{publish_date}_N_{publish_date}_{publish_date}.UVA2"
+
+    return uva2_filename
 
 
 def _add_woonplaatsen_uva2_config():
@@ -76,7 +84,7 @@ def _add_woonplaatsen_uva2_config():
 """
 
     bag.WoonplaatsenExportConfig.products['uva2'] = {
-        'api_type': 'graphql',
+        'api_type': 'graphql_streaming',
         'exporter': uva2_exporter,
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
@@ -225,6 +233,109 @@ def _add_openbareruimtes_uva2_config():
             'OPRWPL/WPL/sleutelVerzendend': 'ligtInWoonplaats.[0].amsterdamseSleutel',
             'OPRWPL/WPL/Woonplaatsidentificatie': 'ligtInWoonplaats.[0].identificatie',
             'OPRWPL/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'OPRWPL/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            }
+        },
+        'query': uva2_query
+    }
+
+
+def _add_nummeraanduidingen_uva2_config():
+    uva2_query = """
+{
+  bagNummeraanduidingen {
+    edges {
+      node {
+        amsterdamseSleutel
+        huisnummer
+        huisletter
+        huisnummertoevoeging
+        postcode
+        documentdatum
+        documentnummer
+        typeAdresseerbaarObject
+        beginGeldigheid
+        eindGeldigheid
+        status
+        ligtAanOpenbareruimte {
+          edges {
+            node {
+              amsterdamseSleutel
+              straatcode
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    bag.NummeraanduidingenExportConfig.products['uva2'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'filename': get_uva2_filename("NUM"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'amsterdamseSleutel',
+            'IdentificatiecodeNummeraanduiding': 'amsterdamseSleutel',
+            'Huisnummer': 'huisnummer',
+            'Huisletter': 'huisletter',
+            'Huisnummertoevoeging': 'huisnummertoevoeging',
+            'Postcode': 'postcode',
+            'DocumentdatumMutatieNummeraanduiding': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'documentdatum',
+            },
+            'DocumentnummerMutatieNummeraanduiding': 'documentnummer',
+            'TypeAdresseerbaarObjectDomein': 'typeAdresseerbaarObject.code',
+            'OmschrijvingTypeAdresseerbaarObjectDomein': 'typeAdresseerbaarObject.omschrijving',
+            'Adresnummer': '',
+            'Mutatie-gebruiker': '',
+            'Indicatie-vervallen': '',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'NUMBRN/BRN/Code': '',
+            'NUMBRN/TijdvakRelatie/begindatumRelatie': '',
+            'NUMBRN/TijdvakRelatie/einddatumRelatie': '',
+            'NUMSTS/STS/Code': {
+                'action': 'format',
+                'formatter': format_uva2_status,
+                'value': 'status.code',
+                'kwargs': {'entity_name': 'nummeraanduidingen'},
+            },
+            'NUMSTS/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'NUMSTS/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'NUMOPR/OPR/sleutelVerzendend': 'ligtAanOpenbareruimte.[0].amsterdamseSleutel',
+            'NUMOPR/WPL/Straatcode': 'ligtAanOpenbareruimte.[0].straatcode',
+            'NUMOPR/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'beginGeldigheid',
