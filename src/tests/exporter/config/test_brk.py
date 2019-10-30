@@ -528,6 +528,27 @@ class TestKadastraleobjectenCsvFormat(TestCase):
         for inp, outp in testcases:
             self.assertEqual(outp, self.format.format_kadgrootte(inp))
 
+    def test_if_vve(self):
+        expected = {
+            'condition': 'isempty',
+            'reference': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+            'negate': True,
+            'trueval': {'true': 'val'},
+            'falseval': 'FALSEVAL',
+        }
+
+        self.assertEqual(expected, self.format.if_vve({'true': 'val'}, 'FALSEVAL'))
+
+    def test_vve_or_subj(self):
+        expected = {
+            'condition': 'isempty',
+            'reference': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
+            'negate': True,
+            'trueval': 'betrokkenBijAppartementsrechtsplitsingVve.[0].theAttribute',
+            'falseval': 'vanKadastraalsubject.[0].theAttribute',
+        }
+        self.assertEqual(expected, self.format.vve_or_subj('theAttribute'))
+
 
 class TestKadastraleobjectenEsriFormat(TestCase):
 
