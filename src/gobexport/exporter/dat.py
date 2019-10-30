@@ -84,6 +84,25 @@ def _to_number(value, precision=None):
         .replace('.', ',')
 
 
+def _to_number_string(value, precision=None):
+    """Convert a value number and return as string
+    Also remove a leading zero
+
+    The decimal dot is replaced by a comma
+
+    Example:
+        2.5 => 2,5
+        0.5 => ,5
+
+    :param value:
+    :return:
+    """
+    assert(type(value) in [int, float, str, decimal.Decimal] or value is None)
+    value = format(value, f'.{precision}f') if precision and value is not None else value
+    return '' if value is None else f'$${value}$$'\
+        .replace('.', ',').replace('0,', ',')
+
+
 def _to_date(value, *args):
     """Convert to date
 
@@ -167,6 +186,7 @@ def type_convert(type_name, value, *args):
         'str': _to_string,
         'bool': _to_boolean,
         'num': _to_number,
+        'numstr': _to_number_string,
         'dat': _to_date,
         'geo': _to_geometry,
         'coo': _to_coord,
