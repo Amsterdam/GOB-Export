@@ -1,6 +1,6 @@
 import pytest
 
-from gobexport.exporter.dat import _to_plain, _to_string, _to_boolean, _to_number, _to_date, _to_geometry, _to_coord, type_convert
+from gobexport.exporter.dat import _to_plain, _to_string, _to_boolean, _to_number, _to_number_string, _to_date, _to_geometry, _to_coord, type_convert
 
 
 def test_to_string():
@@ -32,6 +32,18 @@ def test_to_number():
         with pytest.raises(AssertionError):
             assert(_to_number(v))
 
+def test_to_number_string():
+    assert(_to_number_string(5) == '$$5$$')
+    assert(_to_number_string(5.1) == '$$5,1$$')
+    assert(_to_number_string(5.1235353, 2) == '$$5,12$$')
+    assert(_to_number_string(0.1235353, 2) == '$$,12$$')
+    assert(_to_number_string(-5.1235353, 2) == '$$-5,12$$')
+    assert(_to_number_string(-0.1235353, 2) == '$$-,12$$')
+    assert(_to_number_string(None) == '')
+
+    for v in ['', True, [], {}]:
+        with pytest.raises(AssertionError):
+            assert(_to_number(v))
 
 def test_to_date():
     assert(_to_date('2020-05-20') == '$$20200520$$')
