@@ -18,7 +18,7 @@ class PeilmerkenExportConfig:
             'endpoint': '/gob/nap/peilmerken/?view=enhanced&ndjson=true',
             'filename': 'DAT/NAP_PEILMERK.dat',
             'mime_type': 'plain/text',
-            'format': 'identificatie:str|hoogteTovNap:numstr:4|jaar:str|merk.code:str|omschrijving:str|'
+            'format': 'identificatie:str|hoogteTovNap:numstr:4|jaar:numstr|merk.code:str|omschrijving:str|'
                       'windrichting:str|xCoordinaatMuurvlak:num:0|yCoordinaatMuurvlak:num:0|rwsNummer:str|'
                       'geometrie:geo'
         }
