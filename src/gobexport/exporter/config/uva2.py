@@ -307,7 +307,13 @@ def _add_nummeraanduidingen_uva2_config():
                 'value': 'documentdatum',
             },
             'DocumentnummerMutatieNummeraanduiding': 'documentnummer',
-            'TypeAdresseerbaarObjectDomein': 'typeAdresseerbaarObject.code',
+            'TypeAdresseerbaarObjectDomein': {
+                'action': 'fill',
+                'length': 2,
+                'character': '0',
+                'value': 'typeAdresseerbaarObject.code',
+                'fill_type': 'rjust'
+            },
             'OmschrijvingTypeAdresseerbaarObjectDomein': 'typeAdresseerbaarObject.omschrijving',
             'Adresnummer': '',
             'Mutatie-gebruiker': '',
@@ -342,13 +348,13 @@ def _add_nummeraanduidingen_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'NUMOPR/OPR/sleutelVerzendend': 'ligtAanOpenbareruimte.[0].amsterdamseSleutel',
-            'NUMOPR/WPL/Straatcode': 'ligtAanOpenbareruimte.[0].straatcode',
+            'NUMOPR/OPR/Straatcode': 'ligtAanOpenbareruimte.[0].straatcode',
             'NUMOPR/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'beginGeldigheid',
             },
-            'OPRWPL/TijdvakRelatie/einddatumRelatie': {
+            'NUMOPR/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'eindGeldigheid',
