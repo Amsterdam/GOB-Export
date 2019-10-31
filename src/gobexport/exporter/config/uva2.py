@@ -8,6 +8,10 @@ from gobexport.filters.notempty_filter import NotEmptyFilter
 
 UVA2_DATE_FORMAT = '%Y%m%d'
 UVA2_STATUS_CODES = {
+    'ligplaatsen': {
+        '1': '33',
+        '2': '34',
+    },
     'nummeraanduidingen': {
         '1': '16',
         '2': '17',
@@ -23,6 +27,7 @@ def add_uva2_products():
     _add_woonplaatsen_uva2_config()
     _add_openbareruimtes_uva2_config()
     _add_nummeraanduidingen_uva2_config()
+    _add_ligplaatsen_uva2_config()
 
 
 def format_uva2_date(datetimestr):
@@ -45,6 +50,11 @@ def format_uva2_status(value, entity_name=None):
     assert value in UVA2_STATUS_CODES[entity_name], "A valid status code is required"
 
     return UVA2_STATUS_CODES[entity_name][value]
+
+
+def format_uva2_buurt(value):
+    # Strip the first character (Stadsdeelcode)
+    return value[1:]
 
 
 def get_uva2_filename(abbreviation):
@@ -297,7 +307,13 @@ def _add_nummeraanduidingen_uva2_config():
                 'value': 'documentdatum',
             },
             'DocumentnummerMutatieNummeraanduiding': 'documentnummer',
-            'TypeAdresseerbaarObjectDomein': 'typeAdresseerbaarObject.code',
+            'TypeAdresseerbaarObjectDomein': {
+                'action': 'fill',
+                'length': 2,
+                'character': '0',
+                'value': 'typeAdresseerbaarObject.code',
+                'fill_type': 'rjust'
+            },
             'OmschrijvingTypeAdresseerbaarObjectDomein': 'typeAdresseerbaarObject.omschrijving',
             'Adresnummer': '',
             'Mutatie-gebruiker': '',
@@ -332,13 +348,115 @@ def _add_nummeraanduidingen_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'NUMOPR/OPR/sleutelVerzendend': 'ligtAanOpenbareruimte.[0].amsterdamseSleutel',
-            'NUMOPR/WPL/Straatcode': 'ligtAanOpenbareruimte.[0].straatcode',
+            'NUMOPR/OPR/Straatcode': 'ligtAanOpenbareruimte.[0].straatcode',
             'NUMOPR/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'beginGeldigheid',
             },
-            'OPRWPL/TijdvakRelatie/einddatumRelatie': {
+            'NUMOPR/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            }
+        },
+        'query': uva2_query
+    }
+
+
+def _add_ligplaatsen_uva2_config():
+    uva2_query = """
+{
+  bagLigplaatsen {
+    edges {
+      node {
+        amsterdamseSleutel
+        documentdatum
+        documentnummer
+        beginGeldigheid
+        eindGeldigheid
+        status
+        ligtInBuurt {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    bag.LigplaatsenExportConfig.products['uva2'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'filename': get_uva2_filename("LIG"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'amsterdamseSleutel',
+            'Ligplaatsidentificatie': 'amsterdamseSleutel',
+            'DocumentdatumMutatieLigplaats': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'documentdatum',
+            },
+            'DocumentnummerMutatieLigplaats': 'documentnummer',
+            'LigplaatsnummerGemeente': '',
+            'Mutatie-gebruiker': '',
+            'Indicatie-vervallen': '',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'LIGBRN/BRN/Code': '',
+            'LIGBRN/TijdvakRelatie/begindatumRelatie': '',
+            'LIGBRN/TijdvakRelatie/einddatumRelatie': '',
+            'LIGSTS/STS/Code': {
+                'action': 'format',
+                'formatter': format_uva2_status,
+                'value': 'status.code',
+                'kwargs': {'entity_name': 'ligplaatsen'},
+            },
+            'LIGSTS/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'LIGSTS/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'LIGBRT/BRT/sleutelVerzendend': {
+                'action': 'fill',
+                'length': 14,
+                'character': '0',
+                'value': 'ligtInBuurt.[0].identificatie',
+                'fill_type': 'ljust'
+            },
+            'LIGBRT/BRT/Buurtcode': {
+                'action': 'format',
+                'formatter': format_uva2_buurt,
+                'value': 'ligtInBuurt.[0].code',
+            },
+            'LIGBRT/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'LIGBRT/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'eindGeldigheid',
