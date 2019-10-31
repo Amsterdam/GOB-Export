@@ -20,6 +20,10 @@ UVA2_STATUS_CODES = {
         '1': '35',
         '2': '36',
     },
+    'standplaatsen': {
+        '1': '37',
+        '2': '38',
+    },
 }
 
 
@@ -28,6 +32,7 @@ def add_uva2_products():
     _add_openbareruimtes_uva2_config()
     _add_nummeraanduidingen_uva2_config()
     _add_ligplaatsen_uva2_config()
+    _add_standplaatsen_uva2_config()
 
 
 def format_uva2_date(datetimestr):
@@ -435,6 +440,108 @@ def _add_ligplaatsen_uva2_config():
                 'value': 'beginGeldigheid',
             },
             'LIGSTS/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'LIGBRT/BRT/sleutelVerzendend': {
+                'action': 'fill',
+                'length': 14,
+                'character': '0',
+                'value': 'ligtInBuurt.[0].identificatie',
+                'fill_type': 'ljust'
+            },
+            'LIGBRT/BRT/Buurtcode': {
+                'action': 'format',
+                'formatter': format_uva2_buurt,
+                'value': 'ligtInBuurt.[0].code',
+            },
+            'LIGBRT/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'LIGBRT/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            }
+        },
+        'query': uva2_query
+    }
+
+
+def _add_standplaatsen_uva2_config():
+    uva2_query = """
+{
+  bagStandplaatsen {
+    edges {
+      node {
+        amsterdamseSleutel
+        documentdatum
+        documentnummer
+        beginGeldigheid
+        eindGeldigheid
+        status
+        ligtInBuurt {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    bag.StandplaatsenExportConfig.products['uva2'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'filename': get_uva2_filename("STA"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'amsterdamseSleutel',
+            'Standplaatsidentificatie': 'amsterdamseSleutel',
+            'DocumentdatumMutatieStandplaats': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'documentdatum',
+            },
+            'DocumentnummerMutatieStandplaats': 'documentnummer',
+            'StandplaatsnummerGemeente': '',
+            'Mutatie-gebruiker': '',
+            'Indicatie-vervallen': '',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'STABRN/BRN/Code': '',
+            'STABRN/TijdvakRelatie/begindatumRelatie': '',
+            'STABRN/TijdvakRelatie/einddatumRelatie': '',
+            'STASTS/STS/Code': {
+                'action': 'format',
+                'formatter': format_uva2_status,
+                'value': 'status.code',
+                'kwargs': {'entity_name': 'standplaatsen'},
+            },
+            'STASTS/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'STASTS/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'eindGeldigheid',
