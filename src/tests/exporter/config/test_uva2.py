@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from datetime import date
 
-from gobexport.exporter.config.uva2 import get_uva2_filename, format_uva2_date, format_uva2_status
+from gobexport.exporter.config.uva2 import get_uva2_filename, format_uva2_date, format_uva2_status, format_uva2_buurt
 
 
 class TestUVA2ConfigHelpers(TestCase):
@@ -26,6 +26,11 @@ class TestUVA2ConfigHelpers(TestCase):
         for inp in ['invalid_str', None]:
             # These inputs should not change
             self.assertEqual(inp, format_uva2_date(inp))
+
+    def test_format_uva2_buurt(self):
+        inp = 'A01p'
+        outp = '01p'
+        self.assertEqual(outp, format_uva2_buurt(inp))
 
     def test_format_uva2_status_invalid(self):
         # Test invalid entity names
