@@ -1324,6 +1324,12 @@ class KadastraleobjectenCsvFormat:
         else:
             return str(int(floatval))
 
+    def vve_or_subj(self, attribute):
+        return self.if_vve(
+            trueval=f"betrokkenBijAppartementsrechtsplitsingVve.[0].{attribute}",
+            falseval=f"vanKadastraalsubject.[0].{attribute}",
+        )
+
     def get_format(self):
         return {
             'BRK_KOT_ID': 'identificatie',
@@ -1371,10 +1377,7 @@ class KadastraleobjectenCsvFormat:
                     'N': 'Definitieve grens',
                 },
             },
-            'BRK_SJT_ID': self.if_vve(
-                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
-                falseval='vanKadastraalsubject.[0].identificatie'
-            ),
+            'BRK_SJT_ID': self.vve_or_subj('identificatie'),
             'SJT_NAAM': self.if_vve(
                 trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
                 falseval={
@@ -1408,21 +1411,18 @@ class KadastraleobjectenCsvFormat:
                     'falseval': 'vanKadastraalsubject.[0].statutaireNaam'
                 }
             ),
-            'SJT_TYPE': self.if_vve(
-                trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].typeSubject',
-                falseval='vanKadastraalsubject.[0].typeSubject',
-            ),
+            'SJT_TYPE': self.vve_or_subj('typeSubject'),
             'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject.[0].geboortedatum',
             'SJT_NP_GEBOORTEPLAATS': 'vanKadastraalsubject.[0].geboorteplaats',
             'SJT_NP_GEBOORTELAND_CODE': 'vanKadastraalsubject.[0].geboorteland.code',
             'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject.[0].geboorteland.omschrijving',
             'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject.[0].datumOverlijden',
-            'SJT_NNP_RSIN': 'vanKadastraalsubject.[0].heeftRsinVoor.bronwaarde',
-            'SJT_NNP_KVKNUMMER': 'vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde',
-            'SJT_NNP_RECHTSVORM_CODE': 'vanKadastraalsubject.[0].rechtsvorm.code',
-            'SJT_NNP_RECHTSVORM_OMS': 'vanKadastraalsubject.[0].rechtsvorm.omschrijving',
-            'SJT_NNP_STATUTAIRE_NAAM': 'vanKadastraalsubject.[0].statutaireNaam',
-            'SJT_NNP_STATUTAIRE_ZETEL': 'vanKadastraalsubject.[0].statutaireZetel',
+            'SJT_NNP_RSIN': self.vve_or_subj('heeftRsinVoor.bronwaarde'),
+            'SJT_NNP_KVKNUMMER': self.vve_or_subj('vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde'),
+            'SJT_NNP_RECHTSVORM_CODE': self.vve_or_subj('vanKadastraalsubject.[0].rechtsvorm.code'),
+            'SJT_NNP_RECHTSVORM_OMS': self.vve_or_subj('vanKadastraalsubject.[0].rechtsvorm.omschrijving'),
+            'SJT_NNP_STATUTAIRE_NAAM': self.vve_or_subj('vanKadastraalsubject.[0].statutaireNaam'),
+            'SJT_NNP_STATUTAIRE_ZETEL': self.vve_or_subj('vanKadastraalsubject.[0].statutaireZetel'),
             'SJT_ZRT': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].aardZakelijkRecht.omschrijving',
             'SJT_AANDEEL': self.if_vve(
                 trueval={
@@ -1444,6 +1444,10 @@ class KadastraleobjectenCsvFormat:
                             'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.noemer'
                         ]
                     },
+                    'falseval': {
+                        'action': 'literal',
+                        'value': 'ONBEKEND',
+                    }
                 }
             ),
             'SJT_VVE_SJT_ID': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
@@ -1505,7 +1509,7 @@ class KadastraleobjectenEsriFormat(KadastraleobjectenCsvFormat):
             'STATUSCOD': 'KOT_STATUS_CODE',
             'TOESTD_DAT': self.toestd_dat,
             'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
-            'SJT_VVE_ID': 'BRK_SJT_ID',
+            'SJT_VVE_ID': 'SJT_VVE_SJT_ID',
             'BRK_SJT_ID': 'BRK_SJT_ID',
             'SJT_NAAM': 'SJT_NAAM',
             'SJT_TYPE': 'SJT_TYPE',
@@ -1806,13 +1810,6 @@ class KadastraleobjectenExportConfig:
             lambda x, y: int(x.split('.')[-1]) > int(y.split('.')[-1])
     }
 
-    entity_filters = [
-        NotEmptyFilter(
-            'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
-            'vanKadastraalsubject.[0].identificatie'
-        ),
-    ]
-
     """
     Tenaamstellingen/Subject: Return the tenaamstelling with the largest aandeel (teller/noemer). When multiple
     tenaamstellingen have an even aandeel, sort the tenaamstellingen by its subject's geslachtsnaam.
@@ -1826,7 +1823,6 @@ class KadastraleobjectenExportConfig:
             'mime_type': 'plain/text',
             'format': csv_format.get_format(),
             'sort': sort,
-            'entity_filters': entity_filters,
         },
         'esri_actueel': {
             'api_type': 'graphql_streaming',
@@ -1835,7 +1831,6 @@ class KadastraleobjectenExportConfig:
             'mime_type': 'application/octet-stream',
             'format': esri_format.get_format(),
             'sort': sort,
-            'entity_filters': entity_filters,
             'extra_files': [
                 {
                     'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.dbf',

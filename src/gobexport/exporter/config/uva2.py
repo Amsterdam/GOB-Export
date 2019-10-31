@@ -178,7 +178,13 @@ def _add_openbareruimtes_uva2_config():
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
-            'TypeOpenbareRuimteDomein': 'type.code',
+            'TypeOpenbareRuimteDomein': {
+                'action': 'fill',
+                'length': 2,
+                'character': '0',
+                'value': 'type.code',
+                'fill_type': 'rjust'
+            },
             'OmschrijvingTypeOpenbareRuimteDomein': '',
             'NaamOpenbareRuimte': 'naam',
             'DocumentdatumMutatieOpenbareRuimte': {
@@ -204,16 +210,8 @@ def _add_openbareruimtes_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'OPRBRN/BRN/Code': '',
-            'OPRBRN/TijdvakRelatie/begindatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'beginGeldigheid',
-            },
-            'OPRBRN/TijdvakRelatie/einddatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'eindGeldigheid',
-            },
+            'OPRBRN/TijdvakRelatie/begindatumRelatie': '',
+            'OPRBRN/TijdvakRelatie/einddatumRelatie': '',
             'OPRSTS/STS/Code': {
                 'action': 'format',
                 'formatter': format_uva2_status,
