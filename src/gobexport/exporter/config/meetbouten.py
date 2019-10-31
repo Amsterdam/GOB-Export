@@ -71,7 +71,7 @@ class ReferentiepuntenExportConfig:
             'endpoint': '/gob/meetbouten/referentiepunten/?view=enhanced&ndjson=true',
             'filename': 'DAT/MBT_REFERENTIEPUNT.dat',
             'mime_type': 'plain/text',
-            'format': 'identificatie:num|geometrie:coo:x|geometrie:coo:y|'
+            'format': 'identificatie:str|geometrie:coo:x|geometrie:coo:y|'
                       'hoogteTovNap:num:4|datum:dat|locatie:str|geometrie:geo'
         }
     }
