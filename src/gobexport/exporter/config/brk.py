@@ -340,11 +340,17 @@ class AantekeningenExportConfig:
                           perceelnummer
                           indexletter
                           indexnummer
-                          aangeduidDoorKadastralegemeentecode
+                          aangeduidDoorKadastralegemeentecode {
+                            edges {
+                              node {
+                                broninfo
+                              }
+                            }
+                          }
                           aangeduidDoorKadastralesectie {
                             edges {
                               node {
-                                bronwaarde
+                                code
                               }
                             }
                           }
@@ -379,8 +385,8 @@ class AantekeningenExportConfig:
         },
         'BRK_KOT_ID': 'rustOpKadastraalobject.[0].identificatie',
         'KOT_KADASTRALEGEMCODE_CODE':
-            'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
-        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].bronwaarde',
+            'aangeduidDoorKadastralegemeentecode.[0].broninfo.omschrijving',
+        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
         'KOT_PERCEELNUMMER': 'rustOpKadastraalobject.[0].perceelnummer',
         'KOT_INDEX_LETTER': 'rustOpKadastraalobject.[0].indexletter',
         'KOT_INDEX_NUMMER': 'rustOpKadastraalobject.[0].indexnummer',
@@ -413,11 +419,17 @@ class AantekeningenExportConfig:
               perceelnummer
               indexletter
               indexnummer
-              aangeduidDoorKadastralegemeentecode
+              aangeduidDoorKadastralegemeentecode {
+                edges {
+                  node {
+                    broninfo
+                  }
+                }
+              }
               aangeduidDoorKadastralesectie {
                 edges {
                   node {
-                    bronwaarde
+                    code
                   }
                 }
               }
@@ -446,8 +458,8 @@ class AantekeningenExportConfig:
         },
         'BRK_KOT_ID': 'heeftBetrekkingOpKadastraalObject.[0].identificatie',
         'KOT_KADASTRALEGEMCODE_CODE':
-            'heeftBetrekkingOpKadastraalObject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
-        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].bronwaarde',
+            'aangeduidDoorKadastralegemeentecode.[0].broninfo.omschrijving',
+        'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
         'KOT_PERCEELNUMMER': 'heeftBetrekkingOpKadastraalObject.[0].perceelnummer',
         'KOT_INDEX_LETTER': 'heeftBetrekkingOpKadastraalObject.[0].indexletter',
         'KOT_INDEX_NUMMER': 'heeftBetrekkingOpKadastraalObject.[0].indexnummer',
@@ -730,12 +742,12 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
             'ZRT_BETREKKING_OP_KOT': {
                 'action': 'concat',
                 'fields': [
-                    'rustOpKadastraalobject.[0].aangeduidDoorKadastralegemeentecode.bronwaarde',
+                    'aangeduidDoorKadastralegemeentecode.[0].broninfo.omschrijving',
                     {
                         'action': 'literal',
                         'value': '-'
                     },
-                    'aangeduidDoorKadastralesectie.[0].bronwaarde',
+                    'aangeduidDoorKadastralesectie.[0].code',
                     {
                         'action': 'literal',
                         'value': '-'
@@ -929,11 +941,17 @@ class ZakelijkerechtenExportConfig:
               indexnummer
               identificatie
               status
-              aangeduidDoorKadastralegemeentecode
+              aangeduidDoorKadastralegemeentecode {
+                edges {
+                  node {
+                    broninfo
+                  }
+                }
+              }
               aangeduidDoorKadastralesectie {
                 edges {
                   node {
-                    bronwaarde
+                    code
                   }
                 }
               }
@@ -1045,9 +1063,9 @@ class BrkBagCsvFormat:
     def get_format(self):
         return {
             'BRK_KOT_ID': 'identificatie',
-            'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.code',
-            'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
-            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].bronwaarde',
+            'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.[0].broninfo.code',
+            'KOT_AKRKADGEMEENTECODE_OMS': 'aangeduidDoorKadastralegemeentecode.[0].broninfo.omschrijving',
+            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
             'KOT_PERCEELNUMMER': 'perceelnummer',
             'KOT_INDEX_LETTER': 'indexletter',
             'KOT_INDEX_NUMMER': 'indexnummer',
@@ -1095,12 +1113,24 @@ class BrkBagExportConfig:
     edges {
       node {
         identificatie
-        aangeduidDoorKadastralegemeente
-        aangeduidDoorKadastralegemeentecode
+        aangeduidDoorKadastralegemeente {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
+        aangeduidDoorKadastralegemeentecode {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
         aangeduidDoorKadastralesectie {
           edges {
             node {
-              bronwaarde
+              code
             }
           }
         }
@@ -1334,11 +1364,11 @@ class KadastraleobjectenCsvFormat:
         return {
             'BRK_KOT_ID': 'identificatie',
             'KOT_GEMEENTENAAM': 'aangeduidDoorGemeente.naam',
-            'KOT_AKRKADGEMCODE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.code',
-            'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
-            'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.broninfo.code',
-            'KOT_KAD_GEMEENTE_OMS': 'aangeduidDoorKadastralegemeente.broninfo.omschrijving',
-            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].bronwaarde',
+            'KOT_AKRKADGEMCODE_CODE': 'aangeduidDoorKadastralegemeentecode.[0].broninfo.code',
+            'KOT_KADASTRALEGEMEENTE_CODE': 'aangeduidDoorKadastralegemeentecode.[0].broninfo.omschrijving',
+            'KOT_KAD_GEMEENTECODE': 'aangeduidDoorKadastralegemeente.[0].broninfo.code',
+            'KOT_KAD_GEMEENTE_OMS': 'aangeduidDoorKadastralegemeente.[0].broninfo.omschrijving',
+            'KOT_SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
             'KOT_PERCEELNUMMER': 'perceelnummer',
             'KOT_INDEX_LETTER': 'indexletter',
             'KOT_INDEX_NUMMER': 'indexnummer',
@@ -1601,12 +1631,24 @@ class KadastraleobjectenExportConfig:
             }
           }
         }
-        aangeduidDoorKadastralegemeentecode
-        aangeduidDoorKadastralegemeente
+        aangeduidDoorKadastralegemeentecode {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
+        aangeduidDoorKadastralegemeente {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
         aangeduidDoorKadastralesectie {
           edges {
             node {
-              bronwaarde
+              code
             }
           }
         }
@@ -1707,12 +1749,24 @@ class KadastraleobjectenExportConfig:
             }
           }
         }
-        aangeduidDoorKadastralegemeentecode
-        aangeduidDoorKadastralegemeente
+        aangeduidDoorKadastralegemeentecode {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
+        aangeduidDoorKadastralegemeente {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
         aangeduidDoorKadastralesectie {
           edges {
             node {
-                bronwaarde
+              code
             }
           }
         }
@@ -1946,12 +2000,24 @@ class BijpijlingExportConfig:
             }
           }
         }
-        aangeduidDoorKadastralegemeentecode
-        aangeduidDoorKadastralegemeente
+        aangeduidDoorKadastralegemeentecode {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
+        aangeduidDoorKadastralegemeente {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
         aangeduidDoorKadastralesectie {
           edges {
             node {
-                bronwaarde
+              code
             }
           }
         }
@@ -1977,9 +2043,9 @@ class BijpijlingExportConfig:
             'format': {
                 'BRK_KOT_ID': 'identificatie',
                 'GEMEENTE': 'aangeduidDoorGemeente.naam',
-                'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.broninfo.omschrijving',
-                'KADGEM': 'aangeduidDoorKadastralegemeente.broninfo.omschrijving',
-                'SECTIE': 'aangeduidDoorKadastralesectie.[0].bronwaarde',
+                'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.[0].broninfo.omschrijving',
+                'KADGEM': 'aangeduidDoorKadastralegemeente.[0].broninfo.omschrijving',
+                'SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
                 'PERCEELNR': 'perceelnummer',
                 'INDEXLTR': 'indexletter',
                 'INDEXNR': 'indexnummer',
@@ -2019,9 +2085,9 @@ class PerceelnummerEsriFormat:
         return {
             'BRK_KOT_ID': 'identificatie',
             'GEMEENTE': 'aangeduidDoorGemeente.naam',
-            'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.bronwaarde',
-            'KADGEM': 'aangeduidDoorKadastralegemeente.bronwaarde',
-            'SECTIE': 'aangeduidDoorKadastralesectie.[0].bronwaarde',
+            'KADGEMCODE': 'aangeduidDoorKadastralegemeentecode.[0].broninfo.omschrijving',
+            'KADGEM': 'aangeduidDoorKadastralegemeente.[0].broninfo.omschrijving',
+            'SECTIE': 'aangeduidDoorKadastralesectie.[0].code',
             'PERCEELNR': 'perceelnummer',
             'INDEXLTR': 'indexletter',
             'INDEXNR': 'indexnummer',
@@ -2062,12 +2128,24 @@ class PerceelnummerExportConfig:
             }
           }
         }
-        aangeduidDoorKadastralegemeentecode
-        aangeduidDoorKadastralegemeente
+        aangeduidDoorKadastralegemeentecode {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
+        aangeduidDoorKadastralegemeente {
+          edges {
+            node {
+              broninfo
+            }
+          }
+        }
         aangeduidDoorKadastralesectie {
           edges {
             node {
-                bronwaarde
+              code
             }
           }
         }
