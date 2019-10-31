@@ -1448,11 +1448,11 @@ class KadastraleobjectenCsvFormat:
             'SJT_NP_GEBOORTELAND_OMS': 'vanKadastraalsubject.[0].geboorteland.omschrijving',
             'SJT_NP_DATUMOVERLIJDEN': 'vanKadastraalsubject.[0].datumOverlijden',
             'SJT_NNP_RSIN': self.vve_or_subj('heeftRsinVoor.bronwaarde'),
-            'SJT_NNP_KVKNUMMER': self.vve_or_subj('vanKadastraalsubject.[0].heeftKvknummerVoor.bronwaarde'),
-            'SJT_NNP_RECHTSVORM_CODE': self.vve_or_subj('vanKadastraalsubject.[0].rechtsvorm.code'),
-            'SJT_NNP_RECHTSVORM_OMS': self.vve_or_subj('vanKadastraalsubject.[0].rechtsvorm.omschrijving'),
-            'SJT_NNP_STATUTAIRE_NAAM': self.vve_or_subj('vanKadastraalsubject.[0].statutaireNaam'),
-            'SJT_NNP_STATUTAIRE_ZETEL': self.vve_or_subj('vanKadastraalsubject.[0].statutaireZetel'),
+            'SJT_NNP_KVKNUMMER': self.vve_or_subj('heeftKvknummerVoor.bronwaarde'),
+            'SJT_NNP_RECHTSVORM_CODE': self.vve_or_subj('rechtsvorm.code'),
+            'SJT_NNP_RECHTSVORM_OMS': self.vve_or_subj('rechtsvorm.omschrijving'),
+            'SJT_NNP_STATUTAIRE_NAAM': self.vve_or_subj('statutaireNaam'),
+            'SJT_NNP_STATUTAIRE_ZETEL': self.vve_or_subj('statutaireZetel'),
             'SJT_ZRT': 'invRustOpKadastraalobjectBrkZakelijkerechten.[0].aardZakelijkRecht.omschrijving',
             'SJT_AANDEEL': self.if_vve(
                 trueval={
