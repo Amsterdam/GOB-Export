@@ -406,6 +406,7 @@ def _add_ligplaatsen_uva2_config():
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
             'Ligplaatsidentificatie': 'amsterdamseSleutel',
+            'Ligplaatsgeometrie': '',
             'DocumentdatumMutatieLigplaats': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -508,6 +509,7 @@ def _add_standplaatsen_uva2_config():
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
             'Standplaatsidentificatie': 'amsterdamseSleutel',
+            'Standplaatsgeometrie': '',
             'DocumentdatumMutatieStandplaats': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -546,24 +548,24 @@ def _add_standplaatsen_uva2_config():
                 'formatter': format_uva2_date,
                 'value': 'eindGeldigheid',
             },
-            'LIGBRT/BRT/sleutelVerzendend': {
+            'STABRT/BRT/sleutelVerzendend': {
                 'action': 'fill',
                 'length': 14,
                 'character': '0',
                 'value': 'ligtInBuurt.[0].identificatie',
                 'fill_type': 'ljust'
             },
-            'LIGBRT/BRT/Buurtcode': {
+            'STABRT/BRT/Buurtcode': {
                 'action': 'format',
                 'formatter': format_uva2_buurt,
                 'value': 'ligtInBuurt.[0].code',
             },
-            'LIGBRT/TijdvakRelatie/begindatumRelatie': {
+            'STABRT/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'beginGeldigheid',
             },
-            'LIGBRT/TijdvakRelatie/einddatumRelatie': {
+            'STABRT/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'eindGeldigheid',
