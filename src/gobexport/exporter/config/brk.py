@@ -1321,6 +1321,19 @@ class KadastraleobjectenCsvFormat:
             'falseval': falseval,
         }
 
+    def if_sjt(self, trueval, falseval=None):
+        val = {
+            'condition': 'isempty',
+            'reference': 'vanKadastraalsubject.[0].identificatie',
+            'negate': True,
+            'trueval': trueval,
+        }
+
+        if falseval:
+            val['falseval'] = falseval
+
+        return val
+
     def if_empty_geenWaarde(self, reference):
         return {
             'condition': 'isempty',
@@ -1410,36 +1423,38 @@ class KadastraleobjectenCsvFormat:
             'BRK_SJT_ID': self.vve_or_subj('identificatie'),
             'SJT_NAAM': self.if_vve(
                 trueval='betrokkenBijAppartementsrechtsplitsingVve.[0].statutaireNaam',
-                falseval={
-                    'condition': 'isempty',
-                    'reference': 'vanKadastraalsubject.[0].statutaireNaam',
-                    'trueval': {
-                        'action': 'concat',
-                        'fields': [
-                            'vanKadastraalsubject.[0].geslachtsnaam',
-                            {
-                                'action': 'literal',
-                                'value': ','
-                            },
-                            'vanKadastraalsubject.[0].voornamen',
-                            {
-                                'action': 'literal',
-                                'value': ','
-                            },
-                            'vanKadastraalsubject.[0].voorvoegsels',
-                            {
-                                'action': 'literal',
-                                'value': ' ('
-                            },
-                            'vanKadastraalsubject.[0].geslacht.code',
-                            {
-                                'action': 'literal',
-                                'value': ')'
-                            },
-                        ]
-                    },
-                    'falseval': 'vanKadastraalsubject.[0].statutaireNaam'
-                }
+                falseval=self.if_sjt(
+                    trueval={
+                        'condition': 'isempty',
+                        'reference': 'vanKadastraalsubject.[0].statutaireNaam',
+                        'trueval': {
+                            'action': 'concat',
+                            'fields': [
+                                'vanKadastraalsubject.[0].geslachtsnaam',
+                                {
+                                    'action': 'literal',
+                                    'value': ','
+                                },
+                                'vanKadastraalsubject.[0].voornamen',
+                                {
+                                    'action': 'literal',
+                                    'value': ','
+                                },
+                                'vanKadastraalsubject.[0].voorvoegsels',
+                                {
+                                    'action': 'literal',
+                                    'value': ' ('
+                                },
+                                'vanKadastraalsubject.[0].geslacht.code',
+                                {
+                                    'action': 'literal',
+                                    'value': ')'
+                                },
+                            ]
+                        },
+                        'falseval': 'vanKadastraalsubject.[0].statutaireNaam'
+                    }
+                )
             ),
             'SJT_TYPE': self.vve_or_subj('typeSubject'),
             'SJT_NP_GEBOORTEDATUM': 'vanKadastraalsubject.[0].geboortedatum',
@@ -1539,8 +1554,8 @@ class KadastraleobjectenEsriFormat(KadastraleobjectenCsvFormat):
             'STATUSCOD': 'KOT_STATUS_CODE',
             'TOESTD_DAT': self.toestd_dat,
             'VL_KGR_IND': 'KOT_IND_VOORLOPIGE_KADGRENS',
-            'SJT_VVE_ID': 'SJT_VVE_SJT_ID',
             'BRK_SJT_ID': 'BRK_SJT_ID',
+            'VVE_SJT_ID': 'SJT_VVE_SJT_ID',
             'SJT_NAAM': 'SJT_NAAM',
             'SJT_TYPE': 'SJT_TYPE',
             'RSIN': 'SJT_NNP_RSIN',
