@@ -10,9 +10,7 @@ class TestUVA2ConfigHelpers(TestCase):
     def test_get_uva2_filename(self):
         publish_date = date.today().strftime('%Y%m%d')
 
-        # Get uva2 filename return a callable
-        filename_function = get_uva2_filename('ABC')
-        self.assertEqual(f"UVA2_Actueel/ABC_{publish_date}_N_{publish_date}_{publish_date}.UVA2", filename_function())
+        self.assertEqual(f"UVA2_Actueel/ABC_{publish_date}_N_{publish_date}_{publish_date}.UVA2", get_uva2_filename('ABC'))
 
         # Assert undefined file name raises error
         with self.assertRaises(AssertionError):

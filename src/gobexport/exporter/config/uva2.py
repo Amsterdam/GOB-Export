@@ -65,11 +65,8 @@ def format_uva2_buurt(value):
 def get_uva2_filename(abbreviation):
     assert abbreviation, "UVA2 requires an abbreviation"
 
-    def uva2_filename():
-        publish_date = date.today().strftime(UVA2_DATE_FORMAT)
-        return f"UVA2_Actueel/{abbreviation}_{publish_date}_N_{publish_date}_{publish_date}.UVA2"
-
-    return uva2_filename
+    publish_date = date.today().strftime(UVA2_DATE_FORMAT)
+    return f"UVA2_Actueel/{abbreviation}_{publish_date}_N_{publish_date}_{publish_date}.UVA2"
 
 
 def _add_woonplaatsen_uva2_config():
@@ -104,7 +101,7 @@ def _add_woonplaatsen_uva2_config():
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
         ],
-        'filename': get_uva2_filename("WPL"),
+        'filename': lambda: get_uva2_filename("WPL"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -189,7 +186,7 @@ def _add_openbareruimtes_uva2_config():
             NotEmptyFilter('amsterdamseSleutel'),
             NotEmptyFilter('straatcode'),
         ],
-        'filename': get_uva2_filename("OPR"),
+        'filename': lambda: get_uva2_filename("OPR"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -297,7 +294,7 @@ def _add_nummeraanduidingen_uva2_config():
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
         ],
-        'filename': get_uva2_filename("NUM"),
+        'filename': lambda: get_uva2_filename("NUM"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -395,13 +392,59 @@ def _add_ligplaatsen_uva2_config():
 }
 """
 
+    uva2_numlighfd_query = """
+{
+  bagLigplaatsen {
+    edges {
+      node {
+        amsterdamseSleutel
+        beginGeldigheid
+        eindGeldigheid
+        heeftHoofdadres {
+          edges {
+            node {
+              amsterdamseSleutel
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    uva2_numlignvn_query = """
+{
+  bagLigplaatsen {
+    edges {
+      node {
+        amsterdamseSleutel
+        beginGeldigheid
+        eindGeldigheid
+        heeftNevenadres {
+          edges {
+            node {
+              amsterdamseSleutel
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
     bag.LigplaatsenExportConfig.products['uva2'] = {
         'api_type': 'graphql_streaming',
         'exporter': uva2_exporter,
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
         ],
-        'filename': get_uva2_filename("LIG"),
+        'filename': lambda: get_uva2_filename("LIG"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -471,6 +514,87 @@ def _add_ligplaatsen_uva2_config():
         'query': uva2_query
     }
 
+    # NUMLIGHFD
+    bag.LigplaatsenExportConfig.products['uva2_numlighfd'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+            NotEmptyFilter('heeftHoofdadres.[0].amsterdamseSleutel'),
+        ],
+        'filename': lambda: get_uva2_filename("NUMLIGHFD"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'heeftHoofdadres.[0].amsterdamseSleutel',
+            'IdentificatiecodeNummeraanduiding': 'heeftHoofdadres.[0].amsterdamseSleutel',
+            'Ligplaatsgeometrie': '',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].eindGeldigheid',
+            },
+            'NUMLIGHFD/LIG/sleutelVerzenden': 'amsterdamseSleutel',
+            'NUMLIGHFD/LIG/Ligplaatsidentificatie': 'amsterdamseSleutel',
+            'NUMLIGHFD/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].beginGeldigheid',
+            },
+            'NUMLIGHFD/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].eindGeldigheid',
+            }
+        },
+        'query': uva2_numlighfd_query
+    }
+
+    # NUMLIGNVN
+    bag.LigplaatsenExportConfig.products['uva2_numlignvn'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+            NotEmptyFilter('heeftNevenadres.[0].amsterdamseSleutel'),
+        ],
+        'unfold': True,
+        'filename': lambda: get_uva2_filename("NUMLIGNVN"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'heeftNevenadres.[0].amsterdamseSleutel',
+            'IdentificatiecodeNummeraanduiding': 'heeftNevenadres.[0].amsterdamseSleutel',
+            'Ligplaatsgeometrie': '',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].eindGeldigheid',
+            },
+            'NUMLIGNVN/LIG/sleutelVerzenden': 'amsterdamseSleutel',
+            'NUMLIGNVN/LIG/Ligplaatsidentificatie': 'amsterdamseSleutel',
+            'NUMLIGNVN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].beginGeldigheid',
+            },
+            'NUMLIGNVN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].eindGeldigheid',
+            }
+        },
+        'query': uva2_numlignvn_query
+    }
+
 
 def _add_standplaatsen_uva2_config():
     uva2_query = """
@@ -504,7 +628,7 @@ def _add_standplaatsen_uva2_config():
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
         ],
-        'filename': get_uva2_filename("STA"),
+        'filename': lambda: get_uva2_filename("STA"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
