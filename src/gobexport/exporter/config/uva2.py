@@ -65,11 +65,8 @@ def format_uva2_buurt(value):
 def get_uva2_filename(abbreviation):
     assert abbreviation, "UVA2 requires an abbreviation"
 
-    def uva2_filename():
-        publish_date = date.today().strftime(UVA2_DATE_FORMAT)
-        return f"UVA2_Actueel/{abbreviation}_{publish_date}_N_{publish_date}_{publish_date}.UVA2"
-
-    return uva2_filename
+    publish_date = date.today().strftime(UVA2_DATE_FORMAT)
+    return f"UVA2_Actueel/{abbreviation}_{publish_date}_N_{publish_date}_{publish_date}.UVA2"
 
 
 def _add_woonplaatsen_uva2_config():
@@ -104,7 +101,7 @@ def _add_woonplaatsen_uva2_config():
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
         ],
-        'filename': get_uva2_filename("WPL"),
+        'filename': lambda: get_uva2_filename("WPL"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -189,7 +186,7 @@ def _add_openbareruimtes_uva2_config():
             NotEmptyFilter('amsterdamseSleutel'),
             NotEmptyFilter('straatcode'),
         ],
-        'filename': get_uva2_filename("OPR"),
+        'filename': lambda: get_uva2_filename("OPR"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -297,7 +294,7 @@ def _add_nummeraanduidingen_uva2_config():
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
         ],
-        'filename': get_uva2_filename("NUM"),
+        'filename': lambda: get_uva2_filename("NUM"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -401,7 +398,7 @@ def _add_ligplaatsen_uva2_config():
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
         ],
-        'filename': get_uva2_filename("LIG"),
+        'filename': lambda: get_uva2_filename("LIG"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -504,7 +501,7 @@ def _add_standplaatsen_uva2_config():
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
         ],
-        'filename': get_uva2_filename("STA"),
+        'filename': lambda: get_uva2_filename("STA"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
