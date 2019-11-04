@@ -527,7 +527,6 @@ def _add_ligplaatsen_uva2_config():
         'format': {
             'sleutelVerzendend': 'heeftHoofdadres.[0].amsterdamseSleutel',
             'IdentificatiecodeNummeraanduiding': 'heeftHoofdadres.[0].amsterdamseSleutel',
-            'Ligplaatsgeometrie': '',
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -538,7 +537,7 @@ def _add_ligplaatsen_uva2_config():
                 'formatter': format_uva2_date,
                 'value': 'heeftHoofdadres.[0].eindGeldigheid',
             },
-            'NUMLIGHFD/LIG/sleutelVerzenden': 'amsterdamseSleutel',
+            'NUMLIGHFD/LIG/sleutelVerzendend': 'amsterdamseSleutel',
             'NUMLIGHFD/LIG/Ligplaatsidentificatie': 'amsterdamseSleutel',
             'NUMLIGHFD/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
@@ -568,7 +567,6 @@ def _add_ligplaatsen_uva2_config():
         'format': {
             'sleutelVerzendend': 'heeftNevenadres.[0].amsterdamseSleutel',
             'IdentificatiecodeNummeraanduiding': 'heeftNevenadres.[0].amsterdamseSleutel',
-            'Ligplaatsgeometrie': '',
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -579,7 +577,7 @@ def _add_ligplaatsen_uva2_config():
                 'formatter': format_uva2_date,
                 'value': 'heeftNevenadres.[0].eindGeldigheid',
             },
-            'NUMLIGNVN/LIG/sleutelVerzenden': 'amsterdamseSleutel',
+            'NUMLIGNVN/LIG/sleutelVerzendend': 'amsterdamseSleutel',
             'NUMLIGNVN/LIG/Ligplaatsidentificatie': 'amsterdamseSleutel',
             'NUMLIGNVN/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
@@ -613,6 +611,52 @@ def _add_standplaatsen_uva2_config():
             node {
               identificatie
               code
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    uva2_numstahfd_query = """
+{
+  bagStandplaatsen {
+    edges {
+      node {
+        amsterdamseSleutel
+        beginGeldigheid
+        eindGeldigheid
+        heeftHoofdadres {
+          edges {
+            node {
+              amsterdamseSleutel
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    uva2_numstanvn_query = """
+{
+  bagStandplaatsen {
+    edges {
+      node {
+        amsterdamseSleutel
+        beginGeldigheid
+        eindGeldigheid
+        heeftNevenadres {
+          edges {
+            node {
+              amsterdamseSleutel
+              beginGeldigheid
+              eindGeldigheid
             }
           }
         }
@@ -696,4 +740,83 @@ def _add_standplaatsen_uva2_config():
             }
         },
         'query': uva2_query
+    }
+
+    # NUMSTAHFD
+    bag.StandplaatsenExportConfig.products['uva2_numstahfd'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+            NotEmptyFilter('heeftHoofdadres.[0].amsterdamseSleutel'),
+        ],
+        'filename': lambda: get_uva2_filename("NUMSTAHFD"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'heeftHoofdadres.[0].amsterdamseSleutel',
+            'IdentificatiecodeNummeraanduiding': 'heeftHoofdadres.[0].amsterdamseSleutel',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].eindGeldigheid',
+            },
+            'NUMSTAHFD/STA/sleutelVerzendend': 'amsterdamseSleutel',
+            'NUMSTAHFD/STA/Standplaatsidentificatie': 'amsterdamseSleutel',
+            'NUMSTAHFD/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].beginGeldigheid',
+            },
+            'NUMSTAHFD/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].eindGeldigheid',
+            }
+        },
+        'query': uva2_numstahfd_query
+    }
+
+    # NUMSTANVN
+    bag.StandplaatsenExportConfig.products['uva2_numstanvn'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+            NotEmptyFilter('heeftNevenadres.[0].amsterdamseSleutel'),
+        ],
+        'unfold': True,
+        'filename': lambda: get_uva2_filename("NUMSTANVN"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'heeftNevenadres.[0].amsterdamseSleutel',
+            'IdentificatiecodeNummeraanduiding': 'heeftNevenadres.[0].amsterdamseSleutel',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].eindGeldigheid',
+            },
+            'NUMSTANVN/STA/sleutelVerzendend': 'amsterdamseSleutel',
+            'NUMSTANVN/STA/Standplaatsidentificatie': 'amsterdamseSleutel',
+            'NUMSTANVN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].beginGeldigheid',
+            },
+            'NUMSTANVN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].eindGeldigheid',
+            }
+        },
+        'query': uva2_numstanvn_query
     }
