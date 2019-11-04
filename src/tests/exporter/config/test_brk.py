@@ -539,6 +539,20 @@ class TestKadastraleobjectenCsvFormat(TestCase):
 
         self.assertEqual(expected, self.format.if_vve({'true': 'val'}, 'FALSEVAL'))
 
+    def test_if_sjt(self):
+        expected = {
+            'condition': 'isempty',
+            'negate': True,
+            'reference': 'vanKadastraalsubject.[0].identificatie',
+            'trueval': 'the true val',
+        }
+
+        self.assertEqual(expected, self.format.if_sjt('the true val'))
+
+        expected['falseval'] = 'the false val'
+
+        self.assertEqual(expected, self.format.if_sjt('the true val', 'the false val'))
+
     def test_vve_or_subj(self):
         expected = {
             'condition': 'isempty',
