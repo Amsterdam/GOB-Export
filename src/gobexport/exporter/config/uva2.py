@@ -1,3 +1,5 @@
+import re
+
 from datetime import date
 import dateutil.parser as dt_parser
 
@@ -7,23 +9,97 @@ from gobexport.exporter.uva2 import uva2_exporter
 from gobexport.filters.notempty_filter import NotEmptyFilter
 
 UVA2_DATE_FORMAT = '%Y%m%d'
-UVA2_STATUS_CODES = {
-    'ligplaatsen': {
+UVA2_MAPPING = {
+    'ligplaatsen_status': {
         '1': '33',
         '2': '34',
     },
-    'nummeraanduidingen': {
+    'nummeraanduidingen_status': {
         '1': '16',
         '2': '17',
     },
-    'openbareruimtes': {
+    'openbareruimtes_status': {
         '1': '35',
         '2': '36',
     },
-    'standplaatsen': {
+    'standplaatsen_status': {
         '1': '37',
         '2': '38',
     },
+    'verblijfsobjecten_status': {
+        '1': '18',
+        '2': '19',
+        '3': '20',
+        '4': '21',
+        '5': '22',
+        '6': '23',
+    },
+    'verblijfsobjecten_type_woonobject_code': {
+        'Meerdere woningen': 'M',
+        'Eén woning': 'E',
+        'Onbekend': 'O',
+    },
+    'verblijfsobjecten_type_woonobject_omschrijving': {
+        'Meerdere woningen': 'Meergezinswoning',
+        'Eén woning': 'Eengezinswoning',
+        'Onbekend': 'Onbekend',
+    },
+    'verblijfsobjecten_gebruiksdoel_domein': {
+        'sportfunctie': '600',
+        'onderwijsfunctie': '700',
+        'winkelfunctie': '800',
+        'overige gebruiksfunctie': '900',
+        'woonfunctie': '1000',
+        'Gemengde panden': '1020',
+        'Complex met eenheden': '1040',
+        'Bijzondere woongebouwen': '1050',
+        'Internaat': '1054',
+        'bijeenkomstfunctie': '1100',
+        'celfunctie': '1200',
+        'gezondheidszorgfunctie': '1300',
+        'woonfunctie verpleeghuis': '1310',
+        'Inrichting': '1320',
+        'industriefunctie': '1400',
+        'kantoorfunctie': '1500',
+        'logiesfunctie': '1600',
+        'Seniorenwoning': '2060',
+        'Rolstoeltoegankelijke woning': '2061',
+        'Studentenwoning': '2070',
+        'Complex, onzelfst. studentenwoonruimten': '2081',
+        'Complex, onzelfst. seniorenwoonruimten': '2082',
+        'Complex, onzelfst. gehandicaptenwoonruimten': '2083',
+        'Complex, onzelfst. woonruimten': '2085',
+        'gezondheidszorgfunctie verpleeghuis': '2310',
+        'Complex,onzelfst. woonruimten met begeleiding': '2330',
+    },
+    'verblijfsobjecten_gebruiksdoel_omschrijving': {
+        'sportfunctie': 'BEST-sportfunctie',
+        'onderwijsfunctie': 'BEST-onderwijsfunctie',
+        'winkelfunctie': 'BEST-winkelfunctie',
+        'overige gebruiksfunctie': 'BEST-overige gebruiksfunctie',
+        'woonfunctie': 'BEST-woonfunctie',
+        'Gemengde panden': 'BEST-gemengde panden',
+        'Complex met eenheden': 'BEST-complex met eenheden',
+        'Bijzondere woongebouwen': 'BEST-bijzondere woongebouwen',
+        'Internaat': 'BEST-internaat',
+        'bijeenkomstfunctie': 'BEST-bijeenkomstfunctie',
+        'celfunctie': 'BEST-celfunctie',
+        'gezondheidszorgfunctie': 'BEST-gezondheidszorgfunctie',
+        'woonfunctie verpleeghuis': 'BEST-verpleeghuis',
+        'Inrichting': 'BEST-inrichting',
+        'industriefunctie': 'BEST-industriefunctie',
+        'kantoorfunctie': 'BEST-kantoorfunctie',
+        'logiesfunctie': 'BEST-logiesfunctie',
+        'Seniorenwoning': '2060 Seniorenwoning',
+        'Rolstoeltoegankelijke woning': '2061 Rolstoeltoegankelijke woning',
+        'Studentenwoning': '2070 Studentenwoning',
+        'Complex, onzelfst. studentenwoonruimten': '2081 Complex, onzelfst. studentenwoonruimten',
+        'Complex, onzelfst. seniorenwoonruimten': '2082 Complex, onzelfst. seniorenwoonruimten',
+        'Complex, onzelfst. gehandicaptenwoonruimten': '2083 Complex, onzelfst. gehandicaptenwoonruimten',
+        'Complex, onzelfst. woonruimten': '2085 Complex, onzelfst. woonruimten',
+        'gezondheidszorgfunctie verpleeghuis': '2310 Verpleeghuis',
+        'Complex,onzelfst. woonruimten met begeleiding': '2330 Complex,onzelfst. woonruimten met begeleiding',
+    }
 }
 
 
@@ -33,6 +109,7 @@ def add_uva2_products():
     _add_nummeraanduidingen_uva2_config()
     _add_ligplaatsen_uva2_config()
     _add_standplaatsen_uva2_config()
+    _add_verblijfsobjecten_uva2_config()
 
 
 def format_uva2_date(datetimestr):
@@ -48,18 +125,66 @@ def format_uva2_date(datetimestr):
         return datetimestr
 
 
-def format_uva2_status(value, entity_name=None):
-    # Status could be an int or string
+def format_uva2_mapping(value, mapping_name=None):
+    # Value could be an int or string
     value = str(value)
-    assert entity_name and entity_name in UVA2_STATUS_CODES, "A valid entity name is required"
-    assert value in UVA2_STATUS_CODES[entity_name], "A valid status code is required"
+    assert mapping_name and mapping_name in UVA2_MAPPING, "A valid mapping name is required"
+    assert value in UVA2_MAPPING[mapping_name], "A valid key is required"
 
-    return UVA2_STATUS_CODES[entity_name][value]
+    return UVA2_MAPPING[mapping_name][value]
 
 
 def format_uva2_buurt(value):
     # Strip the first character (Stadsdeelcode)
     return value[1:]
+
+
+def format_uva2_coordinate(value, coordinate=None):
+    assert coordinate in ('x', 'y'), "A valid coordinate (x or y) should be provided"
+
+    index = 1 if coordinate == 'x' else 2
+
+    match = re.match(r'^POINT\(([0-9\.]+) ([0-9\.]+)\)$', value)
+    if match:
+        return int(round(float(match.group(index))))
+    else:
+        return ''
+
+
+def row_formatter_verblijfsobjecten(row):
+    """
+    Format rows for UVA2 with the following rules:
+    GebruiksdoelVerblijfsobjectDomein, and OmschrijvingGebruiksdoelVerblijfsobjectDomein:
+        1. Get the value from gebruiksdoel
+        2. If there's a value in gebruiksdoelWoonfunctie use this value
+        3. If gebruiksdoel is 'Woonfunctie' and gebruiksdoelWoonfunctie use '2075 Woning'
+        4. If there's a value in gebruiksdoelGezondheidszorgfunctie use this value
+        5. If there are multiple gebruiksdoel and no gebruiksdoelWoonfunctie use the first value
+    """
+    node = row['node']
+    # Get the first gebruiksdoel
+    gebruiksdoel = node['gebruiksdoel'][0]['omschrijving']
+
+    # Overwrite if we have a woonfunctie or gezondheidszorgfunctie
+    if node['gebruiksdoelWoonfunctie']:
+        gebruiksdoel = node['gebruiksdoelWoonfunctie']['omschrijving']
+        gebruiksdoel = 'woonfunctie verpleeghuis' if gebruiksdoel == 'Verpleeghuis' else gebruiksdoel
+
+    if node['gebruiksdoelGezondheidszorgfunctie']:
+        gebruiksdoel = node['gebruiksdoelGezondheidszorgfunctie']['omschrijving']
+        gebruiksdoel = 'gezondheidszorgfunctie verpleeghuis' if gebruiksdoel == 'Verpleeghuis' else gebruiksdoel
+
+    if gebruiksdoel == 'woonfunctie':
+        node['GebruiksdoelVerblijfsobjectDomein'] = '2075'
+        node['OmschrijvingGebruiksdoelVerblijfsobjectDomein'] = '2075 Woning'
+    else:
+        node['GebruiksdoelVerblijfsobjectDomein'] = format_uva2_mapping(
+                                                        gebruiksdoel,
+                                                        'verblijfsobjecten_gebruiksdoel_domein')
+        node['OmschrijvingGebruiksdoelVerblijfsobjectDomein'] = format_uva2_mapping(
+                                                        gebruiksdoel,
+                                                        'verblijfsobjecten_gebruiksdoel_omschrijving')
+    return row
 
 
 def get_uva2_filename(abbreviation):
@@ -226,9 +351,9 @@ def _add_openbareruimtes_uva2_config():
             'OPRBRN/TijdvakRelatie/einddatumRelatie': '',
             'OPRSTS/STS/Code': {
                 'action': 'format',
-                'formatter': format_uva2_status,
+                'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'entity_name': 'openbareruimtes'},
+                'kwargs': {'mapping_name': 'openbareruimtes_status'},
             },
             'OPRSTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
@@ -335,9 +460,9 @@ def _add_nummeraanduidingen_uva2_config():
             'NUMBRN/TijdvakRelatie/einddatumRelatie': '',
             'NUMSTS/STS/Code': {
                 'action': 'format',
-                'formatter': format_uva2_status,
+                'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'entity_name': 'nummeraanduidingen'},
+                'kwargs': {'mapping_name': 'nummeraanduidingen_status'},
             },
             'NUMSTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
@@ -474,9 +599,9 @@ def _add_ligplaatsen_uva2_config():
             'LIGBRN/TijdvakRelatie/einddatumRelatie': '',
             'LIGSTS/STS/Code': {
                 'action': 'format',
-                'formatter': format_uva2_status,
+                'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'entity_name': 'ligplaatsen'},
+                'kwargs': {'mapping_name': 'ligplaatsen_status'},
             },
             'LIGSTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
@@ -702,9 +827,9 @@ def _add_standplaatsen_uva2_config():
             'STABRN/TijdvakRelatie/einddatumRelatie': '',
             'STASTS/STS/Code': {
                 'action': 'format',
-                'formatter': format_uva2_status,
+                'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'entity_name': 'standplaatsen'},
+                'kwargs': {'mapping_name': 'standplaatsen_status'},
             },
             'STASTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
@@ -819,4 +944,247 @@ def _add_standplaatsen_uva2_config():
             }
         },
         'query': uva2_numstanvn_query
+    }
+
+
+def _add_verblijfsobjecten_uva2_config():
+    uva2_query = """
+{
+  bagVerblijfsobjecten {
+    edges {
+      node {
+        amsterdamseSleutel
+        gebruiksdoel
+        gebruiksdoelWoonfunctie
+        gebruiksdoelGezondheidszorgfunctie
+        oppervlakte
+        documentdatum
+        documentnummer
+        verdiepingToegang
+        aantalEenhedenComplex
+        aantalBouwlagen
+        ligtInPanden {
+          edges {
+            node {
+              typeWoonobject
+              ligging
+            }
+          }
+        }
+        aantalKamers
+        beginGeldigheid
+        eindGeldigheid
+        redenafvoer
+        eigendomsverhouding
+        feitelijkGebruik
+        toegang
+        redenopvoer
+        status
+        ligtInBuurt {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        geometrie
+      }
+    }
+  }
+}
+"""
+
+    bag.VerblijfsobjectenExportConfig.products['uva2'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'filename': lambda: get_uva2_filename("VBO"),
+        'row_formatter': row_formatter_verblijfsobjecten,
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelverzendend': 'amsterdamseSleutel',
+            'Verblijfsobjectidentificatie': 'amsterdamseSleutel',
+            'Verblijfsobjectgeometrie': '',
+            'X-Coordinaat': {
+                'action': 'format',
+                'formatter': format_uva2_coordinate,
+                'value': 'geometrie',
+                'kwargs': {
+                    'coordinate': 'x'
+                }
+            },
+            'Y-Coordinaat': {
+                'action': 'format',
+                'formatter': format_uva2_coordinate,
+                'value': 'geometrie',
+                'kwargs': {
+                    'coordinate': 'y'
+                }
+            },
+            'GebruiksdoelVerblijfsobjectDomein': 'GebruiksdoelVerblijfsobjectDomein',
+            'OmschrijvingGebruiksdoelVerblijfsobjectDomein': 'OmschrijvingGebruiksdoelVerblijfsobjectDomein',
+            'OppervlakteVerblijfsobject': 'oppervlakte',
+            'DocumentdatumMutatieVerblijfsobject': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'documentdatum',
+            },
+            'DocumentnummerMutatieVerblijfsobject': 'documentnummer',
+            'Bouwlaagtoegang': 'verdiepingToegang',
+            'Frontbreedte': '',
+            'VerblijfsobjectnummerGemeente': '',
+            'StatusCoordinaatDomein': '',
+            'OmschrijvingCoordinaatDomein': '',
+            'AantalVerhuurbareEenheden': 'aantalEenhedenComplex',
+            'CBS-nummer': '',
+            'AantalBouwlagen': 'aantalBouwlagen',
+            'TypeWoonobjectDomein': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'ligtInPanden.[0].typeWoonobject.code',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_type_woonobject_code'},
+            },
+            'OmschrijvingTypeWoonobjectDomein': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'ligtInPanden.[0].typeWoonobject.omschrijving',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_type_woonobject_omschrijving'},
+            },
+            'IndicatieWoningvoorraad': '',
+            'AantalKamers': 'aantalKamers',
+            'Mutatie-gebruiker': '',
+            'Indicatie-vervallen': '',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'VBOAVR/AVR/Code': 'redenafvoer.code',
+            'VBOAVR/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'VBOAVR/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'VBOBRN/BRN/Code': '',
+            'VBOBRN/TijdvakRelatie/begindatumRelatie': '',
+            'VBOBRN/TijdvakRelatie/einddatumRelatie': '',
+            'VBOEGM/EGM/Code': {
+                'action': 'fill',
+                'length': 2,
+                'character': '0',
+                'value': 'eigendomsverhouding.code',
+                'fill_type': 'rjust'
+            },
+            'VBOEGM/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'VBOEGM/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'VBOFNG/FNG/Code': '',
+            'VBOFNG/TijdvakRelatie/begindatumRelatie': '',
+            'VBOFNG/TijdvakRelatie/einddatumRelatie': '',
+            'VBOGBK/GBK/Code': 'feitelijkGebruik.code',
+            'VBOGBK/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'VBOGBK/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'VBOLOC/LOC/Code': '',
+            'VBOLOC/TijdvakRelatie/begindatumRelatie': '',
+            'VBOLOC/TijdvakRelatie/einddatumRelatie': '',
+            'VBOLGG/LGG/Code': {
+                'action': 'fill',
+                'length': 2,
+                'character': '0',
+                'value': 'ligtInPanden.[0].ligging.code',
+                'fill_type': 'rjust'
+            },
+            'VBOLGG/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'VBOLGG/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'VBOMNT/MNT/Code': '',
+            'VBOMNT/TijdvakRelatie/begindatumRelatie': '',
+            'VBOMNT/TijdvakRelatie/einddatumRelatie': '',
+            'VBOTGG/TGG/Code': 'toegang.[0].code',
+            'VBOTGG/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'VBOTGG/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'VBOOVR/OVR/Code': 'redenopvoer.code',
+            'VBOOVR/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'VBOOVR/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'VBOSTS/STS/Code': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_status'},
+            },
+            'VBOSTS/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'VBOSTS/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'VBOBRT/BRT/sleutelVerzendend': 'ligtInBuurt.[0].identificatie',
+            'VBOBRT/BRT/Buurtcode': 'ligtInBuurt.[0].code',
+            'VBOBRT/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'VBOBRT/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            }
+        },
+        'query': uva2_query
     }
