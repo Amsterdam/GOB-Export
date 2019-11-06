@@ -215,6 +215,9 @@ def dat_exporter(api, file, format=None, append=False, filter: EntityFilter=None
     with open(file, 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
         # Get the headers from the first record in the API
         for entity in api:
+            # Add the row_count to the entity for use in DAT files
+            row_count += 1
+            entity['row_count'] = row_count
             if filter and not filter.filter(entity):
                 continue
 
@@ -228,7 +231,6 @@ def dat_exporter(api, file, format=None, append=False, filter: EntityFilter=None
 
             fp.write('|'.join(export) + '\n')
 
-            row_count += 1
             progress.tick()
 
     return row_count

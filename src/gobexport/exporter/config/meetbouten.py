@@ -1,3 +1,5 @@
+from shapely.geometry import shape, mapping
+
 from gobexport.exporter.dat import dat_exporter
 
 
@@ -86,13 +88,49 @@ class RollagenExportConfig:
         $$AK25$$|1|121287|485235|POINT (121287.0 485245.0)
 
     """
+    row_count = 0
+
+    def row_formatter_rollagen(row):
+        node = row['node']
+
+        # Convert the bouwblok geometry to a centroid
+        geom = shape(node['isGemetenVanBouwblok']['edges'][0]['node']['geometrie'])
+        node['geometrie'] = mapping(geom.centroid)
+
+        # Round the coordinates to three decimal places
+        node['geometrie']['coordinates'] = [str(round(coordinate, 3))
+                                            for coordinate in node['geometrie']['coordinates']]
+        return row
+
+    query = """
+{
+  meetboutenRollagen(sort:identificatie_asc) {
+    edges {
+      node {
+        identificatie
+        isGemetenVanBouwblok {
+          edges {
+            node {
+              code
+              geometrie
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
     products = {
         'dat': {
+            'api_type': 'graphql',
             'exporter': dat_exporter,
-            'endpoint': '/gob/meetbouten/rollagen/?view=enhanced&ndjson=true',
+            'row_formatter': row_formatter_rollagen,
             'filename': 'DAT/MBT_ROLLAAG.dat',
             'mime_type': 'plain/text',
-            'format': 'identificatie:str|idx:num|geometrie:coo:x|geometrie:coo:y|geometrie:geo'
+            'format': 'identificatie:str|row_count:num|geometrie:coo:x|geometrie:coo:y|geometrie:geo',
+            'query': query
         }
     }
 
