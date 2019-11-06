@@ -27,6 +27,7 @@ lowers       % lowercase characters of all alphabetic characters
 uppers       % uppercase characters of all alphabetic characters
 
 """
+import re
 import json
 import hashlib
 import statistics
@@ -50,6 +51,13 @@ _export_config = {
     "meetbouten": meetbouten.configs,
     "bag": bag.configs,
     "test_catalogue": test.configs
+}
+
+
+# Allow for variables in filenames. A variable will be converted into a regular expression
+# and vice versa for a generated proposal
+replacements = {
+    "{DATE}": "\d{8}"
 }
 
 
@@ -85,9 +93,10 @@ def test(catalogue):
 
             for filename in filenames:
                 obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
-                if checks.get(filename):
+                check = _get_check(checks, filename)
+                if check:
                     stats = _get_analysis(obj_info, obj)
-                    if _check_file(filename, stats, checks):
+                    if _check_file(check, filename, stats, checks):
                         logger.info(f"{filename} OK")
                     else:
                         logger.info(f"{filename} FAILED")
@@ -95,8 +104,7 @@ def test(catalogue):
                     logger.error(f"{filename} MISSING")
                 else:
                     logger.warning(f"{filename} UNCHECKED")
-                    proposal = _propose_check_file(filename, obj_info, obj)
-                    proposals[filename] = proposal
+                    _propose_check_file(proposals, filename, obj_info, obj)
 
     # Write out any missing test definitions
     _write_proposals(conn_info, catalogue, checks, proposals)
@@ -120,6 +128,27 @@ def _get_file(conn_info, filename):
         pass
 
     return None, None
+
+
+def _get_check(checks, filename):
+    """
+    Find a test specification (check) for the give filename
+
+    :param checks: all test specifications
+    :param filename: a filename, possibly containing variables
+    :return: the test specification for the given filename or None if not found
+    """
+    if checks.get(filename):
+        # Simple case, filename without variables
+        return checks[filename]
+
+    for check in checks.keys():
+        # Try variable substitution
+        pattern = re.escape(check)
+        for src, dst in replacements.items():
+            pattern = pattern.replace(re.escape(src), dst)
+        if re.match(pattern, filename):
+            return checks[check]
 
 
 def _get_checks(conn_info, catalogue):
@@ -164,7 +193,7 @@ def _write_proposals(conn_info, catalogue, checks, proposals):
                    content_type="application/json")
 
 
-def _propose_check_file(filename, obj_info, obj):
+def _propose_check_file(proposals, filename, obj_info, obj):
     """
     Build a proposal to check the given file
 
@@ -173,6 +202,12 @@ def _propose_check_file(filename, obj_info, obj):
     :param obj: Current file object
     :return: proposal object
     """
+    proposal_key = filename
+    for src, dst in replacements.items():
+        # heuristic method to convert variable values to a variable name
+        if re.search(dst, filename):
+            proposal_key = re.sub(dst, src, proposal_key)
+
     # Base the proposal on the analysis of the current file
     analysis = _get_analysis(obj_info, obj)
     analysis["age_hours"] = 24
@@ -192,7 +227,9 @@ def _propose_check_file(filename, obj_info, obj):
             # Within limits
             low, high = _get_low_high(value)
             proposal[key] = [low, high]
-    return proposal
+
+    logger.info(f"Proposal generated for {proposal_key}")
+    proposals[proposal_key] = proposal
 
 
 def _get_low_high(value):
@@ -222,7 +259,7 @@ def _get_low_high(value):
     return low, high
 
 
-def _check_file(filename, stats, checks):
+def _check_file(check, filename, stats, checks):
     """
     Test if all checks that have been defined for the given file are OK
 
@@ -231,7 +268,6 @@ def _check_file(filename, stats, checks):
     :param checks: Check to apply onto the statistics
     :return: True if all checks succeed
     """
-    check = checks[filename]
     total_result = True
     for key, margin in check.items():
         # Get corresponding value for check
