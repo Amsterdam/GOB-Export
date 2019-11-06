@@ -19,6 +19,16 @@ class TestExportTest(TestCase):
         pass
 
     @patch('gobexport.test.logger', MagicMock())
+    def test_get_check(self):
+        checks = {
+            'key': 'value',
+            'any_{DATE}_key': 'any date value'
+        }
+        self.assertEqual(test._get_check(checks, 'key'), 'value')
+        self.assertEqual(test._get_check(checks, 'any_20200130_key'), 'any date value')
+        self.assertEqual(test._get_check(checks, 'some other key'), None)
+
+    @patch('gobexport.test.logger', MagicMock())
     def test_low_high(self):
         low, high = test._get_low_high(0.5)
         self.assertEqual(low, 0.47)
@@ -119,9 +129,9 @@ class TestExportTest(TestCase):
                 'equal': [1]
             }
         }
-        self.assertEqual(test._check_file(filename, stats, checks), True)
+        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), True)
         stats['equal'] = 2
-        self.assertEqual(test._check_file(filename, stats, checks), False)
+        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
 
         stats = {
             '<=': 1
@@ -131,9 +141,9 @@ class TestExportTest(TestCase):
                 '<=': [None, 2]
             }
         }
-        self.assertEqual(test._check_file(filename, stats, checks), True)
+        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), True)
         stats['<='] = 3
-        self.assertEqual(test._check_file(filename, stats, checks), False)
+        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
 
         stats = {
             '>=': 1
@@ -143,9 +153,9 @@ class TestExportTest(TestCase):
                 '>=': [0, None]
             }
         }
-        self.assertEqual(test._check_file(filename, stats, checks), True)
+        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), True)
         stats['>='] = -1
-        self.assertEqual(test._check_file(filename, stats, checks), False)
+        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
 
         stats = {
             'between': 1
@@ -155,11 +165,11 @@ class TestExportTest(TestCase):
                 'between': [0, 2]
             }
         }
-        self.assertEqual(test._check_file(filename, stats, checks), True)
+        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), True)
         stats['between'] = 3
-        self.assertEqual(test._check_file(filename, stats, checks), False)
+        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
         stats['between'] = -1
-        self.assertEqual(test._check_file(filename, stats, checks), False)
+        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
 
     @patch('gobexport.test.logger')
     def test_check_file_warning(self, mock_logger):
@@ -171,7 +181,7 @@ class TestExportTest(TestCase):
         }
         stats = []
 
-        test._check_file(filename, stats, checks)
+        test._check_file(checks[filename], filename, stats, checks)
         mock_logger.warning.assert_called_with('Value missing for k1 check in fname')
 
     @patch('gobexport.test.logger', MagicMock())
@@ -193,8 +203,9 @@ class TestExportTest(TestCase):
             'uppers': 0.0
         }
         filename = 'any file'
-        result = test._propose_check_file(filename, None, None)
-        self.assertEqual(result, {
+        proposals = {}
+        test._propose_check_file(proposals, filename, None, None)
+        self.assertEqual(proposals['any file'], {
             'age_hours': [0, 24],
             'bytes': [100, None],
             'first_bytes': ['any hash'],
@@ -209,6 +220,10 @@ class TestExportTest(TestCase):
             'lowers': [0.95, 1.05],
             'uppers': [-0.01, 0.01]
         })
+        filename = 'any 20200130 file'
+        proposals = {}
+        test._propose_check_file(proposals, filename, None, None)
+        self.assertTrue('any {DATE} file' in proposals)
 
     @patch('gobexport.test.logger', MagicMock())
     @patch('gobexport.test.put_object')
