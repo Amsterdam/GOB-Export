@@ -98,10 +98,8 @@ class RollagenExportConfig:
         node['geometrie'] = mapping(geom.centroid)
 
         # Round the coordinates to three decimal places
-        rounded_coordinates = []
-        for coordinate in node['geometrie']['coordinates']:
-            rounded_coordinates.append(str(round(coordinate, 3)))
-        node['geometrie']['coordinates'] = rounded_coordinates
+        node['geometrie']['coordinates'] = [str(round(coordinate, 3))
+                                            for coordinate in node['geometrie']['coordinates']]
         return row
 
     query = """
