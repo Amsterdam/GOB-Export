@@ -16,7 +16,7 @@ class TestDatExporter(TestCase):
     @patch("gobexport.exporter.dat.re", MagicMock())
     def test_dat_exporter_filter(self, mock_progress_ticker):
 
-        api = ['a']
+        api = [{'a': 'b'}]
         file = ""
 
         dat_exporter(api, file)
@@ -28,6 +28,5 @@ class TestDatExporter(TestCase):
         mock_filter.filter.return_value = False
         dat_exporter(api, file, filter=mock_filter)
 
-        mock_filter.filter.assert_called_with('a')
+        mock_filter.filter.assert_called_with({'a': 'b', 'row_count': 1})
         mock_tick.tick.assert_not_called()
-
