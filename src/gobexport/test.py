@@ -56,7 +56,7 @@ _export_config = {
 
 # Allow for variables in filenames. A variable will be converted into a regular expression
 # and vice versa for a generated proposal
-replacements = {
+_REPLACEMENTS = {
     "{DATE}": "\d{8}"
 }
 
@@ -145,7 +145,7 @@ def _get_check(checks, filename):
     for check in checks.keys():
         # Try variable substitution
         pattern = re.escape(check)
-        for src, dst in replacements.items():
+        for src, dst in _REPLACEMENTS.items():
             pattern = pattern.replace(re.escape(src), dst)
         if re.match(pattern, filename):
             return checks[check]
@@ -203,7 +203,7 @@ def _propose_check_file(proposals, filename, obj_info, obj):
     :return: proposal object
     """
     proposal_key = filename
-    for src, dst in replacements.items():
+    for src, dst in _REPLACEMENTS.items():
         # heuristic method to convert variable values to a variable name
         if re.search(dst, filename):
             proposal_key = re.sub(dst, src, proposal_key)
