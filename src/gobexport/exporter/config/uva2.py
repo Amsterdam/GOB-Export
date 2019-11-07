@@ -993,6 +993,52 @@ def _add_verblijfsobjecten_uva2_config():
 }
 """
 
+    uva2_numvbohfd_query = """
+{
+  bagVerblijfsobjecten {
+    edges {
+      node {
+        amsterdamseSleutel
+        beginGeldigheid
+        eindGeldigheid
+        heeftHoofdadres {
+          edges {
+            node {
+              amsterdamseSleutel
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    uva2_numvbonvn_query = """
+{
+  bagVerblijfsobjecten {
+    edges {
+      node {
+        amsterdamseSleutel
+        beginGeldigheid
+        eindGeldigheid
+        heeftNevenadres {
+          edges {
+            node {
+              amsterdamseSleutel
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
     bag.VerblijfsobjectenExportConfig.products['uva2'] = {
         'api_type': 'graphql_streaming',
         'exporter': uva2_exporter,
@@ -1185,4 +1231,83 @@ def _add_verblijfsobjecten_uva2_config():
             }
         },
         'query': uva2_query
+    }
+
+    # NUMVBOHFD
+    bag.VerblijfsobjectenExportConfig.products['uva2_numvbohfd'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+            NotEmptyFilter('heeftHoofdadres.[0].amsterdamseSleutel'),
+        ],
+        'filename': lambda: get_uva2_filename("NUMVBOHFD"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'heeftHoofdadres.[0].amsterdamseSleutel',
+            'IdentificatiecodeNummeraanduiding': 'heeftHoofdadres.[0].amsterdamseSleutel',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].eindGeldigheid',
+            },
+            'NUMVBOHFD/VBO/sleutelVerzendend': 'amsterdamseSleutel',
+            'NUMVBOHFD/VBO/Ligplaatsidentificatie': 'amsterdamseSleutel',
+            'NUMLIGHFD/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].beginGeldigheid',
+            },
+            'NUMVBOHFD/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftHoofdadres.[0].eindGeldigheid',
+            }
+        },
+        'query': uva2_numvbohfd_query
+    }
+
+    # NUMVBONVN
+    bag.VerblijfsobjectenExportConfig.products['uva2_numvbonvn'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+            NotEmptyFilter('heeftNevenadres.[0].amsterdamseSleutel'),
+        ],
+        'unfold': True,
+        'filename': lambda: get_uva2_filename("NUMVBONVN"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'heeftNevenadres.[0].amsterdamseSleutel',
+            'IdentificatiecodeNummeraanduiding': 'heeftNevenadres.[0].amsterdamseSleutel',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].eindGeldigheid',
+            },
+            'NUMVBONVN/VBO/sleutelVerzendend': 'amsterdamseSleutel',
+            'NUMVBONVN/VBO/Ligplaatsidentificatie': 'amsterdamseSleutel',
+            'NUMVBONVN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].beginGeldigheid',
+            },
+            'NUMVBONVN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'heeftNevenadres.[0].eindGeldigheid',
+            }
+        },
+        'query': uva2_numvbonvn_query
     }

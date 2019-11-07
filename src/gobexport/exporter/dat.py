@@ -215,11 +215,12 @@ def dat_exporter(api, file, format=None, append=False, filter: EntityFilter=None
     with open(file, 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
         # Get the headers from the first record in the API
         for entity in api:
+            if filter and not filter.filter(entity):
+                continue
+
             # Add the row_count to the entity for use in DAT files
             row_count += 1
             entity['row_count'] = row_count
-            if filter and not filter.filter(entity):
-                continue
 
             pattern = re.compile('([\[\]\w.]+):(\w+):?({[\d\w\s:",]*}|\w+)?\|?')
             export = []
