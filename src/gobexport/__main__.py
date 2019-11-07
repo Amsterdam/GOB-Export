@@ -24,6 +24,7 @@ def handle_export_msg(msg):
 
     catalogue = header['catalogue']
     collection = header['collection']
+    product = header.get('product', None)
     destination = header['destination']
     application = "GOBExport"
 
@@ -36,11 +37,12 @@ def handle_export_msg(msg):
         'application': application,
         'catalogue': catalogue,
         'entity': collection,
+        'product': product,
     })
 
     logger.configure(msg, "EXPORT")
 
-    export(catalogue, collection, destination)
+    export(catalogue, collection, product, destination)
 
     return {
         "header": msg.get("header"),
