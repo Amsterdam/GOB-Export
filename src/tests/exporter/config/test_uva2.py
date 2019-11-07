@@ -47,7 +47,7 @@ class TestUVA2ConfigHelpers(TestCase):
         status = [('1', '35'), ('2', '36'), (1, '35')]
 
         for input, expected in status:
-            self.assertEqual(expected, format_uva2_mapping(input, "openbareruimtes_status"))
+            self.assertEqual(format_uva2_mapping(input, "openbareruimtes_status"), '')
 
         # Test invalid status for openbareruimtes
         status = [3, '4', 'a', None]
@@ -61,7 +61,7 @@ class TestUVA2ConfigHelpers(TestCase):
         status = [('1', '16'), ('2', '17'), (1, '16')]
 
         for input, expected in status:
-            self.assertEqual(expected, format_uva2_mapping(input, "nummeraanduidingen_status"))
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status"), '')
 
         # Test invalid status for nummeraanduidingen
         status = [3, '4', 'a', None]
