@@ -129,9 +129,7 @@ def format_uva2_mapping(value, mapping_name=None):
     # Value could be an int or string
     value = str(value)
     assert mapping_name and mapping_name in UVA2_MAPPING, "A valid mapping name is required"
-    assert value in UVA2_MAPPING[mapping_name], "A valid key is required"
-
-    return UVA2_MAPPING[mapping_name][value]
+    return UVA2_MAPPING[mapping_name].get(value, '')
 
 
 def format_uva2_buurt(value):
