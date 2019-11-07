@@ -47,28 +47,26 @@ class TestUVA2ConfigHelpers(TestCase):
         status = [('1', '35'), ('2', '36'), (1, '35')]
 
         for input, expected in status:
-            self.assertEqual(expected, format_uva2_mapping(input, "openbareruimtes_status"))
+            self.assertEqual(format_uva2_mapping(input, "openbareruimtes_status"), expected)
 
         # Test invalid status for openbareruimtes
         status = [3, '4', 'a', None]
 
         for input in status:
-            with self.assertRaises(AssertionError):
-                format_uva2_mapping(input, "openbareruimtes_status")
+            self.assertEqual(format_uva2_mapping(input, "openbareruimtes_status"), '')
 
     def test_format_uva2_status_nummeraanduidingen(self):
         # Status 1 and 2 should be mapped to 16, 17 for nummeraanduidingen
         status = [('1', '16'), ('2', '17'), (1, '16')]
 
         for input, expected in status:
-            self.assertEqual(expected, format_uva2_mapping(input, "nummeraanduidingen_status"))
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status"), expected)
 
         # Test invalid status for nummeraanduidingen
         status = [3, '4', 'a', None]
 
         for input in status:
-            with self.assertRaises(AssertionError):
-                format_uva2_mapping(input, "nummeraanduidingen_status")
+            self.assertEqual(format_uva2_mapping(input, "openbareruimtes_status"), '')
 
     def test_format_uva2_coordinate(self):
         value = "POINT(124888 486338)"

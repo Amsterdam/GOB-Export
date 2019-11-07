@@ -70,12 +70,13 @@ def _with_retries(method, max_tries=_MAX_TRIES, retry_timeout=_RETRY_TIMEOUT, ex
 
 
 @with_buffered_iterable  # noqa: C901
-def _export_collection(host, catalogue, collection, destination):
+def _export_collection(host, catalogue, collection, product_name, destination):
     """Export a collection from a catalog
 
     :param host: The API host to retrieve the catalog and collection from
     :param catalog: The name of the catalog
     :param collection: The name of the collection
+    :param product_name: The name of the product to export
     :param destination: The destination of the resulting output file(s)
     :return:
     """
@@ -87,8 +88,11 @@ def _export_collection(host, catalogue, collection, destination):
 
     files = []
 
+    # If a product has been supplied, export only that product
+    products = {product_name: config.products[product_name]} if product_name else config.products
+
     # Start exporting each product
-    for name, product in config.products.items():
+    for name, product in products.items():
         logger.info(f"Export to file '{name}' started, API type: {product.get('api_type', 'REST')}")
 
         # Get name of local file to write results to
@@ -159,9 +163,10 @@ def _export_collection(host, catalogue, collection, destination):
     logger.info("Export completed")
 
 
-def export(catalogue, collection, destination):
+def export(catalogue, collection, product, destination):
     host = get_host()
     _export_collection(host=host,
                        catalogue=catalogue,
                        collection=collection,
+                       product_name=product,
                        destination=destination)
