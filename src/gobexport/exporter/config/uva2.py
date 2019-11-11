@@ -1257,8 +1257,8 @@ def _add_verblijfsobjecten_uva2_config():
                 'value': 'heeftHoofdadres.[0].eindGeldigheid',
             },
             'NUMVBOHFD/VBO/sleutelVerzendend': 'amsterdamseSleutel',
-            'NUMVBOHFD/VBO/Ligplaatsidentificatie': 'amsterdamseSleutel',
-            'NUMLIGHFD/TijdvakRelatie/begindatumRelatie': {
+            'NUMVBOHFD/VBO/Verblijfsobjectidentificatie': 'amsterdamseSleutel',
+            'NUMVBOHFD/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'heeftHoofdadres.[0].beginGeldigheid',
@@ -1296,8 +1296,8 @@ def _add_verblijfsobjecten_uva2_config():
                 'formatter': format_uva2_date,
                 'value': 'heeftNevenadres.[0].eindGeldigheid',
             },
-            'NUMVBONVN/VBO/sleutelVerzendend': 'amsterdamseSleutel',
-            'NUMVBONVN/VBO/Ligplaatsidentificatie': 'amsterdamseSleutel',
+            'NUMVBONVN/sleutelVerzendend': 'amsterdamseSleutel',
+            'NUMVBONVN/VBO/Verblijfsobjectidentificatie': 'amsterdamseSleutel',
             'NUMVBONVN/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
