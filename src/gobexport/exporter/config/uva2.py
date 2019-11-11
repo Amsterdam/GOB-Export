@@ -26,6 +26,15 @@ UVA2_MAPPING = {
         '1': '37',
         '2': '38',
     },
+    'panden_status': {
+        '1': '24',
+        '2': '25',
+        '3': '26',
+        '7': '27',
+        '10': '30',
+        '11': '31',
+        '12': '32',
+    },
     'verblijfsobjecten_status': {
         '1': '18',
         '2': '19',
@@ -110,6 +119,7 @@ def add_uva2_products():
     _add_ligplaatsen_uva2_config()
     _add_standplaatsen_uva2_config()
     _add_verblijfsobjecten_uva2_config()
+    _add_panden_uva2_config()
 
 
 def format_uva2_date(datetimestr):
@@ -1310,4 +1320,98 @@ def _add_verblijfsobjecten_uva2_config():
             }
         },
         'query': uva2_numvbonvn_query
+    }
+
+
+def _add_panden_uva2_config():
+    uva2_query = """
+{
+  bagPanden {
+    edges {
+      node {
+        amsterdamseSleutel
+        documentdatum
+        documentnummer
+        oorspronkelijkBouwjaar
+        beginGeldigheid
+        eindGeldigheid
+        status
+        ligtInBouwblok {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    bag.PandenExportConfig.products['uva2'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'filename': lambda: get_uva2_filename("PND"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelverzendend': 'amsterdamseSleutel',
+            'Pandidentificatie': 'amsterdamseSleutel',
+            'Pandgeometrie': '',
+            'DocumentdatumMutatiePand': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'documentdatum',
+            },
+            'DocumentnummerMutatiePand': 'documentnummer',
+            'OorspronkelijkBouwjaarPand': 'oorspronkelijkBouwjaar',
+            'LaagsteBouwlaag': '',
+            'HoogsteBouwlaag': '',
+            'Pandnummer': '',
+            'Mutatie-gebruiker': '',
+            'Indicatie-vervallen': '',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'PNDSTS/STS/Code': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'panden_status'},
+            },
+            'PNDSTS/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'PNDSTS/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'PNDBBK/BBK/sleutelVerzendend': 'ligtInBouwblok.[0].identificatie',
+            'PNDBBK/BBK/Bouwbloknummer': 'ligtInBouwblok.[0].code',
+            'PNDBBK/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'PNDBBK/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            }
+        },
+        'query': uva2_query
     }
