@@ -7,7 +7,7 @@ def resolve_config_filenames(config):
     """
 
     for product in config.products.values():
-        product['filename'] = product['filename']() if callable(product['filename']) else product['filename']
+        product['resolved_filename'] = product['filename']() if callable(product['filename']) else product['filename']
 
         for file in product.get('extra_files', []):
-            file['filename'] = file['filename']() if callable(file['filename']) else file['filename']
+            file['resolved_filename'] = file['filename']() if callable(file['filename']) else file['filename']

@@ -96,7 +96,8 @@ def _export_collection(host, catalogue, collection, product_name, destination):
         logger.info(f"Export to file '{name}' started, API type: {product.get('api_type', 'REST')}")
 
         # Get name of local file to write results to
-        results_file = _get_filename(product['filename']) if destination == "Objectstore" else product['filename']
+        results_file = _get_filename(product['resolved_filename']) if destination == "Objectstore" \
+            else product['resolved_filename']
 
         # Buffer items if they are used multiple times. This prevents calling API multiple times for same data
         source = product_source(product)
@@ -120,13 +121,13 @@ def _export_collection(host, catalogue, collection, product_name, destination):
                 # Do not add file to files again when appending
                 files.append({
                     'temp_location': results_file,
-                    'distribution': product['filename'],
+                    'distribution': product['resolved_filename'],
                     'mime_type': product['mime_type']})
 
             # Add extra result files (e.g. .prj file)
             extra_files = product.get('extra_files', [])
-            files.extend([{'temp_location': _get_filename(file['filename']),
-                           'distribution': file['filename'],
+            files.extend([{'temp_location': _get_filename(file['resolved_filename']),
+                           'distribution': file['resolved_filename'],
                            'mime_type': file['mime_type']} for file in extra_files])
 
     if destination == "Objectstore":

@@ -89,7 +89,8 @@ def test(catalogue):
         resolve_config_filenames(config)
 
         for name, product in config.products.items():
-            filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
+            filenames = [product['resolved_filename']] + [product['resolved_filename']
+                                                          for product in product.get('extra_files', [])]
 
             for filename in filenames:
                 obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")

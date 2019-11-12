@@ -26,11 +26,17 @@ class TestUtils(TestCase):
 
     def test_resolve_config_filenames(self):
         config = self.MockConfig()
+
+        # Expect resolved_filename to be added
         expected = {
             'product1': {
                 'filename': 'fname',
+                'resolved_filename': 'fname',
                 'extra_files': [
-                    {'filename': 'extra_file_name'}
+                    {
+                        'filename': 'extra_file_name',
+                        'resolved_filename': 'extra_file_name'
+                    }
                 ]
             }
         }
@@ -38,11 +44,16 @@ class TestUtils(TestCase):
 
         self.assertEqual(expected, config.products)
 
+        # Expect filename to still be the same function, and resolved filename to be added
         expected = {
             'product1': {
-                'filename': 'l_fname',
+                'filename': self.MockConfigFunctions.products['product1']['filename'],
+                'resolved_filename': 'l_fname',
                 'extra_files': [
-                    {'filename': 'l_extra_file_name'}
+                    {
+                        'filename': self.MockConfigFunctions.products['product1']['extra_files'][0]['filename'],
+                        'resolved_filename': 'l_extra_file_name'
+                    }
                 ]
             }
         }
