@@ -1350,6 +1350,29 @@ def _add_panden_uva2_config():
 }
 """
 
+    uva2_pndvbo_query = """
+{
+  bagVerblijfsobjecten {
+    edges {
+      node {
+        amsterdamseSleutel
+        beginGeldigheid
+        eindGeldigheid
+        ligtInPanden {
+          edges {
+            node {
+              amsterdamseSleutel
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
     bag.PandenExportConfig.products['uva2'] = {
         'api_type': 'graphql_streaming',
         'exporter': uva2_exporter,
@@ -1414,4 +1437,43 @@ def _add_panden_uva2_config():
             }
         },
         'query': uva2_query
+    }
+
+    bag.PandenExportConfig.products['uva2_pndvbo'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+            NotEmptyFilter('ligtInPanden.[0].amsterdamseSleutel'),
+        ],
+        'filename': lambda: get_uva2_filename("PNDVBO"),
+        'mime_type': 'plain/text',
+        'unfold': True,
+        'format': {
+            'sleutelverzendend': 'ligtInPanden.[0].amsterdamseSleutel',
+            'Pandidentificatie': 'ligtInPanden.[0].amsterdamseSleutel',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'ligtInPanden.[0].beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'ligtInPanden.[0].eindGeldigheid',
+            },
+            'PNDVBO/VBO/sleutelVerzendend': 'amsterdamseSleutel',
+            'PNDVBO/VBO/Verblijfsobjectidentificatie': 'amsterdamseSleutel',
+            'PNDVBO/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'PNDVBO/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            }
+        },
+        'query': uva2_pndvbo_query
     }
