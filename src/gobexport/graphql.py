@@ -93,7 +93,7 @@ class GraphQL:
         :return: updated query
         """
         # First check if the query has a filter
-        filters = re.search(f'{self.schema_collection_name}\((.+)?\)', query)
+        filters = re.search(f'{self.schema_collection_name}\s*\((.+)?\)', query)
         if filters:
             # adjust number of records to request
             match = re.search('first:\s?(([\d]+)?)', query)
