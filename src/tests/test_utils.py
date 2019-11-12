@@ -1,4 +1,5 @@
 from unittest import TestCase
+from unittest.mock import ANY
 
 from gobexport.utils import resolve_config_filenames
 
@@ -29,8 +30,9 @@ class TestUtils(TestCase):
         expected = {
             'product1': {
                 'filename': 'fname',
+                'resolve_filename': ANY,
                 'extra_files': [
-                    {'filename': 'extra_file_name'}
+                    {'filename': 'extra_file_name', 'resolve_filename': ANY}
                 ]
             }
         }
@@ -38,11 +40,22 @@ class TestUtils(TestCase):
 
         self.assertEqual(expected, config.products)
 
+        # Test that resolver method resolved to the expected filename
+        product = config.products['product1']
+        self.assertEqual(product['resolve_filename'](), expected['product1']['filename'])
+
+        # Test that next run should give the same result
+        product['filename'] = None
+        resolve_config_filenames(config)
+        product = config.products['product1']
+        self.assertEqual(product['filename'], expected['product1']['filename'])
+
         expected = {
             'product1': {
                 'filename': 'l_fname',
+                'resolve_filename': ANY,
                 'extra_files': [
-                    {'filename': 'l_extra_file_name'}
+                    {'filename': 'l_extra_file_name', 'resolve_filename': ANY}
                 ]
             }
         }
