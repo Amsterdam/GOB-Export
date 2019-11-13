@@ -71,6 +71,7 @@ UVA2_MAPPING = {
         'industriefunctie': '1400',
         'kantoorfunctie': '1500',
         'logiesfunctie': '1600',
+        'Recreatiewoningen': '1610',
         'Seniorenwoning': '2060',
         'Rolstoeltoegankelijke woning': '2061',
         'Studentenwoning': '2070',
@@ -85,7 +86,7 @@ UVA2_MAPPING = {
         'sportfunctie': 'BEST-sportfunctie',
         'onderwijsfunctie': 'BEST-onderwijsfunctie',
         'winkelfunctie': 'BEST-winkelfunctie',
-        'overige gebruiksfunctie': 'BEST-overige gebruiksfunctie',
+        'overige gebruiksfunctie': 'BEST-overige gebruiksfunctie ',
         'woonfunctie': 'BEST-woonfunctie',
         'Gemengde panden': 'BEST-gemengde panden',
         'Complex met eenheden': 'BEST-complex met eenheden',
@@ -99,6 +100,7 @@ UVA2_MAPPING = {
         'industriefunctie': 'BEST-industriefunctie',
         'kantoorfunctie': 'BEST-kantoorfunctie',
         'logiesfunctie': 'BEST-logiesfunctie',
+        'Recreatiewoningen': 'BEST-recreatiewoningen',
         'Seniorenwoning': '2060 Seniorenwoning',
         'Rolstoeltoegankelijke woning': '2061 Rolstoeltoegankelijke woning',
         'Studentenwoning': '2070 Studentenwoning',
@@ -170,8 +172,9 @@ def row_formatter_verblijfsobjecten(row):
         5. If there are multiple gebruiksdoel and no gebruiksdoelWoonfunctie use the first value
     """
     node = row['node']
-    # Get the first gebruiksdoel
-    gebruiksdoel = node['gebruiksdoel'][0]['omschrijving']
+    # Get the first gebruiksdoel, sorted by code
+    sorted_gebruiksdoel = sorted(node['gebruiksdoel'], key=lambda i: int(i['code']))
+    gebruiksdoel = sorted_gebruiksdoel[0]['omschrijving']
 
     # Overwrite if we have a woonfunctie or gezondheidszorgfunctie
     if node['gebruiksdoelWoonfunctie']:
@@ -1087,7 +1090,15 @@ def _add_verblijfsobjecten_uva2_config():
                 'value': 'documentdatum',
             },
             'DocumentnummerMutatieVerblijfsobject': 'documentnummer',
-            'Bouwlaagtoegang': 'verdiepingToegang',
+            'Bouwlaagtoegang': {
+                'condition': 'isempty',
+                'reference': 'verdiepingToegang',
+                'trueval': {
+                    'action': 'literal',
+                    'value': '0',
+                },
+                'falseval': 'verdiepingToegang'
+            },
             'Frontbreedte': '',
             'VerblijfsobjectnummerGemeente': '',
             'StatusCoordinaatDomein': '',
@@ -1098,17 +1109,25 @@ def _add_verblijfsobjecten_uva2_config():
             'TypeWoonobjectDomein': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
-                'value': 'ligtInPanden.[0].typeWoonobject.code',
+                'value': 'ligtInPanden.[0].typeWoonobject',
                 'kwargs': {'mapping_name': 'verblijfsobjecten_type_woonobject_code'},
             },
             'OmschrijvingTypeWoonobjectDomein': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
-                'value': 'ligtInPanden.[0].typeWoonobject.omschrijving',
+                'value': 'ligtInPanden.[0].typeWoonobject',
                 'kwargs': {'mapping_name': 'verblijfsobjecten_type_woonobject_omschrijving'},
             },
             'IndicatieWoningvoorraad': '',
-            'AantalKamers': 'aantalKamers',
+            'AantalKamers': {
+                'condition': 'isempty',
+                'reference': 'aantalKamers',
+                'trueval': {
+                    'action': 'literal',
+                    'value': '0',
+                },
+                'falseval': 'aantalKamers'
+            },
             'Mutatie-gebruiker': '',
             'Indicatie-vervallen': '',
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
@@ -1123,48 +1142,104 @@ def _add_verblijfsobjecten_uva2_config():
             },
             'VBOAVR/AVR/Code': 'redenafvoer.code',
             'VBOAVR/TijdvakRelatie/begindatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'beginGeldigheid',
+                'condition': 'isempty',
+                'reference': 'redenafvoer.code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'beginGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOAVR/TijdvakRelatie/einddatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'eindGeldigheid',
+                'condition': 'isempty',
+                'reference': 'redenafvoer.code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'eindGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOBRN/BRN/Code': '',
             'VBOBRN/TijdvakRelatie/begindatumRelatie': '',
             'VBOBRN/TijdvakRelatie/einddatumRelatie': '',
             'VBOEGM/EGM/Code': {
-                'action': 'fill',
-                'length': 2,
-                'character': '0',
-                'value': 'eigendomsverhouding.code',
-                'fill_type': 'rjust'
+                'condition': 'isempty',
+                'reference': 'eigendomsverhouding.code',
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                },
+                'falseval': {
+                    'action': 'fill',
+                    'length': 2,
+                    'character': '0',
+                    'value': 'eigendomsverhouding.code',
+                    'fill_type': 'rjust'
+                }
             },
             'VBOEGM/TijdvakRelatie/begindatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'beginGeldigheid',
+                'condition': 'isempty',
+                'reference': 'eigendomsverhouding.code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'beginGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOEGM/TijdvakRelatie/einddatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'eindGeldigheid',
+                'condition': 'isempty',
+                'reference': 'eigendomsverhouding.code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'eindGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOFNG/FNG/Code': '',
             'VBOFNG/TijdvakRelatie/begindatumRelatie': '',
             'VBOFNG/TijdvakRelatie/einddatumRelatie': '',
             'VBOGBK/GBK/Code': 'feitelijkGebruik.code',
             'VBOGBK/TijdvakRelatie/begindatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'beginGeldigheid',
+                'condition': 'isempty',
+                'reference': 'feitelijkGebruik.code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'beginGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOGBK/TijdvakRelatie/einddatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'eindGeldigheid',
+                'condition': 'isempty',
+                'reference': 'feitelijkGebruik.code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'eindGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOLOC/LOC/Code': '',
             'VBOLOC/TijdvakRelatie/begindatumRelatie': '',
@@ -1191,25 +1266,57 @@ def _add_verblijfsobjecten_uva2_config():
             'VBOMNT/TijdvakRelatie/einddatumRelatie': '',
             'VBOTGG/TGG/Code': 'toegang.[0].code',
             'VBOTGG/TijdvakRelatie/begindatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'beginGeldigheid',
+                'condition': 'isempty',
+                'reference': 'toegang.[0].code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'beginGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOTGG/TijdvakRelatie/einddatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'eindGeldigheid',
+                'condition': 'isempty',
+                'reference': 'toegang.[0].code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'eindGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOOVR/OVR/Code': 'redenopvoer.code',
             'VBOOVR/TijdvakRelatie/begindatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'beginGeldigheid',
+                'condition': 'isempty',
+                'reference': 'redenopvoer.code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'beginGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOOVR/TijdvakRelatie/einddatumRelatie': {
-                'action': 'format',
-                'formatter': format_uva2_date,
-                'value': 'eindGeldigheid',
+                'condition': 'isempty',
+                'reference': 'redenopvoer.code',
+                'falseval': {
+                    'action': 'format',
+                    'formatter': format_uva2_date,
+                    'value': 'eindGeldigheid',
+                },
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                }
             },
             'VBOSTS/STS/Code': {
                 'action': 'format',
@@ -1228,7 +1335,11 @@ def _add_verblijfsobjecten_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'VBOBRT/BRT/sleutelVerzendend': 'ligtInBuurt.[0].identificatie',
-            'VBOBRT/BRT/Buurtcode': 'ligtInBuurt.[0].code',
+            'VBOBRT/BRT/Buurtcode': {
+                'action': 'format',
+                'formatter': format_uva2_buurt,
+                'value': 'ligtInBuurt.[0].code',
+            },
             'VBOBRT/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
