@@ -92,7 +92,7 @@ class TestUVA2ConfigHelpers(TestCase):
         # Test woonfuctie without gebruiksdoelWoonfunctie
         row = {
             'node': {
-                'gebruiksdoel': [{'omschrijving': 'woonfunctie'}],
+                'gebruiksdoel': [{'omschrijving': 'woonfunctie', 'code': '1'}],
                 'gebruiksdoelWoonfunctie': {},
                 'gebruiksdoelGezondheidszorgfunctie': {},
             }
@@ -100,7 +100,28 @@ class TestUVA2ConfigHelpers(TestCase):
 
         expected_row = {
             'node': {
-                'gebruiksdoel': [{'omschrijving': 'woonfunctie'}],
+                'gebruiksdoel': [{'omschrijving': 'woonfunctie', 'code': '1'}],
+                'gebruiksdoelWoonfunctie': {},
+                'gebruiksdoelGezondheidszorgfunctie': {},
+                'GebruiksdoelVerblijfsobjectDomein': '2075',
+                'OmschrijvingGebruiksdoelVerblijfsobjectDomein': '2075 Woning'
+            }
+        }
+
+        self.assertEqual(row_formatter_verblijfsobjecten(row), expected_row)
+
+        # Test woonfuctie multiple, expect first record sorted by code
+        row = {
+            'node': {
+                'gebruiksdoel': [{'omschrijving': 'sportfunctie', 'code': '2'}, {'omschrijving': 'woonfunctie', 'code': '1'}],
+                'gebruiksdoelWoonfunctie': {},
+                'gebruiksdoelGezondheidszorgfunctie': {},
+            }
+        }
+
+        expected_row = {
+            'node': {
+                'gebruiksdoel': [{'omschrijving': 'sportfunctie', 'code': '2'}, {'omschrijving': 'woonfunctie', 'code': '1'}],
                 'gebruiksdoelWoonfunctie': {},
                 'gebruiksdoelGezondheidszorgfunctie': {},
                 'GebruiksdoelVerblijfsobjectDomein': '2075',
@@ -113,7 +134,7 @@ class TestUVA2ConfigHelpers(TestCase):
         # Test gebruiksdoelWoonfunctie
         row = {
             'node': {
-                'gebruiksdoel': [{'omschrijving': 'woonfunctie'}],
+                'gebruiksdoel': [{'omschrijving': 'woonfunctie', 'code': '1'}],
                 'gebruiksdoelWoonfunctie': {'omschrijving': 'Verpleeghuis'},
                 'gebruiksdoelGezondheidszorgfunctie': {},
             }
@@ -121,7 +142,7 @@ class TestUVA2ConfigHelpers(TestCase):
 
         expected_row = {
             'node': {
-                'gebruiksdoel': [{'omschrijving': 'woonfunctie'}],
+                'gebruiksdoel': [{'omschrijving': 'woonfunctie', 'code': '1'}],
                 'gebruiksdoelWoonfunctie': {'omschrijving': 'Verpleeghuis'},
                 'gebruiksdoelGezondheidszorgfunctie': {},
                 'GebruiksdoelVerblijfsobjectDomein': '1310',
@@ -134,7 +155,7 @@ class TestUVA2ConfigHelpers(TestCase):
         # Test gebruiksdoelGezondheidszorgfunctie
         row = {
             'node': {
-                'gebruiksdoel': [{'omschrijving': 'gezondheidszorgfunctie'}],
+                'gebruiksdoel': [{'omschrijving': 'gezondheidszorgfunctie', 'code': '1'}],
                 'gebruiksdoelWoonfunctie': {},
                 'gebruiksdoelGezondheidszorgfunctie': {'omschrijving': 'Verpleeghuis'},
             }
@@ -142,7 +163,7 @@ class TestUVA2ConfigHelpers(TestCase):
 
         expected_row = {
             'node': {
-                'gebruiksdoel': [{'omschrijving': 'gezondheidszorgfunctie'}],
+                'gebruiksdoel': [{'omschrijving': 'gezondheidszorgfunctie', 'code': '1'}],
                 'gebruiksdoelWoonfunctie': {},
                 'gebruiksdoelGezondheidszorgfunctie': {'omschrijving': 'Verpleeghuis'},
                 'GebruiksdoelVerblijfsobjectDomein': '2310',
