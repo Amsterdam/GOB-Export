@@ -161,6 +161,22 @@ def format_uva2_coordinate(value, coordinate=None):
         return ''
 
 
+def show_date_when_reference_filled(reference_name, date_field):
+    return {
+        'condition': 'isempty',
+        'reference': reference_name,
+        'falseval': {
+            'action': 'format',
+            'formatter': format_uva2_date,
+            'value': date_field,
+        },
+        'trueval': {
+            'action': 'literal',
+            'value': ''
+        }
+    }
+
+
 def row_formatter_verblijfsobjecten(row):
     """
     Format rows for UVA2 with the following rules:
@@ -1141,32 +1157,14 @@ def _add_verblijfsobjecten_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'VBOAVR/AVR/Code': 'redenafvoer.code',
-            'VBOAVR/TijdvakRelatie/begindatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'redenafvoer.code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'beginGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
-            'VBOAVR/TijdvakRelatie/einddatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'redenafvoer.code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'eindGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
+            'VBOAVR/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
+                'redenafvoer.code',
+                'beginGeldigheid'
+            ),
+            'VBOAVR/TijdvakRelatie/einddatumRelatie': show_date_when_reference_filled(
+                'redenafvoer.code',
+                'eindGeldigheid'
+            ),
             'VBOBRN/BRN/Code': '',
             'VBOBRN/TijdvakRelatie/begindatumRelatie': '',
             'VBOBRN/TijdvakRelatie/einddatumRelatie': '',
@@ -1185,62 +1183,26 @@ def _add_verblijfsobjecten_uva2_config():
                     'fill_type': 'rjust'
                 }
             },
-            'VBOEGM/TijdvakRelatie/begindatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'eigendomsverhouding.code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'beginGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
-            'VBOEGM/TijdvakRelatie/einddatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'eigendomsverhouding.code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'eindGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
+            'VBOEGM/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
+                'eigendomsverhouding.code',
+                'beginGeldigheid'
+            ),
+            'VBOEGM/TijdvakRelatie/einddatumRelatie': show_date_when_reference_filled(
+                'eigendomsverhouding.code',
+                'eindGeldigheid'
+            ),
             'VBOFNG/FNG/Code': '',
             'VBOFNG/TijdvakRelatie/begindatumRelatie': '',
             'VBOFNG/TijdvakRelatie/einddatumRelatie': '',
             'VBOGBK/GBK/Code': 'feitelijkGebruik.code',
-            'VBOGBK/TijdvakRelatie/begindatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'feitelijkGebruik.code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'beginGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
-            'VBOGBK/TijdvakRelatie/einddatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'feitelijkGebruik.code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'eindGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
+            'VBOGBK/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
+                'feitelijkGebruik.code',
+                'beginGeldigheid'
+            ),
+            'VBOGBK/TijdvakRelatie/einddatumRelatie': show_date_when_reference_filled(
+                'feitelijkGebruik.code',
+                'eindGeldigheid'
+            ),
             'VBOLOC/LOC/Code': '',
             'VBOLOC/TijdvakRelatie/begindatumRelatie': '',
             'VBOLOC/TijdvakRelatie/einddatumRelatie': '',
@@ -1265,59 +1227,23 @@ def _add_verblijfsobjecten_uva2_config():
             'VBOMNT/TijdvakRelatie/begindatumRelatie': '',
             'VBOMNT/TijdvakRelatie/einddatumRelatie': '',
             'VBOTGG/TGG/Code': 'toegang.[0].code',
-            'VBOTGG/TijdvakRelatie/begindatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'toegang.[0].code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'beginGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
-            'VBOTGG/TijdvakRelatie/einddatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'toegang.[0].code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'eindGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
+            'VBOTGG/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
+                'toegang.[0].code',
+                'beginGeldigheid'
+            ),
+            'VBOTGG/TijdvakRelatie/einddatumRelatie': show_date_when_reference_filled(
+                'toegang.[0].code',
+                'eindGeldigheid'
+            ),
             'VBOOVR/OVR/Code': 'redenopvoer.code',
-            'VBOOVR/TijdvakRelatie/begindatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'redenopvoer.code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'beginGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
-            'VBOOVR/TijdvakRelatie/einddatumRelatie': {
-                'condition': 'isempty',
-                'reference': 'redenopvoer.code',
-                'falseval': {
-                    'action': 'format',
-                    'formatter': format_uva2_date,
-                    'value': 'eindGeldigheid',
-                },
-                'trueval': {
-                    'action': 'literal',
-                    'value': ''
-                }
-            },
+            'VBOOVR/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
+                'redenopvoer.code',
+                'beginGeldigheid'
+            ),
+            'VBOOVR/TijdvakRelatie/einddatumRelatie': show_date_when_reference_filled(
+                'redenopvoer.code',
+                'eindGeldigheid'
+            ),
             'VBOSTS/STS/Code': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
