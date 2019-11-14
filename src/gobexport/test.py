@@ -334,7 +334,15 @@ def _get_analysis(obj_info, obj):
 
     lines = content.split('\n')
 
-    first_line = lines[0]
+    nth = {
+        1: "first",
+        2: "second",
+        3: "third",
+        4: "fourth"
+    }
+    analyses = range(min(max(nth.keys()), len(lines)))
+    lines_analysis = {f"{nth[n + 1]}_line": hashlib.md5(lines[n].encode(ENCODING)).hexdigest() for n in analyses}
+
     first_lines = '\n'.join(lines[:10])
 
     line_lengths = [len(line) for line in lines]
@@ -350,7 +358,7 @@ def _get_analysis(obj_info, obj):
 
     return {
         **base_analysis,
-        "first_line": hashlib.md5(first_line.encode(ENCODING)).hexdigest(),
+        **lines_analysis,
         "first_lines": hashlib.md5(first_lines.encode(ENCODING)).hexdigest(),
         "chars": chars,
         "lines": len(lines),

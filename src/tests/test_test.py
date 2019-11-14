@@ -104,6 +104,8 @@ class TestExportTest(TestCase):
             'bytes': len(obj),
             'first_bytes': mock.ANY,
             'first_line': mock.ANY,
+            'second_line': mock.ANY,
+            'third_line': mock.ANY,
             'first_lines': mock.ANY,
             'chars': len(obj),
             'lines': 3,
@@ -114,6 +116,32 @@ class TestExportTest(TestCase):
             'digits': 0.25,
             'alphas': 0.5,
             'spaces': 0.25,
+            'lowers': 1.0,
+            'uppers': 0.0
+        })
+
+        obj = b"123\n\nabc def\nx\ny" # 5 lines
+        obj_info['content_type'] = "plain/text"
+        obj_info['bytes'] = len(obj)
+        analysis = test._get_analysis(obj_info, obj)
+        self.assertEqual(analysis, {
+            'age_hours': mock.ANY,
+            'bytes': len(obj),
+            'first_bytes': mock.ANY,
+            'first_line': mock.ANY,
+            'second_line': mock.ANY,
+            'third_line': mock.ANY,
+            'fourth_line': mock.ANY,
+            'first_lines': mock.ANY,
+            'chars': len(obj),
+            'lines': 5,
+            'empty_lines': 1,
+            'max_line': 7,
+            'min_line': 1,
+            'avg_line': 3,
+            'digits': 0.1875,
+            'alphas': 0.5,
+            'spaces': 0.3125,
             'lowers': 1.0,
             'uppers': 0.0
         })
