@@ -76,6 +76,15 @@ class TestExport(TestCase):
 
     @patch('gobexport.export.logger', mock.MagicMock())
     @patch('gobexport.export.time.sleep', lambda n: None)
-    def test_export(self):
-        result = export("meetbouten", "meetbouten", None, "File")
+    @patch('gobexport.export._export_collection')
+    @patch('gobexport.export.get_host')
+    def test_export(self, mock_host, mock_export_collection):
+        result = export("catalogue", "collection", "product", "File")
         self.assertEqual(result, None)
+        mock_export_collection.assert_called_with(
+            host=mock_host.return_value,
+            catalogue='catalogue',
+            collection='collection',
+            product_name='product',
+            destination='File',
+        )

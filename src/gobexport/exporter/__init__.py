@@ -92,7 +92,8 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
         query = product['query']
         api = GraphQLStreaming(host, query, unfold=unfold, sort=product.get('sort'),
                                row_formatter=product.get('row_formatter'),
-                               cross_relations=product.get('cross_relations', False))
+                               cross_relations=product.get('cross_relations', False),
+                               batch_size=product.get('batch_size'))
     else:
         # Use the REST API
         endpoint = product.get('endpoint')
