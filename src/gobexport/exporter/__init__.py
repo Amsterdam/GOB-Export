@@ -49,6 +49,7 @@ CONFIG_MAPPING = {
         'gemeentes': brk.GemeentesExportConfig,
         'bijpijling': brk.BijpijlingExportConfig,
         'perceelnummer': brk.PerceelnummerExportConfig,
+        'kadastralegemeentecodes': brk.KadastraleGemeentecodesExportConfig,
     },
     'wkpb': {
         'beperkingen': wkpb.BeperkingenExportConfig,
