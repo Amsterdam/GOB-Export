@@ -46,12 +46,17 @@ def _get_filename_date():
     return dt_parser.parse(meta.get('kennisgevingsdatum'))
 
 
+def brk_directory(type='csv'):
+    type_dir, _ = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
+    return f"AmsterdamRegio/{type_dir}"
+
+
 def brk_filename(name, type='csv', append_date=True):
     assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
-    type_dir, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
+    _, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
     date = _get_filename_date()
     datestr = f"_{date.strftime('%Y%m%d')}" if append_date else ""
-    return f'AmsterdamRegio/{type_dir}/BRK_{name}{datestr}.{extension}'
+    return f'{brk_directory(type)}/BRK_{name}{datestr}.{extension}'
 
 
 def sort_attributes(attrs: dict, ordering: list):
@@ -2076,6 +2081,7 @@ class GemeentesExportConfig:
 }
 '''
 
+    shp_filename = 'BRK_GEMEENTE'
     products = {
         'csv': {
             'exporter': csv_exporter,
@@ -2096,23 +2102,149 @@ class GemeentesExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql',
-            'filename': lambda: brk_filename('Gemeente', type='shp'),
+            'filename': f'{brk_directory("shp")}/{shp_filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
                 'GEMEENTE': 'naam',
-                'GME_ID': 'identificatie'
             },
             'extra_files': [
                 {
-                    'filename': lambda: brk_filename('Gemeente', type='dbf'),
+                    'filename': f'{brk_directory("dbf")}/{shp_filename}.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('Gemeente', type='shx'),
+                    'filename': f'{brk_directory("shx")}/{shp_filename}.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('Gemeente', type='prj'),
+                    'filename': f'{brk_directory("prj")}/{shp_filename}.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+            ],
+            'query': query
+        }
+    }
+
+
+class KadastraleGemeentecodesExportConfig:
+    query = '''
+{
+  brkKadastralegemeentecodes {
+    edges {
+      node {
+        identificatie
+        geometrie
+        isOnderdeelVanKadastralegemeente {
+          edges {
+            node {
+              identificatie
+
+              ligtInGemeente {
+                edges {
+                  node {
+                    naam
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    filename = 'BRK_KAD_GEMEENTE'
+    products = {
+        'shape': {
+            'exporter': esri_exporter,
+            'api_type': 'graphql_streaming',
+            'filename': f'{brk_directory("shp")}/{filename}.shp',
+            'mime_type': 'application/octet-stream',
+            'format': {
+                'GEMEENTE': 'ligtInGemeente.[0].naam',
+                'KADGEMCODE': 'identificatie',
+                'KADGEM': 'isOnderdeelVanKadastralegemeente.[0].identificatie',
+            },
+            'extra_files': [
+                {
+                    'filename': f'{brk_directory("dbf")}/{filename}.dbf',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("shx")}/{filename}.shx',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("prj")}/{filename}.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+            ],
+            'query': query
+        }
+    }
+
+
+class KadastralesectiesExportConfig:
+    query = '''
+{
+  brkKadastralesecties {
+    edges {
+      node {
+        code
+        geometrie
+        isOnderdeelVanKadastralegemeentecode {
+          edges {
+            node {
+              identificatie
+              isOnderdeelVanKadastralegemeente {
+                edges {
+                  node {
+                    identificatie
+                    ligtInGemeente {
+                      edges {
+                        node {
+                          naam
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    filename = 'BRK_KAD_SECTIE'
+    products = {
+        'shape': {
+            'exporter': esri_exporter,
+            'api_type': 'graphql_streaming',
+            'filename': f'{brk_directory("shp")}/{filename}.shp',
+            'mime_type': 'application/octet-stream',
+            'format': {
+                'GEMEENTE': 'ligtInGemeente.[0].naam',
+                'KADGEMCODE': 'isOnderdeelVanKadastralegemeentecode.[0].identificatie',
+                'KADGEM': 'isOnderdeelVanKadastralegemeente.[0].identificatie',
+                'SECTIE': 'code',
+            },
+            'extra_files': [
+                {
+                    'filename': f'{brk_directory("dbf")}/{filename}.dbf',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("shx")}/{filename}.shx',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("prj")}/{filename}.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
