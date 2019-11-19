@@ -265,9 +265,18 @@ def _add_woonplaatsen_uva2_config():
                 'value': 'documentdatum',
             },
             'DocumentnummerMutatieWoonplaats': 'documentnummer',
-            'WoonplaatsPTTSchrijfwijze': '',
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'WoonplaatsPTTSchrijfwijze': {
+                'action': 'literal',
+                'value': 'Amsterdam',
+            },
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI',
+            },
+            'Indicatie-vervallen': {
+                'action': 'literal',
+                'value': 'N',
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
