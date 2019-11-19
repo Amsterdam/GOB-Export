@@ -30,9 +30,13 @@ UVA2_MAPPING = {
         '1': '35',
         '2': '36',
     },
-    'standplaatsen_status': {
+    'standplaatsen_status_code': {
         '1': '37',
         '2': '38',
+    },
+    'standplaatsen_status_vervallen': {
+        '1': 'N',
+        '2': 'J',
     },
     'panden_status': {
         '1': '24',
@@ -886,8 +890,16 @@ def _add_standplaatsen_uva2_config():
             },
             'DocumentnummerMutatieStandplaats': 'documentnummer',
             'StandplaatsnummerGemeente': '',
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI',
+            },
+            'Indicatie-vervallen': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'standplaatsen_status_vervallen'},
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -899,13 +911,21 @@ def _add_standplaatsen_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'STABRN/BRN/Code': '',
-            'STABRN/TijdvakRelatie/begindatumRelatie': '',
-            'STABRN/TijdvakRelatie/einddatumRelatie': '',
+            'STABRN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'STABRN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
             'STASTS/STS/Code': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'mapping_name': 'standplaatsen_status'},
+                'kwargs': {'mapping_name': 'standplaatsen_status_code'},
             },
             'STASTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
