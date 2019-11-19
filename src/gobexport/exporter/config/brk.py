@@ -2081,6 +2081,7 @@ class GemeentesExportConfig:
 }
 '''
 
+    shp_filename = 'BRK_GEMEENTE'
     products = {
         'csv': {
             'exporter': csv_exporter,
@@ -2101,23 +2102,22 @@ class GemeentesExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql',
-            'filename': lambda: brk_filename('Gemeente', type='shp'),
+            'filename': f'{brk_directory("shp")}/{shp_filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
                 'GEMEENTE': 'naam',
-                'GME_ID': 'identificatie'
             },
             'extra_files': [
                 {
-                    'filename': lambda: brk_filename('Gemeente', type='dbf'),
+                    'filename': f'{brk_directory("dbf")}/{shp_filename}.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('Gemeente', type='shx'),
+                    'filename': f'{brk_directory("shx")}/{shp_filename}.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('Gemeente', type='prj'),
+                    'filename': f'{brk_directory("prj")}/{shp_filename}.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -2220,8 +2220,8 @@ class KadastralesectiesExportConfig:
   }
 }
 '''
-    filename = 'BRK_KAD_SECTIE'
 
+    filename = 'BRK_KAD_SECTIE'
     products = {
         'shape': {
             'exporter': esri_exporter,
