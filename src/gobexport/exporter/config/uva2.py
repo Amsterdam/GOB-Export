@@ -14,9 +14,13 @@ UVA2_MAPPING = {
         '1': '33',
         '2': '34',
     },
-    'nummeraanduidingen_status': {
+    'nummeraanduidingen_status_code': {
         '1': '16',
         '2': '17',
+    },
+    'nummeraanduidingen_status_vervallen': {
+        '1': 'N',
+        '2': 'J',
     },
     'openbareruimtes_status': {
         '1': '35',
@@ -137,10 +141,10 @@ def format_uva2_date(datetimestr):
         return datetimestr
 
 
-def format_uva2_mapping(value, mapping_name=None):
+def format_uva2_mapping(value, mapping_name):
     # Value could be an int or string
     value = str(value)
-    assert mapping_name and mapping_name in UVA2_MAPPING, "A valid mapping name is required"
+    assert mapping_name in UVA2_MAPPING, "A valid mapping name is required"
     return UVA2_MAPPING[mapping_name].get(value, '')
 
 
@@ -479,8 +483,16 @@ def _add_nummeraanduidingen_uva2_config():
             },
             'OmschrijvingTypeAdresseerbaarObjectDomein': 'typeAdresseerbaarObject.omschrijving',
             'Adresnummer': '',
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI',
+            },
+            'Indicatie-vervallen': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'nummeraanduidingen_status_vervallen'},
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -492,13 +504,21 @@ def _add_nummeraanduidingen_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'NUMBRN/BRN/Code': '',
-            'NUMBRN/TijdvakRelatie/begindatumRelatie': '',
-            'NUMBRN/TijdvakRelatie/einddatumRelatie': '',
+            'NUMBRN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'NUMBRN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
             'NUMSTS/STS/Code': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'mapping_name': 'nummeraanduidingen_status'},
+                'kwargs': {'mapping_name': 'nummeraanduidingen_status_code'},
             },
             'NUMSTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
