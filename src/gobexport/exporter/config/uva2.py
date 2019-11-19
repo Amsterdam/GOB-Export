@@ -10,9 +10,13 @@ from gobexport.filters.notempty_filter import NotEmptyFilter
 
 UVA2_DATE_FORMAT = '%Y%m%d'
 UVA2_MAPPING = {
-    'ligplaatsen_status': {
+    'ligplaatsen_status_code': {
         '1': '33',
         '2': '34',
+    },
+    'ligplaatsen_status_vervallen': {
+        '1': 'N',
+        '2': 'J',
     },
     'nummeraanduidingen_status_code': {
         '1': '16',
@@ -638,8 +642,16 @@ def _add_ligplaatsen_uva2_config():
             },
             'DocumentnummerMutatieLigplaats': 'documentnummer',
             'LigplaatsnummerGemeente': '',
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI',
+            },
+            'Indicatie-vervallen': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'ligplaatsen_status_vervallen'},
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -651,13 +663,21 @@ def _add_ligplaatsen_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'LIGBRN/BRN/Code': '',
-            'LIGBRN/TijdvakRelatie/begindatumRelatie': '',
-            'LIGBRN/TijdvakRelatie/einddatumRelatie': '',
+            'LIGBRN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'LIGBRN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
             'LIGSTS/STS/Code': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'mapping_name': 'ligplaatsen_status'},
+                'kwargs': {'mapping_name': 'ligplaatsen_status_code'},
             },
             'LIGSTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
