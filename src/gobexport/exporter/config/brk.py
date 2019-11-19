@@ -46,12 +46,17 @@ def _get_filename_date():
     return dt_parser.parse(meta.get('kennisgevingsdatum'))
 
 
+def brk_directory(type='csv'):
+    type_dir, _ = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
+    return f"AmsterdamRegio/{type_dir}"
+
+
 def brk_filename(name, type='csv', append_date=True):
     assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
-    type_dir, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
+    _, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
     date = _get_filename_date()
     datestr = f"_{date.strftime('%Y%m%d')}" if append_date else ""
-    return f'AmsterdamRegio/{type_dir}/BRK_{name}{datestr}.{extension}'
+    return f'{brk_directory(type)}/BRK_{name}{datestr}.{extension}'
 
 
 def sort_attributes(attrs: dict, ordering: list):
@@ -2113,6 +2118,65 @@ class GemeentesExportConfig:
                 },
                 {
                     'filename': lambda: brk_filename('Gemeente', type='prj'),
+                    'mime_type': 'application/octet-stream'
+                },
+            ],
+            'query': query
+        }
+    }
+
+
+class KadastraleGemeentecodesExportConfig:
+    query = '''
+{
+  brkKadastralegemeentecodes {
+    edges {
+      node {
+        identificatie
+        geometrie
+        isOnderdeelVanKadastralegemeente {
+          edges {
+            node {
+              identificatie
+
+              ligtInGemeente {
+                edges {
+                  node {
+                    naam
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    products = {
+        'shape': {
+            'exporter': esri_exporter,
+            'api_type': 'graphql_streaming',
+            'filename': f'{brk_directory("shp")}/BRK_KAD_GEMEENTE.shp',
+            'mime_type': 'application/octet-stream',
+            'format': {
+                'GEMEENTE': 'ligtInGemeente.[0].naam',
+                'KADGEMCODE': 'identificatie',
+                'KADGEM': 'isOnderdeelVanKadastralegemeente.[0].identificatie',
+            },
+            'extra_files': [
+                {
+                    'filename': f'{brk_directory("dbf")}/BRK_KAD_GEMEENTE.dbf',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("shx")}/BRK_KAD_GEMEENTE.shx',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("prj")}/BRK_KAD_GEMEENTE.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
