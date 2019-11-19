@@ -175,7 +175,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
     ]
 
     def _get_person_attrs(self):
-        bsn_field = "_embedded.heeftBsnVoor.bronwaarde"
+        bsn_field = "heeftBsnVoor.bronwaarde"
 
         # Are prefixed with SJT_NP_ and SJT_KAD_ . Only one of the sets will be set, depending on the value of BSN
         generic_attrs = {
@@ -225,7 +225,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
     def _get_kvk_attrs(self):
         # Are prefixed with either SJT_NNP_ or SJT_KAD_
         # If SJT_NNP_KVKNUMMER is available, SJT_NNP_ attrs should be set, otherwise SJT_KAD_
-        kvk_field = "_embedded.heeftKvknummerVoor.bronwaarde"
+        kvk_field = "heeftKvknummerVoor.bronwaarde"
 
         generic_attrs = {
             'RECHTSVORM_CODE': 'rechtsvorm.code',
@@ -243,7 +243,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
         sjt_kad_attrs = self._add_condition_to_attrs(show_when_not_kvk_condition, sjt_kad_attrs)
 
         return {
-            'SJT_NNP_RSIN': '_embedded.heeftRsinVoor.bronwaarde',
+            'SJT_NNP_RSIN': 'heeftRsinVoor.bronwaarde',
             'SJT_NNP_KVKNUMMER': kvk_field,
             **sjt_nnp_attrs,
             **sjt_kad_attrs,
@@ -299,8 +299,8 @@ class KadastralesubjectenExportConfig:
 
     products = {
         'csv': {
+            'endpoint': '/gob/brk/kadastralesubjecten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
-            'endpoint': '/gob/brk/kadastralesubjecten',
             'filename': lambda: brk_filename("kadastraal_subject"),
             'mime_type': 'plain/text',
             'format': format.get_format(),
@@ -1221,13 +1221,17 @@ class BrkBagExportConfig:
 class StukdelenExportConfig:
     format = {
         'BRK_SDL_ID': 'identificatie',
-        'SDL_AARDSTUKDEEL_CODE': 'aard.code',
-        'SDL_AARDSTUKDEEL_OMS': 'aard.omschrijving',
+        'SDL_AARD_STUKDEEL_CODE': 'aard.code',
+        'SDL_AARD_STUKDEEL_OMS': 'aard.omschrijving',
         'SDL_KOOPSOM': 'bedragTransactie.bedrag',
         'SDL_KOOPSOM_VALUTA': 'bedragTransactie.valuta',
         'BRK_STK_ID': 'stukidentificatie',
-        'STK_AKRPORTEFEUILLENR': 'portefeuillenummerAkr',
-        'STK_TIJDSTIP_AANBIEDING': 'tijdstipAanbiedingStuk',
+        'STK_AKR_PORTEFEUILLENR': 'portefeuillenummerAkr',
+        'STK_TIJDSTIP_AANBIEDING': {
+            'action': 'format',
+            'formatter': format_timestamp,
+            'value': 'tijdstipAanbiedingStuk',
+        },
         'STK_REEKS_CODE': 'reeks',
         'STK_VOLGNUMMER': 'volgnummerStuk',
         'STK_REGISTERCODE_CODE': 'registercodeStuk.code',
@@ -1235,19 +1239,19 @@ class StukdelenExportConfig:
         'STK_SOORTREGISTER_CODE': 'soortRegisterStuk.code',
         'STK_SOORTREGISTER_OMS': 'soortRegisterStuk.omschrijving',
         'STK_DEEL_SOORT': 'deelSoortStuk',
-        'BRK_TNG_ID': 'isBronVoorTenaamstelling.identificatie',
+        'BRK_TNG_ID': 'isBronVoorTenaamstelling.[0].identificatie',
         'BRK_ATG_ID': {
             'condition': 'isempty',
-            'reference': 'isBronVoorAantekeningRecht.identificatie',
+            'reference': 'isBronVoorAantekeningRecht.[0].identificatie',
             'negate': True,
             # Either one or the other is set, or none, but never both
-            'trueval': 'isBronVoorAantekeningRecht.identificatie',
-            'elseval': 'isBronVoorAantekeningKadastraalObject.identificatie'
+            'trueval': 'isBronVoorAantekeningRecht.[0].identificatie',
+            'falseval': 'isBronVoorAantekeningKadastraalObject.[0].identificatie'
         },
-        'BRK_ASG_VVE': 'isBronVoorZakelijkRecht.appartementsrechtsplitsingidentificatie'
+        'BRK_ASG_VVE': 'isBronVoorZakelijkRecht.[0].appartementsrechtsplitsingidentificatie'
     }
 
-    query = '''
+    query_tng = '''
 {
   brkStukdelen {
     edges {
@@ -1270,6 +1274,28 @@ class StukdelenExportConfig:
             }
           }
         }
+      }
+    }
+  }
+}
+'''
+
+    query_art = '''
+{
+  brkStukdelen {
+    edges {
+      node {
+        identificatie
+        aard
+        bedragTransactie
+        stukidentificatie
+        portefeuillenummerAkr
+        tijdstipAanbiedingStuk
+        reeks
+        volgnummerStuk
+        registercodeStuk
+        soortRegisterStuk
+        deelSoortStuk
         isBronVoorAantekeningRecht {
           edges {
             node {
@@ -1277,14 +1303,58 @@ class StukdelenExportConfig:
             }
           }
         }
-        isBronVoorAantekeningKadastraalObject {
-          edges {
-            node {
-              identificatie
+      }
+    }
+  }
+}
+'''
+
+    query_akt = '''
+    {
+      brkStukdelen {
+        edges {
+          node {
+            identificatie
+            aard
+            bedragTransactie
+            stukidentificatie
+            portefeuillenummerAkr
+            tijdstipAanbiedingStuk
+            reeks
+            volgnummerStuk
+            registercodeStuk
+            soortRegisterStuk
+            deelSoortStuk
+            isBronVoorAantekeningKadastraalObject {
+              edges {
+                node {
+                  identificatie
+                }
+              }
             }
           }
         }
-        isBronVoorZakelijkRecht {
+      }
+    }
+    '''
+
+    query_zrt = '''
+{
+  brkStukdelen {
+    edges {
+      node {
+        identificatie
+        aard
+        bedragTransactie
+        stukidentificatie
+        portefeuillenummerAkr
+        tijdstipAanbiedingStuk
+        reeks
+        volgnummerStuk
+        registercodeStuk
+        soortRegisterStuk
+        deelSoortStuk
+        isBronVoorZakelijkRecht(active: false) {
           edges {
             node {
               appartementsrechtsplitsingidentificatie
@@ -1298,14 +1368,64 @@ class StukdelenExportConfig:
 '''
 
     products = {
-        'csv': {
+        'csv_tng': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'batch_size': 10000,
             'unfold': True,
-            'query': query,
+            'query': query_tng,
             'filename': lambda: brk_filename('stukdeel'),
             'mime_type': 'plain/text',
             'format': format,
+            'entity_filters': [
+                NotEmptyFilter('isBronVoorTenaamstelling.[0].identificatie'),
+            ]
+        },
+        'csv_art': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql_streaming',
+            'batch_size': 10000,
+            'unfold': True,
+            'query': query_art,
+            'append': True,
+            'filename': lambda: brk_filename('stukdeel'),
+            'mime_type': 'plain/text',
+            'format': format,
+            'entity_filters': [
+                NotEmptyFilter(
+                    'isBronVoorAantekeningRecht.[0].identificatie',
+                ),
+            ]
+        },
+        'csv_akt': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql_streaming',
+            'batch_size': 10000,
+            'unfold': True,
+            'query': query_akt,
+            'append': True,
+            'filename': lambda: brk_filename('stukdeel'),
+            'mime_type': 'plain/text',
+            'format': format,
+            'entity_filters': [
+                NotEmptyFilter(
+                    'isBronVoorAantekeningKadastraalObject.[0].identificatie',
+                ),
+            ]
+        },
+        'csv_zrt': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql_streaming',
+            'batch_size': 10000,
+            'unfold': True,
+            'append': True,
+            'query': query_zrt,
+            'filename': lambda: brk_filename('stukdeel'),
+            'mime_type': 'plain/text',
+            'format': format,
+            'entity_filters': [
+                NotEmptyFilter('isBronVoorZakelijkRecht.[0].appartementsrechtsplitsingidentificatie')
+            ]
         }
     }
 
