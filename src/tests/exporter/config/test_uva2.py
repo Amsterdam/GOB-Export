@@ -55,18 +55,31 @@ class TestUVA2ConfigHelpers(TestCase):
         for input in status:
             self.assertEqual(format_uva2_mapping(input, "openbareruimtes_status"), '')
 
-    def test_format_uva2_status_nummeraanduidingen(self):
+    def test_format_uva2_nummeraanduidingen_status_code(self):
         # Status 1 and 2 should be mapped to 16, 17 for nummeraanduidingen
         status = [('1', '16'), ('2', '17'), (1, '16')]
 
         for input, expected in status:
-            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status"), expected)
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status_code"), expected)
 
         # Test invalid status for nummeraanduidingen
         status = [3, '4', 'a', None]
 
         for input in status:
-            self.assertEqual(format_uva2_mapping(input, "openbareruimtes_status"), '')
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status_code"), '')
+
+    def test_format_uva2_nummeraanduidingen_status_vervallen(self):
+        # Status 1 and 2 should be mapped to 16, 17 for nummeraanduidingen Indicatie-vervallen
+        status = [('1', 'N'), ('2', 'J'), (1, 'N'), (2, 'J')]
+
+        for input, expected in status:
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status_vervallen"), expected)
+
+        # Test invalid status for nummeraanduidingen
+        status = [3, '4', 'a', None]
+
+        for input in status:
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status_vervallen"), '')
 
     def test_format_uva2_coordinate(self):
         value = "POINT(124888 486338)"
