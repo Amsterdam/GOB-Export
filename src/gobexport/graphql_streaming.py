@@ -30,6 +30,8 @@ class GraphQLStreaming:
         :return:
         """
         for item in self._execute_query(self.query):
+            # Formatter may return multiple rows for one item, for example when 'unfold' is set to True. Hence the
+            # double yield from (the first yield from being in _execute_query)
             yield from self.formatter.format_item(json.loads(item))
 
     def _add_pagination_to_query(self, query: str, after: str, batch_size: int):
