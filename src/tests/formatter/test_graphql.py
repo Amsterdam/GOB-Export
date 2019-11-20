@@ -280,6 +280,7 @@ class TestGraphQLResultFormatter(TestCase):
         }]
 
         formatter = GraphQLResultFormatter()
+        formatter._undouble = MagicMock(side_effect=lambda x: x)
         result = formatter._box_item(item)
         self.assertEqual(len(expected_result), len(result))
         self.assertEqual(expected_result, result)
@@ -429,6 +430,7 @@ class TestGraphQLResultFormatter(TestCase):
         ]
 
         formatter = GraphQLResultFormatter()
+        formatter._undouble = MagicMock(side_effect=lambda x: x)
         result = formatter._box_item(item)
         self.assertEqual(expected_result, result)
 
@@ -555,6 +557,7 @@ class TestGraphQLResultFormatter(TestCase):
             },
         ]
         formatter = GraphQLResultFormatter()
+        formatter._undouble = MagicMock(side_effect=lambda x: x)
         result = formatter._box_item(item)
         self.assertEqual(expected_result, result)
 
@@ -761,6 +764,7 @@ class TestGraphQLResultFormatter(TestCase):
 
         ]
         formatter = GraphQLResultFormatter(cross_relations=True)
+        formatter._undouble = MagicMock(side_effect=lambda x: x)
         result = formatter._box_item(item)
         self.assertEqual(expected_result, result)
 
