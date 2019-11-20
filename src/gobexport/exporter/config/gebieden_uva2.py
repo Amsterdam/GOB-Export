@@ -258,7 +258,7 @@ def _add_buurten_uva2_config():
             'BRTSDL/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'ligtInWijk.[0].ligtInStadsdeel.[0].beginGeldigheid',
+                'value': 'beginGeldigheid'
             },
             'BRTSDL/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
