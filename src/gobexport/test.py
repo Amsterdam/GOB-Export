@@ -60,6 +60,17 @@ _REPLACEMENTS = {
     "{DATE}": "\d{8}"
 }
 
+# Definition of test values
+_NTH = {
+    1: "first",
+    2: "second",
+    3: "third",
+    4: "fourth"
+}
+_MAXIMUM_VALUES = ["age_hours"]
+_MINIMUM_VALUES = ["bytes", "chars", "lines"]
+_ABSOLUTE_VALUES = ["empty_lines", "first_bytes", "first_lines"] + [f"{nth}_line" for nth in _NTH.values()]
+
 
 def test(catalogue):
     """
@@ -214,14 +225,11 @@ def _propose_check_file(proposals, filename, obj_info, obj):
 
     proposal = {}
     for key, value in analysis.items():
-        if key in ["age_hours"]:
-            # Maximum value
+        if key in _MAXIMUM_VALUES:
             proposal[key] = [0, value]
-        elif key in ["bytes", "chars", "lines"]:
-            # Minimum value
+        elif key in _MINIMUM_VALUES:
             proposal[key] = [value, None]
-        elif key in ["empty_lines", "first_bytes", "first_line", "first_lines"]:
-            # Absolute value
+        elif key in _ABSOLUTE_VALUES:
             proposal[key] = [value]
         else:
             # Within limits
@@ -334,14 +342,8 @@ def _get_analysis(obj_info, obj):
 
     lines = content.split('\n')
 
-    nth = {
-        1: "first",
-        2: "second",
-        3: "third",
-        4: "fourth"
-    }
-    analyses = range(min(max(nth.keys()), len(lines)))
-    lines_analysis = {f"{nth[n + 1]}_line": hashlib.md5(lines[n].encode(ENCODING)).hexdigest() for n in analyses}
+    analyses = range(min(max(_NTH.keys()), len(lines)))
+    lines_analysis = {f"{_NTH[n + 1]}_line": hashlib.md5(lines[n].encode(ENCODING)).hexdigest() for n in analyses}
 
     first_lines = '\n'.join(lines[:10])
 

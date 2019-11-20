@@ -42,6 +42,32 @@ class TestUVA2ConfigHelpers(TestCase):
         with self.assertRaises(AssertionError):
             format_uva2_mapping('1', 'invalid')
 
+    def test_format_uva2_ligplaatsen_status_code(self):
+        # Status 1 and 2 should be mapped to 33, 34 for ligplaatsen
+        status = [('1', '33'), ('2', '34'), (1, '33'), (2, '34')]
+
+        for input, expected in status:
+            self.assertEqual(format_uva2_mapping(input, "ligplaatsen_status_code"), expected)
+
+        # Test invalid status for ligplaatsen
+        status = [3, '4', 'a', None]
+
+        for input in status:
+            self.assertEqual(format_uva2_mapping(input, "ligplaatsen_status_code"), '')
+
+    def test_format_uva2_ligplaatsen_status_vervallen(self):
+        # Status 1 and 2 should be mapped to N, J for ligplaatsen Indicatie-vervallen
+        status = [('1', 'N'), ('2', 'J'), (1, 'N'), (2, 'J')]
+
+        for input, expected in status:
+            self.assertEqual(format_uva2_mapping(input, "ligplaatsen_status_vervallen"), expected)
+
+        # Test invalid status for ligplaatsen
+        status = [3, '4', 'a', None]
+
+        for input in status:
+            self.assertEqual(format_uva2_mapping(input, "ligplaatsen_status_vervallen"), '')
+
     def test_format_uva2_status_openbareruimtes(self):
         # Status 1 and 2 should be mapped to 35, 36 for openbareruimtes
         status = [('1', '35'), ('2', '36'), (1, '35')]
@@ -55,18 +81,57 @@ class TestUVA2ConfigHelpers(TestCase):
         for input in status:
             self.assertEqual(format_uva2_mapping(input, "openbareruimtes_status"), '')
 
-    def test_format_uva2_status_nummeraanduidingen(self):
+    def test_format_uva2_nummeraanduidingen_status_code(self):
         # Status 1 and 2 should be mapped to 16, 17 for nummeraanduidingen
-        status = [('1', '16'), ('2', '17'), (1, '16')]
+        status = [('1', '16'), ('2', '17'), (1, '16'), (2, '17')]
 
         for input, expected in status:
-            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status"), expected)
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status_code"), expected)
 
         # Test invalid status for nummeraanduidingen
         status = [3, '4', 'a', None]
 
         for input in status:
-            self.assertEqual(format_uva2_mapping(input, "openbareruimtes_status"), '')
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status_code"), '')
+
+    def test_format_uva2_nummeraanduidingen_status_vervallen(self):
+        # Status 1 and 2 should be mapped to N, J for nummeraanduidingen Indicatie-vervallen
+        status = [('1', 'N'), ('2', 'J'), (1, 'N'), (2, 'J')]
+
+        for input, expected in status:
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status_vervallen"), expected)
+
+        # Test invalid status for nummeraanduidingen
+        status = [3, '4', 'a', None]
+
+        for input in status:
+            self.assertEqual(format_uva2_mapping(input, "nummeraanduidingen_status_vervallen"), '')
+
+    def test_format_uva2_standplaatsen_status_code(self):
+        # Status 1 and 2 should be mapped to 37, 38 for standplaatsen
+        status = [('1', '37'), ('2', '38'), (1, '37'), (2, '38')]
+
+        for input, expected in status:
+            self.assertEqual(format_uva2_mapping(input, "standplaatsen_status_code"), expected)
+
+        # Test invalid status for standplaatsen
+        status = [3, '4', 'a', None]
+
+        for input in status:
+            self.assertEqual(format_uva2_mapping(input, "standplaatsen_status_code"), '')
+
+    def test_format_uva2_standplaatsen_status_vervallen(self):
+        # Status 1 and 2 should be mapped to N, J for standplaatsen Indicatie-vervallen
+        status = [('1', 'N'), ('2', 'J'), (1, 'N'), (2, 'J')]
+
+        for input, expected in status:
+            self.assertEqual(format_uva2_mapping(input, "standplaatsen_status_vervallen"), expected)
+
+        # Test invalid status for standplaatsen
+        status = [3, '4', 'a', None]
+
+        for input in status:
+            self.assertEqual(format_uva2_mapping(input, "standplaatsen_status_vervallen"), '')
 
     def test_format_uva2_coordinate(self):
         value = "POINT(124888 486338)"

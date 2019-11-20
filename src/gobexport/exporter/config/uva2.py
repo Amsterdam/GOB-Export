@@ -10,21 +10,33 @@ from gobexport.filters.notempty_filter import NotEmptyFilter
 
 UVA2_DATE_FORMAT = '%Y%m%d'
 UVA2_MAPPING = {
-    'ligplaatsen_status': {
+    'ligplaatsen_status_code': {
         '1': '33',
         '2': '34',
     },
-    'nummeraanduidingen_status': {
+    'ligplaatsen_status_vervallen': {
+        '1': 'N',
+        '2': 'J',
+    },
+    'nummeraanduidingen_status_code': {
         '1': '16',
         '2': '17',
+    },
+    'nummeraanduidingen_status_vervallen': {
+        '1': 'N',
+        '2': 'J',
     },
     'openbareruimtes_status': {
         '1': '35',
         '2': '36',
     },
-    'standplaatsen_status': {
+    'standplaatsen_status_code': {
         '1': '37',
         '2': '38',
+    },
+    'standplaatsen_status_vervallen': {
+        '1': 'N',
+        '2': 'J',
     },
     'panden_status': {
         '1': '24',
@@ -137,10 +149,10 @@ def format_uva2_date(datetimestr):
         return datetimestr
 
 
-def format_uva2_mapping(value, mapping_name=None):
+def format_uva2_mapping(value, mapping_name):
     # Value could be an int or string
     value = str(value)
-    assert mapping_name and mapping_name in UVA2_MAPPING, "A valid mapping name is required"
+    assert mapping_name in UVA2_MAPPING, "A valid mapping name is required"
     return UVA2_MAPPING[mapping_name].get(value, '')
 
 
@@ -479,8 +491,16 @@ def _add_nummeraanduidingen_uva2_config():
             },
             'OmschrijvingTypeAdresseerbaarObjectDomein': 'typeAdresseerbaarObject.omschrijving',
             'Adresnummer': '',
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI',
+            },
+            'Indicatie-vervallen': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'nummeraanduidingen_status_vervallen'},
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -492,13 +512,21 @@ def _add_nummeraanduidingen_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'NUMBRN/BRN/Code': '',
-            'NUMBRN/TijdvakRelatie/begindatumRelatie': '',
-            'NUMBRN/TijdvakRelatie/einddatumRelatie': '',
+            'NUMBRN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'NUMBRN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
             'NUMSTS/STS/Code': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'mapping_name': 'nummeraanduidingen_status'},
+                'kwargs': {'mapping_name': 'nummeraanduidingen_status_code'},
             },
             'NUMSTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
@@ -618,8 +646,16 @@ def _add_ligplaatsen_uva2_config():
             },
             'DocumentnummerMutatieLigplaats': 'documentnummer',
             'LigplaatsnummerGemeente': '',
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI',
+            },
+            'Indicatie-vervallen': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'ligplaatsen_status_vervallen'},
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -631,13 +667,21 @@ def _add_ligplaatsen_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'LIGBRN/BRN/Code': '',
-            'LIGBRN/TijdvakRelatie/begindatumRelatie': '',
-            'LIGBRN/TijdvakRelatie/einddatumRelatie': '',
+            'LIGBRN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'LIGBRN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
             'LIGSTS/STS/Code': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'mapping_name': 'ligplaatsen_status'},
+                'kwargs': {'mapping_name': 'ligplaatsen_status_code'},
             },
             'LIGSTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
@@ -846,8 +890,16 @@ def _add_standplaatsen_uva2_config():
             },
             'DocumentnummerMutatieStandplaats': 'documentnummer',
             'StandplaatsnummerGemeente': '',
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI',
+            },
+            'Indicatie-vervallen': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'standplaatsen_status_vervallen'},
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -859,13 +911,21 @@ def _add_standplaatsen_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'STABRN/BRN/Code': '',
-            'STABRN/TijdvakRelatie/begindatumRelatie': '',
-            'STABRN/TijdvakRelatie/einddatumRelatie': '',
+            'STABRN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'STABRN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
             'STASTS/STS/Code': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'mapping_name': 'standplaatsen_status'},
+                'kwargs': {'mapping_name': 'standplaatsen_status_code'},
             },
             'STASTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
