@@ -255,8 +255,6 @@ def _add_buurten_uva2_config():
             },
             'BRTSDL/SDL/Stadsdeelcode': 'ligtInWijk.[0].ligtInStadsdeel.[0].code',
             'BRTSDL/TijdvakRelatie/begindatumRelatie': {
-                # 'action': 'literal',
-                # 'value': "20150101",
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'ligtInWijk.[0].ligtInStadsdeel.[0].beginGeldigheid',
