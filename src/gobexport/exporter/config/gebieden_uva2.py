@@ -169,6 +169,7 @@ def _add_stadsdelen_uva2_config():
         'query': uva2_sdl_query
     }
 
+
 def _add_buurten_uva2_config():
 
     uva2_query = """
