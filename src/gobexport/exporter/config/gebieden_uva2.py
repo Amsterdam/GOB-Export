@@ -13,6 +13,7 @@ def add_gebieden_uva2_products():
     """
     _add_stadsdelen_uva2_config()
     _add_buurten_uva2_config()
+    _add_bouwblokken_uva2_config()
 
 
 def _add_stadsdelen_uva2_config():
@@ -264,6 +265,78 @@ def _add_buurten_uva2_config():
                 'action': 'format',
                 'formatter': format_uva2_date,
                 'value': 'ligtInWijk.[0].ligtInStadsdeel.[0].eindGeldigheid',
+            }
+        },
+        'query': uva2_query
+    }
+
+
+def _add_bouwblokken_uva2_config():
+
+    uva2_query = """
+{
+  gebiedenBouwblokken {
+    edges {
+      node {
+        identificatie
+        code
+        beginGeldigheid
+        eindGeldigheid
+        ligtInBuurt(active: true) {
+          edges {
+            node {
+              identificatie
+              code
+              beginGeldigheid
+              eindGeldigheid
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    gebieden.BouwblokkenExportConfig.products['uva2'] = {
+        'api_type': 'graphql',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('identificatie'),
+        ],
+        'filename': lambda: get_uva2_filename("BBK"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'identificatie',
+            'Bouwbloknummer': 'code',
+            'Geometrie': '',
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'BBKBRT/BRT/sleutelVerzendend': {
+                'action': 'fill',
+                'length': 14,
+                'character': '0',
+                'value': 'ligtInBuurt.[0].identificatie',
+                'fill_type': 'ljust'
+            },
+            'BBKBRT/BRT/Buurtcode': 'ligtInBuurt.[0].code',
+            'BBKBRT/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'ligtInBuurt.[0].beginGeldigheid'
+            },
+            'BBKBRT/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'ligtInBuurt.[0].eindGeldigheid',
             }
         },
         'query': uva2_query
