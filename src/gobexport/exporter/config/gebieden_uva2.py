@@ -1,6 +1,6 @@
 from gobexport.exporter.config import gebieden
 from gobexport.exporter.config.uva2 import get_uva2_filename
-from gobexport.exporter.config.uva2 import format_uva2_date
+from gobexport.exporter.config.uva2 import format_uva2_date, format_uva2_buurt
 from gobexport.exporter.uva2 import uva2_exporter
 
 from gobexport.filters.notempty_filter import NotEmptyFilter
@@ -12,6 +12,7 @@ def add_gebieden_uva2_products():
     :return:
     """
     _add_stadsdelen_uva2_config()
+    _add_buurten_uva2_config()
 
 
 def _add_stadsdelen_uva2_config():
@@ -166,4 +167,105 @@ def _add_stadsdelen_uva2_config():
             }
         },
         'query': uva2_sdl_query
+    }
+
+def _add_buurten_uva2_config():
+
+    uva2_query = """
+{
+  gebiedenBuurten {
+    edges {
+      node {
+        identificatie
+        code
+        naam
+        documentnummer
+        documentdatum
+        beginGeldigheid
+        eindGeldigheid
+        ligtInWijk {
+          edges {
+            node {
+              ligtInStadsdeel {
+                edges {
+                  node {
+                    identificatie
+                    code
+                    beginGeldigheid
+                    eindGeldigheid
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    gebieden.BuurtenExportConfig.products['uva2'] = {
+        'api_type': 'graphql',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('identificatie'),
+        ],
+        'filename': lambda: get_uva2_filename("BRT"),
+        'mime_type': 'plain/text',
+        'format': {
+            'sleutelVerzendend': 'identificatie',
+            'Buurtcode': {
+                'action': 'format',
+                'formatter': format_uva2_buurt,
+                'value': 'code',
+            },
+            'Buurtnaam': 'naam',
+            'Brondocumentverwijzing': 'documentnummer',
+            'Brondocumentdatum': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'documentdatum',
+            },
+            'Geometrie': '',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': "DPG",
+            },
+            'Indicatie-vervallen': {
+                'action': 'literal',
+                'value': "N",
+            },
+            'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'TijdvakGeldigheid/einddatumTijdvakGeldigheid': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'BRTSDL/SDL/sleutelVerzendend': {
+                'action': 'fill',
+                'length': 14,
+                'character': '0',
+                'value': 'ligtInWijk.[0].ligtInStadsdeel.[0].identificatie',
+                'fill_type': 'ljust'
+            },
+            'BRTSDL/SDL/Stadsdeelcode': 'ligtInWijk.[0].ligtInStadsdeel.[0].code',
+            'BRTSDL/TijdvakRelatie/begindatumRelatie': {
+                # 'action': 'literal',
+                # 'value': "20150101",
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'ligtInWijk.[0].ligtInStadsdeel.[0].beginGeldigheid',
+            },
+            'BRTSDL/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'ligtInWijk.[0].ligtInStadsdeel.[0].eindGeldigheid',
+            }
+        },
+        'query': uva2_query
     }
