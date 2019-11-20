@@ -162,12 +162,7 @@ class GraphQLResultFormatter:
         :param items:
         :return:
         """
-        result = []
-
-        for item in items:
-            if item not in result:
-                result.append(item)
-        return result
+        return [item for i, item in enumerate(items) if item not in items[:i]]
 
     def _box_item(self, item):
         """Boxes (flattens) an item. The input item is an item with (possibly) multiple nested relations. The result
