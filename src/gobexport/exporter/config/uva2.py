@@ -38,7 +38,7 @@ UVA2_MAPPING = {
         '1': 'N',
         '2': 'J',
     },
-    'panden_status': {
+    'panden_status_code': {
         '1': '24',
         '2': '25',
         '3': '26',
@@ -46,6 +46,19 @@ UVA2_MAPPING = {
         '10': '30',
         '11': '31',
         '12': '32',
+        '13': '50',
+        '14': '51',
+    },
+    'panden_status_vervallen': {
+        '1': 'N',
+        '2': 'N',
+        '3': 'N',
+        '7': 'J',
+        '10': 'N',
+        '11': 'N',
+        '12': 'N',
+        '13': 'J',
+        '14': 'J',
     },
     'verblijfsobjecten_status': {
         '1': '18',
@@ -1501,8 +1514,16 @@ def _add_panden_uva2_config():
             'LaagsteBouwlaag': '',
             'HoogsteBouwlaag': '',
             'Pandnummer': '',
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI',
+            },
+            'Indicatie-vervallen': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'panden_status_vervallen'},
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -1517,7 +1538,7 @@ def _add_panden_uva2_config():
                 'action': 'format',
                 'formatter': format_uva2_mapping,
                 'value': 'status.code',
-                'kwargs': {'mapping_name': 'panden_status'},
+                'kwargs': {'mapping_name': 'panden_status_code'},
             },
             'PNDSTS/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
