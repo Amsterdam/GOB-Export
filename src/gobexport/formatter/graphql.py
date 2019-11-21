@@ -156,6 +156,14 @@ class GraphQLResultFormatter:
 
         return duplicates
 
+    def _undouble(self, items: list):
+        """Undoubles items in list
+
+        :param items:
+        :return:
+        """
+        return [item for i, item in enumerate(items) if item not in items[:i]]
+
     def _box_item(self, item):
         """Boxes (flattens) an item. The input item is an item with (possibly) multiple nested relations. The result
         is a list of all possible combinations of relations of the input item.
@@ -209,7 +217,7 @@ class GraphQLResultFormatter:
             # In case we haven't duplicated base_item into boxed_items
             duplicates = [base_item]
 
-        return [{'node': item} for item in duplicates]
+        return self._undouble([{'node': item} for item in duplicates])
 
     def _get_children(self, edges: list):
         childs = []

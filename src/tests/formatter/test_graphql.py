@@ -1,3 +1,5 @@
+import random
+
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
@@ -61,6 +63,15 @@ class TestGraphQLResultFormatter(TestCase):
         formatter._flatten_edge = lambda x: 'flattened(' + x + ')'
 
         self.assertEqual(['flattened(formatted_row(a))'], list(formatter.format_item('a')))
+
+    def test_undouble(self):
+        # Generate random lists of integers, plus add empty list
+        testcases = [[random.randint(0, 10) for _ in range(random.randint(0, 50))] for _ in range(20)] + [[]]
+
+        formatter = GraphQLResultFormatter()
+
+        for testcase in testcases:
+            self.assertEqual(sorted(list(set(testcase))), sorted(formatter._undouble(testcase)))
 
     def test_flatten_edge(self):
         formatter = GraphQLResultFormatter()
@@ -280,6 +291,7 @@ class TestGraphQLResultFormatter(TestCase):
         }]
 
         formatter = GraphQLResultFormatter()
+        formatter._undouble = MagicMock(side_effect=lambda x: x)
         result = formatter._box_item(item)
         self.assertEqual(len(expected_result), len(result))
         self.assertEqual(expected_result, result)
@@ -429,6 +441,7 @@ class TestGraphQLResultFormatter(TestCase):
         ]
 
         formatter = GraphQLResultFormatter()
+        formatter._undouble = MagicMock(side_effect=lambda x: x)
         result = formatter._box_item(item)
         self.assertEqual(expected_result, result)
 
@@ -555,6 +568,7 @@ class TestGraphQLResultFormatter(TestCase):
             },
         ]
         formatter = GraphQLResultFormatter()
+        formatter._undouble = MagicMock(side_effect=lambda x: x)
         result = formatter._box_item(item)
         self.assertEqual(expected_result, result)
 
@@ -761,6 +775,7 @@ class TestGraphQLResultFormatter(TestCase):
 
         ]
         formatter = GraphQLResultFormatter(cross_relations=True)
+        formatter._undouble = MagicMock(side_effect=lambda x: x)
         result = formatter._box_item(item)
         self.assertEqual(expected_result, result)
 
