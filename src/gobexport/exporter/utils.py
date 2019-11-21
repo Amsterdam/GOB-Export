@@ -31,8 +31,10 @@ def evaluate_condition(entity: dict, condition: dict):
 
     if condition_type == 'isempty':
         condition_result = not bool(onfield_value)
+    elif condition_type == 'isnone':
+        condition_result = onfield_value is None
     else:
-        raise NotImplementedError(f"Not implemented condition f{condition_type}")
+        raise NotImplementedError(f"Not implemented condition {condition_type}")
 
     if condition_result is condition_should_be:
         result = trueval
