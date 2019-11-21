@@ -255,6 +255,7 @@ def _add_woonplaatsen_uva2_config():
         amsterdamseSleutel
         identificatie
         naam
+        woonplaatsPtt
         documentdatum
         documentnummer
         beginGeldigheid
@@ -290,10 +291,7 @@ def _add_woonplaatsen_uva2_config():
                 'value': 'documentdatum',
             },
             'DocumentnummerMutatieWoonplaats': 'documentnummer',
-            'WoonplaatsPTTSchrijfwijze': {
-                'action': 'literal',
-                'value': 'Amsterdam',
-            },
+            'WoonplaatsPTTSchrijfwijze': 'woonplaatsPtt',
             'Mutatie-gebruiker': {
                 'action': 'literal',
                 'value': 'DBI',
@@ -347,6 +345,7 @@ def _add_openbareruimtes_uva2_config():
         documentdatum
         documentnummer
         straatcode
+        straatnaamPtt
         naamNen
         beginGeldigheid
         eindGeldigheid
@@ -394,9 +393,15 @@ def _add_openbareruimtes_uva2_config():
             'Straatnummer': '',
             'Straatcode': 'straatcode',
             'StraatnaamNENSchrijfwijze': 'naamNen',
-            'StraatnaamPTTSchrijfwijze': '',
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'StraatnaamPTTSchrijfwijze': 'straatnaamPtt',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI'
+            },
+            'Indicatie-vervallen': {
+                'action': 'literal',
+                'value': 'N'
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
