@@ -67,6 +67,24 @@ UVA2_MAPPING = {
         '4': '21',
         '5': '22',
         '6': '23',
+        '7': '40',
+        '8': '41',
+    },
+    'verblijfsobjecten_status_coordinaat_domein': {
+        '1': 'TMP',
+        '2': '',
+        '3': 'TMP',
+        '4': 'DEF',
+        '5': 'DEF',
+        '6': 'DEF',
+    },
+    'verblijfsobjecten_status_coordinaat_omschrijving': {
+        '1': 'Tijdelijk punt',
+        '2': '',
+        '3': 'Tijdelijk punt',
+        '4': 'Definitief punt',
+        '5': 'Definitief punt',
+        '6': 'Definitief punt',
     },
     'verblijfsobjecten_type_woonobject_code': {
         'Meerdere woningen': 'M',
@@ -1084,6 +1102,7 @@ def _add_verblijfsobjecten_uva2_config():
         documentnummer
         verdiepingToegang
         aantalEenhedenComplex
+        cbsNummer
         aantalBouwlagen
         ligtInPanden {
           edges {
@@ -1093,11 +1112,13 @@ def _add_verblijfsobjecten_uva2_config():
             }
           }
         }
+        indicatieWoningvoorraad
         aantalKamers
         beginGeldigheid
         eindGeldigheid
         redenafvoer
         eigendomsverhouding
+        financieringscode
         feitelijkGebruik
         toegang
         redenopvoer
@@ -1192,7 +1213,13 @@ def _add_verblijfsobjecten_uva2_config():
                     'coordinate': 'y'
                 }
             },
-            'GebruiksdoelVerblijfsobjectDomein': 'GebruiksdoelVerblijfsobjectDomein',
+            'GebruiksdoelVerblijfsobjectDomein': {
+                'action': 'fill',
+                'length': 4,
+                'character': '0',
+                'value': 'GebruiksdoelVerblijfsobjectDomein',
+                'fill_type': 'rjust'
+            },
             'OmschrijvingGebruiksdoelVerblijfsobjectDomein': 'OmschrijvingGebruiksdoelVerblijfsobjectDomein',
             'OppervlakteVerblijfsobject': 'oppervlakte',
             'DocumentdatumMutatieVerblijfsobject': {
@@ -1202,20 +1229,38 @@ def _add_verblijfsobjecten_uva2_config():
             },
             'DocumentnummerMutatieVerblijfsobject': 'documentnummer',
             'Bouwlaagtoegang': {
-                'condition': 'isempty',
+                'condition': 'isnone',
                 'reference': 'verdiepingToegang',
                 'trueval': {
                     'action': 'literal',
-                    'value': '0',
+                    'value': '',
                 },
-                'falseval': 'verdiepingToegang'
+                'falseval': {
+                    'condition': 'isempty',
+                    'reference': 'verdiepingToegang',
+                    'trueval': {
+                        'action': 'literal',
+                        'value': '0',
+                    },
+                    'falseval': 'verdiepingToegang'
+                }
             },
             'Frontbreedte': '',
             'VerblijfsobjectnummerGemeente': '',
-            'StatusCoordinaatDomein': '',
-            'OmschrijvingCoordinaatDomein': '',
+            'StatusCoordinaatDomein': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_status_coordinaat_domein'}
+            },
+            'OmschrijvingCoordinaatDomein': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_status_coordinaat_omschrijving'}
+            },
             'AantalVerhuurbareEenheden': 'aantalEenhedenComplex',
-            'CBS-nummer': '',
+            'CBS-nummer': 'cbsNummer',
             'AantalBouwlagen': 'aantalBouwlagen',
             'TypeWoonobjectDomein': {
                 'action': 'format',
@@ -1229,18 +1274,32 @@ def _add_verblijfsobjecten_uva2_config():
                 'value': 'ligtInPanden.[0].typeWoonobject',
                 'kwargs': {'mapping_name': 'verblijfsobjecten_type_woonobject_omschrijving'},
             },
-            'IndicatieWoningvoorraad': '',
+            'IndicatieWoningvoorraad': 'indicatieWoningvoorraad',
             'AantalKamers': {
-                'condition': 'isempty',
+                'condition': 'isnone',
                 'reference': 'aantalKamers',
                 'trueval': {
                     'action': 'literal',
-                    'value': '0',
+                    'value': '',
                 },
-                'falseval': 'aantalKamers'
+                'falseval': {
+                    'condition': 'isempty',
+                    'reference': 'aantalKamers',
+                    'trueval': {
+                        'action': 'literal',
+                        'value': '0',
+                    },
+                    'falseval': 'aantalKamers'
+                }
             },
-            'Mutatie-gebruiker': '',
-            'Indicatie-vervallen': '',
+            'Mutatie-gebruiker': {
+                'action': 'literal',
+                'value': 'DBI'
+            },
+            'Indicatie-vervallen': {
+                'action': 'literal',
+                'value': 'N'
+            },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
                 'formatter': format_uva2_date,
@@ -1286,9 +1345,21 @@ def _add_verblijfsobjecten_uva2_config():
                 'eigendomsverhouding.code',
                 'eindGeldigheid'
             ),
-            'VBOFNG/FNG/Code': '',
-            'VBOFNG/TijdvakRelatie/begindatumRelatie': '',
-            'VBOFNG/TijdvakRelatie/einddatumRelatie': '',
+            'VBOFNG/FNG/Code': {
+                'action': 'fill',
+                'length': 4,
+                'character': '0',
+                'value': 'financieringscode.code',
+                'fill_type': 'rjust'
+            },
+            'VBOFNG/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
+                'financieringscode.code',
+                'beginGeldigheid'
+            ),
+            'VBOFNG/TijdvakRelatie/einddatumRelatie': show_date_when_reference_filled(
+                'financieringscode.code',
+                'eindGeldigheid'
+            ),
             'VBOGBK/GBK/Code': 'feitelijkGebruik.code',
             'VBOGBK/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
                 'feitelijkGebruik.code',
@@ -1302,11 +1373,19 @@ def _add_verblijfsobjecten_uva2_config():
             'VBOLOC/TijdvakRelatie/begindatumRelatie': '',
             'VBOLOC/TijdvakRelatie/einddatumRelatie': '',
             'VBOLGG/LGG/Code': {
-                'action': 'fill',
-                'length': 2,
-                'character': '0',
-                'value': 'ligtInPanden.[0].ligging.code',
-                'fill_type': 'rjust'
+                'condition': 'isempty',
+                'reference': 'ligtInPanden.[0].ligging.code',
+                'trueval': {
+                    'action': 'literal',
+                    'value': '99'
+                },
+                'falseval': {
+                    'action': 'fill',
+                    'length': 2,
+                    'character': '0',
+                    'value': 'ligtInPanden.[0].ligging.code',
+                    'fill_type': 'rjust'
+                }
             },
             'VBOLGG/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
@@ -1321,7 +1400,13 @@ def _add_verblijfsobjecten_uva2_config():
             'VBOMNT/MNT/Code': '',
             'VBOMNT/TijdvakRelatie/begindatumRelatie': '',
             'VBOMNT/TijdvakRelatie/einddatumRelatie': '',
-            'VBOTGG/TGG/Code': 'toegang.[0].code',
+            'VBOTGG/TGG/Code': {
+                'action': 'fill',
+                'length': 2,
+                'character': '0',
+                'value': 'toegang.[0].code',
+                'fill_type': 'rjust'
+            },
             'VBOTGG/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
                 'toegang.[0].code',
                 'beginGeldigheid'
