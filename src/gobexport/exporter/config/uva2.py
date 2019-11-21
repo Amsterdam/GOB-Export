@@ -413,8 +413,16 @@ def _add_openbareruimtes_uva2_config():
                 'value': 'eindGeldigheid',
             },
             'OPRBRN/BRN/Code': '',
-            'OPRBRN/TijdvakRelatie/begindatumRelatie': '',
-            'OPRBRN/TijdvakRelatie/einddatumRelatie': '',
+            'OPRBRN/TijdvakRelatie/begindatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'OPRBRN/TijdvakRelatie/einddatumRelatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
             'OPRSTS/STS/Code': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
