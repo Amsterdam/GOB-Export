@@ -282,13 +282,11 @@ def _add_bouwblokken_uva2_config():
         code
         beginGeldigheid
         eindGeldigheid
-        ligtInBuurt(active: true) {
+        ligtInBuurt {
           edges {
             node {
               identificatie
               code
-              beginGeldigheid
-              eindGeldigheid
             }
           }
         }
@@ -331,12 +329,12 @@ def _add_bouwblokken_uva2_config():
             'BBKBRT/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'ligtInBuurt.[0].beginGeldigheid'
+                'value': 'beginGeldigheid'
             },
             'BBKBRT/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'ligtInBuurt.[0].eindGeldigheid',
+                'value': 'eindGeldigheid',
             }
         },
         'query': uva2_query
