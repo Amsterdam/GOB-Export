@@ -5,11 +5,13 @@ from datetime import date
 from gobexport.exporter.config.bag_diva import (
     get_uva2_filename,
     get_dat_landelijke_sleutel_filename,
+    get_dat_geometrie_filename,
     format_uva2_date,
     format_uva2_mapping,
     format_uva2_buurt,
     format_uva2_coordinate,
     row_formatter_verblijfsobjecten,
+    row_formatter_geometrie,
 )
 
 
@@ -32,6 +34,13 @@ class TestUVA2ConfigHelpers(TestCase):
         # Assert undefined file name raises error
         with self.assertRaises(AssertionError):
             get_dat_landelijke_sleutel_filename(None)
+
+    def test_get_dat_geometrie_filename(self):
+        self.assertEqual(f"DAT_Geometrie/DAT_ABC_GEOMETRIE.dat", get_dat_geometrie_filename('ABC'))
+
+        # Assert undefined file name raises error
+        with self.assertRaises(AssertionError):
+            get_dat_geometrie_filename(None)
 
     def test_format_timestamp(self):
         inp = '2035-03-31'
@@ -277,3 +286,36 @@ class TestUVA2ConfigHelpers(TestCase):
         }
 
         self.assertEqual(row_formatter_verblijfsobjecten(row), expected_row)
+
+    def test_row_formatter_geometrie(self):
+        row = {
+            'node': {
+                'amsterdamseSleutel': '03630000000000',
+                'geometrie': 'POINT(123, 456)'
+            }
+        }
+
+        expected_row = {
+            'node': {
+                'amsterdamseSleutel': '3630000000000',
+                'geometrie': 'POINT (123, 456)'
+            }
+        }
+
+        self.assertEqual(row_formatter_geometrie(row), expected_row)
+
+        row = {
+            'node': {
+                'amsterdamseSleutel': '03630000000000',
+                'geometrie': None
+            }
+        }
+
+        expected_row = {
+            'node': {
+                'amsterdamseSleutel': '3630000000000',
+                'geometrie': ''
+            }
+        }
+
+        self.assertEqual(row_formatter_geometrie(row), expected_row)
