@@ -5,6 +5,7 @@ import dateutil.parser as dt_parser
 
 from gobexport.exporter.config import bag
 from gobexport.exporter.csv import csv_exporter
+from gobexport.exporter.dat import dat_exporter
 from gobexport.exporter.uva2 import uva2_exporter
 
 from gobexport.filters.unique_filter import UniqueFilter
@@ -259,6 +260,20 @@ def row_formatter_verblijfsobjecten(row):
     return row
 
 
+def row_formatter_geometrie(row):
+    """
+    Format rows for DAT geometrie export with the following rules:
+    1. Remove the leading 0 from the amsterdamseSleutel
+    2. Format the WKT string to include a space
+    """
+    row['node']['amsterdamseSleutel'] = row['node']['amsterdamseSleutel'][1:]
+
+    row['node']['geometrie'] = re.sub(r'([A-Z]+)(\(.+\))', r'\1 \2', row['node']['geometrie']) \
+        if row['node']['geometrie'] else ''
+
+    return row
+
+
 def get_uva2_filename(abbreviation):
     assert abbreviation, "UVA2 requires an abbreviation"
 
@@ -271,6 +286,12 @@ def get_dat_landelijke_sleutel_filename(abbreviation):
 
     publish_date = date.today().strftime(UVA2_DATE_FORMAT)
     return f"DAT_Landelijke_Sleutel/{abbreviation}_{publish_date}.dat"
+
+
+def get_dat_geometrie_filename(collection_name):
+    assert collection_name, "DAT Geometrie requires a collection_name"
+
+    return f"DAT_Geometrie/DAT_{collection_name}_GEOMETRIE.dat"
 
 
 def _add_woonplaatsen_diva_config():
@@ -444,6 +465,19 @@ def _add_openbareruimtes_diva_config():
 }
 """
 
+    dat_geometrie_query = """
+{
+  bagOpenbareruimtes {
+    edges {
+      node {
+        amsterdamseSleutel
+        geometrie
+      }
+    }
+  }
+}
+"""
+
     bag.OpenbareruimtesExportConfig.products['uva2'] = {
         'api_type': 'graphql_streaming',
         'exporter': uva2_exporter,
@@ -560,6 +594,20 @@ def _add_openbareruimtes_diva_config():
             'straatcode': 'straatcode'
         },
         'query': dat_landelijke_sleutel_query
+    }
+
+    # Geometrie
+    bag.OpenbareruimtesExportConfig.products['dat_geometrie'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': dat_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'row_formatter': row_formatter_geometrie,
+        'filename': lambda: get_dat_geometrie_filename("OPENBARERUIMTE"),
+        'mime_type': 'plain/text',
+        'format': 'amsterdamseSleutel:num|geometrie:plain',
+        'query': dat_geometrie_query
     }
 
 
@@ -812,6 +860,19 @@ def _add_ligplaatsen_diva_config():
 }
 """
 
+    dat_geometrie_query = """
+{
+  bagLigplaatsen {
+    edges {
+      node {
+        amsterdamseSleutel
+        geometrie
+      }
+    }
+  }
+}
+"""
+
     bag.LigplaatsenExportConfig.products['uva2'] = {
         'api_type': 'graphql_streaming',
         'exporter': uva2_exporter,
@@ -1009,6 +1070,20 @@ def _add_ligplaatsen_diva_config():
         'query': dat_landelijke_sleutel_query
     }
 
+    # Geometrie
+    bag.LigplaatsenExportConfig.products['dat_geometrie'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': dat_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'row_formatter': row_formatter_geometrie,
+        'filename': lambda: get_dat_geometrie_filename("LIGPLAATS"),
+        'mime_type': 'plain/text',
+        'format': 'amsterdamseSleutel:num|geometrie:plain',
+        'query': dat_geometrie_query
+    }
+
 
 def _add_standplaatsen_diva_config():
     uva2_query = """
@@ -1089,6 +1164,19 @@ def _add_standplaatsen_diva_config():
       node {
         amsterdamseSleutel
         identificatie
+      }
+    }
+  }
+}
+"""
+
+    dat_geometrie_query = """
+{
+  bagStandplaatsen {
+    edges {
+      node {
+        amsterdamseSleutel
+        geometrie
       }
     }
   }
@@ -1292,6 +1380,20 @@ def _add_standplaatsen_diva_config():
         'query': dat_landelijke_sleutel_query
     }
 
+    # Geometrie
+    bag.StandplaatsenExportConfig.products['dat_geometrie'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': dat_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'row_formatter': row_formatter_geometrie,
+        'filename': lambda: get_dat_geometrie_filename("STANDPLAATS"),
+        'mime_type': 'plain/text',
+        'format': 'amsterdamseSleutel:num|geometrie:plain',
+        'query': dat_geometrie_query
+    }
+
 
 def _add_verblijfsobjecten_diva_config():
     uva2_query = """
@@ -1397,6 +1499,19 @@ def _add_verblijfsobjecten_diva_config():
       node {
         amsterdamseSleutel
         identificatie
+      }
+    }
+  }
+}
+"""
+
+    dat_geometrie_query = """
+{
+  bagVerblijfsobjecten {
+    edges {
+      node {
+        amsterdamseSleutel
+        geometrie
       }
     }
   }
@@ -1784,6 +1899,20 @@ def _add_verblijfsobjecten_diva_config():
         'query': dat_landelijke_sleutel_query
     }
 
+    # Geometrie
+    bag.VerblijfsobjectenExportConfig.products['dat_geometrie'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': dat_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'row_formatter': row_formatter_geometrie,
+        'filename': lambda: get_dat_geometrie_filename("VERBLIJFSOBJECT"),
+        'mime_type': 'plain/text',
+        'format': 'amsterdamseSleutel:num|geometrie:plain',
+        'query': dat_geometrie_query
+    }
+
 
 def _add_panden_diva_config():
     uva2_query = """
@@ -1842,6 +1971,19 @@ def _add_panden_diva_config():
       node {
         amsterdamseSleutel
         identificatie
+      }
+    }
+  }
+}
+"""
+
+    dat_geometrie_query = """
+{
+  bagPanden {
+    edges {
+      node {
+        amsterdamseSleutel
+        geometrie
       }
     }
   }
@@ -1985,4 +2127,18 @@ def _add_panden_diva_config():
             },
         },
         'query': dat_landelijke_sleutel_query
+    }
+
+    # Geometrie
+    bag.PandenExportConfig.products['dat_geometrie'] = {
+        'api_type': 'graphql_streaming',
+        'exporter': dat_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'row_formatter': row_formatter_geometrie,
+        'filename': lambda: get_dat_geometrie_filename("PAND"),
+        'mime_type': 'plain/text',
+        'format': 'amsterdamseSleutel:num|geometrie:plain',
+        'query': dat_geometrie_query
     }
