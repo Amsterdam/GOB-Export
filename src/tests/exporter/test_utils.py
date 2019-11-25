@@ -47,6 +47,46 @@ class TestUtils(TestCase):
         self.assertEqual(None, res)
 
     @patch('gobexport.exporter.utils.get_entity_value')
+    def test_evaluate_condition_is_none(self, mock_get_entity_value):
+        mock_get_entity_value.return_value = 'some truthy value'
+        entity = MagicMock()
+        condition = {
+            'reference': 'some.reference',
+            'condition': 'isnone',
+            'trueval': 'some.other.reference',
+        }
+
+        res = evaluate_condition(entity, condition)
+        mock_get_entity_value.assert_called_with(entity, ['some', 'reference'])
+
+        # Expect falseval (None)
+        self.assertEqual(None, res)
+
+        mock_get_entity_value.return_value = ''
+        condition = {
+            'reference': 'some.reference',
+            'condition': 'isnone',
+            'trueval': 'some.other.reference',
+        }
+
+        res = evaluate_condition(entity, condition)
+
+        # Expect falseval (None)
+        self.assertEqual(None, res)
+
+        mock_get_entity_value.side_effect = [None, 'some value']
+        condition = {
+            'reference': 'some.reference',
+            'condition': 'isnone',
+            'trueval': 'some.other.reference',
+        }
+
+        res = evaluate_condition(entity, condition)
+
+        # Expect trueval
+        self.assertEqual('some value', res)
+
+    @patch('gobexport.exporter.utils.get_entity_value')
     def test_evaluate_condition_negated(self, mock_get_entity_value):
         mock_get_entity_value.side_effect = ['some truthy value', 'some value']
         entity = MagicMock()
