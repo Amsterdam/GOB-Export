@@ -1,6 +1,5 @@
 from gobexport.exporter.config import gebieden
-from gobexport.exporter.config.uva2 import get_uva2_filename
-from gobexport.exporter.config.uva2 import format_uva2_date, format_uva2_buurt
+from gobexport.exporter.config.bag_diva import get_uva2_filename, format_uva2_date, format_uva2_buurt
 from gobexport.exporter.uva2 import uva2_exporter
 
 from gobexport.filters.notempty_filter import NotEmptyFilter
