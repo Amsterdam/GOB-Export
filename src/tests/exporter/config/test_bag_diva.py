@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 from datetime import date
 
 from gobexport.exporter.config.bag_diva import (
+    get_uva2_cleanup_mask,
     get_uva2_filename,
     get_dat_landelijke_sleutel_filename,
     get_dat_geometrie_filename,
@@ -17,12 +18,19 @@ from gobexport.exporter.config.bag_diva import (
 
 class TestUVA2ConfigHelpers(TestCase):
 
+    def test_get_uva2_cleanup_mask(self):
+        self.assertEqual(f"UVA2_Actueel/ABC_*.UVA2", get_uva2_cleanup_mask('ABC'))
+
+        # Assert undefined abbreviation raises error
+        with self.assertRaises(AssertionError):
+            get_uva2_cleanup_mask(None)
+
     def test_get_uva2_filename(self):
         publish_date = date.today().strftime('%Y%m%d')
 
         self.assertEqual(f"UVA2_Actueel/ABC_{publish_date}_N_{publish_date}_{publish_date}.UVA2", get_uva2_filename('ABC'))
 
-        # Assert undefined file name raises error
+        # Assert undefined abbreviation raises error
         with self.assertRaises(AssertionError):
             get_uva2_filename(None)
 

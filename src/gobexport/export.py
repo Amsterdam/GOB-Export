@@ -14,10 +14,10 @@ from gobcore.logging.logger import logger
 
 from gobexport.config import get_host, CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
-from gobexport.distributor.objectstore import distribute_to_objectstore
+from gobexport.distributor.objectstore import cleanup_objectstore, distribute_to_objectstore
 from gobexport.exporter import CONFIG_MAPPING, export_to_file, product_source
 from gobexport.buffered_iterable import with_buffered_iterable
-from gobexport.utils import resolve_config_filenames
+from gobexport.utils import resolve_config
 
 _MAX_TRIES = 3          # Default number of times to try the export
 _RETRY_TIMEOUT = 300    # Default seconds between consecutive retries
@@ -84,7 +84,8 @@ def _export_collection(host, catalogue, collection, product_name, destination):
 
     # Get the configuration for this collection
     config = CONFIG_MAPPING[catalogue][collection]
-    resolve_config_filenames(config)
+    resolve_config(config, "filename")
+    resolve_config(config, "cleanup_mask")
 
     files = []
 
@@ -121,12 +122,14 @@ def _export_collection(host, catalogue, collection, product_name, destination):
                 files.append({
                     'temp_location': results_file,
                     'distribution': product['filename'],
+                    'cleanup_mask': product.get('cleanup_mask'),
                     'mime_type': product['mime_type']})
 
             # Add extra result files (e.g. .prj file)
             extra_files = product.get('extra_files', [])
             files.extend([{'temp_location': _get_filename(file['filename']),
                            'distribution': file['filename'],
+                           'cleanup_mask': file.get('cleanup_mask'),
                            'mime_type': file['mime_type']} for file in extra_files])
 
     if destination == "Objectstore":
@@ -153,6 +156,15 @@ def _export_collection(host, catalogue, collection, product_name, destination):
                     return False
 
             logger.info(f"File distributed to {destination} on location: {container}{file['distribution']}.")
+
+            if file['cleanup_mask']:
+                deleted_files_count = cleanup_objectstore(connection,
+                                                          CONTAINER_BASE,
+                                                          catalogue,
+                                                          file['cleanup_mask'],
+                                                          file['distribution'])
+                logger.info(f"{deleted_files_count} {file['cleanup_mask']} files deleted from "
+                            f"{destination} on location: {container}.")
 
             # Delete temp file
             os.remove(file['temp_location'])

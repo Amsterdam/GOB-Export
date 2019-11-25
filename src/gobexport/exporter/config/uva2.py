@@ -264,6 +264,12 @@ def get_uva2_filename(abbreviation):
     return f"UVA2_Actueel/{abbreviation}_{publish_date}_N_{publish_date}_{publish_date}.UVA2"
 
 
+def get_uva2_cleanup_mask(abbreviation):
+    """Create fnmatch cleanup mask for UVA2 files."""
+    assert abbreviation, "UVA2 requires an abbreviation"
+    return f"UVA2_Actueel/{abbreviation}_*.UVA2"
+
+
 def _add_woonplaatsen_uva2_config():
     uva2_query = """
 {
@@ -298,6 +304,7 @@ def _add_woonplaatsen_uva2_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("WPL"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("WPL"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -390,6 +397,7 @@ def _add_openbareruimtes_uva2_config():
             NotEmptyFilter('straatcode'),
         ],
         'filename': lambda: get_uva2_filename("OPR"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("OPR"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -512,6 +520,7 @@ def _add_nummeraanduidingen_uva2_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("NUM"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("NUM"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -678,6 +687,7 @@ def _add_ligplaatsen_uva2_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("LIG"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("LIG"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -772,6 +782,7 @@ def _add_ligplaatsen_uva2_config():
             NotEmptyFilter('heeftHoofdadres.[0].amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("NUMLIGHFD"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("NUMLIGHFD"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'heeftHoofdadres.[0].amsterdamseSleutel',
@@ -812,6 +823,7 @@ def _add_ligplaatsen_uva2_config():
         ],
         'unfold': True,
         'filename': lambda: get_uva2_filename("NUMLIGNVN"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("NUMLIGNVN"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'heeftNevenadres.[0].amsterdamseSleutel',
@@ -922,6 +934,7 @@ def _add_standplaatsen_uva2_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("STA"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("STA"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'amsterdamseSleutel',
@@ -1016,6 +1029,7 @@ def _add_standplaatsen_uva2_config():
             NotEmptyFilter('heeftHoofdadres.[0].amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("NUMSTAHFD"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("NUMSTAHFD"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'heeftHoofdadres.[0].amsterdamseSleutel',
@@ -1056,6 +1070,7 @@ def _add_standplaatsen_uva2_config():
         ],
         'unfold': True,
         'filename': lambda: get_uva2_filename("NUMSTANVN"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("NUMSTANVN"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'heeftNevenadres.[0].amsterdamseSleutel',
@@ -1191,6 +1206,7 @@ def _add_verblijfsobjecten_uva2_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("VBO"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("VBO"),
         'row_formatter': row_formatter_verblijfsobjecten,
         'mime_type': 'plain/text',
         'format': {
@@ -1469,6 +1485,7 @@ def _add_verblijfsobjecten_uva2_config():
             NotEmptyFilter('heeftHoofdadres.[0].amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("NUMVBOHFD"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("NUMVBOHFD"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'heeftHoofdadres.[0].amsterdamseSleutel',
@@ -1509,6 +1526,7 @@ def _add_verblijfsobjecten_uva2_config():
         ],
         'unfold': True,
         'filename': lambda: get_uva2_filename("NUMVBONVN"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("NUMVBONVN"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'heeftNevenadres.[0].amsterdamseSleutel',
@@ -1597,6 +1615,7 @@ def _add_panden_uva2_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("PND"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("PND"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelverzendend': 'amsterdamseSleutel',
@@ -1672,6 +1691,7 @@ def _add_panden_uva2_config():
             NotEmptyFilter('ligtInPanden.[0].amsterdamseSleutel'),
         ],
         'filename': lambda: get_uva2_filename("PNDVBO"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("PNDVBO"),
         'mime_type': 'plain/text',
         'unfold': True,
         'format': {

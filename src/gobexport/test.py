@@ -41,7 +41,7 @@ from gobcore.logging.logger import logger
 from gobexport.config import CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.exporter.config import nap, gebieden, meetbouten, bag, test
-from gobexport.utils import resolve_config_filenames
+from gobexport.utils import resolve_config
 
 
 # All export configurations per catalogue
@@ -97,7 +97,7 @@ def test(catalogue):
     # Make proposals for any missing test definitions
     proposals = {}
     for config in _export_config[catalogue]:
-        resolve_config_filenames(config)
+        resolve_config(config, "filename")
 
         for name, product in config.products.items():
             filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]

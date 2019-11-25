@@ -281,6 +281,12 @@ def get_uva2_filename(abbreviation):
     return f"UVA2_Actueel/{abbreviation}_{publish_date}_N_{publish_date}_{publish_date}.UVA2"
 
 
+def get_uva2_cleanup_mask(abbreviation):
+    """Create fnmatch cleanup mask for UVA2 files."""
+    assert abbreviation, "UVA2 requires an abbreviation"
+    return f"UVA2_Actueel/{abbreviation}_*.UVA2"
+
+
 def get_dat_landelijke_sleutel_filename(abbreviation):
     assert abbreviation, "DAT Landelijke Sleutel requires an abbreviation"
 

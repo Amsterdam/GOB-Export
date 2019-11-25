@@ -1,30 +1,29 @@
 
-def resolve_config_filenames(config):
-    """Replaces filenames in config with the resolved version for the filenames that are defined with functions.
+def resolve_config(config, key):
+    """Replaces a key (like "filename") in config with the resolved versions that are defined with functions.
 
     :param config:
     :return:
     """
 
-    def get_resolver(filename):
+    def get_resolver(key):
         """
-        Return resolve filename method
-        or generate a resolver that resolves to the literal filename value
-        :param filename:
+        Return resolve key method
+        or generate a resolver that resolves to the literal key value
+        :param key:
         :return:
         """
-        return filename if callable(filename) else lambda: filename
+        return key if callable(key) else lambda: key
 
-    filename = "filename"
-    resolve_filename = "resolve_filename"
+    resolve_key = f"resolve_{key}"
     for product in config.products.values():
-        if not product.get(resolve_filename):
+        if not product.get(resolve_key):
             # Set resolver methods only once
-            product[resolve_filename] = get_resolver(product[filename])
+            product[resolve_key] = get_resolver(product.get(key))
             for file in product.get('extra_files', []):
-                file[resolve_filename] = get_resolver(file[filename])
+                file[resolve_key] = get_resolver(file.get(key))
 
-        # Resolve filenames by calling the resolver methods
-        product[filename] = product[resolve_filename]()
+        # Resolve keys by calling the resolver methods
+        product[key] = product[resolve_key]()
         for file in product.get('extra_files', []):
-            file[filename] = file[resolve_filename]()
+            file[key] = file[resolve_key]()

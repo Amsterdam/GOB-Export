@@ -1,5 +1,10 @@
 from gobexport.exporter.config import gebieden
-from gobexport.exporter.config.bag_diva import get_uva2_filename, format_uva2_date, format_uva2_buurt
+from gobexport.exporter.config.bag_diva import (
+    get_uva2_cleanup_mask,
+    get_uva2_filename,
+    format_uva2_date,
+    format_uva2_buurt,
+)
 from gobexport.exporter.uva2 import uva2_exporter
 
 from gobexport.filters.notempty_filter import NotEmptyFilter
@@ -49,6 +54,7 @@ def _add_stadsdelen_uva2_config():
         'exporter': uva2_exporter,
         'entity_filters': [],
         'filename': lambda: get_uva2_filename("GME"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("GME"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': {
@@ -117,6 +123,7 @@ def _add_stadsdelen_uva2_config():
             NotEmptyFilter('identificatie'),
         ],
         'filename': lambda: get_uva2_filename("SDL"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("SDL"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'identificatie',
@@ -213,6 +220,7 @@ def _add_buurten_uva2_config():
             NotEmptyFilter('identificatie'),
         ],
         'filename': lambda: get_uva2_filename("BRT"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("BRT"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'identificatie',
@@ -302,6 +310,7 @@ def _add_bouwblokken_uva2_config():
             NotEmptyFilter('identificatie'),
         ],
         'filename': lambda: get_uva2_filename("BBK"),
+        'cleanup_mask': lambda: get_uva2_cleanup_mask("BBK"),
         'mime_type': 'plain/text',
         'format': {
             'sleutelVerzendend': 'identificatie',

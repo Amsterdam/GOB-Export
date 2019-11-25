@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import ANY
 
-from gobexport.utils import resolve_config_filenames
+from gobexport.utils import resolve_config
 
 
 class TestUtils(TestCase):
@@ -25,7 +25,7 @@ class TestUtils(TestCase):
             }
         }
 
-    def test_resolve_config_filenames(self):
+    def test_resolve_config_filename(self):
         config = self.MockConfig()
         expected = {
             'product1': {
@@ -36,7 +36,7 @@ class TestUtils(TestCase):
                 ]
             }
         }
-        resolve_config_filenames(config)
+        resolve_config(config, "filename")
 
         self.assertEqual(expected, config.products)
 
@@ -46,7 +46,7 @@ class TestUtils(TestCase):
 
         # Test that next run should give the same result
         product['filename'] = None
-        resolve_config_filenames(config)
+        resolve_config(config, "filename")
         product = config.products['product1']
         self.assertEqual(product['filename'], expected['product1']['filename'])
 
@@ -60,6 +60,6 @@ class TestUtils(TestCase):
             }
         }
         config = self.MockConfigFunctions()
-        resolve_config_filenames(config)
+        resolve_config(config, "filename")
 
         self.assertEqual(expected, config.products)
