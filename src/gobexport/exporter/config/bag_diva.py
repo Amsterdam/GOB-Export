@@ -323,7 +323,7 @@ def _add_woonplaatsen_diva_config():
 
     dat_landelijke_sleutel_query = """
 {
-  bagWoonplaatsen {
+  bagWoonplaatsen(active: false) {
     edges {
       node {
         amsterdamseSleutel
@@ -453,7 +453,7 @@ def _add_openbareruimtes_diva_config():
 
     dat_landelijke_sleutel_query = """
 {
-  bagOpenbareruimtes {
+  bagOpenbareruimtes(active: false) {
     edges {
       node {
         amsterdamseSleutel
@@ -644,7 +644,7 @@ def _add_nummeraanduidingen_diva_config():
 
     dat_landelijke_sleutel_query = """
 {
-  bagNummeraanduidingen {
+  bagNummeraanduidingen(active: false) {
     edges {
       node {
         amsterdamseSleutel
@@ -849,7 +849,7 @@ def _add_ligplaatsen_diva_config():
 
     dat_landelijke_sleutel_query = """
 {
-  bagLigplaatsen {
+  bagLigplaatsen(active: false) {
     edges {
       node {
         amsterdamseSleutel
@@ -1159,7 +1159,7 @@ def _add_standplaatsen_diva_config():
 
     dat_landelijke_sleutel_query = """
 {
-  bagStandplaatsen {
+  bagStandplaatsen(active: false) {
     edges {
       node {
         amsterdamseSleutel
@@ -1494,7 +1494,7 @@ def _add_verblijfsobjecten_diva_config():
 
     dat_landelijke_sleutel_query = """
 {
-  bagVerblijfsobjecten {
+  bagVerblijfsobjecten(active: false) {
     edges {
       node {
         amsterdamseSleutel
@@ -1966,7 +1966,7 @@ def _add_panden_diva_config():
 
     dat_landelijke_sleutel_query = """
 {
-  bagPanden {
+  bagPanden(active: false) {
     edges {
       node {
         amsterdamseSleutel
