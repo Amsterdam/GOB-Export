@@ -29,7 +29,7 @@ class TestUVA2ConfigHelpers(TestCase):
     def test_get_dat_landelijke_sleutel_filename(self):
         publish_date = date.today().strftime('%Y%m%d')
 
-        self.assertEqual(f"DEF_Landelijke_Sleutel/ABC_{publish_date}.dat", get_dat_landelijke_sleutel_filename('DEF', 'ABC'))
+        self.assertEqual(f"DEF_LandelijkeSleutel/ABC_{publish_date}.dat", get_dat_landelijke_sleutel_filename('DEF', 'ABC'))
 
         # Assert undefined file name raises error
         with self.assertRaises(AssertionError):
@@ -169,9 +169,9 @@ class TestUVA2ConfigHelpers(TestCase):
 
     def test_format_uva2_panden_status_vervallen(self):
         status = [('1', 'N'), ('2', 'N'), ('3', 'N'),
-                  ('7', 'N'), ('10', 'N'), ('11', 'N'), ('12', 'N'),
+                  ('7', 'N'), ('9', 'J'), ('10', 'N'), ('11', 'N'), ('12', 'J'),
                   (1, 'N'), (2, 'N'), (3, 'N'),
-                  (7, 'N'), (10, 'N'), (11, 'N'), (12, 'N'), (13, 'J'), (14, 'J')]
+                  (7, 'N'), (9, 'J'), (10, 'N'), (11, 'N'), (12, 'J'), (13, 'N'), (14, 'J')]
 
         for input, expected in status:
             self.assertEqual(format_uva2_mapping(input, "panden_status_vervallen"), expected)

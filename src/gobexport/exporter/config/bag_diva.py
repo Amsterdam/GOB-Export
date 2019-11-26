@@ -57,10 +57,11 @@ UVA2_MAPPING = {
         '2': 'N',
         '3': 'N',
         '7': 'N',
+        '9': 'J',
         '10': 'N',
         '11': 'N',
-        '12': 'N',
-        '13': 'J',
+        '12': 'J',
+        '13': 'N',
         '14': 'J',
     },
     'verblijfsobjecten_status': {
@@ -285,7 +286,7 @@ def get_dat_landelijke_sleutel_filename(catalogue_name, abbreviation):
     assert catalogue_name and abbreviation, "DAT Landelijke Sleutel requires a catalogue_name and an abbreviation"
 
     publish_date = date.today().strftime(UVA2_DATE_FORMAT)
-    return f"{catalogue_name}_Landelijke_Sleutel/{abbreviation}_{publish_date}.dat"
+    return f"{catalogue_name}_LandelijkeSleutel/{abbreviation}_{publish_date}.dat"
 
 
 def get_dat_geometrie_filename(catalogue_name, collection_name):
