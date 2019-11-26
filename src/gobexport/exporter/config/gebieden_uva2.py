@@ -324,7 +324,11 @@ def _add_bouwblokken_uva2_config():
                 'value': 'ligtInBuurt.[0].identificatie',
                 'fill_type': 'ljust'
             },
-            'BBKBRT/BRT/Buurtcode': 'ligtInBuurt.[0].code',
+            'BBKBRT/BRT/Buurtcode': {
+                'action': 'format',
+                'formatter': format_uva2_buurt,
+                'value': 'ligtInBuurt.[0].code',
+            },
             'BBKBRT/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
