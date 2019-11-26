@@ -285,7 +285,7 @@ def get_dat_landelijke_sleutel_filename(catalogue_name, abbreviation):
     assert catalogue_name and abbreviation, "DAT Landelijke Sleutel requires a catalogue_name and an abbreviation"
 
     publish_date = date.today().strftime(UVA2_DATE_FORMAT)
-    return f"{catalogue_name}_Landelijke_Sleutel/{abbreviation}_{publish_date}.dat"
+    return f"{catalogue_name}_LandelijkeSleutel/{abbreviation}_{publish_date}.dat"
 
 
 def get_dat_geometrie_filename(catalogue_name, collection_name):
