@@ -29,7 +29,7 @@ class TestUVA2ConfigHelpers(TestCase):
     def test_get_dat_landelijke_sleutel_filename(self):
         publish_date = date.today().strftime('%Y%m%d')
 
-        self.assertEqual(f"DEF_Landelijke_Sleutel/ABC_{publish_date}.dat", get_dat_landelijke_sleutel_filename('DEF', 'ABC'))
+        self.assertEqual(f"DEF_LandelijkeSleutel/ABC_{publish_date}.dat", get_dat_landelijke_sleutel_filename('DEF', 'ABC'))
 
         # Assert undefined file name raises error
         with self.assertRaises(AssertionError):
