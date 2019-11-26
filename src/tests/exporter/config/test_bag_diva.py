@@ -169,9 +169,9 @@ class TestUVA2ConfigHelpers(TestCase):
 
     def test_format_uva2_panden_status_vervallen(self):
         status = [('1', 'N'), ('2', 'N'), ('3', 'N'),
-                  ('7', 'N'), ('10', 'N'), ('11', 'N'), ('12', 'N'),
+                  ('7', 'N'), ('9', 'J'), ('10', 'N'), ('11', 'N'), ('12', 'J'),
                   (1, 'N'), (2, 'N'), (3, 'N'),
-                  (7, 'N'), (10, 'N'), (11, 'N'), (12, 'N'), (13, 'N'), (14, 'J')]
+                  (7, 'N'), (9, 'J'), (10, 'N'), (11, 'N'), (12, 'J'), (13, 'N'), (14, 'J')]
 
         for input, expected in status:
             self.assertEqual(format_uva2_mapping(input, "panden_status_vervallen"), expected)
