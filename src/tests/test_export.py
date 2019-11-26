@@ -57,13 +57,15 @@ class TestExport(TestCase):
     @mock.patch('gobexport.export.os.remove', lambda f: None)
     @patch('gobexport.export.distribute_to_objectstore')
     @patch('gobexport.export.export_to_file')
-    def test_export_objectstore_one_product(self, mock_export_to_file, mock_distribute):
+    @patch('gobexport.export.cleanup_datefiles')
+    def test_export_objectstore_one_product(self, mock_clean, mock_export_to_file, mock_distribute):
         mock_export_to_file.side_effect = lambda *args, **kwargs: True
         # Only csv_actueel should be exported
         result = _export_collection("host", "gebieden", "stadsdelen", "csv_actueel", "Objectstore")
         self.assertEqual(result, None)
         mock_distribute.assert_called()
         self.assertEqual(mock_distribute.call_count, 1)
+        mock_clean.assert_called()
 
     @patch('gobexport.export.logger', mock.MagicMock())
     @patch('gobexport.export.time.sleep', lambda n: None)
