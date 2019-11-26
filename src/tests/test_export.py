@@ -3,7 +3,7 @@ from unittest.mock import mock_open, patch
 
 from gobcore.exceptions import GOBException
 
-from gobexport.export import export, _export_collection
+from gobexport.export import export, _export_collection, cleanup_datefiles
 
 def fail(msg):
     raise Exception(msg)
@@ -88,3 +88,21 @@ class TestExport(TestCase):
             product_name='product',
             destination='File',
         )
+
+    @patch('gobexport.export.logger', mock.MagicMock())
+    @patch('gobexport.export.get_full_container_list')
+    @patch('gobexport.export.delete_object')
+    def test_cleanup_datafile(self, mock_delete, mock_list):
+        mock_list.return_value = []
+        cleanup_datefiles('any connection', 'any container', 'any filename')
+        mock_list.assert_not_called()
+
+        mock_list.return_value = ['f1', 'f2']
+        cleanup_datefiles('any connection', 'any container', 'any filename')
+        mock_list.assert_not_called()
+        mock_delete.assert_not_called()
+
+        mock_list.return_value = [{'name': name} for name in ['..f20201230..', '..f20201231..']]
+        cleanup_datefiles('any connection', 'any container', '..f20201231..')
+        mock_list.assert_called_with('any connection', 'any container')
+        mock_delete.assert_called_with('any connection', 'any container', {'name': '..f20201230..'})
