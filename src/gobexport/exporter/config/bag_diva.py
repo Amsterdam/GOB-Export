@@ -56,7 +56,7 @@ UVA2_MAPPING = {
         '1': 'N',
         '2': 'N',
         '3': 'N',
-        '7': 'J',
+        '7': 'N',
         '10': 'N',
         '11': 'N',
         '12': 'N',
@@ -281,17 +281,17 @@ def get_uva2_filename(abbreviation):
     return f"UVA2_Actueel/{abbreviation}_{publish_date}_N_{publish_date}_{publish_date}.UVA2"
 
 
-def get_dat_landelijke_sleutel_filename(abbreviation):
-    assert abbreviation, "DAT Landelijke Sleutel requires an abbreviation"
+def get_dat_landelijke_sleutel_filename(catalogue_name, abbreviation):
+    assert catalogue_name and abbreviation, "DAT Landelijke Sleutel requires a catalogue_name and an abbreviation"
 
     publish_date = date.today().strftime(UVA2_DATE_FORMAT)
-    return f"DAT_Landelijke_Sleutel/{abbreviation}_{publish_date}.dat"
+    return f"{catalogue_name}_Landelijke_Sleutel/{abbreviation}_{publish_date}.dat"
 
 
-def get_dat_geometrie_filename(collection_name):
-    assert collection_name, "DAT Geometrie requires a collection_name"
+def get_dat_geometrie_filename(catalogue_name, collection_name):
+    assert catalogue_name and collection_name, "DAT Geometrie requires a catalogue_name and a collection_name"
 
-    return f"DAT_Geometrie/DAT_{collection_name}_GEOMETRIE.dat"
+    return f"{catalogue_name}_Geometrie/{catalogue_name}_{collection_name}_GEOMETRIE.dat"
 
 
 def _add_woonplaatsen_diva_config():
@@ -402,7 +402,7 @@ def _add_woonplaatsen_diva_config():
             NotEmptyFilter('identificatie'),
             UniqueFilter('identificatie')
         ],
-        'filename': lambda: get_dat_landelijke_sleutel_filename("WPL"),
+        'filename': lambda: get_dat_landelijke_sleutel_filename("BAG", "WPL"),
         'mime_type': 'plain/text',
         'format': {
             'asd_woonplaatscode': 'amsterdamseSleutel',
@@ -453,7 +453,7 @@ def _add_openbareruimtes_diva_config():
 
     dat_landelijke_sleutel_query = """
 {
-  bagOpenbareruimtes(active: false) {
+  bagOpenbareruimtes(active: false, sort: eind_geldigheid_desc) {
     edges {
       node {
         amsterdamseSleutel
@@ -571,14 +571,14 @@ def _add_openbareruimtes_diva_config():
 
     # Landelijke sleutel
     bag.OpenbareruimtesExportConfig.products['dat_landelijke_sleutel'] = {
-        'api_type': 'graphql_streaming',
+        'api_type': 'graphql',
         'exporter': csv_exporter,
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
             NotEmptyFilter('identificatie'),
             UniqueFilter('identificatie')
         ],
-        'filename': lambda: get_dat_landelijke_sleutel_filename("OPR"),
+        'filename': lambda: get_dat_landelijke_sleutel_filename("BAG", "OPR"),
         'mime_type': 'plain/text',
         'format': {
             'asd_openbare-ruimtecode': 'amsterdamseSleutel',
@@ -604,7 +604,7 @@ def _add_openbareruimtes_diva_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'row_formatter': row_formatter_geometrie,
-        'filename': lambda: get_dat_geometrie_filename("OPENBARERUIMTE"),
+        'filename': lambda: get_dat_geometrie_filename("BAG", "OPENBARERUIMTE"),
         'mime_type': 'plain/text',
         'format': 'amsterdamseSleutel:num|geometrie:plain',
         'query': dat_geometrie_query
@@ -757,7 +757,7 @@ def _add_nummeraanduidingen_diva_config():
             NotEmptyFilter('identificatie'),
             UniqueFilter('identificatie')
         ],
-        'filename': lambda: get_dat_landelijke_sleutel_filename("NUM"),
+        'filename': lambda: get_dat_landelijke_sleutel_filename("BAG", "NUM"),
         'mime_type': 'plain/text',
         'format': {
             'asd_adrescode': 'amsterdamseSleutel',
@@ -1053,7 +1053,7 @@ def _add_ligplaatsen_diva_config():
             NotEmptyFilter('identificatie'),
             UniqueFilter('identificatie')
         ],
-        'filename': lambda: get_dat_landelijke_sleutel_filename("LIG"),
+        'filename': lambda: get_dat_landelijke_sleutel_filename("BAG", "LIG"),
         'mime_type': 'plain/text',
         'format': {
             'asd_ligplaatscode': 'amsterdamseSleutel',
@@ -1078,7 +1078,7 @@ def _add_ligplaatsen_diva_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'row_formatter': row_formatter_geometrie,
-        'filename': lambda: get_dat_geometrie_filename("LIGPLAATS"),
+        'filename': lambda: get_dat_geometrie_filename("BAG", "LIGPLAATS"),
         'mime_type': 'plain/text',
         'format': 'amsterdamseSleutel:num|geometrie:plain',
         'query': dat_geometrie_query
@@ -1363,7 +1363,7 @@ def _add_standplaatsen_diva_config():
             NotEmptyFilter('identificatie'),
             UniqueFilter('identificatie')
         ],
-        'filename': lambda: get_dat_landelijke_sleutel_filename("STA"),
+        'filename': lambda: get_dat_landelijke_sleutel_filename("BAG", "STA"),
         'mime_type': 'plain/text',
         'format': {
             'asd_standplaatscode': 'amsterdamseSleutel',
@@ -1388,7 +1388,7 @@ def _add_standplaatsen_diva_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'row_formatter': row_formatter_geometrie,
-        'filename': lambda: get_dat_geometrie_filename("STANDPLAATS"),
+        'filename': lambda: get_dat_geometrie_filename("BAG", "STANDPLAATS"),
         'mime_type': 'plain/text',
         'format': 'amsterdamseSleutel:num|geometrie:plain',
         'query': dat_geometrie_query
@@ -1882,7 +1882,7 @@ def _add_verblijfsobjecten_diva_config():
             NotEmptyFilter('identificatie'),
             UniqueFilter('identificatie')
         ],
-        'filename': lambda: get_dat_landelijke_sleutel_filename("VBO"),
+        'filename': lambda: get_dat_landelijke_sleutel_filename("BAG", "VBO"),
         'mime_type': 'plain/text',
         'format': {
             'asd_verblijfsobjectcode': 'amsterdamseSleutel',
@@ -1907,7 +1907,7 @@ def _add_verblijfsobjecten_diva_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'row_formatter': row_formatter_geometrie,
-        'filename': lambda: get_dat_geometrie_filename("VERBLIJFSOBJECT"),
+        'filename': lambda: get_dat_geometrie_filename("BAG", "VERBLIJFSOBJECT"),
         'mime_type': 'plain/text',
         'format': 'amsterdamseSleutel:num|geometrie:plain',
         'query': dat_geometrie_query
@@ -2112,7 +2112,7 @@ def _add_panden_diva_config():
             NotEmptyFilter('identificatie'),
             UniqueFilter('identificatie')
         ],
-        'filename': lambda: get_dat_landelijke_sleutel_filename("PND"),
+        'filename': lambda: get_dat_landelijke_sleutel_filename("BAG", "PND"),
         'mime_type': 'plain/text',
         'format': {
             'asd_pandcode': 'amsterdamseSleutel',
@@ -2137,7 +2137,7 @@ def _add_panden_diva_config():
             NotEmptyFilter('amsterdamseSleutel'),
         ],
         'row_formatter': row_formatter_geometrie,
-        'filename': lambda: get_dat_geometrie_filename("PAND"),
+        'filename': lambda: get_dat_geometrie_filename("BAG", "PAND"),
         'mime_type': 'plain/text',
         'format': 'amsterdamseSleutel:num|geometrie:plain',
         'query': dat_geometrie_query

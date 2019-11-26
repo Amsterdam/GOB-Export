@@ -29,18 +29,18 @@ class TestUVA2ConfigHelpers(TestCase):
     def test_get_dat_landelijke_sleutel_filename(self):
         publish_date = date.today().strftime('%Y%m%d')
 
-        self.assertEqual(f"DAT_Landelijke_Sleutel/ABC_{publish_date}.dat", get_dat_landelijke_sleutel_filename('ABC'))
+        self.assertEqual(f"DEF_Landelijke_Sleutel/ABC_{publish_date}.dat", get_dat_landelijke_sleutel_filename('DEF', 'ABC'))
 
         # Assert undefined file name raises error
         with self.assertRaises(AssertionError):
-            get_dat_landelijke_sleutel_filename(None)
+            get_dat_landelijke_sleutel_filename(None, None)
 
     def test_get_dat_geometrie_filename(self):
-        self.assertEqual(f"DAT_Geometrie/DAT_ABC_GEOMETRIE.dat", get_dat_geometrie_filename('ABC'))
+        self.assertEqual(f"DEF_Geometrie/DEF_ABC_GEOMETRIE.dat", get_dat_geometrie_filename('DEF', 'ABC'))
 
         # Assert undefined file name raises error
         with self.assertRaises(AssertionError):
-            get_dat_geometrie_filename(None)
+            get_dat_geometrie_filename(None, None)
 
     def test_format_timestamp(self):
         inp = '2035-03-31'
@@ -169,9 +169,9 @@ class TestUVA2ConfigHelpers(TestCase):
 
     def test_format_uva2_panden_status_vervallen(self):
         status = [('1', 'N'), ('2', 'N'), ('3', 'N'),
-                  ('7', 'J'), ('10', 'N'), ('11', 'N'), ('12', 'N'),
+                  ('7', 'N'), ('10', 'N'), ('11', 'N'), ('12', 'N'),
                   (1, 'N'), (2, 'N'), (3, 'N'),
-                  (7, 'J'), (10, 'N'), (11, 'N'), (12, 'N'), (13, 'J'), (14, 'J')]
+                  (7, 'N'), (10, 'N'), (11, 'N'), (12, 'N'), (13, 'J'), (14, 'J')]
 
         for input, expected in status:
             self.assertEqual(format_uva2_mapping(input, "panden_status_vervallen"), expected)
