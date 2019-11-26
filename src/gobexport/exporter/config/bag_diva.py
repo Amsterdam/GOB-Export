@@ -60,7 +60,7 @@ UVA2_MAPPING = {
         '10': 'N',
         '11': 'N',
         '12': 'N',
-        '13': 'J',
+        '13': 'N',
         '14': 'J',
     },
     'verblijfsobjecten_status': {
