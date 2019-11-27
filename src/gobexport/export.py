@@ -169,19 +169,28 @@ def _export_collection(host, catalogue, collection, product_name, destination):
 
 
 def cleanup_datefiles(connection, container, filename):
-    key = re.sub(r"\d{8}", "\\\d{8}", filename)  # Detect dates and replace the date by it's regex
-    if key == filename:
+    """Delete previous files from ObjectStore.
+
+    The file with filename is not deleted.
+    """
+    cleanup_pattern = get_cleanup_pattern(filename)
+    if cleanup_pattern == filename:
         # No dates in filename, nothing to do
         return
 
     logger.info(f'Clean previous files for {filename}.')
     try:
         for item in get_full_container_list(connection, container):
-            if re.match(key, item['name']) and item['name'] != filename:
+            if re.match(cleanup_pattern, item['name']) and item['name'] != filename:
                 delete_object(connection, container, item)
                 logger.info(f'File {item["name"]} deleted.')
     except Exception:
         pass
+
+
+def get_cleanup_pattern(filename):
+    """Detect dates and replace the date by it's regex."""
+    return re.sub(r"\d{8}", "\\\d{8}", filename)
 
 
 def export(catalogue, collection, product, destination):
