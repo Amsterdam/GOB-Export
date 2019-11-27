@@ -46,6 +46,8 @@ UVA2_MAPPING = {
         '2': '25',
         '3': '26',
         '7': '27',
+        '8': '28',
+        '9': '29',
         '10': '30',
         '11': '31',
         '12': '32',
@@ -57,10 +59,11 @@ UVA2_MAPPING = {
         '2': 'N',
         '3': 'N',
         '7': 'N',
+        '8': 'J',
         '9': 'J',
         '10': 'N',
         '11': 'N',
-        '12': 'J',
+        '12': 'N',
         '13': 'N',
         '14': 'J',
     },
@@ -73,6 +76,16 @@ UVA2_MAPPING = {
         '6': '23',
         '7': '40',
         '8': '41',
+    },
+    'verblijfsobjecten_status_vervallen': {
+        '1': 'N',
+        '2': 'J',
+        '3': 'N',
+        '4': 'N',
+        '5': 'J',
+        '6': 'N',
+        '7': 'N',
+        '8': 'J',
     },
     'verblijfsobjecten_status_coordinaat_domein': {
         '1': 'TMP',
@@ -1632,8 +1645,10 @@ def _add_verblijfsobjecten_diva_config():
                 'value': 'DBI'
             },
             'Indicatie-vervallen': {
-                'action': 'literal',
-                'value': 'N'
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_status_vervallen'}
             },
             'TijdvakGeldigheid/begindatumTijdvakGeldigheid': {
                 'action': 'format',
@@ -1681,11 +1696,13 @@ def _add_verblijfsobjecten_diva_config():
                 'eindGeldigheid'
             ),
             'VBOFNG/FNG/Code': {
-                'action': 'fill',
-                'length': 4,
-                'character': '0',
-                'value': 'financieringscode.code',
-                'fill_type': 'rjust'
+                'condition': 'isempty',
+                'reference': 'financieringscode.code',
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                },
+                'falseval': 'financieringscode.code'
             },
             'VBOFNG/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
                 'financieringscode.code',
@@ -1736,11 +1753,19 @@ def _add_verblijfsobjecten_diva_config():
             'VBOMNT/TijdvakRelatie/begindatumRelatie': '',
             'VBOMNT/TijdvakRelatie/einddatumRelatie': '',
             'VBOTGG/TGG/Code': {
-                'action': 'fill',
-                'length': 2,
-                'character': '0',
-                'value': 'toegang.[0].code',
-                'fill_type': 'rjust'
+                'condition': 'isempty',
+                'reference': 'toegang.[0].code',
+                'trueval': {
+                    'action': 'literal',
+                    'value': ''
+                },
+                'falseval': {
+                    'action': 'fill',
+                    'length': 2,
+                    'character': '0',
+                    'value': 'toegang.[0].code',
+                    'fill_type': 'rjust'
+                }
             },
             'VBOTGG/TijdvakRelatie/begindatumRelatie': show_date_when_reference_filled(
                 'toegang.[0].code',
