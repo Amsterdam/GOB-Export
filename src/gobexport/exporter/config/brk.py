@@ -2156,6 +2156,7 @@ class KadastraleGemeentecodesExportConfig:
 '''
 
     filename = 'BRK_KAD_GEMEENTE'
+    line_filename = 'BRK_KAD_GEMEENTE_L'
     products = {
         'shape': {
             'exporter': esri_exporter,
@@ -2182,6 +2183,31 @@ class KadastraleGemeentecodesExportConfig:
                 },
             ],
             'query': query
+        },
+        'lineshape': {
+            'exporter': esri_exporter,
+            'endpoint': '/gob/brk/kadastralegemeentecodes/?view=linegeometry&ndjson=true',
+            'filename': f'{brk_directory("shp")}/{line_filename}.shp',
+            'mime_type': 'application/octet-stream',
+            'format': {
+                'GEMEENTE': 'gemeente',
+                'KADGEMCODE': 'kadastraleGemeentecode',
+                'KADGEM': 'kadastraleGemeente',
+            },
+            'extra_files': [
+                {
+                    'filename': f'{brk_directory("dbf")}/{line_filename}.dbf',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("shx")}/{line_filename}.shx',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("prj")}/{line_filename}.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+            ]
         }
     }
 
@@ -2222,6 +2248,7 @@ class KadastralesectiesExportConfig:
 '''
 
     filename = 'BRK_KAD_SECTIE'
+    line_filename = 'BRK_KAD_SECTIE_L'
     products = {
         'shape': {
             'exporter': esri_exporter,
@@ -2249,6 +2276,32 @@ class KadastralesectiesExportConfig:
                 },
             ],
             'query': query
+        },
+        'lineshape': {
+            'exporter': esri_exporter,
+            'endpoint': '/gob/brk/kadastralesecties/?view=linegeometry&ndjson=true',
+            'filename': f'{brk_directory("shp")}/{line_filename}.shp',
+            'mime_type': 'application/octet-stream',
+            'format': {
+                'GEMEENTE': 'gemeente',
+                'KADGEMCODE': 'kadastraleGemeentecode',
+                'KADGEM': 'kadastraleGemeente',
+                'SECTIE': 'kadastraleSectieCode'
+            },
+            'extra_files': [
+                {
+                    'filename': f'{brk_directory("dbf")}/{line_filename}.dbf',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("shx")}/{line_filename}.shx',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("prj")}/{line_filename}.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+            ]
         }
     }
 

@@ -4,6 +4,7 @@ from datetime import date
 
 from gobexport.exporter.config.bag_diva import (
     get_uva2_filename,
+    get_uva2_adresobject_filename,
     get_dat_landelijke_sleutel_filename,
     get_dat_geometrie_filename,
     format_uva2_date,
@@ -22,9 +23,18 @@ class TestUVA2ConfigHelpers(TestCase):
 
         self.assertEqual(f"UVA2_Actueel/ABC_{publish_date}_N_{publish_date}_{publish_date}.UVA2", get_uva2_filename('ABC'))
 
-        # Assert undefined file name raises error
+        # Assert undefined abbreviation raises error
         with self.assertRaises(AssertionError):
             get_uva2_filename(None)
+
+    def test_get_uva2_adresobject_filename(self):
+        publish_date = date.today().strftime('%Y%m%d')
+
+        self.assertEqual(f"UVA2_Actueel/ADRESOBJECT_ABC_{publish_date}.UVA2", get_uva2_adresobject_filename('ABC'))
+
+        # Assert undefined abbreviation raises error
+        with self.assertRaises(AssertionError):
+            get_uva2_adresobject_filename(None)
 
     def test_get_dat_landelijke_sleutel_filename(self):
         publish_date = date.today().strftime('%Y%m%d')
