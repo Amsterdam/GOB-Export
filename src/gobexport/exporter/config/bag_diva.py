@@ -7,6 +7,7 @@ from gobexport.exporter.config import bag
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.dat import dat_exporter
 from gobexport.exporter.uva2 import uva2_exporter
+from gobexport.exporter.esri import get_x, get_y, get_longitude, get_latitude
 
 from gobexport.filters.unique_filter import UniqueFilter
 from gobexport.filters.notempty_filter import NotEmptyFilter
@@ -879,6 +880,7 @@ def _add_ligplaatsen_diva_config():
         documentdatum
         documentnummer
         status
+        geometrie
         heeftHoofdadres {
           edges {
             node {
@@ -1184,10 +1186,26 @@ def _add_ligplaatsen_diva_config():
                 'value': 'ligtInBuurt.[0].code',
             },
             'Buurtnaam': 'ligtInBuurt.[0].naam',
-            'Xcoordinaat(RD)': '',  # TODO
-            'Ycoordinaat(RD)': '',  # TODO
-            'Longitude(WGS84)': '',  # TODO
-            'Latitude(WGS84)': '',  # TODO
+            'Xcoordinaat(RD)': {
+                'action': 'format',
+                'formatter': get_x,
+                'value': 'geometrie',
+            },
+            'Ycoordinaat(RD)': {
+                'action': 'format',
+                'formatter': get_y,
+                'value': 'geometrie',
+            },
+            'Longitude(WGS84)': {
+                'action': 'format',
+                'formatter': get_longitude,
+                'value': 'geometrie',
+            },
+            'Latitude(WGS84)': {
+                'action': 'format',
+                'formatter': get_latitude,
+                'value': 'geometrie',
+            },
             'Oppervlakte ligplaats': '',  # empty
             'Documentdatum mutatie': 'documentdatum',
             'Documentnummer mutatie': 'documentnummer',
