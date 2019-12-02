@@ -300,7 +300,7 @@ def get_uva2_adresobject_filename(abbreviation):
     assert abbreviation, "UVA2 ADRESOBJECT requires an abbreviation"
 
     publish_date = date.today().strftime(UVA2_DATE_FORMAT)
-    return f"UVA2_Actueel/ADRESOBJECT_{abbreviation}_{publish_date}.UVA2"
+    return f"UVA2_ADRESOBJECT/ADRESOBJECT_{abbreviation}_{publish_date}.UVA2"
 
 
 def get_dat_landelijke_sleutel_filename(catalogue_name, abbreviation):
@@ -884,15 +884,14 @@ def _add_ligplaatsen_diva_config():
         heeftHoofdadres {
           edges {
             node {
-              identificatie
+              amsterdamseSleutel
               postcode
               huisnummer
               huisletter
               huisnummertoevoeging
               ligtAanOpenbareruimte {
-                      edges {
-                      node {
-                          identificatie
+                edges {
+                  node {
                     straatcode
                     straatnaamPtt
                     naam
@@ -900,7 +899,7 @@ def _add_ligplaatsen_diva_config():
                     ligtInWoonplaats {
                       edges {
                         node {
-                          identificatie
+                          amsterdamseSleutel
                           naam
                         }
                       }
@@ -1157,7 +1156,7 @@ def _add_ligplaatsen_diva_config():
                 'formatter': format_uva2_date,
                 'value': 'eindGeldigheid',
             },
-            'Identificerende sleutel nummeraanduiding hoofdadres': 'heeftHoofdadres.[0].identificatie',
+            'Identificerende sleutel nummeraanduiding hoofdadres': 'heeftHoofdadres.[0].amsterdamseSleutel',
             'Huisnummer hoofdadres': 'heeftHoofdadres.[0].huisnummer',
             'Huisletter hoofdadres': 'heeftHoofdadres.[0].huisletter',
             'Huisnummertoevoeging hoofdadres': 'heeftHoofdadres.[0].huisnummertoevoeging',
@@ -1166,7 +1165,7 @@ def _add_ligplaatsen_diva_config():
             'Naam openbare ruimte hoofdadres': 'ligtAanOpenbareruimte.[0].naam',
             'Straatnaam NEN hoofdadres': 'ligtAanOpenbareruimte.[0].naamNen',
             'Straatnaam TPG hoofdadres': 'ligtAanOpenbareruimte.[0].straatnaamPtt',
-            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.[0].identificatie',
+            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.[0].amsterdamseSleutel',
             'Woonplaatsnaam hoofdadres': 'ligtInWoonplaats.[0].naam',
             'Datum begin geldigheid ligplaats': {
                 'action': 'format',
@@ -1207,7 +1206,11 @@ def _add_ligplaatsen_diva_config():
                 'value': 'geometrie',
             },
             'Oppervlakte ligplaats': '',  # empty
-            'Documentdatum mutatie': 'documentdatum',
+            'Documentdatum mutatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'documentdatum',
+            },
             'Documentnummer mutatie': 'documentnummer',
             'Broncode': '',  # empty
             'Broncode omschrijving': '',  # empty

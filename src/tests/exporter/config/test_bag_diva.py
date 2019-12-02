@@ -30,7 +30,7 @@ class TestUVA2ConfigHelpers(TestCase):
     def test_get_uva2_adresobject_filename(self):
         publish_date = date.today().strftime('%Y%m%d')
 
-        self.assertEqual(f"UVA2_Actueel/ADRESOBJECT_ABC_{publish_date}.UVA2", get_uva2_adresobject_filename('ABC'))
+        self.assertEqual(f"UVA2_ADRESOBJECT/ADRESOBJECT_ABC_{publish_date}.UVA2", get_uva2_adresobject_filename('ABC'))
 
         # Assert undefined abbreviation raises error
         with self.assertRaises(AssertionError):
