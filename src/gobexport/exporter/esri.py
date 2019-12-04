@@ -12,6 +12,15 @@ from gobexport.filters.entity_filter import EntityFilter
 gdal.UseExceptions()
 os.environ['SHAPE_ENCODING'] = "utf-8"
 
+spatialref_rd = osr.SpatialReference()
+spatialref_rd.ImportFromEPSG(28992)
+
+spatialref_wgs84 = osr.SpatialReference()
+spatialref_wgs84.ImportFromEPSG(4326)
+
+transform = osr.CoordinateTransformation(spatialref_rd, spatialref_wgs84)
+COORDINATE_PRECISION = 7
+
 
 def add_field_definitions(layer, fieldnames):
     """Adds all fieldnames to a shape layer definition
@@ -115,3 +124,47 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
     dstfile.Destroy()
 
     return row_count
+
+
+def get_centroid(wkt):
+    """Get Centroid from WKT geomentry.
+
+    We need POINT to be able to get coordinates.
+    """
+    return ogr.CreateGeometryFromWkt(wkt).Centroid()
+
+
+def get_x(wkt):
+    """Get X coordinate from Centroid of WKT geomentry.
+
+    Also cast it to integer.
+    """
+    return int(get_centroid(wkt).GetX())
+
+
+def get_y(wkt):
+    """Get Y coordinate from Centroid of WKT geomentry.
+
+    Also cast it to integer.
+    """
+    return int(get_centroid(wkt).GetY())
+
+
+def get_longitude(wkt):
+    """Get Longitude coordinate (WGS84) from Centroid of WKT geomentry.
+
+    Also round it to COORDINATE_PRECISION (decimal percision).
+    """
+    centroid = get_centroid(wkt)
+    centroid.Transform(transform)
+    return round(centroid.GetX(), COORDINATE_PRECISION)
+
+
+def get_latitude(wkt):
+    """Get Latitude coordinate (WGS84) from Centroid of WKT geomentry.
+
+    Also round it to COORDINATE_PRECISION (decimal percision).
+    """
+    centroid = get_centroid(wkt)
+    centroid.Transform(transform)
+    return round(centroid.GetY(), COORDINATE_PRECISION)
