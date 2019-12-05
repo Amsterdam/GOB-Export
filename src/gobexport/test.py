@@ -105,14 +105,15 @@ def test(catalogue):
             for filename in filenames:
                 obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
                 check = _get_check(checks, filename)
-                if check:
+
+                if obj_info is None:
+                    logger.error(f"{filename} MISSING")
+                elif check:
                     stats = _get_analysis(obj_info, obj)
                     if _check_file(check, filename, stats, checks):
                         logger.info(f"{filename} OK")
                     else:
                         logger.info(f"{filename} FAILED")
-                elif obj_info is None:
-                    logger.error(f"{filename} MISSING")
                 else:
                     logger.warning(f"{filename} UNCHECKED")
                     _propose_check_file(proposals, filename, obj_info, obj)
