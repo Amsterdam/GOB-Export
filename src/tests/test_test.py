@@ -327,13 +327,13 @@ class TestExportTest(TestCase):
         self.assertEqual(obj, "get object")
         mock_get_object.assert_called_with('any connection', {'name': filename}, 'any container')
 
-    @patch('gobexport.test.logger', MagicMock())
+    @patch('gobexport.test.logger')
     @patch('gobexport.test._get_file')
     @patch('gobexport.test._write_proposals')
     @patch('gobexport.test._get_checks')
     @patch('gobexport.test.connect_to_objectstore')
     @patch('gobexport.test.CONTAINER_BASE', 'development')
-    def test_test(self, mock_connect_to_objectstore, mock_get_checks, mock_write_proposals, mock_get_file):
+    def test_test(self, mock_connect_to_objectstore, mock_get_checks, mock_write_proposals, mock_get_file, mock_logger):
         catalogue = "any catalogue"
         mock_connect_to_objectstore.return_value = "Any connection", None
         config = MockConfig()
@@ -400,3 +400,8 @@ class TestExportTest(TestCase):
             'any catalogue',
             {filename: {'bytes': [0]}},
             {})
+
+        # Check case in which check is defined, but filename is missing
+        mock_get_file.return_value = None, None
+        test.test(catalogue)
+        mock_logger.error.assert_called_with("any filename MISSING")
