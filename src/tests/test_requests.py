@@ -68,14 +68,14 @@ class TestRequests(TestCase):
     @patch("gobexport.requests.requests")
     def test_post(self, mock_requests):
         result = gobexport.requests.post_stream('url', 'some json')
-        mock_requests.post.assert_called_with('url', stream=True, json='some json')
+        mock_requests.post.assert_called_with('url', headers=None, stream=True, json='some json')
         self.assertEqual(mock_requests.post.return_value.iter_lines.return_value, result)
 
     @patch("gobexport.requests.requests")
     def test_post_stream_params(self, mock_requests):
         kwargs = {'abc': 'def', 'ghi': 'jkl'}
         result = gobexport.requests.post_stream('url', 'some json', **kwargs)
-        mock_requests.post.assert_called_with('url', stream=True, json='some json', **kwargs)
+        mock_requests.post.assert_called_with('url', headers=None, stream=True, json='some json', **kwargs)
 
     @patch("gobexport.requests.requests.post")
     def test_post_stream_exception(self, mock_requests_post):
@@ -86,7 +86,25 @@ class TestRequests(TestCase):
         with self.assertRaisesRegexp(gobexport.requests.APIException, 'Request failed due to API exception'):
             gobexport.requests.post_stream('any url', True)
 
+    @patch('gobexport.requests.urllib.request.Request', lambda url, headers: url)
     @patch('gobexport.requests.urllib.request.urlopen')
     def test_urlopen(self, mock_open):
         result = gobexport.requests.urlopen('any url')
         mock_open.assert_called_with('any url')
+
+    @patch('gobexport.requests.get_secure_header')
+    def test_updated_headers(self, mock_secure_header):
+        result = gobexport.requests._updated_headers("any url", "any header")
+        self.assertEqual(result, "any header")
+
+        mock_secure_header.return_value = {'secure key': 'secure value'}
+        url = f"some {gobexport.requests._SECURE_URL} url"
+        headers = {
+            'some key': "some value",
+            'secure key': "some obsolete value"
+        }
+        result = gobexport.requests._updated_headers(url, headers)
+        self.assertEqual(result, {
+            'some key': 'some value',
+            'secure key': 'secure value'
+        })

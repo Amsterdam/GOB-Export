@@ -37,7 +37,7 @@ class MockResponse:
 
 
 def mock_get(ok=True, results=[]):
-    return lambda url, timeout: MockResponse(ok, results)
+    return lambda url, headers, timeout: MockResponse(ok, results)
 
 
 def test_api(monkeypatch):
