@@ -869,75 +869,6 @@ def _add_ligplaatsen_diva_config():
 }
 """
 
-    uva2_adresobject_query = """
-{
-  bagLigplaatsen {
-    edges {
-      node {
-        amsterdamseSleutel
-        beginGeldigheid
-        eindGeldigheid
-        documentdatum
-        documentnummer
-        status
-        geometrie
-        heeftHoofdadres {
-          edges {
-            node {
-              amsterdamseSleutel
-              postcode
-              huisnummer
-              huisletter
-              huisnummertoevoeging
-              ligtAanOpenbareruimte {
-                edges {
-                  node {
-                    straatcode
-                    straatnaamPtt
-                    naam
-                    naamNen
-                    ligtInWoonplaats {
-                      edges {
-                        node {
-                          amsterdamseSleutel
-                          naam
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        ligtInBuurt {
-          edges {
-            node {
-              code
-              naam
-              ligtInWijk {
-                edges {
-                  node {
-                    ligtInStadsdeel {
-                      edges {
-                        node {
-                          code
-                          naam
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-"""
-
     dat_landelijke_sleutel_query = """
 {
   bagLigplaatsen(active: false) {
@@ -1137,7 +1068,7 @@ def _add_ligplaatsen_diva_config():
 
     # ADRESOBJECT
     bag.LigplaatsenExportConfig.products['uva2_adresobject'] = {
-        'api_type': 'graphql_streaming',
+        'endpoint': '/gob/bag/ligplaatsen/?view=enhanced_uva2&ndjson=true',
         'exporter': uva2_exporter,
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
@@ -1156,35 +1087,35 @@ def _add_ligplaatsen_diva_config():
                 'formatter': format_uva2_date,
                 'value': 'eindGeldigheid',
             },
-            'Identificerende sleutel nummeraanduiding hoofdadres': 'heeftHoofdadres.[0].amsterdamseSleutel',
-            'Huisnummer hoofdadres': 'heeftHoofdadres.[0].huisnummer',
-            'Huisletter hoofdadres': 'heeftHoofdadres.[0].huisletter',
-            'Huisnummertoevoeging hoofdadres': 'heeftHoofdadres.[0].huisnummertoevoeging',
-            'Postcode hoofdadres': 'heeftHoofdadres.[0].postcode',
-            'Straatcode hoofdadres': 'ligtAanOpenbareruimte.[0].straatcode',
-            'Naam openbare ruimte hoofdadres': 'ligtAanOpenbareruimte.[0].naam',
-            'Straatnaam NEN hoofdadres': 'ligtAanOpenbareruimte.[0].naamNen',
-            'Straatnaam TPG hoofdadres': 'ligtAanOpenbareruimte.[0].straatnaamPtt',
-            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.[0].amsterdamseSleutel',
-            'Woonplaatsnaam hoofdadres': 'ligtInWoonplaats.[0].naam',
+            'Identificerende sleutel nummeraanduiding hoofdadres': 'heeftHoofdadres.amsterdamseSleutel',
+            'Huisnummer hoofdadres': 'heeftHoofdadres.huisnummer',
+            'Huisletter hoofdadres': 'heeftHoofdadres.huisletter',
+            'Huisnummertoevoeging hoofdadres': 'heeftHoofdadres.huisnummertoevoeging',
+            'Postcode hoofdadres': 'heeftHoofdadres.postcode',
+            'Straatcode hoofdadres': 'ligtAanOpenbareruimte.straatcode',
+            'Naam openbare ruimte hoofdadres': 'ligtAanOpenbareruimte.naam',
+            'Straatnaam NEN hoofdadres': 'ligtAanOpenbareruimte.naamNen',
+            'Straatnaam TPG hoofdadres': 'ligtAanOpenbareruimte.straatnaamPtt',
+            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.amsterdamseSleutel',
+            'Woonplaatsnaam hoofdadres': 'ligtInWoonplaats.naam',
             'Datum begin geldigheid ligplaats': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'beginGeldigheid',
+                'value': 'beginGeldigheidObject',
             },
             'Datum einde geldigheid ligplaats': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'eindGeldigheid',
+                'value': 'eindGeldigheidObject',
             },
-            'Stadsdeelcode': 'ligtInStadsdeel.[0].code',
-            'Stadsdeelnaam': 'ligtInStadsdeel.[0].naam',
+            'Stadsdeelcode': 'ligtInStadsdeel.code',
+            'Stadsdeelnaam': 'ligtInStadsdeel.naam',
             'Buurtcode': {
                 'action': 'format',
                 'formatter': format_uva2_buurt,
-                'value': 'ligtInBuurt.[0].code',
+                'value': 'ligtInBuurt.code',
             },
-            'Buurtnaam': 'ligtInBuurt.[0].naam',
+            'Buurtnaam': 'ligtInBuurt.naam',
             'Xcoordinaat(RD)': {
                 'action': 'format',
                 'formatter': get_x,
@@ -1221,8 +1152,7 @@ def _add_ligplaatsen_diva_config():
                 'kwargs': {'mapping_name': 'ligplaatsen_status_code'},
             },
             'Statuscode omschrijving': 'status.omschrijving',
-        },
-        'query': uva2_adresobject_query
+        }
     }
 
     # Landelijke sleutel
