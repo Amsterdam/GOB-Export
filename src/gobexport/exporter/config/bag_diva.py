@@ -2155,6 +2155,163 @@ def _add_verblijfsobjecten_diva_config():
         'query': uva2_numvbonvn_query
     }
 
+    # ADRESOBJECT
+    bag.VerblijfsobjectenExportConfig.products['uva2_adresobject'] = {
+        'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced_uva2&ndjson=true',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'filename': lambda: get_uva2_adresobject_filename("VOT"),
+        'row_formatter': row_formatter_verblijfsobjecten,
+        'mime_type': 'plain/text',
+        'format': {
+            'Identificerende sleutel Verblijfsobject': 'amsterdamseSleutel',
+            'Datum begin geldigheid mutatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'Datum einde geldigheid mutatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'Identificerende sleutel nummeraanduiding hoofdadres': 'heeftHoofdadres.amsterdamseSleutel',
+            'Huisnummer hoofdadres': 'heeftHoofdadres.huisnummer',
+            'Huisletter hoofdadres': 'heeftHoofdadres.huisletter',
+            'Huisnummertoevoeging hoofdadres': 'heeftHoofdadres.huisnummertoevoeging',
+            'Postcode hoofdadres': 'heeftHoofdadres.postcode',
+            'Straatcode hoofdadres': 'ligtAanOpenbareruimte.straatcode',
+            'Naam openbare ruimte hoofdadres': 'ligtAanOpenbareruimte.naam',
+            'Straatnaam NEN hoofdadres': 'ligtAanOpenbareruimte.naamNen',
+            'Straatnaam TPG hoofdadres': 'ligtAanOpenbareruimte.straatnaamPtt',
+            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.amsterdamseSleutel',
+            'Woonplaatsnaam hoofdadres': 'ligtInWoonplaats.naam',
+            'Datum begin geldigheid verblijfsobject': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheidObject',
+            },
+            'Datum einde geldigheid verblijfsobject': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheidObject',
+            },
+            'Stadsdeelcode': 'ligtInStadsdeel.code',
+            'Stadsdeelnaam': 'ligtInStadsdeel.naam',
+            'Buurtcode': {
+                'action': 'format',
+                'formatter': format_uva2_buurt,
+                'value': 'ligtInBuurt.code',
+            },
+            'Buurtnaam': 'ligtInBuurt.naam',
+            'Xcoordinaat(RD)': {
+                'action': 'format',
+                'formatter': get_x,
+                'value': 'geometrie',
+            },
+            'Ycoordinaat(RD)': {
+                'action': 'format',
+                'formatter': get_y,
+                'value': 'geometrie',
+            },
+            'Longitude(WGS84)': {
+                'action': 'format',
+                'formatter': get_longitude,
+                'value': 'geometrie',
+            },
+            'Latitude(WGS84)': {
+                'action': 'format',
+                'formatter': get_latitude,
+                'value': 'geometrie',
+            },
+            'Oppervlakte verblijfsobject': '',  # empty
+            'Documentdatum mutatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'documentdatum',
+            },
+            'Documentnummer mutatie': 'documentnummer',
+            'Broncode': '',  # empty
+            'Broncode omschrijving': '',  # empty
+            'Statuscode': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_status'},
+            },
+            'Statuscode omschrijving': 'status.omschrijving',
+            'Status coordinaat domein': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_status_coordinaat_domein'}
+            },
+            'Omschrijving coordinaat domein': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_status_coordinaat_omschrijving'}
+            },
+            'Gebruiksdoel code': {
+                'action': 'fill',
+                'length': 4,
+                'character': '0',
+                'value': 'GebruiksdoelVerblijfsobjectDomein',
+                'fill_type': 'rjust'
+            },
+            'Gebruiksdoel omschrijving': 'OmschrijvingGebruiksdoelVerblijfsobjectDomein',
+            'Bouwlaag toegang': {
+                'condition': 'isnone',
+                'reference': 'verdiepingToegang',
+                'trueval': {
+                    'action': 'literal',
+                    'value': '',
+                },
+                'falseval': {
+                    'condition': 'isempty',
+                    'reference': 'verdiepingToegang',
+                    'trueval': {
+                        'action': 'literal',
+                        'value': '0',
+                    },
+                    'falseval': 'verdiepingToegang'
+                }
+            },
+            'Aantal verhuurbare eenheden': 'aantalEenhedenComplex',
+            'CBS-nummer': 'cbsNummer',
+            'Aantal bouwlagen': 'aantalBouwlagen',
+            'Type woonobject domein': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'ligtInPanden.typeWoonobject',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_type_woonobject_code'},
+            },
+            'Type woonobject omschrijving': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'ligtInPanden.typeWoonobject',
+                'kwargs': {'mapping_name': 'verblijfsobjecten_type_woonobject_omschrijving'},
+            },
+            'Indicatie woningvoorraad': 'indicatieWoningvoorraad',
+            'Gebruik code': 'feitelijkGebruik.code',
+            'Gebruik omschrijving': 'feitelijkGebruik.omschrijving',
+            'Locatie ingang code': '',  # empty
+            'Locatie ingang omschrijving': '',  # empty
+            'Ligging code': 'ligtInPanden.ligging.code',
+            'Ligging omschrijving': 'ligtInPanden.ligging.omschrijving',
+            'Financieringswijze code': 'financieringscode.code',
+            'Financieringswijze omschrijving': 'financieringscode.omschrijving',
+            'Eigendomsverhouding code': 'eigendomsverhouding.code',
+            'Eigendomsverhouding omschrijving': 'eigendomsverhouding.omschrijving',
+            'Toegang code': 'toegang.code',
+            'Toegang omschrijving': 'toegang.omschrijving',
+            'Bouwjaar': 'ligtInPanden.oorspronkelijkBouwjaar',
+            'Bouwbloknummer': 'ligtInPanden.ligtInBouwblok.code',
+        }
+    }
+
     # Landelijke sleutel
     bag.VerblijfsobjectenExportConfig.products['dat_landelijke_sleutel'] = {
         'api_type': 'graphql_streaming',
