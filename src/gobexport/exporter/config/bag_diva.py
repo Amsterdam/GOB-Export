@@ -1465,6 +1465,95 @@ def _add_standplaatsen_diva_config():
         'query': uva2_numstanvn_query
     }
 
+    # ADRESOBJECT
+    bag.StandplaatsenExportConfig.products['uva2_adresobject'] = {
+        'endpoint': '/gob/bag/standplaatsen/?view=enhanced_uva2&ndjson=true',
+        'exporter': uva2_exporter,
+        'entity_filters': [
+            NotEmptyFilter('amsterdamseSleutel'),
+        ],
+        'filename': lambda: get_uva2_adresobject_filename("SPS"),
+        'mime_type': 'plain/text',
+        'format': {
+            'Identificerende sleutel standplaats': 'amsterdamseSleutel',
+            'Datum begin geldigheid mutatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheid',
+            },
+            'Datum einde geldigheid mutatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheid',
+            },
+            'Identificerende sleutel nummeraanduiding hoofdadres': 'heeftHoofdadres.amsterdamseSleutel',
+            'Huisnummer hoofdadres': 'heeftHoofdadres.huisnummer',
+            'Huisletter hoofdadres': 'heeftHoofdadres.huisletter',
+            'Huisnummertoevoeging hoofdadres': 'heeftHoofdadres.huisnummertoevoeging',
+            'Postcode hoofdadres': 'heeftHoofdadres.postcode',
+            'Straatcode hoofdadres': 'ligtAanOpenbareruimte.straatcode',
+            'Naam openbare ruimte hoofdadres': 'ligtAanOpenbareruimte.naam',
+            'Straatnaam NEN hoofdadres': 'ligtAanOpenbareruimte.naamNen',
+            'Straatnaam TPG hoofdadres': 'ligtAanOpenbareruimte.straatnaamPtt',
+            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.amsterdamseSleutel',
+            'Woonplaatsnaam hoofdadres': 'ligtInWoonplaats.naam',
+            'Datum begin geldigheid standplaats': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'beginGeldigheidObject',
+            },
+            'Datum einde geldigheid standplaats': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'eindGeldigheidObject',
+            },
+            'Stadsdeelcode': 'ligtInStadsdeel.code',
+            'Stadsdeelnaam': 'ligtInStadsdeel.naam',
+            'Buurtcode': {
+                'action': 'format',
+                'formatter': format_uva2_buurt,
+                'value': 'ligtInBuurt.code',
+            },
+            'Buurtnaam': 'ligtInBuurt.naam',
+            'Xcoordinaat(RD)': {
+                'action': 'format',
+                'formatter': get_x,
+                'value': 'geometrie',
+            },
+            'Ycoordinaat(RD)': {
+                'action': 'format',
+                'formatter': get_y,
+                'value': 'geometrie',
+            },
+            'Longitude(WGS84)': {
+                'action': 'format',
+                'formatter': get_longitude,
+                'value': 'geometrie',
+            },
+            'Latitude(WGS84)': {
+                'action': 'format',
+                'formatter': get_latitude,
+                'value': 'geometrie',
+            },
+            'Oppervlakte standplaats': '',  # empty
+            'Documentdatum mutatie': {
+                'action': 'format',
+                'formatter': format_uva2_date,
+                'value': 'documentdatum',
+            },
+            'Documentnummer mutatie': 'documentnummer',
+            'Broncode': '',  # empty
+            'Broncode omschrijving': '',  # empty
+            'Statuscode': {
+                'action': 'format',
+                'formatter': format_uva2_mapping,
+                'value': 'status.code',
+                'kwargs': {'mapping_name': 'standplaatsen_status_code'},
+            },
+            'Statuscode omschrijving': 'status.omschrijving',
+        }
+    }
+
     # Landelijke sleutel
     bag.StandplaatsenExportConfig.products['dat_landelijke_sleutel'] = {
         'api_type': 'graphql_streaming',
