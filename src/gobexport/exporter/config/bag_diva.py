@@ -248,7 +248,11 @@ def row_formatter_verblijfsobjecten(row):
         4. If there's a value in gebruiksdoelGezondheidszorgfunctie use this value
         5. If there are multiple gebruiksdoel and no gebruiksdoelWoonfunctie use the first value
     """
-    node = row['node']
+    if 'node' in row:
+        node = row['node']  # export via graphql/graphql_streaming
+    else:
+        node = row  # export via enhanced views
+
     # Get the first gebruiksdoel, sorted by code
     sorted_gebruiksdoel = sorted(node['gebruiksdoel'], key=lambda i: int(i['code']))
     gebruiksdoel = sorted_gebruiksdoel[0]['omschrijving']
