@@ -234,6 +234,7 @@ class TestUVA2ConfigHelpers(TestCase):
         }
 
         self.assertEqual(row_formatter_verblijfsobjecten(row), expected_row)
+        self.assertEqual(row_formatter_verblijfsobjecten(row['node']), expected_row['node'])
 
         # Test woonfuctie multiple, expect first record sorted by code
         row = {
@@ -255,6 +256,7 @@ class TestUVA2ConfigHelpers(TestCase):
         }
 
         self.assertEqual(row_formatter_verblijfsobjecten(row), expected_row)
+        self.assertEqual(row_formatter_verblijfsobjecten(row['node']), expected_row['node'])
 
         # Test gebruiksdoelWoonfunctie
         row = {
@@ -276,6 +278,7 @@ class TestUVA2ConfigHelpers(TestCase):
         }
 
         self.assertEqual(row_formatter_verblijfsobjecten(row), expected_row)
+        self.assertEqual(row_formatter_verblijfsobjecten(row['node']), expected_row['node'])
 
         # Test gebruiksdoelGezondheidszorgfunctie
         row = {
@@ -297,6 +300,7 @@ class TestUVA2ConfigHelpers(TestCase):
         }
 
         self.assertEqual(row_formatter_verblijfsobjecten(row), expected_row)
+        self.assertEqual(row_formatter_verblijfsobjecten(row['node']), expected_row['node'])
 
     def test_row_formatter_geometrie(self):
         row = {
