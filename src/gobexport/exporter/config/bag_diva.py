@@ -833,14 +833,14 @@ def _add_ligplaatsen_diva_config():
     edges {
       node {
         amsterdamseSleutel
-        beginGeldigheid
-        eindGeldigheid
         heeftHoofdadres {
           edges {
             node {
               amsterdamseSleutel
               beginGeldigheid
               eindGeldigheid
+              beginGeldigheidRelatie
+              eindGeldigheidRelatie
             }
           }
         }
@@ -856,14 +856,14 @@ def _add_ligplaatsen_diva_config():
     edges {
       node {
         amsterdamseSleutel
-        beginGeldigheid
-        eindGeldigheid
         heeftNevenadres {
           edges {
             node {
               amsterdamseSleutel
               beginGeldigheid
               eindGeldigheid
+              beginGeldigheidRelatie
+              eindGeldigheidRelatie
             }
           }
         }
@@ -1019,12 +1019,12 @@ def _add_ligplaatsen_diva_config():
             'NUMLIGHFD/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftHoofdadres.[0].beginGeldigheid',
+                'value': 'heeftHoofdadres.[0].beginGeldigheidRelatie',
             },
             'NUMLIGHFD/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftHoofdadres.[0].eindGeldigheid',
+                'value': 'heeftHoofdadres.[0].eindGeldigheidRelatie',
             }
         },
         'query': uva2_numlighfd_query
@@ -1059,12 +1059,12 @@ def _add_ligplaatsen_diva_config():
             'NUMLIGNVN/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftNevenadres.[0].beginGeldigheid',
+                'value': 'heeftNevenadres.[0].beginGeldigheidRelatie',
             },
             'NUMLIGNVN/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftNevenadres.[0].eindGeldigheid',
+                'value': 'heeftNevenadres.[0].eindGeldigheidRelatie',
             }
         },
         'query': uva2_numlignvn_query
@@ -1232,14 +1232,14 @@ def _add_standplaatsen_diva_config():
     edges {
       node {
         amsterdamseSleutel
-        beginGeldigheid
-        eindGeldigheid
         heeftHoofdadres {
           edges {
             node {
               amsterdamseSleutel
               beginGeldigheid
               eindGeldigheid
+              beginGeldigheidRelatie
+              eindGeldigheidRelatie
             }
           }
         }
@@ -1255,14 +1255,14 @@ def _add_standplaatsen_diva_config():
     edges {
       node {
         amsterdamseSleutel
-        beginGeldigheid
-        eindGeldigheid
         heeftNevenadres {
           edges {
             node {
               amsterdamseSleutel
               beginGeldigheid
               eindGeldigheid
+              beginGeldigheidRelatie
+              eindGeldigheidRelatie
             }
           }
         }
@@ -1418,12 +1418,12 @@ def _add_standplaatsen_diva_config():
             'NUMSTAHFD/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftHoofdadres.[0].beginGeldigheid',
+                'value': 'heeftHoofdadres.[0].beginGeldigheidRelatie',
             },
             'NUMSTAHFD/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftHoofdadres.[0].eindGeldigheid',
+                'value': 'heeftHoofdadres.[0].eindGeldigheidRelatie',
             }
         },
         'query': uva2_numstahfd_query
@@ -1458,12 +1458,12 @@ def _add_standplaatsen_diva_config():
             'NUMSTANVN/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftNevenadres.[0].beginGeldigheid',
+                'value': 'heeftNevenadres.[0].beginGeldigheidRelatie',
             },
             'NUMSTANVN/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftNevenadres.[0].eindGeldigheid',
+                'value': 'heeftNevenadres.[0].eindGeldigheidRelatie',
             }
         },
         'query': uva2_numstanvn_query
@@ -1656,14 +1656,14 @@ def _add_verblijfsobjecten_diva_config():
     edges {
       node {
         amsterdamseSleutel
-        beginGeldigheid
-        eindGeldigheid
         heeftHoofdadres {
           edges {
             node {
               amsterdamseSleutel
               beginGeldigheid
               eindGeldigheid
+              beginGeldigheidRelatie
+              eindGeldigheidRelatie
             }
           }
         }
@@ -1679,14 +1679,14 @@ def _add_verblijfsobjecten_diva_config():
     edges {
       node {
         amsterdamseSleutel
-        beginGeldigheid
-        eindGeldigheid
         heeftNevenadres {
           edges {
             node {
               amsterdamseSleutel
               beginGeldigheid
               eindGeldigheid
+              beginGeldigheidRelatie
+              eindGeldigheidRelatie
             }
           }
         }
@@ -2038,12 +2038,12 @@ def _add_verblijfsobjecten_diva_config():
             'NUMVBOHFD/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftHoofdadres.[0].beginGeldigheid',
+                'value': 'heeftHoofdadres.[0].beginGeldigheidRelatie',
             },
             'NUMVBOHFD/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftHoofdadres.[0].eindGeldigheid',
+                'value': 'heeftHoofdadres.[0].eindGeldigheidRelatie',
             }
         },
         'query': uva2_numvbohfd_query
@@ -2078,12 +2078,12 @@ def _add_verblijfsobjecten_diva_config():
             'NUMVBONVN/TijdvakRelatie/begindatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftNevenadres.[0].beginGeldigheid',
+                'value': 'heeftNevenadres.[0].beginGeldigheidRelatie',
             },
             'NUMVBONVN/TijdvakRelatie/einddatumRelatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'heeftNevenadres.[0].eindGeldigheid',
+                'value': 'heeftNevenadres.[0].eindGeldigheidRelatie',
             }
         },
         'query': uva2_numvbonvn_query
