@@ -11,6 +11,13 @@ A running [GOB infrastructure](https://github.com/Amsterdam/GOB-Infra) and
 [GOB API](https://github.com/Amsterdam/GOB-API)
 is required to run this component.
 
+## Secure data
+
+In order to access secure data over the GOB API you need to define environment variables:
+- KEYCLOAK_URL
+- KEYCLOAK_CLIENT_ID
+- KEYCLOAK_SECRET
+
 # Docker
 
 ## Requirements
