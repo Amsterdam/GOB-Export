@@ -12,8 +12,14 @@ class TestEntityExportConfig:
             'filename': 'test_output.ndjson',
             'mime_type': 'application/x-ndjson',
             'format': None
+        },
+        'sec': {
+            'exporter': ndjson_exporter,
+            'endpoint': '/gob/secure/test_catalogue/secure/',
+            'filename': 'test_secure.ndjson',
+            'mime_type': 'application/x-ndjson',
+            'format': None
         }
     }
-
 
 configs = [TestEntityExportConfig]
