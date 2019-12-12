@@ -11,7 +11,7 @@ from gobcore.model import GOBModel
 
 from gobexport.formatter.graphql import GraphQLResultFormatter
 
-GRAPHQL_ENDPOINT = '/gob/graphql/'
+GRAPHQL_ENDPOINT = '/gob/secure/graphql/'
 NUM_RECORDS = 1  # Initially ask for only one record
 TARGET_DURATION = 30  # Target request duration is 30 seconds
 
