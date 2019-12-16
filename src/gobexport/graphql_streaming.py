@@ -5,7 +5,7 @@ from gobexport.requests import post_stream
 
 from gobexport.formatter.graphql import GraphQLResultFormatter
 
-STREAMING_GRAPHQL_ENDPOINT = '/gob/graphql/streaming/'
+STREAMING_GRAPHQL_ENDPOINT = '/gob/secure/graphql/streaming/'
 
 
 class GraphQLStreaming:

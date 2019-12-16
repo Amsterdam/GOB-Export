@@ -1100,7 +1100,7 @@ def _add_ligplaatsen_diva_config():
             'Naam openbare ruimte hoofdadres': 'ligtAanOpenbareruimte.naam',
             'Straatnaam NEN hoofdadres': 'ligtAanOpenbareruimte.naamNen',
             'Straatnaam TPG hoofdadres': 'ligtAanOpenbareruimte.straatnaamPtt',
-            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.amsterdamseSleutel',
+            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.identificatie',
             'Woonplaatsnaam hoofdadres': 'ligtInWoonplaats.naam',
             'Datum begin geldigheid ligplaats': {
                 'action': 'format',
@@ -1499,7 +1499,7 @@ def _add_standplaatsen_diva_config():
             'Naam openbare ruimte hoofdadres': 'ligtAanOpenbareruimte.naam',
             'Straatnaam NEN hoofdadres': 'ligtAanOpenbareruimte.naamNen',
             'Straatnaam TPG hoofdadres': 'ligtAanOpenbareruimte.straatnaamPtt',
-            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.amsterdamseSleutel',
+            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.identificatie',
             'Woonplaatsnaam hoofdadres': 'ligtInWoonplaats.naam',
             'Datum begin geldigheid standplaats': {
                 'action': 'format',
@@ -2120,7 +2120,7 @@ def _add_verblijfsobjecten_diva_config():
             'Naam openbare ruimte hoofdadres': 'ligtAanOpenbareruimte.naam',
             'Straatnaam NEN hoofdadres': 'ligtAanOpenbareruimte.naamNen',
             'Straatnaam TPG hoofdadres': 'ligtAanOpenbareruimte.straatnaamPtt',
-            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.amsterdamseSleutel',
+            'Woonplaatscode hoofdadres': 'ligtInWoonplaats.identificatie',
             'Woonplaatsnaam hoofdadres': 'ligtInWoonplaats.naam',
             'Datum begin geldigheid verblijfsobject': {
                 'action': 'format',

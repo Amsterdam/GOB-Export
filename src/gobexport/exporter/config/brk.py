@@ -1,11 +1,11 @@
 import dateutil.parser as dt_parser
-import requests
 import copy
 
 from fractions import Fraction
 from operator import itemgetter
 from typing import Optional
 
+from gobexport import requests
 from gobexport.config import get_host
 
 from gobexport.exporter.csv import csv_exporter
@@ -42,7 +42,7 @@ FILE_TYPE_MAPPING = {
 
 
 def _get_filename_date():
-    meta = requests.get(f"{get_host()}/gob/brk/meta/1").json()
+    meta = requests.get(f"{get_host()}/gob/secure/brk/meta/1").json()
     return dt_parser.parse(meta.get('kennisgevingsdatum'))
 
 
@@ -304,7 +304,7 @@ class KadastralesubjectenExportConfig:
 
     products = {
         'csv': {
-            'endpoint': '/gob/brk/kadastralesubjecten/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/secure/brk/kadastralesubjecten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': lambda: brk_filename("kadastraal_subject"),
             'mime_type': 'plain/text',
@@ -2186,7 +2186,7 @@ class KadastraleGemeentecodesExportConfig:
         },
         'lineshape': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/brk/kadastralegemeentecodes/?view=linegeometry&ndjson=true',
+            'endpoint': '/gob/secure/brk/kadastralegemeentecodes/?view=linegeometry&ndjson=true',
             'filename': f'{brk_directory("shp")}/{line_filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -2279,7 +2279,7 @@ class KadastralesectiesExportConfig:
         },
         'lineshape': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/brk/kadastralesecties/?view=linegeometry&ndjson=true',
+            'endpoint': '/gob/secure/brk/kadastralesecties/?view=linegeometry&ndjson=true',
             'filename': f'{brk_directory("shp")}/{line_filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
