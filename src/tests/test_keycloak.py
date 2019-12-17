@@ -3,9 +3,9 @@ from unittest import TestCase, mock
 from gobexport.keycloak import get_credentials, refresh_credentials, get_secure_header
 
 
-@mock.patch('gobexport.keycloak.OIDC_PROVIDER_TOKEN_ENDPOINT', "any keycloak url")
-@mock.patch('gobexport.keycloak.OIDC_PROVIDER_CLIENT_ID', "any keycloak client id")
-@mock.patch('gobexport.keycloak.OIDC_PROVIDER_CLIENT_SECRET', "any keycloak secret")
+@mock.patch('gobexport.keycloak.OIDC_TOKEN_ENDPOINT', "any keycloak url")
+@mock.patch('gobexport.keycloak.OIDC_CLIENT_ID', "any keycloak client id")
+@mock.patch('gobexport.keycloak.OIDC_CLIENT_SECRET', "any keycloak secret")
 class TestKeycloak(TestCase):
 
     @mock.patch('gobexport.keycloak.requests.post')
