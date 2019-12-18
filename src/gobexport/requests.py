@@ -5,7 +5,7 @@ import urllib.request
 
 from gobexport.keycloak import get_secure_header
 
-_MAX_TRIES = 60                # Maximum number of times to try the request
+_MAX_TRIES = 3                 # Maximum number of times to try the request
 _RETRY_TIMEOUT = 60            # Seconds between consecetive retries
 
 # Pass a tuple to timeout with the first element being a connect timeout

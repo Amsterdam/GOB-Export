@@ -23,7 +23,7 @@ from gobexport.buffered_iterable import with_buffered_iterable
 from gobexport.utils import resolve_config_filenames
 
 _MAX_TRIES = 3          # Default number of times to try the export
-_RETRY_TIMEOUT = 300    # Default seconds between consecutive retries
+_RETRY_TIMEOUT = 60     # Default seconds between consecutive retries
 
 
 # TODO: Should be fetched from GOBCore in next iterations
