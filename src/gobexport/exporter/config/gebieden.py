@@ -989,13 +989,3 @@ class BouwblokkenExportConfig:
 '''
         }
     }
-
-
-configs = [
-    StadsdelenExportConfig,
-    GGPGebiedenExportConfig,
-    GGWGebiedenExportConfig,
-    WijkenExportConfig,
-    BuurtenExportConfig,
-    BouwblokkenExportConfig
-]

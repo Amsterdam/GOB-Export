@@ -133,11 +133,3 @@ class RollagenExportConfig:
             'query': query
         }
     }
-
-
-configs = [
-    MeetboutExportConfig,
-    MetingenExportConfig,
-    ReferentiepuntenExportConfig,
-    RollagenExportConfig
-]
