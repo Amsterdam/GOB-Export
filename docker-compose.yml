@@ -8,9 +8,9 @@ services:
     environment:
       MESSAGE_BROKER_ADDRESS: rabbitmq
       API_HOST: http://gobapi:8000
-      KEYCLOAK_URL: ${KEYCLOAK_URL}
-      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
-      KEYCLOAK_SECRET: ${KEYCLOAK_SECRET}
+      OIDC_TOKEN_ENDPOINT: ${OIDC_TOKEN_ENDPOINT}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
     env_file: .env
 
 networks:

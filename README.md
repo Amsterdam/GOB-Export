@@ -14,9 +14,9 @@ is required to run this component.
 ## Secure data
 
 In order to access secure data over the GOB API you need to define environment variables:
-- KEYCLOAK_URL
-- KEYCLOAK_CLIENT_ID
-- KEYCLOAK_SECRET
+- OIDC_TOKEN_ENDPOINT
+- OIDC_CLIENT_ID
+- OIDC_CLIENT_SECRET
 
 # Docker
 
