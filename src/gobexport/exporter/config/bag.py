@@ -1731,15 +1731,3 @@ class BrondocumentenExportConfig:
             }
         },
     }
-
-
-configs = [
-    WoonplaatsenExportConfig,
-    OpenbareruimtesExportConfig,
-    NummeraanduidingenExportConfig,
-    VerblijfsobjectenExportConfig,
-    StandplaatsenExportConfig,
-    LigplaatsenExportConfig,
-    PandenExportConfig,
-    BrondocumentenExportConfig
-]

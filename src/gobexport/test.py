@@ -40,19 +40,11 @@ from gobcore.logging.logger import logger
 
 from gobexport.config import CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
-from gobexport.exporter.config import nap, gebieden, meetbouten, bag, test
+from gobexport.exporter import CONFIG_MAPPING
 from gobexport.utils import resolve_config_filenames
 
-
-# All export configurations per catalogue
-_export_config = {
-    "nap": nap.configs,
-    "gebieden": gebieden.configs,
-    "meetbouten": meetbouten.configs,
-    "bag": bag.configs,
-    "test_catalogue": test.configs
-}
-
+# Collect all export configs
+_export_config = {cat: configs.values() for cat, configs in CONFIG_MAPPING.items()}
 
 # Allow for variables in filenames. A variable will be converted into a regular expression
 # and vice versa for a generated proposal
