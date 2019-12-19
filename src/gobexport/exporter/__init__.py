@@ -99,7 +99,7 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
     else:
         # Use the REST API
         endpoint = product.get('endpoint')
-        api = API(host=host, path=endpoint)
+        api = API(host=host, path=endpoint, row_formatter=product.get('row_formatter'))
 
     exporter = product.get('exporter')
     format = product.get('format')
