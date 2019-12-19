@@ -22,7 +22,7 @@ graphql_records = [{'identificatie': '2', 'boolean': True, 'geometrie': {'type':
 
 
 class MockAPI:
-    def __init__(self, host=None, path=None):
+    def __init__(self, host=None, path=None, row_formatter=None):
         pass
 
     def __iter__(self):
