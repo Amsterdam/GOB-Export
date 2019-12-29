@@ -1,5 +1,5 @@
 from gobexport.api import API
-from gobexport.exporter.config import bag, brk, gebieden, meetbouten, nap, test, wkpb
+from gobexport.exporter.config import bag, brk, bgt, gebieden, meetbouten, nap, test, wkpb
 from gobexport.exporter.config.bag_diva import add_bag_diva_products
 from gobexport.exporter.config.gebieden_uva2 import add_gebieden_uva2_products
 from gobexport.graphql import GraphQL
@@ -51,6 +51,10 @@ CONFIG_MAPPING = {
         'perceelnummer': brk.PerceelnummerExportConfig,
         'kadastralegemeentecodes': brk.KadastraleGemeentecodesExportConfig,
         'kadastralesecties': brk.KadastralesectiesExportConfig,
+    },
+    'bgt': {
+        'onderbouw': bgt.OnderbouwExportConfig,
+        'overbouw': bgt.OverbouwExportConfig,
     },
     'wkpb': {
         'beperkingen': wkpb.BeperkingenExportConfig,
