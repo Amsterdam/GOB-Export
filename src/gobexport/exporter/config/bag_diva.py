@@ -2160,7 +2160,7 @@ def _add_verblijfsobjecten_diva_config():
                 'formatter': get_latitude,
                 'value': 'geometrie',
             },
-            'Oppervlakte verblijfsobject': '',  # empty
+            'Oppervlakte verblijfsobject': 'oppervlakte',
             'Documentdatum mutatie': {
                 'action': 'format',
                 'formatter': format_uva2_date,
