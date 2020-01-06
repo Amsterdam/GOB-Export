@@ -91,12 +91,14 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
         query = product['query']
         expand_history = product.get('expand_history')
         sort = product.get('sort')
-        api = GraphQL(host, query, catalogue, collection, expand_history, sort=sort, unfold=unfold,
+        secure = product.get('secure', False)
+        api = GraphQL(host, query, catalogue, collection, expand_history, sort=sort, unfold=unfold, secure=secure,
                       row_formatter=product.get('row_formatter'),
                       cross_relations=product.get('cross_relations', False))
     elif product.get('api_type') == 'graphql_streaming':
         query = product['query']
-        api = GraphQLStreaming(host, query, unfold=unfold, sort=product.get('sort'),
+        secure = product.get('secure', False)
+        api = GraphQLStreaming(host, query, unfold=unfold, sort=product.get('sort'), secure=secure,
                                row_formatter=product.get('row_formatter'),
                                cross_relations=product.get('cross_relations', False),
                                batch_size=product.get('batch_size'))
