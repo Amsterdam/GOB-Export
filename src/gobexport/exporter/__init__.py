@@ -1,5 +1,5 @@
 from gobexport.api import API
-from gobexport.exporter.config import bag, brk, gebieden, meetbouten, nap, test, wkpb
+from gobexport.exporter.config import bag, brk, bgt, gebieden, meetbouten, nap, test, wkpb
 from gobexport.exporter.config.bag_diva import add_bag_diva_products
 from gobexport.exporter.config.gebieden_uva2 import add_gebieden_uva2_products
 from gobexport.graphql import GraphQL
@@ -52,6 +52,10 @@ CONFIG_MAPPING = {
         'kadastralegemeentecodes': brk.KadastraleGemeentecodesExportConfig,
         'kadastralesecties': brk.KadastralesectiesExportConfig,
     },
+    'bgt': {
+        'onderbouw': bgt.OnderbouwExportConfig,
+        'overbouw': bgt.OverbouwExportConfig,
+    },
     'wkpb': {
         'beperkingen': wkpb.BeperkingenExportConfig,
         'brondocumenten': wkpb.BrondocumentenExportConfig,
@@ -87,19 +91,21 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
         query = product['query']
         expand_history = product.get('expand_history')
         sort = product.get('sort')
-        api = GraphQL(host, query, catalogue, collection, expand_history, sort=sort, unfold=unfold,
+        secure = product.get('secure', False)
+        api = GraphQL(host, query, catalogue, collection, expand_history, sort=sort, unfold=unfold, secure=secure,
                       row_formatter=product.get('row_formatter'),
                       cross_relations=product.get('cross_relations', False))
     elif product.get('api_type') == 'graphql_streaming':
         query = product['query']
-        api = GraphQLStreaming(host, query, unfold=unfold, sort=product.get('sort'),
+        secure = product.get('secure', False)
+        api = GraphQLStreaming(host, query, unfold=unfold, sort=product.get('sort'), secure=secure,
                                row_formatter=product.get('row_formatter'),
                                cross_relations=product.get('cross_relations', False),
                                batch_size=product.get('batch_size'))
     else:
         # Use the REST API
         endpoint = product.get('endpoint')
-        api = API(host=host, path=endpoint)
+        api = API(host=host, path=endpoint, row_formatter=product.get('row_formatter'))
 
     exporter = product.get('exporter')
     format = product.get('format')

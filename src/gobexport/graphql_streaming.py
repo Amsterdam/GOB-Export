@@ -3,17 +3,20 @@ import re
 
 from gobexport.requests import post_stream
 
+from gobexport.config import PUBLIC_URL, SECURE_URL
 from gobexport.formatter.graphql import GraphQLResultFormatter
 
-STREAMING_GRAPHQL_ENDPOINT = '/gob/secure/graphql/streaming/'
+STREAMING_GRAPHQL_PUBLIC_ENDPOINT = f'{PUBLIC_URL}/graphql/streaming/'
+STREAMING_GRAPHQL_SECURE_ENDPOINT = f'{SECURE_URL}/graphql/streaming/'
 
 
 class GraphQLStreaming:
 
     def __init__(self, host, query, unfold=False, sort=None, row_formatter=None, cross_relations=False,
-                 batch_size=None):
+                 batch_size=None, secure=False):
         self.host = host
         self.query = query
+        self.url = self.host + (STREAMING_GRAPHQL_SECURE_ENDPOINT if secure else STREAMING_GRAPHQL_PUBLIC_ENDPOINT)
         self.batch_size = batch_size
 
         self.formatter = GraphQLResultFormatter(sort=sort, unfold=unfold, row_formatter=row_formatter,
@@ -22,7 +25,7 @@ class GraphQLStreaming:
         self.current_page = None
 
     def _execute_query(self, query):
-        yield from post_stream(f"{self.host}{STREAMING_GRAPHQL_ENDPOINT}", {'query': query})
+        yield from post_stream(self.url, {'query': query})
 
     def _query_all(self):
         """Query on the input query as is. Don't add pagination.

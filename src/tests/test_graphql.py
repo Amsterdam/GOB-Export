@@ -3,6 +3,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from gobexport.graphql import GraphQL
+from gobexport.graphql import GRAPHQL_PUBLIC_ENDPOINT, GRAPHQL_SECURE_ENDPOINT
 
 next = False
 
@@ -118,6 +119,13 @@ class TestGraphQl(TestCase):
 
         api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=MagicMock())
         self.assertIsNotNone(api.formatter)
+
+    def test_secure(self):
+        api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
+        self.assertEqual(api.url, f'host{GRAPHQL_PUBLIC_ENDPOINT}')
+
+        api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', secure=True)
+        self.assertEqual(api.url, f'host{GRAPHQL_SECURE_ENDPOINT}')
 
     @patch("gobexport.graphql.requests.post")
     @patch("gobexport.graphql.GraphQLResultFormatter")

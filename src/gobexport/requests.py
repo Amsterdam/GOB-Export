@@ -3,6 +3,7 @@ import time
 
 import urllib.request
 
+from gobexport.config import SECURE_URL
 from gobexport.keycloak import get_secure_header
 
 _MAX_TRIES = 60                # Maximum number of times to try the request
@@ -15,7 +16,7 @@ _RETRY_TIMEOUT = 60            # Seconds between consecetive retries
 _REQUEST_TIMEOUT = (60, 7200)  # Request timout to 60 seconds to connect and 2 hours for the data
 
 # String that identifies a secure GOB url. If an url contains this string it is the url of a secure endpoint
-_SECURE_URL = "/gob/secure/"
+_SECURE_URL = f'{SECURE_URL}/'
 
 
 class APIException(IOError):

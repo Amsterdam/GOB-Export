@@ -80,6 +80,7 @@ class TestStream(TestCase):
         api = API('host', 'path ndjson=true')
         result = [i for i in api]
         self.assertEqual(result, [1, 2, 3])
+        self.assertEqual(5, api.format_item(5))
 
     @patch('gobexport.api.ijson')
     @patch('gobexport.api.requests')
@@ -89,4 +90,22 @@ class TestStream(TestCase):
         api = API('host', 'path stream=true')
         result = [i for i in api]
         self.assertEqual(result, [1, 2, 3])
+        self.assertEqual(5, api.format_item(5))
 
+    @patch('gobexport.api.ijson')
+    @patch('gobexport.api.requests')
+    def test_format_item_with_row_formatter(self, mock_requests, mock_ijson):
+        mock_requests.urlopen.return_value = None
+        row_formatter = lambda x: x*2
+
+        mock_requests.get_stream.return_value = ['1', '2', '3']
+        api = API('host', 'path ndjson=true', row_formatter=row_formatter)
+        result = [i for i in api]
+        self.assertEqual(result, [2, 4, 6])
+
+        mock_ijson.items.return_value = [1, 2, 3]
+        api = API('host', 'path stream=true', row_formatter=row_formatter)
+        result = [i for i in api]
+        self.assertEqual(result, [2, 4, 6])
+
+        self.assertEqual(10, api.format_item(5))
