@@ -3,7 +3,8 @@ import random
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from gobexport.graphql_streaming import GraphQLStreaming, STREAMING_GRAPHQL_ENDPOINT
+from gobexport.graphql_streaming import GraphQLStreaming
+from gobexport.graphql_streaming import STREAMING_GRAPHQL_PUBLIC_ENDPOINT, STREAMING_GRAPHQL_SECURE_ENDPOINT
 from typing import Generator
 
 
@@ -26,6 +27,13 @@ class TestGraphQLStreaming(TestCase):
 
         graphql_streaming._query_paginated.assert_called_once()
 
+    def test_secure(self, mock_formatter):
+        api = GraphQLStreaming('host', 'query')
+        self.assertEqual(api.url, f'host{STREAMING_GRAPHQL_PUBLIC_ENDPOINT}')
+
+        api = GraphQLStreaming('host', 'query', secure=True)
+        self.assertEqual(api.url, f'host{STREAMING_GRAPHQL_SECURE_ENDPOINT}')
+
     @patch("gobexport.graphql_streaming.post_stream")
     def test_execute_query(self, mock_post, mock_formatter):
         mock_post.return_value = iter(['a', 'b', 'c', 'd'])
@@ -34,7 +42,7 @@ class TestGraphQLStreaming(TestCase):
         result = graphql_streaming._execute_query('the query')
 
         self.assertEqual(['a', 'b', 'c', 'd'], list(result))
-        mock_post.assert_called_with(f'host{STREAMING_GRAPHQL_ENDPOINT}', {'query': 'the query'})
+        mock_post.assert_called_with(f'host{STREAMING_GRAPHQL_PUBLIC_ENDPOINT}', {'query': 'the query'})
 
     @patch("gobexport.graphql_streaming.json.loads", lambda x: x)
     def test_query_all(self, mock_formatter):

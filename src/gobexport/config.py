@@ -18,6 +18,10 @@ OIDC_TOKEN_ENDPOINT = os.getenv("OIDC_TOKEN_ENDPOINT")
 OIDC_CLIENT_ID = os.getenv("OIDC_CLIENT_ID")
 OIDC_CLIENT_SECRET = os.getenv("OIDC_CLIENT_SECRET")
 
+# Definition of URLs for public and secure endpoints
+PUBLIC_URL = '/gob'
+SECURE_URL = '/gob/secure'
+
 
 def get_host():
     """API Host

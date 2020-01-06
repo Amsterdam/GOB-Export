@@ -9,9 +9,11 @@ import time
 
 from gobcore.model import GOBModel
 
+from gobexport.config import PUBLIC_URL, SECURE_URL
 from gobexport.formatter.graphql import GraphQLResultFormatter
 
-GRAPHQL_ENDPOINT = '/gob/secure/graphql/'
+GRAPHQL_PUBLIC_ENDPOINT = f'{PUBLIC_URL}/graphql/'
+GRAPHQL_SECURE_ENDPOINT = f'{SECURE_URL}/graphql/'
 NUM_RECORDS = 1  # Initially ask for only one record
 TARGET_DURATION = 30  # Target request duration is 30 seconds
 
@@ -20,7 +22,7 @@ class GraphQL:
     sorter = None
 
     def __init__(self, host, query, catalogue, collection, expand_history=False, sort=None, unfold=False,
-                 row_formatter=None, cross_relations=False):
+                 row_formatter=None, cross_relations=False, secure=False):
         """Constructor
 
         Lazy loading, Just register host and query and wait for the iterator to be called
@@ -32,7 +34,7 @@ class GraphQL:
         :param collection:
         """
         self.host = host
-        self.url = self.host + GRAPHQL_ENDPOINT
+        self.url = self.host + (GRAPHQL_SECURE_ENDPOINT if secure else GRAPHQL_PUBLIC_ENDPOINT)
         self.catalogue = catalogue
         self.collection = collection
         self.schema_collection_name = f'{self.catalogue}{self.collection.title()}'
