@@ -21,7 +21,8 @@ class OnderbouwExportConfig:
                     'formatter': format_guid,
                     'value': 'identificatie',
                 },
-                'eindregistratie': 'eindGeldigheid',
+                'beginGeldigheid': 'beginGeldigheid',
+                'eindGeldigheid': 'eindGeldigheid',
                 'relatievehoogteligging': 'relatieveHoogteligging',
                 'geometrie': {
                     'action': 'format',
@@ -31,10 +32,11 @@ class OnderbouwExportConfig:
             },
             'query': """
 {
-    bgtOnderbouw {
+  bgtOnderbouw {
     edges {
       node {
         identificatie
+        beginGeldigheid
         eindGeldigheid
         relatieveHoogteligging
         geometrie
@@ -62,7 +64,8 @@ class OverbouwExportConfig:
                     'formatter': format_guid,
                     'value': 'identificatie',
                 },
-                'eindregistratie': 'eindGeldigheid',
+                'beginGeldigheid': 'beginGeldigheid',
+                'eindGeldigheid': 'eindGeldigheid',
                 'relatievehoogteligging': 'relatieveHoogteligging',
                 'geometrie': {
                     'action': 'format',
@@ -72,10 +75,11 @@ class OverbouwExportConfig:
             },
             'query': """
 {
-    bgtOverbouw {
+  bgtOverbouw {
     edges {
       node {
         identificatie
+        beginGeldigheid
         eindGeldigheid
         relatieveHoogteligging
         geometrie
