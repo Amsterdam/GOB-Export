@@ -95,6 +95,8 @@ UVA2_MAPPING = {
         '4': 'DEF',
         '5': 'DEF',
         '6': 'DEF',
+        '7': 'DEF',
+        '8': 'DEF',
     },
     'verblijfsobjecten_status_coordinaat_omschrijving': {
         '1': 'Tijdelijk punt',
@@ -103,6 +105,8 @@ UVA2_MAPPING = {
         '4': 'Definitief punt',
         '5': 'Definitief punt',
         '6': 'Definitief punt',
+        '7': 'Definitief punt',
+        '8': 'Definitief punt',
     },
     'verblijfsobjecten_type_woonobject_code': {
         'Meerdere woningen': 'M',
@@ -2130,7 +2134,7 @@ def _add_verblijfsobjecten_diva_config():
             'Datum einde geldigheid verblijfsobject': {
                 'action': 'format',
                 'formatter': format_uva2_date,
-                'value': 'eindGeldigheidObject',
+                'value': 'eindGeldigheid',
             },
             'Stadsdeelcode': 'ligtInStadsdeel.code',
             'Stadsdeelnaam': 'ligtInStadsdeel.naam',
@@ -2215,7 +2219,23 @@ def _add_verblijfsobjecten_diva_config():
             },
             'Aantal verhuurbare eenheden': 'aantalEenhedenComplex',
             'CBS-nummer': 'cbsNummer',
-            'Aantal bouwlagen': 'aantalBouwlagen',
+            'Aantal bouwlagen': {
+                'condition': 'isnone',
+                'reference': 'aantalBouwlagen',
+                'trueval': {
+                    'action': 'literal',
+                    'value': '0',
+                },
+                'falseval': {
+                    'condition': 'isempty',
+                    'reference': 'aantalBouwlagen',
+                    'trueval': {
+                        'action': 'literal',
+                        'value': '0',
+                    },
+                    'falseval': 'aantalBouwlagen'
+                }
+            },
             'Type woonobject domein': {
                 'action': 'format',
                 'formatter': format_uva2_mapping,
@@ -2233,16 +2253,86 @@ def _add_verblijfsobjecten_diva_config():
             'Gebruik omschrijving': 'feitelijkGebruik.omschrijving',
             'Locatie ingang code': '',  # empty
             'Locatie ingang omschrijving': '',  # empty
-            'Ligging code': 'ligtInPanden.ligging.code',
+            'Ligging code': {
+                'condition': 'isnone',
+                'reference': 'ligtInPanden.ligging.code',
+                'trueval': {
+                    'action': 'literal',
+                    'value': '',
+                },
+                'falseval': {
+                    'action': 'fill',
+                    'length': 2,
+                    'character': '0',
+                    'value': 'ligtInPanden.ligging.code',
+                    'fill_type': 'rjust'
+                }
+            },
             'Ligging omschrijving': 'ligtInPanden.ligging.omschrijving',
             'Financieringswijze code': 'financieringscode.code',
             'Financieringswijze omschrijving': 'financieringscode.omschrijving',
-            'Eigendomsverhouding code': 'eigendomsverhouding.code',
+            'Eigendomsverhouding code': {
+                'condition': 'isnone',
+                'reference': 'eigendomsverhouding.code',
+                'trueval': {
+                    'action': 'literal',
+                    'value': '',
+                },
+                'falseval': {
+                    'action': 'fill',
+                    'length': 2,
+                    'character': '0',
+                    'value': 'eigendomsverhouding.code',
+                    'fill_type': 'rjust'
+                }
+            },
             'Eigendomsverhouding omschrijving': 'eigendomsverhouding.omschrijving',
-            'Toegang code': 'toegang.code',
-            'Toegang omschrijving': 'toegang.omschrijving',
+            'Toegang code': {
+                'condition': 'isnone',
+                'reference': 'toegang.code',
+                'trueval': {
+                    'action': 'literal',
+                    'value': '',
+                },
+                'falseval': {
+                    'action': 'fill',
+                    'length': 2,
+                    'character': '0',
+                    'value': 'toegang.code',
+                    'fill_type': 'rjust'
+                }
+            },
+            'Toegang omschrijving': {
+                'condition': 'isnone',
+                'reference': 'toegang.omschrijving',
+                'trueval': {
+                    'action': 'literal',
+                    'value': '',
+                },
+                'falseval': {
+                    'action': 'concat',
+                    'fields': [
+                        'toegang.omschrijving',
+                        {
+                            'action': 'literal',
+                            'value': ' ('
+                        },
+                        {
+                            'action': 'fill',
+                            'length': 2,
+                            'character': '0',
+                            'value': 'toegang.code',
+                            'fill_type': 'rjust'
+                        },
+                        {
+                            'action': 'literal',
+                            'value': ')'
+                        },
+                    ]
+                }
+            },
             'Bouwjaar': 'ligtInPanden.oorspronkelijkBouwjaar',
-            'Bouwbloknummer': 'ligtInPanden.ligtInBouwblok.code',
+            'Bouwbloknummer': 'ligtInBouwblok.code',
         }
     }
 
