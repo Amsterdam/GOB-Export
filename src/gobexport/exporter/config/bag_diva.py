@@ -258,11 +258,11 @@ def row_formatter_verblijfsobjecten(row):
     gebruiksdoel = sorted_gebruiksdoel[0]['omschrijving']
 
     # Overwrite if we have a woonfunctie or gezondheidszorgfunctie
-    if node['gebruiksdoelWoonfunctie']:
+    if node.get('gebruiksdoelWoonfunctie'):
         gebruiksdoel = node['gebruiksdoelWoonfunctie']['omschrijving']
         gebruiksdoel = 'woonfunctie verpleeghuis' if gebruiksdoel == 'Verpleeghuis' else gebruiksdoel
 
-    if node['gebruiksdoelGezondheidszorgfunctie']:
+    if node.get('gebruiksdoelGezondheidszorgfunctie'):
         gebruiksdoel = node['gebruiksdoelGezondheidszorgfunctie']['omschrijving']
         gebruiksdoel = 'gezondheidszorgfunctie verpleeghuis' if gebruiksdoel == 'Verpleeghuis' else gebruiksdoel
 
