@@ -122,11 +122,14 @@ def _get_file(conn_info, filename):
     :param filename: name of the file to retrieve
     :return:
     """
-    for item in get_full_container_list(conn_info['connection'], conn_info['container']):
-        if item["name"] == filename:
-            obj_info = dict(item)
-            obj = get_object(conn_info['connection'], item, conn_info['container'])
-            return obj_info, obj
+    try:
+        for item in get_full_container_list(conn_info['connection'], conn_info['container']):
+            if item["name"] == filename:
+                obj_info = dict(item)
+                obj = get_object(conn_info['connection'], item, conn_info['container'])
+                return obj_info, obj
+    except Exception:
+        pass
 
     return None, None
 

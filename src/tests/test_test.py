@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import gobexport.test as test
 
+
 class MockConfig:
     products = {}
 
@@ -326,6 +327,22 @@ class TestExportTest(TestCase):
         self.assertEqual(obj_info, {'name': filename})
         self.assertEqual(obj, "get object")
         mock_get_object.assert_called_with('any connection', {'name': filename}, 'any container')
+
+    @patch('gobexport.test.logger', MagicMock())
+    @patch('gobexport.test.get_object')
+    @patch('gobexport.test.get_full_container_list')
+    def test_get_file_not_found(self, mock_get_full_container_list, mock_get_object):
+        conn_info = {
+            'connection': "any connection",
+            'container': "any container"
+        }
+        filename = "any filename"
+
+        mock_get_full_container_list.side_effect = lambda *args: raise_exception()
+        obj_info, obj = test._get_file(conn_info, filename)
+        self.assertIsNone(obj_info)
+        self.assertIsNone(obj)
+        mock_get_object.assert_not_called()
 
     @patch('gobexport.test.logger')
     @patch('gobexport.test._get_file')
