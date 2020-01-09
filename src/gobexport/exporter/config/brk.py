@@ -304,7 +304,7 @@ class KadastralesubjectenExportConfig:
 
     products = {
         'csv': {
-            'endpoint': '/gob/brk/kadastralesubjecten/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/secure/brk/kadastralesubjecten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': lambda: brk_filename("kadastraal_subject"),
             'mime_type': 'plain/text',
@@ -477,6 +477,7 @@ class AantekeningenExportConfig:
     products = {
         'csv_art': {
             'api_type': 'graphql_streaming',
+            'secure': True,
             'unfold': True,
             'cross_relations': True,
             'entity_filters': [
@@ -491,6 +492,7 @@ class AantekeningenExportConfig:
         },
         'csv_akt': {
             'api_type': 'graphql_streaming',
+            'secure': True,
             'unfold': True,
             'entity_filters': [
                 NotEmptyFilter('heeftBetrekkingOpKadastraalObject.[0].identificatie'),
@@ -1007,6 +1009,7 @@ class ZakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'unfold': True,
             'row_formatter': format.row_formatter,
             'entity_filters': [
@@ -1046,6 +1049,7 @@ class AardzakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql',
+            'secure': True,
             'query': query,
             'filename': lambda: brk_filename("c_aard_zakelijkrecht"),
             'mime_type': 'plain/text',
@@ -1214,6 +1218,7 @@ class BrkBagExportConfig:
                 VotFilter(),
             ],
             'api_type': 'graphql_streaming',
+            'secure': True,
             'unfold': True,
             'query': query,
             'filename': lambda: brk_filename("BRK_BAG"),
@@ -1376,6 +1381,7 @@ class StukdelenExportConfig:
         'csv_tng': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'batch_size': 10000,
             'unfold': True,
             'query': query_tng,
@@ -1384,11 +1390,12 @@ class StukdelenExportConfig:
             'format': format,
             'entity_filters': [
                 NotEmptyFilter('isBronVoorTenaamstelling.[0].identificatie'),
-            ]
+            ],
         },
         'csv_art': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'batch_size': 10000,
             'unfold': True,
             'query': query_art,
@@ -1400,11 +1407,12 @@ class StukdelenExportConfig:
                 NotEmptyFilter(
                     'isBronVoorAantekeningRecht.[0].identificatie',
                 ),
-            ]
+            ],
         },
         'csv_akt': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'batch_size': 10000,
             'unfold': True,
             'query': query_akt,
@@ -1416,11 +1424,12 @@ class StukdelenExportConfig:
                 NotEmptyFilter(
                     'isBronVoorAantekeningKadastraalObject.[0].identificatie',
                 ),
-            ]
+            ],
         },
         'csv_zrt': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'batch_size': 10000,
             'unfold': True,
             'append': True,
@@ -1430,7 +1439,7 @@ class StukdelenExportConfig:
             'format': format,
             'entity_filters': [
                 NotEmptyFilter('isBronVoorZakelijkRecht.[0].appartementsrechtsplitsingidentificatie')
-            ]
+            ],
         }
     }
 
@@ -2012,6 +2021,7 @@ class KadastraleobjectenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'query': csv_query,
             'filename': lambda: brk_filename('kadastraal_object'),
             'mime_type': 'plain/text',
@@ -2020,6 +2030,7 @@ class KadastraleobjectenExportConfig:
         },
         'esri_actueel': {
             'api_type': 'graphql_streaming',
+            'secure': True,
             'exporter': esri_exporter,
             'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shp',
             'mime_type': 'application/octet-stream',
@@ -2039,10 +2050,11 @@ class KadastraleobjectenExportConfig:
                     'mime_type': 'application/octet-stream'
                 },
             ],
-            'query': esri_query
+            'query': esri_query,
         },
         'esri_actueel_no_subjects': {
             'api_type': 'graphql_streaming',
+            'secure': True,
             'exporter': esri_exporter,
             'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shp',
             'mime_type': 'application/octet-stream',
@@ -2061,7 +2073,7 @@ class KadastraleobjectenExportConfig:
                     'mime_type': 'application/octet-stream'
                 },
             ],
-            'query': esri_query
+            'query': esri_query,
         }
     }
 
@@ -2086,6 +2098,7 @@ class GemeentesExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql',
+            'secure': True,
             'query': query,
             'filename': lambda: brk_filename('Gemeente', type='csv'),
             'mime_type': 'plain/text',
@@ -2102,6 +2115,7 @@ class GemeentesExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql',
+            'secure': True,
             'filename': f'{brk_directory("shp")}/{shp_filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -2161,6 +2175,7 @@ class KadastraleGemeentecodesExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'filename': f'{brk_directory("shp")}/{filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -2186,7 +2201,7 @@ class KadastraleGemeentecodesExportConfig:
         },
         'lineshape': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/brk/kadastralegemeentecodes/?view=linegeometry&ndjson=true',
+            'endpoint': '/gob/secure/brk/kadastralegemeentecodes/?view=linegeometry&ndjson=true',
             'filename': f'{brk_directory("shp")}/{line_filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -2253,6 +2268,7 @@ class KadastralesectiesExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'filename': f'{brk_directory("shp")}/{filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -2279,7 +2295,7 @@ class KadastralesectiesExportConfig:
         },
         'lineshape': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/brk/kadastralesecties/?view=linegeometry&ndjson=true',
+            'endpoint': '/gob/secure/brk/kadastralesecties/?view=linegeometry&ndjson=true',
             'filename': f'{brk_directory("shp")}/{line_filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -2355,6 +2371,7 @@ class BijpijlingExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'filename': lambda: brk_filename('bijpijling', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('bijpijlingGeometrie'),
@@ -2484,6 +2501,7 @@ class PerceelnummerExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
+            'secure': True,
             'filename': lambda: brk_filename('perceelnummer', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('plaatscoordinaten'),
