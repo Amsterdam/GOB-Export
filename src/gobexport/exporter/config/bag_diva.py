@@ -2224,7 +2224,7 @@ def _add_verblijfsobjecten_diva_config():
                 'reference': 'aantalBouwlagen',
                 'trueval': {
                     'action': 'literal',
-                    'value': '0',
+                    'value': '',
                 },
                 'falseval': {
                     'condition': 'isempty',
@@ -2289,7 +2289,7 @@ def _add_verblijfsobjecten_diva_config():
             'Eigendomsverhouding omschrijving': 'eigendomsverhouding.omschrijving',
             'Toegang code': {
                 'condition': 'isnone',
-                'reference': 'toegang.code',
+                'reference': 'toegang.[0].code',
                 'trueval': {
                     'action': 'literal',
                     'value': '',
@@ -2298,13 +2298,13 @@ def _add_verblijfsobjecten_diva_config():
                     'action': 'fill',
                     'length': 2,
                     'character': '0',
-                    'value': 'toegang.code',
+                    'value': 'toegang.[0].code',
                     'fill_type': 'rjust'
                 }
             },
             'Toegang omschrijving': {
                 'condition': 'isnone',
-                'reference': 'toegang.omschrijving',
+                'reference': 'toegang.[0].omschrijving',
                 'trueval': {
                     'action': 'literal',
                     'value': '',
@@ -2312,7 +2312,7 @@ def _add_verblijfsobjecten_diva_config():
                 'falseval': {
                     'action': 'concat',
                     'fields': [
-                        'toegang.omschrijving',
+                        'toegang.[0].omschrijving',
                         {
                             'action': 'literal',
                             'value': ' ('
@@ -2321,7 +2321,7 @@ def _add_verblijfsobjecten_diva_config():
                             'action': 'fill',
                             'length': 2,
                             'character': '0',
-                            'value': 'toegang.code',
+                            'value': 'toegang.[0].code',
                             'fill_type': 'rjust'
                         },
                         {
