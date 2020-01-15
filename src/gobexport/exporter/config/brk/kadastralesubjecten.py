@@ -117,7 +117,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
             'SJT_NP_AANDUIDINGNAAMGEBR_CODE': 'naamGebruik.code',
             'SJT_NP_AANDUIDINGNAAMGEBR_OMS': 'naamGebruik.omschrijving',
             'SJT_NP_VOORNAMEN_PARTNER': 'voornamenPartner',
-            'SJT_NP_VOORVOEGSEL_PARTNER': 'voorVoegselsPartner',
+            'SJT_NP_VOORVOEGSEL_PARTNER': 'voorvoegselsPartner',
             'SJT_NP_GESLACHTSNAAM_PARTNER': 'geslachtsnaamPartner',
             'SJT_NP_LANDWAARNAARVERTR_CODE': 'landWaarnaarVertrokken.code',
             'SJT_NP_LANDWAARNAARVERTR_OMS': 'landWaarnaarVertrokken.omschrijving',
@@ -154,10 +154,10 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
 
     def _get_address_attrs(self):
         nl_address_format = {
-            'OPENBARERUIMTENAAM': 'openbare_ruimte',
+            'OPENBARERUIMTENAAM': 'openbareRuimte',
             'HUISNUMMER': 'huisnummer',
             'HUISLETTER': 'huisletter',
-            'HUISNUMMERTOEVOEGING': 'huisnummer_toevoeging',
+            'HUISNUMMERTOEVOEGING': 'huisnummerToevoeging',
             'POSTCODE': 'postcode',
             'WOONPLAATSNAAM': 'woonplaats',
         }
