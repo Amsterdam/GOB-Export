@@ -73,6 +73,29 @@ def post(url, json):
     return _exec(requests.post, url=url, headers=_updated_headers(url), json=json, timeout=_REQUEST_TIMEOUT)
 
 
+def handle_streaming_gob_response(func):
+    """Wraps streaming endpoints, adds error handling as implemented by GOB-API
+    GOB-API always returns an empty line on a successful request. If the last line is not an empty line, an
+    APIException is raised.
+
+    :param func:
+    :return:
+    """
+    def wrapper(*args, **kwargs):
+        last_item = None
+        for item in func(*args, **kwargs):
+            last_item = item
+
+            if last_item != b'':
+                yield item
+
+        if last_item != b'':
+            raise APIException(f"Incomplete request received from API. See API logs for more info.")
+
+    return wrapper
+
+
+@handle_streaming_gob_response
 def get_stream(url):
     result = requests.get(url=url, headers=_updated_headers(url), stream=True)
 
@@ -83,6 +106,7 @@ def get_stream(url):
     return result.iter_lines()
 
 
+@handle_streaming_gob_response
 def post_stream(url, json, **kwargs):
     result = requests.post(url, headers=_updated_headers(url), stream=True, json=json, **kwargs)
 

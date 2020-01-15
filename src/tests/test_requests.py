@@ -45,16 +45,31 @@ class TestRequests(TestCase):
             gobexport.requests.post("any url", "any json")
         self.assertEqual(mock_requests.post.call_count, 10)
 
+    def test_handle_streaming_gob_response(self):
+        correct_result = ['a', 'b', b'']
+
+        f = gobexport.requests.handle_streaming_gob_response(lambda: iter(correct_result))
+        result = list(f())
+        self.assertEqual(correct_result[:-1], result)
+
+        # No closing newline
+        incorrect_result = ['a', 'b']
+        f = gobexport.requests.handle_streaming_gob_response(lambda: iter(incorrect_result))
+
+        with self.assertRaisesRegex(gobexport.requests.APIException, "Incomplete request received"):
+            result = list(f())
+
     @patch("gobexport.requests.requests")
     def test_stream(self, mock_requests):
 
         mock_get = MockGet()
-        mock_get.iter_lines = MagicMock()
+        mock_get.iter_lines = MagicMock(return_value=['some item', b''])
 
         mock_requests.get.return_value = mock_get
 
-        result = gobexport.requests.get_stream('any url')
+        result = list(gobexport.requests.get_stream('any url'))
         mock_get.iter_lines.assert_called()
+        self.assertEqual(mock_get.iter_lines.return_value[:-1], result)
 
     @patch("gobexport.requests.requests.get")
     def test_get_stream_exception(self, mock_requests_get):
@@ -63,18 +78,20 @@ class TestRequests(TestCase):
         mock_requests_get.return_value = mock_get
 
         with self.assertRaisesRegexp(gobexport.requests.APIException, 'Request failed due to API exception'):
-            gobexport.requests.get_stream('any url')
+            list(gobexport.requests.get_stream('any url'))
 
     @patch("gobexport.requests.requests")
     def test_post(self, mock_requests):
-        result = gobexport.requests.post_stream('url', 'some json')
+        mock_requests.post.return_value.iter_lines.return_value = ['something', b'']
+        result = list(gobexport.requests.post_stream('url', 'some json'))
         mock_requests.post.assert_called_with('url', headers=None, stream=True, json='some json')
-        self.assertEqual(mock_requests.post.return_value.iter_lines.return_value, result)
+        self.assertEqual(mock_requests.post.return_value.iter_lines.return_value[:-1], result)
 
     @patch("gobexport.requests.requests")
     def test_post_stream_params(self, mock_requests):
         kwargs = {'abc': 'def', 'ghi': 'jkl'}
-        result = gobexport.requests.post_stream('url', 'some json', **kwargs)
+        mock_requests.post.return_value.iter_lines.return_value = ['one line', b'']
+        result = list(gobexport.requests.post_stream('url', 'some json', **kwargs))
         mock_requests.post.assert_called_with('url', headers=None, stream=True, json='some json', **kwargs)
 
     @patch("gobexport.requests.requests.post")
@@ -84,7 +101,7 @@ class TestRequests(TestCase):
         mock_requests_post.return_value = mock_get
 
         with self.assertRaisesRegexp(gobexport.requests.APIException, 'Request failed due to API exception'):
-            gobexport.requests.post_stream('any url', True)
+            list(gobexport.requests.post_stream('any url', True))
 
     @patch('gobexport.requests.urllib.request.Request', lambda url, headers: url)
     @patch('gobexport.requests.urllib.request.urlopen')
