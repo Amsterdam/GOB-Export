@@ -92,7 +92,11 @@ def _export_collection(host, catalogue, collection, product_name, destination):
     files = []
 
     # If a product has been supplied, export only that product
-    products = {product_name: config.products[product_name]} if product_name else config.products
+    try:
+        products = {product_name: config.products[product_name]} if product_name else config.products
+    except KeyError:
+        logger.error(f"Product '{product_name}' not found")
+        return
 
     # Start exporting each product
     for name, product in products.items():
