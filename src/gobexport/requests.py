@@ -48,7 +48,7 @@ def _exec(method, url, headers, **kwargs):
             #
             # All exceptions that Requests explicitly raises inherit from requests.exceptions.RequestException.
             n_tries += 1
-            print(f"Request exception: '{str(e)}'")
+            print(f"Request exception: status {response.status_code}, '{str(e)}'")
             print(f"Retry in {_RETRY_TIMEOUT} seconds, retries left: {_MAX_TRIES - n_tries}")
             time.sleep(_RETRY_TIMEOUT)
             # Update headers because access token might be expired

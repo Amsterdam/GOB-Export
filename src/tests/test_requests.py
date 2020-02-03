@@ -11,9 +11,11 @@ class MockResponse:
 
     def __init__(self, exc):
         self.exc = exc
+        self.status_code = 'any status code'
 
     def raise_for_status(self):
         raise self.exc("Any reason")
+    
 
 
 class MockGet:
