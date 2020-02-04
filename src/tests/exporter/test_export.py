@@ -152,6 +152,26 @@ def test_export_to_file(monkeypatch):
 
 class TestExportToFile(TestCase):
 
+    @patch("gobexport.exporter.API")
+    @patch("gobexport.exporter.MergedApi")
+    def test_init_api_merge_result(self, mock_merged_api, mock_api):
+        from gobexport.exporter import _init_api
+
+        product = {
+            'endpoint': '/end/point/1',
+            'merge_result': {
+                'endpoint': '/end/point/2',
+                'match_attributes': ['attr_a', 'attr_b'],
+                'attributes': ['merge_attr'],
+            }
+        }
+
+        res = _init_api(product, 'host', 'catalogue', 'collection')
+
+        self.assertEqual(mock_merged_api.return_value, res)
+        mock_merged_api.assert_called_with(mock_api.return_value, mock_api.return_value,
+                                           ['attr_a', 'attr_b'], ['merge_attr'])
+
     @patch("gobexport.exporter.GraphQLStreaming")
     @patch("gobexport.exporter.BufferedIterable")
     @patch("gobexport.exporter.product_source", lambda x: 'source')

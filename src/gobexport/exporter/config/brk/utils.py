@@ -32,8 +32,12 @@ FILE_TYPE_MAPPING = {
 
 
 def _get_filename_date():
-    meta = requests.get(f"{get_host()}/gob/brk/meta/1").json()
-    return dt_parser.parse(meta.get('kennisgevingsdatum'))
+    response = requests.get(f"{get_host()}/gob/brk/meta/1")
+
+    if response.status_code == 200:
+        meta = response.json()
+        return dt_parser.parse(meta.get('kennisgevingsdatum'))
+    return None
 
 
 def brk_directory(type='csv'):
@@ -45,7 +49,7 @@ def brk_filename(name, type='csv', append_date=True):
     assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
     _, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
     date = _get_filename_date()
-    datestr = f"_{date.strftime('%Y%m%d')}" if append_date else ""
+    datestr = f"_{date.strftime('%Y%m%d') if date else '00000000'}" if append_date else ""
     return f'{brk_directory(type)}/BRK_{name}{datestr}.{extension}'
 
 
