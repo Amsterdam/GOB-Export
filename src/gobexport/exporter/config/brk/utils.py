@@ -1,6 +1,7 @@
 import requests
 import dateutil.parser as dt_parser
 
+from requests.exceptions import HTTPError
 from operator import itemgetter
 from typing import Optional
 
@@ -32,7 +33,14 @@ FILE_TYPE_MAPPING = {
 
 
 def _get_filename_date():
-    meta = requests.get(f"{get_host()}/gob/brk/meta/1").json()
+    response = requests.get(f"{get_host()}/gob/brk/meta/1")
+
+    try:
+        response.raise_for_status()
+    except HTTPError:
+        return None
+
+    meta = response.json()
     return dt_parser.parse(meta.get('kennisgevingsdatum'))
 
 
@@ -45,7 +53,7 @@ def brk_filename(name, type='csv', append_date=True):
     assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
     _, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
     date = _get_filename_date()
-    datestr = f"_{date.strftime('%Y%m%d')}" if append_date else ""
+    datestr = f"_{date.strftime('%Y%m%d') if date else '00000000'}" if append_date else ""
     return f'{brk_directory(type)}/BRK_{name}{datestr}.{extension}'
 
 

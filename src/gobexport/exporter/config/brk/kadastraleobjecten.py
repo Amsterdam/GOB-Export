@@ -70,6 +70,30 @@ class KadastraleobjectenCsvFormat:
             falseval=f"vanKadastraalsubject.[0].{attribute}",
         )
 
+    def row_formatter(self, row):
+        """Merges all 'isOntstaanUitGPerceel' relations into one object, with identificatie column concatenated into
+        one, separated by comma's.
+
+        (Very) simplified example:
+        in     = { isOntstaanUitGPerceel: [{identificatie: 'A'}, {identificatie: 'B'}, {identificatie: 'C'}]}
+        result = { isOntstaanUitGPerceel: [{identificatie: 'A,B,C'}]}
+
+        :param row:
+        :return:
+        """
+        identificatie = ','.join([edge['node']['identificatie']
+                                  for edge in row['node']['isOntstaanUitGPerceel'].get('edges')])
+
+        row['node']['isOntstaanUitGPerceel'] = {
+            'edges': [{
+                'node': {
+                    'identificatie': identificatie
+                }
+            }]
+        }
+
+        return row
+
     def get_format(self):
         return {
             'BRK_KOT_ID': 'identificatie',
@@ -89,7 +113,7 @@ class KadastraleobjectenCsvFormat:
                 'value': 'grootte',
                 'formatter': self.format_kadgrootte,
             },
-            'KOT_RELATIE_G_PERCEEL': self.concat_with_comma('isOntstaanUitGPerceel.identificatie', False),
+            'KOT_RELATIE_G_PERCEEL': 'isOntstaanUitGPerceel.identificatie',
             'KOT_KOOPSOM': 'koopsom',
             'KOT_KOOPSOM_VALUTA': 'koopsomValutacode',
             'KOT_KOOPJAAR': 'koopjaar',
@@ -328,6 +352,26 @@ class KadastraleobjectenExportConfig:
     esri_format = KadastraleobjectenEsriFormat()
     esri_format_no_subjects = KadastraleobjectenEsriNoSubjectsFormat()
 
+    gperc_query = '''
+{
+  brkKadastraleobjecten {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        isOntstaanUitGPerceel {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
     csv_query = '''
 {
   brkKadastraleobjecten {
@@ -369,13 +413,6 @@ class KadastraleobjectenExportConfig:
         indexnummer
         soortGrootte
         grootte
-        isOntstaanUitGPerceel {
-          edges {
-            node {
-              identificatie
-            }
-          }
-        }
         koopsom
         koopsomValutacode
         koopjaar
@@ -582,6 +619,14 @@ class KadastraleobjectenExportConfig:
     """
     products = {
         'csv': {
+            'merge_result': {
+                'api_type': 'graphql_streaming',
+                'attributes': ['isOntstaanUitGPerceel'],
+                'query': gperc_query,
+                'match_attributes': ['identificatie', 'volgnummer'],
+                'row_formatter': csv_format.row_formatter,
+                'secure': True,
+            },
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
             'secure': True,

@@ -5,6 +5,7 @@ import urllib.request
 
 from gobexport.config import SECURE_URL
 from gobexport.keycloak import get_secure_header
+from gobexport.worker import Worker
 
 _MAX_TRIES = 60                # Maximum number of times to try the request
 _RETRY_TIMEOUT = 60            # Seconds between consecetive retries
@@ -97,24 +98,25 @@ def handle_streaming_gob_response(func):
 
 @handle_streaming_gob_response
 def get_stream(url):
-    result = requests.get(url=url, headers=_updated_headers(url), stream=True)
 
     try:
+        result = requests.get(url=url, headers=_updated_headers(url, Worker.headers), stream=True)
         result.raise_for_status()
+        result = Worker.handle_response(result)
     except requests.exceptions.RequestException as e:
         raise APIException(f"Request failed due to API exception, response code {result.status_code}")
-    return result.iter_lines()
+    return result
 
 
 @handle_streaming_gob_response
 def post_stream(url, json, **kwargs):
-    result = requests.post(url, headers=_updated_headers(url), stream=True, json=json, **kwargs)
-
     try:
+        result = requests.post(url, headers=_updated_headers(url, Worker.headers), stream=True, json=json, **kwargs)
         result.raise_for_status()
+        result = Worker.handle_response(result)
     except requests.exceptions.RequestException as e:
         raise APIException(f"Request failed due to API exception, response code {result.status_code}")
-    return result.iter_lines()
+    return result
 
 
 def urlopen(url):

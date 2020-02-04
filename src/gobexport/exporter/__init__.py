@@ -7,6 +7,7 @@ from gobexport.graphql import GraphQL
 from gobexport.graphql_streaming import GraphQLStreaming
 from gobexport.buffered_iterable import BufferedIterable
 from gobexport.filters.group_filter import GroupFilter
+from gobexport.merged_api import MergedApi
 
 CONFIG_MAPPING = {
     'test_catalogue': {
@@ -72,19 +73,7 @@ def product_source(product):
     return product.get('endpoint', product.get('query'))
 
 
-def export_to_file(host, product, file, catalogue, collection, buffer_items=False):
-    """Export a collection from a catalog a file.
-
-    The entities that are exposed by the specified API host are retrieved, converted and written to
-    the specified output file
-
-    :param host: The API host
-    :param product: The product definition for this export type
-    :param file: The name of the file to write the ouput
-    :param catalogue: The catalogue to export
-    :param collection: The collection to export
-    :return: The number of exported rows
-    """
+def _init_api(product: dict, host: str, catalogue: str, collection: str):
     unfold = product.get('unfold', False)
 
     if product.get('api_type') == 'graphql':
@@ -107,6 +96,30 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
         # Use the REST API
         endpoint = product.get('endpoint')
         api = API(host=host, path=endpoint, row_formatter=product.get('row_formatter'))
+
+    if product.get('merge_result'):
+        # A secondary API is defined. Return a new MergedAPI object that combines the results from both API's.
+        api2_product = product.get('merge_result')
+        api2 = _init_api(api2_product, host, catalogue, collection)
+        api = MergedApi(api, api2, api2_product['match_attributes'], api2_product['attributes'])
+
+    return api
+
+
+def export_to_file(host, product, file, catalogue, collection, buffer_items=False):
+    """Export a collection from a catalog a file.
+
+    The entities that are exposed by the specified API host are retrieved, converted and written to
+    the specified output file
+
+    :param host: The API host
+    :param product: The product definition for this export type
+    :param file: The name of the file to write the ouput
+    :param catalogue: The catalogue to export
+    :param collection: The collection to export
+    :return: The number of exported rows
+    """
+    api = _init_api(product, host, catalogue, collection)
 
     exporter = product.get('exporter')
     format = product.get('format')

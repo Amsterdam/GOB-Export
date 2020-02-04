@@ -2,6 +2,8 @@ from unittest import TestCase
 from unittest.mock import patch
 from datetime import datetime
 
+from requests.exceptions import HTTPError
+
 from gobexport.exporter.config.brk.utils import brk_filename, sort_attributes, format_timestamp, _get_filename_date
 
 
@@ -21,6 +23,11 @@ class TestBrkConfigHelpers(TestCase):
         # Assert undefined file type raises error
         with self.assertRaises(AssertionError):
             brk_filename('FileName', type='xxx')
+
+    @patch("gobexport.exporter.config.brk.utils._get_filename_date", lambda: None)
+    def test_brk_filename_none_date(self):
+        self.assertEqual(f"AmsterdamRegio/CSV_Actueel/BRK_FileName_00000000.csv",
+                         brk_filename('FileName'))
 
     def test_sort_attributes(self):
         attrs = {
@@ -76,6 +83,7 @@ class TestBrkConfigHelpers(TestCase):
 
     @patch("gobexport.exporter.config.brk.utils.requests.get")
     def test_get_filename_date(self, mock_request_get):
+        mock_request_get.return_value.status_code = 200
         mock_request_get.return_value.json.return_value = {
             'id': 1,
             'kennisgevingsdatum': "2019-09-03T00:00:00",
@@ -83,3 +91,9 @@ class TestBrkConfigHelpers(TestCase):
 
         expected_date = datetime(year=2019, month=9, day=3)
         self.assertEqual(expected_date, _get_filename_date())
+
+    @patch("gobexport.exporter.config.brk.utils.requests.get")
+    def test_get_filename_date_no_meta(self, mock_request_get):
+        mock_request_get.return_value.raise_for_status.side_effect = HTTPError
+
+        self.assertIsNone(_get_filename_date())
