@@ -62,10 +62,12 @@ class TestRequests(TestCase):
             result = list(f())
 
     @patch("gobexport.requests.requests")
-    def test_stream(self, mock_requests):
+    @patch("gobexport.requests.Worker")
+    def test_stream(self, mock_worker, mock_requests):
 
         mock_get = MockGet()
         mock_get.iter_lines = MagicMock(return_value=['some item', b''])
+        mock_worker.handle_response = mock_get.iter_lines
 
         mock_requests.get.return_value = mock_get
 
@@ -83,18 +85,23 @@ class TestRequests(TestCase):
             list(gobexport.requests.get_stream('any url'))
 
     @patch("gobexport.requests.requests")
-    def test_post(self, mock_requests):
+    @patch("gobexport.requests.Worker")
+    def test_post(self, mock_worker, mock_requests):
         mock_requests.post.return_value.iter_lines.return_value = ['something', b'']
+        mock_worker.handle_response.return_value = ['something', b'']
         result = list(gobexport.requests.post_stream('url', 'some json'))
-        mock_requests.post.assert_called_with('url', headers=None, stream=True, json='some json')
+        mock_requests.post.assert_called_with('url', headers=mock_worker.headers, stream=True, json='some json')
         self.assertEqual(mock_requests.post.return_value.iter_lines.return_value[:-1], result)
 
     @patch("gobexport.requests.requests")
-    def test_post_stream_params(self, mock_requests):
+    @patch("gobexport.requests.Worker")
+    def test_post_stream_params(self, mock_worker, mock_requests):
         kwargs = {'abc': 'def', 'ghi': 'jkl'}
         mock_requests.post.return_value.iter_lines.return_value = ['one line', b'']
+        mock_worker.handle_response.return_value = ['one line', b'']
         result = list(gobexport.requests.post_stream('url', 'some json', **kwargs))
-        mock_requests.post.assert_called_with('url', headers=None, stream=True, json='some json', **kwargs)
+        mock_requests.post.assert_called_with('url', headers=mock_worker.headers, stream=True, json='some json', **kwargs)
+        self.assertEqual(result, ['one line'])
 
     @patch("gobexport.requests.requests.post")
     def test_post_stream_exception(self, mock_requests_post):
