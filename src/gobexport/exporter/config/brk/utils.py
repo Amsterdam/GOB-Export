@@ -1,6 +1,7 @@
 import requests
 import dateutil.parser as dt_parser
 
+from requests.exceptions import HTTPError
 from operator import itemgetter
 from typing import Optional
 
@@ -34,10 +35,13 @@ FILE_TYPE_MAPPING = {
 def _get_filename_date():
     response = requests.get(f"{get_host()}/gob/brk/meta/1")
 
-    if response.status_code == 200:
-        meta = response.json()
-        return dt_parser.parse(meta.get('kennisgevingsdatum'))
-    return None
+    try:
+        response.raise_for_status()
+    except HTTPError:
+        return None
+
+    meta = response.json()
+    return dt_parser.parse(meta.get('kennisgevingsdatum'))
 
 
 def brk_directory(type='csv'):

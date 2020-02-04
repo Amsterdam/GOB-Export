@@ -2,6 +2,8 @@ from unittest import TestCase
 from unittest.mock import patch
 from datetime import datetime
 
+from requests.exceptions import HTTPError
+
 from gobexport.exporter.config.brk.utils import brk_filename, sort_attributes, format_timestamp, _get_filename_date
 
 
@@ -92,6 +94,6 @@ class TestBrkConfigHelpers(TestCase):
 
     @patch("gobexport.exporter.config.brk.utils.requests.get")
     def test_get_filename_date_no_meta(self, mock_request_get):
-        mock_request_get.return_value.status_code = 500
+        mock_request_get.return_value.raise_for_status.side_effect = HTTPError
 
         self.assertIsNone(_get_filename_date())
