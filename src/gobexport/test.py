@@ -41,7 +41,7 @@ from gobcore.logging.logger import logger
 from gobexport.config import CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.exporter import CONFIG_MAPPING
-from gobexport.utils import resolve_config_filenames
+from gobexport.utils import resolve_config_filenames, json_loads
 
 # Collect all export configs
 _export_config = {cat: configs.values() for cat, configs in CONFIG_MAPPING.items()}
@@ -166,7 +166,7 @@ def _get_checks(conn_info, catalogue):
         logger.error(f"Missing checks file: {filename}")
         return {}
     try:
-        return json.loads(checks_file.decode("utf-8"))
+        return json_loads(checks_file.decode("utf-8"))
     except json.JSONDecodeError as e:
         logger.error(f"JSON error in checks file '{filename}': {str(e)}")
         return {}

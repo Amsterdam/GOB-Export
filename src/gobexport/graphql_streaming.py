@@ -1,10 +1,10 @@
-import json
 import re
 
 from gobexport.requests import post_stream
 
 from gobexport.config import PUBLIC_URL, SECURE_URL
 from gobexport.formatter.graphql import GraphQLResultFormatter
+from gobexport.utils import json_loads
 
 STREAMING_GRAPHQL_PUBLIC_ENDPOINT = f'{PUBLIC_URL}/graphql/streaming/'
 STREAMING_GRAPHQL_SECURE_ENDPOINT = f'{SECURE_URL}/graphql/streaming/'
@@ -35,7 +35,7 @@ class GraphQLStreaming:
         for item in self._execute_query(self.query):
             # Formatter may return multiple rows for one item, for example when 'unfold' is set to True. Hence the
             # double yield from (the first yield from being in _execute_query)
-            yield from self.formatter.format_item(json.loads(item))
+            yield from self.formatter.format_item(json_loads(item))
 
     def _add_pagination_to_query(self, query: str, after: str, batch_size: int):
         existing_arguments_pattern = re.compile(r'^(\s*{\s*)(\w+)\s*\((.*)\)')
@@ -78,7 +78,7 @@ class GraphQLStreaming:
             for item in items:
                 result_cnt += 1
 
-                for formatted_item in self.formatter.format_item(json.loads(item)):
+                for formatted_item in self.formatter.format_item(json_loads(item)):
                     last_item = formatted_item['cursor']
                     yield formatted_item
 
