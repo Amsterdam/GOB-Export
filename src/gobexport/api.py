@@ -5,9 +5,9 @@ Encapsulates a paged API endpoint into an iterator
 """
 import time
 import ijson
-import json
 
 import gobexport.requests as requests
+from gobexport.utils import json_loads
 
 
 class API:
@@ -52,7 +52,7 @@ class API:
             print("ndjson")
             items = requests.get_stream(f'{self.host}{self.path}')
             for item in items:
-                yield self.format_item(json.loads(item))
+                yield self.format_item(json_loads(item))
         else:
             while self.path is not None:
                 start = time.time()
