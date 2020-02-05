@@ -44,7 +44,7 @@ class TestGraphQLStreaming(TestCase):
         self.assertEqual(['a', 'b', 'c', 'd'], list(result))
         mock_post.assert_called_with(f'host{STREAMING_GRAPHQL_PUBLIC_ENDPOINT}', {'query': 'the query'})
 
-    @patch("gobexport.graphql_streaming.json.loads", lambda x: x)
+    @patch("gobexport.graphql_streaming.json_loads", lambda x: x)
     def test_query_all(self, mock_formatter):
         query = f'query{random.randint(0, 1000)}'
         exp_result = [random.randint(0, 1000) for _ in range(10)]
@@ -73,7 +73,7 @@ class TestGraphQLStreaming(TestCase):
         graphql_streaming._add_pagination_to_query.assert_called_with(query, after, batch_size)
         graphql_streaming._execute_query.assert_called_with(graphql_streaming._add_pagination_to_query.return_value)
 
-    @patch("gobexport.graphql_streaming.json.loads", lambda x: x)
+    @patch("gobexport.graphql_streaming.json_loads", lambda x: x)
     def test_query_paginated(self, mock_formatter):
         res = {
             None: [

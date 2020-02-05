@@ -1,3 +1,5 @@
+import json
+
 
 def resolve_config_filenames(config):
     """Replaces filenames in config with the resolved version for the filenames that are defined with functions.
@@ -28,3 +30,11 @@ def resolve_config_filenames(config):
         product[filename] = product[resolve_filename]()
         for file in product.get('extra_files', []):
             file[filename] = file[resolve_filename]()
+
+
+def json_loads(item):
+    try:
+        return json.loads(item)
+    except Exception as e:
+        print(f"ERROR: Deserialization failed for item {item}.")
+        raise e
