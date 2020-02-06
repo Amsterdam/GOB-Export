@@ -99,23 +99,26 @@ def handle_streaming_gob_response(func):
 @handle_streaming_gob_response
 def get_stream(url):
 
+    result = None
     try:
         result = requests.get(url=url, headers=_updated_headers(url, Worker.headers), stream=True)
         result.raise_for_status()
         result = Worker.handle_response(result)
     except requests.exceptions.RequestException as e:
-        raise APIException(f"Request failed due to API exception, response code {result.status_code}")
+        raise APIException(f"Request failed due to API exception, response code {result and result.status_code}")
     return result
 
 
 @handle_streaming_gob_response
 def post_stream(url, json, **kwargs):
+
+    result = None
     try:
         result = requests.post(url, headers=_updated_headers(url, Worker.headers), stream=True, json=json, **kwargs)
         result.raise_for_status()
         result = Worker.handle_response(result)
     except requests.exceptions.RequestException as e:
-        raise APIException(f"Request failed due to API exception, response code {result.status_code}")
+        raise APIException(f"Request failed due to API exception, response code {result and result.status_code}")
     return result
 
 
