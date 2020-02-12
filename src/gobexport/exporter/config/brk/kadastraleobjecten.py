@@ -618,24 +618,6 @@ class KadastraleobjectenExportConfig:
     tenaamstellingen have an even aandeel, sort the tenaamstellingen by its subject's geslachtsnaam.
     """
     products = {
-        'csv': {
-            'merge_result': {
-                'api_type': 'graphql_streaming',
-                'attributes': ['isOntstaanUitGPerceel'],
-                'query': gperc_query,
-                'match_attributes': ['identificatie', 'volgnummer'],
-                'row_formatter': csv_format.row_formatter,
-                'secure': True,
-            },
-            'exporter': csv_exporter,
-            'api_type': 'graphql_streaming',
-            'secure': True,
-            'query': csv_query,
-            'filename': lambda: brk_filename('kadastraal_object'),
-            'mime_type': 'plain/text',
-            'format': csv_format.get_format(),
-            'sort': sort,
-        },
         'esri_actueel': {
             'api_type': 'graphql_streaming',
             'secure': True,

@@ -472,13 +472,6 @@ class NummeraanduidingenExportConfig:
             'mime_type': 'plain/text',
             'format': format.get_format(),
         },
-        'csv_history': {
-            'endpoint': '/gob/bag/nummeraanduidingen/?view=enhanced_history&page_size=50000',
-            'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/BAG_nummeraanduiding_ActueelEnHistorie.csv',
-            'mime_type': 'plain/text',
-            'format': history_format.get_format(),
-        },
     }
 
 
@@ -704,13 +697,6 @@ class VerblijfsobjectenExportConfig:
                     'mime_type': 'application/octet-stream'
                 },
             ],
-        },
-        'csv_history': {
-            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced_history&page_size=50000',
-            'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/BAG_verblijfsobject_ActueelEnHistorie.csv',
-            'mime_type': 'plain/text',
-            'format': history_format.get_format(),
         },
     }
 
@@ -1688,13 +1674,6 @@ class PandenExportConfig:
                     'mime_type': 'application/octet-stream'
                 },
             ],
-        },
-        'csv_history': {
-            'endpoint': '/gob/bag/panden/?view=enhanced_history&ndjson=true',
-            'exporter': csv_exporter,
-            'filename': 'CSV_ActueelEnHistorie/BAG_pand_ActueelEnHistorie.csv',
-            'mime_type': 'plain/text',
-            'format': history_format.get_format(),
         },
     }
 
