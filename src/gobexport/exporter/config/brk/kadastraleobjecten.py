@@ -1,10 +1,9 @@
 from fractions import Fraction
 
-from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 from gobexport.exporter.utils import convert_format
 from gobexport.formatter.geometry import format_geometry
-from gobexport.exporter.config.brk.utils import brk_filename, format_timestamp
+from gobexport.exporter.config.brk.utils import format_timestamp
 
 
 class KadastraleobjectenCsvFormat:
@@ -618,24 +617,6 @@ class KadastraleobjectenExportConfig:
     tenaamstellingen have an even aandeel, sort the tenaamstellingen by its subject's geslachtsnaam.
     """
     products = {
-        'csv': {
-            'merge_result': {
-                'api_type': 'graphql_streaming',
-                'attributes': ['isOntstaanUitGPerceel'],
-                'query': gperc_query,
-                'match_attributes': ['identificatie', 'volgnummer'],
-                'row_formatter': csv_format.row_formatter,
-                'secure': True,
-            },
-            'exporter': csv_exporter,
-            'api_type': 'graphql_streaming',
-            'secure': True,
-            'query': csv_query,
-            'filename': lambda: brk_filename('kadastraal_object'),
-            'mime_type': 'plain/text',
-            'format': csv_format.get_format(),
-            'sort': sort,
-        },
         'esri_actueel': {
             'api_type': 'graphql_streaming',
             'secure': True,
