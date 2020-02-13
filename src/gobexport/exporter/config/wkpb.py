@@ -25,21 +25,6 @@ following properties:
 
 class BeperkingenExportConfig:
 
-    query_actueel = '''
-{
-  wkpbBeperkingen {
-    edges {
-      node {
-        identificatie
-        beperking
-        beginGeldigheid
-        eindGeldigheid
-      }
-    }
-  }
-}
-'''
-
     query_type = '''
 {
   wkpbBeperkingen(sort: beperking_asc) {
@@ -66,7 +51,7 @@ class BeperkingenExportConfig:
 
     products = {
         'csv_actueel': {
-            'api_type': 'graphql',
+            'endpoint': '/gob/wkpb/beperkingen/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/WKPB_beperking.csv',
             'mime_type': 'plain/text',
@@ -75,8 +60,7 @@ class BeperkingenExportConfig:
                 'typeCode': 'beperking.code',
                 'beginGeldigheid': 'beginGeldigheid',
                 'eindGeldigheid': 'eindGeldigheid',
-            },
-            'query': query_actueel
+            }
         },
         'csv_types': {
             'api_type': 'graphql',
@@ -109,7 +93,7 @@ class BeperkingenExportConfig:
             'query': query_orgaan
         },
         'csv_kadastraal_object': {
-            'endpoint': '/gob/wkpb/beperkingen/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/wkpb/beperkingen/?view=kadastraalobject&ndjson=true',
             'exporter': csv_exporter,
             'entity_filters': [
                 NotEmptyFilter('kadastraalObject'),
