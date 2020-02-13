@@ -172,4 +172,3 @@ class BrondocumentenExportConfig:
             'unfold': True
         },
     }
-
