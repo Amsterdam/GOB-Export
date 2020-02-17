@@ -2094,6 +2094,7 @@ def _add_verblijfsobjecten_diva_config():
     }
 
     # ADRESOBJECT
+    """ TEMPORARY DISABLED
     bag.VerblijfsobjectenExportConfig.products['uva2_adresobject'] = {
         'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced_uva2&ndjson=true',
         'exporter': uva2_exporter,
@@ -2335,6 +2336,7 @@ def _add_verblijfsobjecten_diva_config():
             'Bouwbloknummer': 'ligtInBouwblok.code',
         }
     }
+    """
 
     # Landelijke sleutel
     bag.VerblijfsobjectenExportConfig.products['dat_landelijke_sleutel'] = {
