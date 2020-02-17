@@ -19,6 +19,7 @@ def before_each(monkeypatch):
 
 records = [{'identificatie': '1', 'geometrie': {'type': 'Point', 'coordinates': [125.6, 10.1]}}]
 graphql_records = [{'identificatie': '2', 'boolean': True, 'geometrie': {'type': 'Point', 'coordinates': [125.6, 10.1]}}]
+objectstore_records = [{'Code': '1', 'Omschrijving': 'Code 1'}]
 
 
 class MockAPI:
@@ -217,7 +218,6 @@ class TestExportToFile(TestCase):
     @patch("gobexport.exporter.product_source", lambda x: 'source')
     def test_export_to_file_entity_filters(self, mock_group_filter, mock_buffered_iterable, mock_graphql_streaming):
         from gobexport.exporter import export_to_file
-
         mock_entity_filter = MagicMock()
         mock_exporter = MagicMock()
 
@@ -239,3 +239,21 @@ class TestExportToFile(TestCase):
                                          'the format',
                                          append=False,
                                          filter=mock_group_filter.return_value)
+
+    @patch("gobexport.exporter.Objectstore")
+    @patch("gobexport.exporter.BufferedIterable")
+    @patch("gobexport.exporter.product_source", lambda x: 'source')
+    def test_export_to_file_objectstore(self, mock_buffered_iterable, mock_objectstore):
+        from gobexport.exporter import export_to_file
+
+        product = {
+            'api_type': 'objectstore',
+            'exporter': MagicMock(),
+            'format': 'the format',
+            'config': 'the config',
+        }
+        result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
+        mock_objectstore.assert_called_with(product['config'], row_formatter=None)
+
+        mock_buffered_iterable.assert_called_with(mock_objectstore.return_value, 'source', buffer_items=False)
+        product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format', append=False)
