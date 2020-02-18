@@ -33,7 +33,7 @@ class TestObjectstoreFile(TestCase):
         
         mock_query_objectstore.assert_called_with(objectstore.connection, objectstore.config)
         
-        assert(str(objectstore) == 'Objectstore mock_objectstore')
+        assert(str(objectstore) == 'ObjectstoreFile mock_objectstore')
 
     @patch("gobexport.objectstore.get_objectstore_config")
     @patch("gobexport.objectstore.connect_to_objectstore")
