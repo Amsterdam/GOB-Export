@@ -3,10 +3,10 @@ import random
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from gobexport.objectstore import Objectstore
+from gobexport.objectstore import ObjectstoreFile
 
 
-class TestObjectstore(TestCase):
+class TestObjectstoreFile(TestCase):
     
     @patch("gobexport.objectstore.get_objectstore_config")
     @patch("gobexport.objectstore.connect_to_objectstore")
@@ -23,7 +23,7 @@ class TestObjectstore(TestCase):
         mock_objectstore_config = mock_get_objectstore_config.return_value
         mock_connect.return_value = ('mock_connection', 'mock_user')
 
-        objectstore = Objectstore(mock_config, row_formatter=None)
+        objectstore = ObjectstoreFile(mock_config, row_formatter=None)
         mock_connect.assert_called_with(mock_objectstore_config)
         
         mock_query_objectstore.return_value = [1,2,3]
@@ -47,7 +47,7 @@ class TestObjectstore(TestCase):
 
         mock_connect.return_value = ('mock_connection', 'mock_user')
 
-        objectstore = Objectstore(mock_config, row_formatter=row_formatter)
+        objectstore = ObjectstoreFile(mock_config, row_formatter=row_formatter)
         mock_query_objectstore.return_value = [1,2,3]
 
         result = [i for i in objectstore]

@@ -1,4 +1,4 @@
-"""Objectstore
+"""ObjectstoreFile
 
 Encapsulates a file read from Objectstore into an iterator
 
@@ -9,7 +9,7 @@ from gobcore.database.reader import query_objectstore
 from gobexport.config import get_objectstore_config
 
 
-class Objectstore:
+class ObjectstoreFile:
 
     def __init__(self, config, row_formatter=None):
         """Constructor
@@ -29,7 +29,7 @@ class Objectstore:
 
         Provide for a readable representation
         """
-        return f"Objectstore {self.objectstore_config['TENANT_NAME']}"
+        return f"ObjectstoreFile {self.objectstore_config['TENANT_NAME']}"
 
     def __iter__(self):
         """Iteration method

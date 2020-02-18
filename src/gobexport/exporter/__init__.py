@@ -8,7 +8,7 @@ from gobexport.graphql_streaming import GraphQLStreaming
 from gobexport.buffered_iterable import BufferedIterable
 from gobexport.filters.group_filter import GroupFilter
 from gobexport.merged_api import MergedApi
-from gobexport.objectstore import Objectstore
+from gobexport.objectstore import ObjectstoreFile
 
 CONFIG_MAPPING = {
     'test_catalogue': {
@@ -95,7 +95,7 @@ def _init_api(product: dict, host: str, catalogue: str, collection: str):
                                batch_size=product.get('batch_size'))
     elif product.get('api_type') == 'objectstore':
         config = product['config']
-        api = Objectstore(config, row_formatter=product.get('row_formatter'))
+        api = ObjectstoreFile(config, row_formatter=product.get('row_formatter'))
     else:
         # Use the REST API
         endpoint = product.get('endpoint')
