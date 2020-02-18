@@ -240,10 +240,10 @@ class TestExportToFile(TestCase):
                                          append=False,
                                          filter=mock_group_filter.return_value)
 
-    @patch("gobexport.exporter.Objectstore")
+    @patch("gobexport.exporter.ObjectstoreFile")
     @patch("gobexport.exporter.BufferedIterable")
     @patch("gobexport.exporter.product_source", lambda x: 'source')
-    def test_export_to_file_objectstore(self, mock_buffered_iterable, mock_objectstore):
+    def test_export_to_file_objectstore(self, mock_buffered_iterable, mock_objectstore_file):
         from gobexport.exporter import export_to_file
 
         product = {
@@ -253,7 +253,7 @@ class TestExportToFile(TestCase):
             'config': 'the config',
         }
         result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
-        mock_objectstore.assert_called_with(product['config'], row_formatter=None)
+        mock_objectstore_file.assert_called_with(product['config'], row_formatter=None)
 
-        mock_buffered_iterable.assert_called_with(mock_objectstore.return_value, 'source', buffer_items=False)
+        mock_buffered_iterable.assert_called_with(mock_objectstore_file.return_value, 'source', buffer_items=False)
         product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format', append=False)
