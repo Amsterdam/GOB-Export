@@ -8,6 +8,7 @@ from gobexport.graphql_streaming import GraphQLStreaming
 from gobexport.buffered_iterable import BufferedIterable
 from gobexport.filters.group_filter import GroupFilter
 from gobexport.merged_api import MergedApi
+from gobexport.objectstore import ObjectstoreFile
 
 CONFIG_MAPPING = {
     'test_catalogue': {
@@ -70,7 +71,7 @@ add_gebieden_uva2_products()
 
 
 def product_source(product):
-    return product.get('endpoint', product.get('query'))
+    return product.get('endpoint', product.get('query', product.get('filename')))
 
 
 def _init_api(product: dict, host: str, catalogue: str, collection: str):
@@ -92,6 +93,9 @@ def _init_api(product: dict, host: str, catalogue: str, collection: str):
                                row_formatter=product.get('row_formatter'),
                                cross_relations=product.get('cross_relations', False),
                                batch_size=product.get('batch_size'))
+    elif product.get('api_type') == 'objectstore':
+        config = product['config']
+        api = ObjectstoreFile(config, row_formatter=product.get('row_formatter'))
     else:
         # Use the REST API
         endpoint = product.get('endpoint')

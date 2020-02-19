@@ -324,6 +324,26 @@ def get_dat_geometrie_filename(catalogue_name, collection_name):
     return f"{catalogue_name}_Geometrie/{catalogue_name}_{collection_name}_GEOMETRIE.dat"
 
 
+def get_codetabel_format(abbreviation, encoding='ascii'):
+    return {
+        'api_type': 'objectstore',
+        'exporter': uva2_exporter,
+        'filename': lambda: get_uva2_filename(abbreviation),
+        'mime_type': 'plain/text',
+        'config': {
+            'file_filter': f'BAG/UVA2/BAG_Actueel/ASCII/{abbreviation}_.+\\.UVA2$',
+            'file_type': 'UVA2',
+            'container': 'basisinformatie',
+            'objectstore': 'Basisinformatie',
+            'encoding': encoding,
+        },
+        'format': {
+            'Code': 'Code',
+            'Omschrijving': 'Omschrijving',
+        }
+    }
+
+
 def _add_woonplaatsen_diva_config():
     uva2_query = """
 {
@@ -448,6 +468,18 @@ def _add_woonplaatsen_diva_config():
         },
         'query': dat_landelijke_sleutel_query
     }
+
+    # Codetabellen
+    bag.WoonplaatsenExportConfig.products['codetabel_avr'] = get_codetabel_format("AVR")
+    bag.WoonplaatsenExportConfig.products['codetabel_brn'] = get_codetabel_format("BRN")
+    bag.WoonplaatsenExportConfig.products['codetabel_egm'] = get_codetabel_format("EGM")
+    bag.WoonplaatsenExportConfig.products['codetabel_fng'] = get_codetabel_format("FNG", encoding='latin-1')
+    bag.WoonplaatsenExportConfig.products['codetabel_gbk'] = get_codetabel_format("GBK", encoding='latin-1')
+    bag.WoonplaatsenExportConfig.products['codetabel_lgg'] = get_codetabel_format("LGG")
+    bag.WoonplaatsenExportConfig.products['codetabel_loc'] = get_codetabel_format("LOC")
+    bag.WoonplaatsenExportConfig.products['codetabel_ovr'] = get_codetabel_format("OVR")
+    bag.WoonplaatsenExportConfig.products['codetabel_sts'] = get_codetabel_format("STS")
+    bag.WoonplaatsenExportConfig.products['codetabel_tgg'] = get_codetabel_format("TGG")
 
 
 def _add_openbareruimtes_diva_config():
