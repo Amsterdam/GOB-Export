@@ -393,7 +393,7 @@ def _add_woonplaatsen_diva_config():
         'filename': lambda: get_uva2_filename("WPL"),
         'mime_type': 'plain/text',
         'format': {
-            'sleutelVerzendend': 'amsterdamseSleutel',
+            'sleutelverzendend': 'amsterdamseSleutel',
             'Woonplaatsidentificatie': 'identificatie',
             'Woonplaatsnaam': 'naam',
             'DocumentdatumMutatieWoonplaats': {
@@ -944,7 +944,7 @@ def _add_ligplaatsen_diva_config():
         'filename': lambda: get_uva2_filename("LIG"),
         'mime_type': 'plain/text',
         'format': {
-            'sleutelVerzendend': 'amsterdamseSleutel',
+            'sleutelverzendend': 'amsterdamseSleutel',
             'Ligplaatsidentificatie': 'amsterdamseSleutel',
             'Ligplaatsgeometrie': '',
             'DocumentdatumMutatieLigplaats': {
@@ -1343,7 +1343,7 @@ def _add_standplaatsen_diva_config():
         'filename': lambda: get_uva2_filename("STA"),
         'mime_type': 'plain/text',
         'format': {
-            'sleutelVerzendend': 'amsterdamseSleutel',
+            'sleutelverzendend': 'amsterdamseSleutel',
             'Standplaatsidentificatie': 'amsterdamseSleutel',
             'Standplaatsgeometrie': '',
             'DocumentdatumMutatieStandplaats': {
