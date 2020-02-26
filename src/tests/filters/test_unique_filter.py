@@ -24,3 +24,12 @@ class TestUniqueFilter(TestCase):
 
         for entity, result in test_cases:
             self.assertEqual(result, unique_filter.filter(entity))
+
+        # If the filter is called again, the results will be all False, because the set isn't cleared
+        for entity, result in test_cases:
+            self.assertEqual(False, unique_filter.filter(entity))
+
+        # Resetting the filter should return the original results
+        unique_filter.reset()
+        for entity, result in test_cases:
+            self.assertEqual(result, unique_filter.filter(entity))
