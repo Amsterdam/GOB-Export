@@ -19,3 +19,6 @@ class UniqueFilter(EntityFilter):
         else:
             self.values.add(value)
             return True
+
+    def reset(self):
+        self.values = set()

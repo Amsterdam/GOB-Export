@@ -9,3 +9,5 @@ class TestEntityFilter(TestCase):
 
         with self.assertRaises(NotImplementedError):
             entity_filter.filter({})
+
+        entity_filter.reset()
