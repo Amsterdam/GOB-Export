@@ -18,3 +18,7 @@ class GroupFilter(EntityFilter):
         :return:
         """
         return all([f.filter(entity) for f in self.filters])
+
+    def reset(self):
+        for f in self.filters:
+            f.reset()

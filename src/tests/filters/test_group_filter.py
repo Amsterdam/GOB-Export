@@ -8,9 +8,13 @@ class TestGroupFilter(TestCase):
     class MockEntityFilter:
         def __init__(self, value: bool):
             self.value = value
+            self.resetted = False
 
         def filter(self, entity: dict):
             return self.value
+        
+        def reset(self):
+            self.resetted = True
 
     def test_filter(self):
 
@@ -25,3 +29,7 @@ class TestGroupFilter(TestCase):
         for filters, result in test_cases:
             group_filter = GroupFilter(filters)
             self.assertEqual(result, group_filter.filter({}))
+            
+            group_filter.reset()
+            for filter in filters:
+                self.assertEqual(filter.resetted, True)

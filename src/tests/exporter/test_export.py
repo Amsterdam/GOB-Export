@@ -191,7 +191,8 @@ class TestExportToFile(TestCase):
                                                   unfold=False, cross_relations=False, batch_size=None, secure=True)
 
         mock_buffered_iterable.assert_called_with(mock_graphql_streaming.return_value, 'source', buffer_items=False)
-        product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format', append=False)
+        product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format',
+                                               append=False, filter=None)
 
     @patch("gobexport.exporter.GraphQLStreaming")
     @patch("gobexport.exporter.BufferedIterable")
@@ -233,12 +234,17 @@ class TestExportToFile(TestCase):
         }
         result = export_to_file('host', product, 'file', 'catalogue', 'collection')
 
+        mock_filter = mock_group_filter.return_value
+
         mock_group_filter.assert_called_with([mock_entity_filter])
         mock_exporter.assert_called_with(mock_buffered_iterable.return_value,
                                          'file',
                                          'the format',
                                          append=False,
                                          filter=mock_group_filter.return_value)
+
+        # Assert the reset function is called on the filter
+        mock_filter.reset.assert_called()
 
     @patch("gobexport.exporter.ObjectstoreFile")
     @patch("gobexport.exporter.BufferedIterable")
@@ -256,4 +262,5 @@ class TestExportToFile(TestCase):
         mock_objectstore_file.assert_called_with(product['config'], row_formatter=None)
 
         mock_buffered_iterable.assert_called_with(mock_objectstore_file.return_value, 'source', buffer_items=False)
-        product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format', append=False)
+        product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format',
+                                               append=False, filter=None)

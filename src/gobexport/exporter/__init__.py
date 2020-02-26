@@ -132,9 +132,13 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
 
     kwargs = {}
 
-    if product.get('entity_filters'):
-        kwargs['filter'] = GroupFilter(product['entity_filters'])
+    filter = GroupFilter(product['entity_filters']) if product.get('entity_filters') else None
+    kwargs['filter'] = filter
 
     row_count = exporter(buffered_api, file, format, append=product.get('append', False), **kwargs)
+
+    # Reset the entity filter(s)
+    if filter:
+        filter.reset()
 
     return row_count
