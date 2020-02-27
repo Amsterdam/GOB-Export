@@ -781,10 +781,79 @@ class BuurtenExportConfig:
 
 class BouwblokkenExportConfig:
 
+    query_actueel = """
+{
+  gebiedenBouwblokken(sort:code_asc) {
+    edges {
+      node {
+        identificatie
+        code
+        beginGeldigheid
+        eindGeldigheid
+        geometrie
+        ligtInBuurt {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+              LigtInGgpgebied {
+                edges {
+                  node {
+                    identificatie
+                    code
+                    naam
+                  }
+                }
+              }
+              LigtInGgwgebied {
+                edges {
+                  node {
+                    identificatie
+                    code
+                    naam
+                  }
+                }
+              }
+              ligtInWijk {
+                edges {
+                  node {
+                    identificatie
+                    code
+                    naam
+                    ligtInStadsdeel {
+                      edges {
+                        node {
+                          identificatie
+                          code
+                          naam
+                          ligtInGemeente {
+                            edges {
+                              node {
+                                identificatie
+                                naam
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
     products = {
         'csv_actueel': {
+            'api_type': 'graphql',
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/bouwblokken/?view=enhanced&ndjson=true',
             'filename': 'CSV_Actueel/GBD_bouwblok_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -798,12 +867,12 @@ class BouwblokkenExportConfig:
                 'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
-                'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
-                'ligtIn:GBD.GGP.identificatie': 'ligtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.code': 'ligtInGgpgebied.code',
-                'ligtIn:GBD.GGP.naam': 'ligtInGgpgebied.naam',
+                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
@@ -814,11 +883,12 @@ class BouwblokkenExportConfig:
                     'formatter': format_geometry,
                     'value': 'geometrie'
                 },
-            }
+            },
+            'query': query_actueel
         },
         'esri_actueel': {
+            'api_type': 'graphql',
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/bouwblokken/?view=enhanced&ndjson=true',
             'filename': 'SHP/GBD_bouwblok.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -832,12 +902,12 @@ class BouwblokkenExportConfig:
                 'wijk_id': 'ligtInWijk.identificatie',
                 'wijk_code': 'ligtInWijk.code',
                 'wijk_naam': 'ligtInWijk.naam',
-                'ggw_id': 'ligtInGgwgebied.identificatie',
-                'ggw_code': 'ligtInGgwgebied.code',
-                'ggw_naam': 'ligtInGgwgebied.naam',
-                'ggp_id': 'ligtInGgpgebied.identificatie',
-                'ggp_code': 'ligtInGgpgebied.code',
-                'ggp_naam': 'ligtInGgpgebied.naam',
+                'ggw_id': 'LigtInGgwgebied.identificatie',
+                'ggw_code': 'LigtInGgwgebied.code',
+                'ggw_naam': 'LigtInGgwgebied.naam',
+                'ggp_id': 'LigtInGgpgebied.identificatie',
+                'ggp_code': 'LigtInGgpgebied.code',
+                'ggp_naam': 'LigtInGgpgebied.naam',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_code': 'ligtInStadsdeel.code',
                 'sdl_naam': 'ligtInStadsdeel.naam',
@@ -857,7 +927,8 @@ class BouwblokkenExportConfig:
                     'filename': 'SHP/GBD_bouwblok.prj',
                     'mime_type': 'application/octet-stream'
                 },
-            ]
+            ],
+            'query': query_actueel
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
