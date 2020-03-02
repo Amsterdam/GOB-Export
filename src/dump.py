@@ -12,6 +12,7 @@ import time
 
 from gobexport.config import SECURE_URL
 from gobexport.keycloak import get_secure_header
+from gobexport.requests import get
 
 config = {
     "ANALYSE_DATABASE_USER": None,
@@ -40,7 +41,7 @@ def update_headers(url, headers=None):
 
 def get_catalog_collections(dump_api, catalog_name):
     url = f"{dump_api}/{catalog_name}/"
-    result = requests.get(url=url, headers=update_headers(url)).json()
+    result = get(url).json()
     catalog = {key: value for key, value in result.items() if key not in ['_links', '_embedded']}
     collections = result['_embedded']['collections']
     return catalog, collections
@@ -48,7 +49,7 @@ def get_catalog_collections(dump_api, catalog_name):
 
 def get_relations(dump_api, catalog, collection):
     url = f"{dump_api}/rel/"
-    result = requests.get(url=url, headers=update_headers(url)).json()
+    result = get(url).json()
     abbreviation = f"{catalog['abbreviation']}_{collection['abbreviation']}".lower()
     relations = result['_embedded']['collections']
     return [collection for collection in relations if collection['name'].startswith(abbreviation)]
