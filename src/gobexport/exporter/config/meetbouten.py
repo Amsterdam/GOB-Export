@@ -42,7 +42,7 @@ class MetingenExportConfig:
 
     """
 
-    query_actueel = '''
+    query_metingen = '''
 {
   meetboutenMetingen (publiceerbaar: true, active: false) {
     edges {
@@ -99,7 +99,7 @@ class MetingenExportConfig:
                       'refereertAanReferentiepunten.[2].identificatie:str|zakkingssnelheid:num:1|'
                       'zakkingCumulatief:num:1|isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|'
                       'pandmsl:str|ligtInStadsdeel.code:str|wijzeVanInwinnen.code:str:{1:"W",2:"T",3:"G"}',
-            'query': query_actueel
+            'query': query_metingen
         }
     }
 
