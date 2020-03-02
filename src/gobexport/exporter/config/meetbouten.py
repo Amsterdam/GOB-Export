@@ -41,18 +41,65 @@ class MetingenExportConfig:
         |$$Fugro$$|3|274||$$K$$|$$W$$
 
     """
+
+    query_actueel = '''
+{
+  meetboutenMetingen (publiceerbaar: true, active: false) {
+    edges {
+      node {
+        identificatie
+        datum
+        typeMeting
+        hoogteTovNap
+        zakking
+        zakkingssnelheid
+        zakkingCumulatief
+        isGemetenDoor
+        hoeveelsteMeting
+        aantalDagen
+        wijzeVanInwinnen
+        refereertAanReferentiepunten (active: false) {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        hoortBijMeetbout (active: false) {
+          edges {
+            node {
+              identificatie
+              ligtInStadsdeel (active: false) {
+                edges {
+                  node {
+                    identificatie
+                    code
+                    naam
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
     products = {
         'dat': {
+            'api_type': 'graphql_streaming',
             'exporter': dat_exporter,
-            'endpoint': '/gob/meetbouten/metingen/?view=enhanced&ndjson=true',
             'filename': 'DAT/MBT_METING.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|'
-                      'hoortBijMeetbout.bronwaarde:str|refereertAanReferentiepunten.[0].bronwaarde:str|'
-                      'refereertAanReferentiepunten.[1].bronwaarde:str|'
-                      'refereertAanReferentiepunten.[2].bronwaarde:str|zakkingssnelheid:num:1|'
+                      'hoortBijMeetbout.identificatie:str|refereertAanReferentiepunten.[0].identificatie:str|'
+                      'refereertAanReferentiepunten.[1].identificatie:str|'
+                      'refereertAanReferentiepunten.[2].identificatie:str|zakkingssnelheid:num:1|'
                       'zakkingCumulatief:num:1|isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|'
-                      'pandmsl:str|ligtInStadsdeel.code:str|wijzeVanInwinnen.code:str:{1:"W",2:"T",3:"G"}'
+                      'pandmsl:str|ligtInStadsdeel.code:str|wijzeVanInwinnen.code:str:{1:"W",2:"T",3:"G"}',
+            'query': query_actueel
         }
     }
 
