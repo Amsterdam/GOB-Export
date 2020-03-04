@@ -289,7 +289,8 @@ def row_formatter_geometrie(row):
     1. Remove the leading 0 from the amsterdamseSleutel
     2. Format the WKT string to include a space
     """
-    row['node']['amsterdamseSleutel'] = row['node']['amsterdamseSleutel'][1:]
+    row['node']['amsterdamseSleutel'] = row['node']['amsterdamseSleutel'][1:] \
+        if row['node']['amsterdamseSleutel'] else ''
 
     row['node']['geometrie'] = re.sub(r'([A-Z]+)(\(.+\))', r'\1 \2', row['node']['geometrie']) \
         if row['node']['geometrie'] else ''

@@ -334,3 +334,19 @@ class TestUVA2ConfigHelpers(TestCase):
         }
 
         self.assertEqual(row_formatter_geometrie(row), expected_row)
+        
+        row = {
+            'node': {
+                'amsterdamseSleutel': '',
+                'geometrie': 'POINT (123, 456)'
+            }
+        }
+
+        expected_row = {
+            'node': {
+                'amsterdamseSleutel': '',
+                'geometrie': 'POINT (123, 456)'
+            }
+        }
+
+        self.assertEqual(row_formatter_geometrie(row), expected_row)
