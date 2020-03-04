@@ -303,34 +303,28 @@ class TestUVA2ConfigHelpers(TestCase):
         self.assertEqual(row_formatter_verblijfsobjecten(row['node']), expected_row['node'])
 
     def test_row_formatter_geometrie(self):
-        row = {
-            'node': {
-                'amsterdamseSleutel': '03630000000000',
-                'geometrie': 'POINT(123, 456)'
+        testcases = [
+            ({'amsterdamseSleutel': '03630000000000', 'geometrie': 'POINT(123, 456)'}, {'amsterdamseSleutel': '3630000000000', 'geometrie': 'POINT (123, 456)'}),
+            ({'amsterdamseSleutel': '03630000000000', 'geometrie': ''}, {'amsterdamseSleutel': '3630000000000', 'geometrie': ''}),
+            ({'amsterdamseSleutel': '03630000000000', 'geometrie': None}, {'amsterdamseSleutel': '3630000000000', 'geometrie': ''}),
+            ({'amsterdamseSleutel': '', 'geometrie': 'POINT(123, 456)'}, {'amsterdamseSleutel': '', 'geometrie': 'POINT (123, 456)'}),
+            ({'amsterdamseSleutel': None, 'geometrie': 'POINT(123, 456)'}, {'amsterdamseSleutel': '', 'geometrie': 'POINT (123, 456)'}),
+        ]
+        
+        for input, expected in testcases:
+            
+            row = {
+                'node': {
+                    'amsterdamseSleutel': input['amsterdamseSleutel'],
+                    'geometrie': input['geometrie']
+                }
             }
-        }
 
-        expected_row = {
-            'node': {
-                'amsterdamseSleutel': '3630000000000',
-                'geometrie': 'POINT (123, 456)'
+            expected_row = {
+                'node': {
+                    'amsterdamseSleutel': expected['amsterdamseSleutel'],
+                    'geometrie': expected['geometrie']
+                }
             }
-        }
 
-        self.assertEqual(row_formatter_geometrie(row), expected_row)
-
-        row = {
-            'node': {
-                'amsterdamseSleutel': '03630000000000',
-                'geometrie': None
-            }
-        }
-
-        expected_row = {
-            'node': {
-                'amsterdamseSleutel': '3630000000000',
-                'geometrie': ''
-            }
-        }
-
-        self.assertEqual(row_formatter_geometrie(row), expected_row)
+            self.assertEqual(row_formatter_geometrie(row), expected_row)
