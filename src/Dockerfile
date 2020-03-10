@@ -17,9 +17,6 @@ COPY requirements.txt /app/
 RUN pip3 install --no-cache-dir -r requirements.txt
 RUN rm requirements.txt
 
-# Copy dump utility
-COPY dump.py dump.py
-
 # Copy gobexport service module
 COPY gobexport gobexport
 
