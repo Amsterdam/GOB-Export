@@ -11,11 +11,28 @@ from gobcore.logging.logger import logger
 
 from gobexport.export import export
 from gobexport.test import test
+from gobexport.dump import Dumper
 
 
 def assert_message_attributes(msg, attrs):
     for attr in attrs:
         assert msg.get(attr), f"Missing attribute {attr}"
+
+
+def handle_export_dump_msg(msg):
+    header = msg['header']
+    logger.configure(msg, "DUMP")
+    Dumper().dump_catalog(catalog_name=header['catalogue'],
+                          collection_name=header['collection'])
+
+
+def handle_export_file_msg(msg):
+    header = msg['header']
+    logger.configure(msg, "EXPORT")
+    export(catalogue=header['catalogue'],
+           collection=header['collection'],
+           product=header['product'],
+           destination=header['destination'])
 
 
 def handle_export_msg(msg):
@@ -40,9 +57,12 @@ def handle_export_msg(msg):
         'product': product,
     })
 
-    logger.configure(msg, "EXPORT")
-
-    export(catalogue, collection, product, destination)
+    if destination == "Database":
+        handle_export_dump_msg(msg)
+    elif destination in ["Objectstore", "File"]:
+        handle_export_file_msg(msg)
+    else:
+        logger.error(f"Unrecognized destination for export {catalogue} {collection}: {destination}")
 
     return {
         "header": msg.get("header"),
