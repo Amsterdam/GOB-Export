@@ -1,5 +1,5 @@
 """
-Simple utility to be able to start exports to the analysis database from Jenkins
+Dumps GOB data to the analysis database
 
 """
 import os
