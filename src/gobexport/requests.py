@@ -36,9 +36,7 @@ def _exec(method, url, headers, **kwargs):
     n_tries = 0
     while n_tries < _MAX_TRIES:
         try:
-            status_code = "Unknown"
             response = method(url=url, headers=headers, **kwargs)
-            stutus_code = response.status_code
             response.raise_for_status()
             return response
         except requests.exceptions.RequestException as e:
@@ -51,7 +49,7 @@ def _exec(method, url, headers, **kwargs):
             #
             # All exceptions that Requests explicitly raises inherit from requests.exceptions.RequestException.
             n_tries += 1
-            print(f"Request exception: status '{status_code}', '{str(e)}'")
+            print(f"Request exception: '{str(e)}'")
             print(f"Retry in {_RETRY_TIMEOUT} seconds, retries left: {_MAX_TRIES - n_tries}")
             time.sleep(_RETRY_TIMEOUT)
             # Update headers because access token might be expired
