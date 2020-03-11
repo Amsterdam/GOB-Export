@@ -2,7 +2,6 @@
 Simple utility to be able to start exports to the analysis database from Jenkins
 
 """
-import logging
 import os
 import json
 import requests
@@ -18,38 +17,55 @@ from gobexport.requests import get
 
 class Dumper():
 
-    config = {}
-    dump_api = None
+    MAX_TRIES = 3
     RETRY_TIMEOUT = 300
 
     def __init__(self):
-        if not Dumper.config:
-            self._init_config()
+        self._init_config()
 
     def _init_config(self):
+        """
+        Initialize dumper configuration
+
+        If localhost is used then use the public GOB url for all other case use the GOB secure url.
+        Read the destination database properties from the environment
+
+        :return:
+        """
         api_host = get_host()
         api_url = PUBLIC_URL if "localhost" in api_host else SECURE_URL
-        Dumper.dump_api = f"{api_host}{api_url}"
-        variables = [
-            "ANALYSE_DATABASE_USER",
-            "ANALYSE_DATABASE_PASSWORD",
-            "ANALYSE_DATABASE_HOST_OVERRIDE",
-            "ANALYSE_DATABASE_PORT_OVERRIDE"
-        ]
-        for variable in variables:
-            value = os.getenv(variable)
-            if value is None:
-                logging.error(f"Environment variable {variable} not set")
-            else:
-                Dumper.config[variable] = value
+        self.dump_api = f"{api_host}{api_url}"
+
+        self.config = {
+            variable: os.getenv(variable) for variable in [
+                "ANALYSE_DATABASE_USER",
+                "ANALYSE_DATABASE_PASSWORD",
+                "ANALYSE_DATABASE_HOST_OVERRIDE",
+                "ANALYSE_DATABASE_PORT_OVERRIDE"
+            ]}
+        if None in self.config.values():
+            logger.error(f"Environment variable(s) not set")
 
     def update_headers(self, url, headers=None):
+        """
+        Update the request headers with authorization parameters if the secure GOB url is used for a request
+
+        :param url:
+        :param headers:
+        :return:
+        """
         headers = headers or {}
         if SECURE_URL in url:
             headers.update(get_secure_header())
         return headers
 
     def get_catalog_collections(self, catalog_name):
+        """
+        Get all collections for a given catalog name
+
+        :param catalog_name:
+        :return:
+        """
         url = f"{self.dump_api}/{catalog_name}/"
         result = get(url).json()
         catalog = {key: value for key, value in result.items() if key not in ['_links', '_embedded']}
@@ -57,6 +73,13 @@ class Dumper():
         return catalog, collections
 
     def get_relations(self, catalog, collection):
+        """
+        Get all releations for a given catalog collection
+
+        :param catalog:
+        :param collection:
+        :return:
+        """
         url = f"{self.dump_api}/rel/"
         result = get(url).json()
         abbreviation = f"{catalog['abbreviation']}_{collection['abbreviation']}".lower()
@@ -64,6 +87,15 @@ class Dumper():
         return [collection for collection in relations if collection['name'].startswith(abbreviation)]
 
     def dump_catalog(self, catalog_name, collection_name):
+        """
+        Dump a catalog. If a collection is specified only dump the given catalog collection.
+
+        The relations for the given catalog (and collection) are also dumped.
+
+        :param catalog_name:
+        :param collection_name:
+        :return:
+        """
         catalog, collections = self.get_catalog_collections(catalog_name)
         if collection_name:
             collections = [collection for collection in collections if collection['name'] == collection_name]
@@ -75,9 +107,18 @@ class Dumper():
                 self.dump_collection(schema, "rel", relation['name'])
 
     def dump_collection(self, schema, catalog_name, collection_name):
-        MAX_TRIES = 3
+        """
+        Dump a catalog collection into a remote database in the given schema
+
+        If the dump fails the operation is retried with a maximum of MAX_TRIES
+        and a wait between each try of RETRY_TIMEOUT
+        :param schema:
+        :param catalog_name:
+        :param collection_name:
+        :return:
+        """
         tries = 0
-        while tries < MAX_TRIES:
+        while tries < Dumper.MAX_TRIES:
             tries += 1
             logger.info(f"Try {tries}: dump {catalog_name} - {collection_name}")
             if self.try_dump_collection(schema, catalog_name, collection_name):
@@ -86,6 +127,16 @@ class Dumper():
             time.sleep(self.RETRY_TIMEOUT)
 
     def try_dump_collection(self, schema, catalog_name, collection_name):
+        """
+        Try to dump the given catalog collection in the given schema
+
+        The dump is performed by issuing an API POST request to the GOB API.
+
+        :param schema:
+        :param catalog_name:
+        :param collection_name:
+        :return:
+        """
         url = f"{self.dump_api}/dump/{catalog_name}/{collection_name}/"
         data = json.dumps({
             "db": {
@@ -124,7 +175,7 @@ class Dumper():
         except Exception as e:
             logger.error(f'Export {catalog_name}-{collection_name} failed: {str(e)}')
         else:
-            success = re.match(r'Export completed', lastline)
+            success = re.match(r'Export completed', lastline) is not None
             if not success:
                 logger.error(f'Export {catalog_name}-{collection_name} completed with errors')
         finally:
