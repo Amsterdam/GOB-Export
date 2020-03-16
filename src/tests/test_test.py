@@ -327,6 +327,16 @@ class TestExportTest(TestCase):
         self.assertEqual(obj, "get object")
         mock_get_object.assert_called_with('any connection', {'name': filename}, 'any container')
 
+        filename = "20201201yz"
+        mock_get_full_container_list.return_value = iter([
+            {'name': '20201101yz', 'last_modified': '100'},
+            {'name': '20201103yz', 'last_modified': '300'},
+            {'name': '20201102yz', 'last_modified': '200'},
+        ])
+        mock_get_object.return_value = "get object"
+        obj_info, obj = test._get_file(conn_info, filename)
+        self.assertEqual(obj_info, {'name': '20201103yz', 'last_modified': '300'})
+
     @patch('gobexport.test.logger')
     @patch('gobexport.test._get_file')
     @patch('gobexport.test._write_proposals')
