@@ -122,13 +122,23 @@ def _get_file(conn_info, filename):
     :param filename: name of the file to retrieve
     :return:
     """
+    # If the filename contains any replacement patterns, use the pattern to find the file
+    for src, dst in _REPLACEMENTS.items():
+        filename = re.sub(dst, src, filename)
+
+    obj_info = None
+    obj = None
     for item in get_full_container_list(conn_info['connection'], conn_info['container']):
-        if item["name"] == filename:
+        item_name = item['name']
+        for src, dst in _REPLACEMENTS.items():
+            item_name = re.sub(dst, src, item_name)
+
+        if item_name == filename and (obj_info is None or item['last_modified'] > obj_info['last_modified']):
+            # If multiple matches, match with the most recent item
             obj_info = dict(item)
             obj = get_object(conn_info['connection'], item, conn_info['container'])
-            return obj_info, obj
 
-    return None, None
+    return obj_info, obj
 
 
 def _get_check(checks, filename):
