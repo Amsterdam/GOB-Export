@@ -14,17 +14,80 @@ class MeetboutExportConfig:
         |$$PB15 $$|1|POINT (120951.0 491840.0)
 
     """
+
+    query_meetbouten = '''
+{
+  meetboutenMeetbouten (publiceerbaar: true, active: false) {
+    edges {
+      node {
+        identificatie
+        locatie
+        status
+        geometrie
+        heeftEersteMeting: invHoortBijMeetboutMeetboutenMetingen (first: 1, active: false, sort:datum_asc) {
+          edges {
+            node {
+              identificatie
+              datum
+            }
+          }
+        }
+        heeftLaatsteMeting: invHoortBijMeetboutMeetboutenMetingen (first: 1, active: false, sort: datum_desc) {
+          edges {
+            node {
+              identificatie
+              hoogteTovNap
+              zakkingssnelheid
+              zakkingCumulatief
+            }
+          }
+        }
+        ligtInBouwblok (active: false) {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        ligtInBuurt (active: false) {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+            }
+          }
+        }
+        ligtInStadsdeel (active: false) {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+            }
+          }
+        }
+        nabijNummeraanduiding
+      }
+    }
+  }
+}
+'''
+
     products = {
         'dat': {
+            'api_type': 'graphql',
             'exporter': dat_exporter,
-            'endpoint': '/gob/meetbouten/meetbouten/?view=enhanced&ndjson=true',
             'filename': 'DAT/MBT_MEETBOUT.dat',
             'mime_type': 'plain/text',
-            'format': 'identificatie:str|ligtInBuurt.code:str|geometrie:coo:x|geometrie:coo:y|hoogteTovNap:num:4|'
-                      'zakkingCumulatief:num:1|datum:dat|bouwblokzijde:num|eigenaar:num|indicatieBeveiligd:str|'
+            'format': 'identificatie:str|ligtInBuurt.code:str|geometrie:coo:x|geometrie:coo:y|'
+                      'heeftLaatsteMeting.[0].hoogteTovNap:num:4|heeftLaatsteMeting.[0].zakkingCumulatief:num:1|'
+                      'heeftEersteMeting.datum:dat|bouwblokzijde:str|eigenaar:str|indicatieBeveiligd:str|'
                       'ligtInStadsdeel.code:str|nabijNummeraanduiding.bronwaarde:str|locatie:str|'
-                      'zakkingssnelheid:num:1|status.code:str:{1: "A", 2:"A", 3:"V"}|ligtInBouwblok.code:str|'
-                      'blokeenheid:num|geometrie:geo'
+                      'heeftLaatsteMeting.[0].zakkingssnelheid:num:1|status.code:str:{1: "A", 2:"A", 3:"V"}|'
+                      'ligtInBouwblok.code:str|blokeenheid:str|geometrie:geo',
+            'query': query_meetbouten
         }
     }
 
@@ -41,18 +104,65 @@ class MetingenExportConfig:
         |$$Fugro$$|3|274||$$K$$|$$W$$
 
     """
+
+    query_metingen = '''
+{
+  meetboutenMetingen (publiceerbaar: true, active: false) {
+    edges {
+      node {
+        identificatie
+        datum
+        typeMeting
+        hoogteTovNap
+        zakking
+        zakkingssnelheid
+        zakkingCumulatief
+        isGemetenDoor
+        hoeveelsteMeting
+        aantalDagen
+        wijzeVanInwinnen
+        refereertAanReferentiepunten (active: false) {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+        hoortBijMeetbout (active: false) {
+          edges {
+            node {
+              identificatie
+              ligtInStadsdeel (active: false) {
+                edges {
+                  node {
+                    identificatie
+                    code
+                    naam
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
     products = {
         'dat': {
+            'api_type': 'graphql_streaming',
             'exporter': dat_exporter,
-            'endpoint': '/gob/meetbouten/metingen/?view=enhanced&ndjson=true',
             'filename': 'DAT/MBT_METING.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:num|datum:dat|typeMeting:str|hoogteTovNap:num:4|zakking:num:1|'
-                      'hoortBijMeetbout.bronwaarde:str|refereertAanReferentiepunten.[0].bronwaarde:str|'
-                      'refereertAanReferentiepunten.[1].bronwaarde:str|'
-                      'refereertAanReferentiepunten.[2].bronwaarde:str|zakkingssnelheid:num:1|'
+                      'hoortBijMeetbout.identificatie:str|refereertAanReferentiepunten.[0].identificatie:str|'
+                      'refereertAanReferentiepunten.[1].identificatie:str|'
+                      'refereertAanReferentiepunten.[2].identificatie:str|zakkingssnelheid:num:1|'
                       'zakkingCumulatief:num:1|isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|'
-                      'pandmsl:str|ligtInStadsdeel.code:str|wijzeVanInwinnen.code:str:{1:"W",2:"T",3:"G"}'
+                      'pandmsl:str|ligtInStadsdeel.code:str|wijzeVanInwinnen.code:str:{1:"W",2:"T",3:"G"}',
+            'query': query_metingen
         }
     }
 
