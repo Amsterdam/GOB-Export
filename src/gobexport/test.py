@@ -342,6 +342,14 @@ def _get_analysis(obj_info, obj):
 
     lines = content.split('\n')
 
+    cols = {}
+    if obj_info['content_type'] in ["text/csv"] or obj_info['name'][-4:].lower() == ".csv":
+        for line in [l for l in lines[1:] if l]:
+            for i, column in enumerate(line.split(";")):
+                column_len = len(column)
+                cols[f"min_col_{i+1}"] = min(column_len, cols.get(f"min_col_{i+1}", column_len))
+                cols[f"max_col_{i+1}"] = max(column_len, cols.get(f"max_col_{i+1}", column_len))
+
     analyses = range(min(max(_NTH.keys()), len(lines)))
     lines_analysis = {f"{_NTH[n + 1]}_line": hashlib.md5(lines[n].encode(ENCODING)).hexdigest() for n in analyses}
 
@@ -372,5 +380,6 @@ def _get_analysis(obj_info, obj):
         "alphas": alphas / chars,
         "spaces": spaces / chars,
         "lowers": 0 if alphas == 0 else lowers / alphas,
-        "uppers": 0 if uppers == 0 else uppers / alphas
+        "uppers": 0 if uppers == 0 else uppers / alphas,
+        **cols
     }
