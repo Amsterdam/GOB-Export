@@ -124,7 +124,7 @@ def test_export_to_file(monkeypatch):
     format = config.products['csv_actueel'].get('format')
 
     export_to_file('host', config.products['csv_actueel'], '/tmp/ttt', catalogue, collection)
-    expected_result = 'identificatie;code;naam;beginGeldigheid;eindGeldigheid;documentdatum;documentnummer;ligtIn:BRK.GME.identificatie;ligtIn:BRK.GME.naam;geometrie\r\n1;;;;;;;;;POINT (125.6 10.1)\r\n'
+    expected_result = 'identificatie;code;naam;beginGeldigheid;eindGeldigheid;documentdatum;documentnummer;ligtIn:BRK.GME.identificatie;ligtIn:BRK.GME.naam;geometrie\r\n2;;;;;;;;;POINT (125.6 10.1)\r\n'
     assert(MockFile.s == expected_result)
 
     MockFile.s = ''
