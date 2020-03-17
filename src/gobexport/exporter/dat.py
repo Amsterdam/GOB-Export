@@ -79,7 +79,7 @@ def _to_number(value, precision=None):
     :return:
     """
     assert(type(value) in [int, float, str, decimal.Decimal] or value is None)
-    value = format(value, f'.{precision}f') if precision and value is not None else value
+    value = format(float(value), f'.{precision}f') if precision and value is not None else value
     return '' if value is None else str(value)\
         .replace('.', ',')
 
@@ -91,14 +91,14 @@ def _to_number_string(value, precision=None):
     The decimal dot is replaced by a comma
 
     Example:
-        2.5 => 2,5
-        0.5 => ,5
+        2.5 => $$2,5$$
+        0.5 => $$,5$$
 
     :param value:
     :return:
     """
     assert(type(value) in [int, float, str, decimal.Decimal] or value is None)
-    value = format(value, f'.{precision}f') if precision and value is not None else value
+    value = format(float(value), f'.{precision}f') if precision and value is not None else value
     return '' if value is None else f'$${value}$$'\
         .replace('.', ',').replace('0,', ',')
 

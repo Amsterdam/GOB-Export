@@ -74,6 +74,7 @@ class TestExportTest(TestCase):
 
         obj = b"123"
         obj_info['content_type'] = "plain/text"
+        obj_info['name'] = "any name"
         obj_info['bytes'] = len(obj)
         analysis = test._get_analysis(obj_info, obj)
         self.assertEqual(analysis, {
@@ -144,6 +145,46 @@ class TestExportTest(TestCase):
             'spaces': 0.3125,
             'lowers': 1.0,
             'uppers': 0.0
+        })
+
+    @patch('gobexport.test.logger', MagicMock())
+    def test_get_analysis_csv(self):
+        iso_now = datetime.datetime.now().isoformat()
+
+        obj = b"a;b;c\n12;;1234\n1;123;1234\n"
+        obj_info = {
+            "last_modified": datetime.datetime.now().isoformat(),
+            "bytes": len(obj),
+            "content_type": "text/csv"
+        }
+        analysis = test._get_analysis(obj_info, obj)
+        print(analysis)
+        self.assertEqual(analysis, {
+            'age_hours': mock.ANY,
+            'bytes': len(obj),
+            'first_bytes': mock.ANY,
+            'first_line': mock.ANY,
+            'second_line': mock.ANY,
+            'third_line': mock.ANY,
+            'fourth_line': mock.ANY,
+            'first_lines': mock.ANY,
+            'chars': len(obj),
+            'lines': mock.ANY,
+            'empty_lines': mock.ANY,
+            'max_line': mock.ANY,
+            'min_line': mock.ANY,
+            'avg_line': mock.ANY,
+            'digits': mock.ANY,
+            'alphas': mock.ANY,
+            'spaces': mock.ANY,
+            'lowers': mock.ANY,
+            'uppers': mock.ANY,
+            'min_col_1': 1,
+            'max_col_1': 2,
+            'min_col_2': 0,
+            'max_col_2': 3,
+            'min_col_3': 4,
+            'max_col_3': 4
         })
 
     @patch('gobexport.test.logger', MagicMock())
@@ -376,6 +417,7 @@ class TestExportTest(TestCase):
             {})
 
         mock_get_file.return_value = {
+            'name': "matched filename",
             'last_modified': datetime.datetime.now().isoformat(),
             'bytes': 100,
             'content_type': 'any content typs'
@@ -385,7 +427,7 @@ class TestExportTest(TestCase):
             {'connection': 'Any connection', 'container': 'development'},
             'any catalogue',
             {},
-            {'any filename': {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
+            {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
 
         mock_get_checks.return_value = {
             filename: {

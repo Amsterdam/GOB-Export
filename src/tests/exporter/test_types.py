@@ -25,25 +25,57 @@ def test_to_boolean():
 
 def test_to_number():
     assert(_to_number(5) == '5')
+    assert(_to_number(-5) == '-5')
     assert(_to_number(5.1) == '5,1')
+    assert(_to_number('5.1') == '5,1')
+    assert(_to_number('-5') == '-5')
     assert(_to_number(None) == '')
 
+    # Test with precision
+    assert(_to_number(5, 2) == '5,00')
+    assert(_to_number(5.1324234, 1) == '5,1')
+    assert(_to_number(5.1324234, 2) == '5,13')
+    assert(_to_number(-5.1324234, 2) == '-5,13')
+    assert(_to_number('5', 2) == '5,00')
+    assert(_to_number('5.1324234', 2) == '5,13')
+    assert(_to_number('-5.1324234', 2) == '-5,13')
+    assert(_to_number('0.0', 1) == '0,0')
+    assert(_to_number(0.0, 1) == '0,0')
+    
     for v in ['', True, [], {}]:
         with pytest.raises(AssertionError):
             assert(_to_number(v))
+    
+    # Test
+    with pytest.raises(ValueError):
+        assert(_to_number('geen nummer', 1))
+    with pytest.raises(ValueError):
+        assert(_to_number('', 1))
 
 def test_to_number_string():
     assert(_to_number_string(5) == '$$5$$')
     assert(_to_number_string(5.1) == '$$5,1$$')
+    assert(_to_number_string('5.1') == '$$5,1$$')
+    assert(_to_number_string('0.1') == '$$,1$$')
+    assert(_to_number_string(None) == '')
+
+    # Test with precision
+    assert(_to_number_string(5, 2) == '$$5,00$$')
     assert(_to_number_string(5.1235353, 2) == '$$5,12$$')
     assert(_to_number_string(0.1235353, 2) == '$$,12$$')
     assert(_to_number_string(-5.1235353, 2) == '$$-5,12$$')
     assert(_to_number_string(-0.1235353, 2) == '$$-,12$$')
-    assert(_to_number_string(None) == '')
+    assert(_to_number_string('5.1',1) == '$$5,1$$')
 
     for v in ['', True, [], {}]:
         with pytest.raises(AssertionError):
             assert(_to_number(v))
+
+    # Test
+    with pytest.raises(ValueError):
+        assert(_to_number('geen nummer', 1))
+    with pytest.raises(ValueError):
+        assert(_to_number('', 1))
 
 def test_to_date():
     assert(_to_date('2020-05-20') == '$$20200520$$')

@@ -98,14 +98,17 @@ def test(catalogue):
                 obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
                 check = _get_check(checks, filename)
 
+                # Report results with the name of the matched file
+                matched_filename = obj_info['name'] if obj_info else filename
+
                 if obj_info is None:
                     logger.error(f"{filename} MISSING")
                 elif check:
                     stats = _get_analysis(obj_info, obj)
-                    if _check_file(check, filename, stats, checks):
-                        logger.info(f"{filename} OK")
+                    if _check_file(check, matched_filename, stats, checks):
+                        logger.info(f"{matched_filename} OK")
                     else:
-                        logger.info(f"{filename} FAILED")
+                        logger.info(f"{matched_filename} FAILED")
                 else:
                     logger.warning(f"{filename} UNCHECKED")
                     _propose_check_file(proposals, filename, obj_info, obj)
@@ -342,6 +345,14 @@ def _get_analysis(obj_info, obj):
 
     lines = content.split('\n')
 
+    cols = {}
+    if obj_info['content_type'] in ["text/csv"] or obj_info['name'][-4:].lower() == ".csv":
+        for line in [l for l in lines[1:] if l]:
+            for i, column in enumerate(line.split(";")):
+                column_len = len(column)
+                cols[f"min_col_{i+1}"] = min(column_len, cols.get(f"min_col_{i+1}", column_len))
+                cols[f"max_col_{i+1}"] = max(column_len, cols.get(f"max_col_{i+1}", column_len))
+
     analyses = range(min(max(_NTH.keys()), len(lines)))
     lines_analysis = {f"{_NTH[n + 1]}_line": hashlib.md5(lines[n].encode(ENCODING)).hexdigest() for n in analyses}
 
@@ -372,5 +383,6 @@ def _get_analysis(obj_info, obj):
         "alphas": alphas / chars,
         "spaces": spaces / chars,
         "lowers": 0 if alphas == 0 else lowers / alphas,
-        "uppers": 0 if uppers == 0 else uppers / alphas
+        "uppers": 0 if uppers == 0 else uppers / alphas,
+        **cols
     }

@@ -97,10 +97,12 @@ class GraphQL:
         # First check if the query has a filter
         filters = re.search(f'{self.schema_collection_name}\s*\((.+)?\)', query)
         if filters:
-            # adjust number of records to request
+
+            # check if the query has a filter on 'first'
             match = re.search('first:\s?(([\d]+)?)', query)
             if match:
-                query = query.replace(match[1], f"{num_records}")
+                # adjust number of records to request
+                query = query.replace(match[1], f"{num_records}", 1)
 
             # Try to find the after parameter, or else add it
             match = re.search('after:\s?("([a-zA-Z\d=]+)?")', query)
