@@ -112,7 +112,7 @@ def test_export_to_file(monkeypatch):
     config = CONFIG_MAPPING[catalogue][collection]
 
     export_to_file('host', config.products['dat'], '/tmp/ttt', catalogue, collection)
-    assert(MockFile.s == '$$1$$||125,6|10,1||||||||||||||POINT (125.6 10.1)\n')
+    assert(MockFile.s == '$$2$$||125,6|10,1||||||||||||||POINT (125.6 10.1)\n')
 
     MockFile.s = ''
 
