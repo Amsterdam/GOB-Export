@@ -417,6 +417,7 @@ class TestExportTest(TestCase):
             {})
 
         mock_get_file.return_value = {
+            'name': "matched filename",
             'last_modified': datetime.datetime.now().isoformat(),
             'bytes': 100,
             'content_type': 'any content typs'
@@ -426,7 +427,7 @@ class TestExportTest(TestCase):
             {'connection': 'Any connection', 'container': 'development'},
             'any catalogue',
             {},
-            {'any filename': {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
+            {'matched filename': {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
 
         mock_get_checks.return_value = {
             filename: {
