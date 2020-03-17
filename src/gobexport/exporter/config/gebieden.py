@@ -26,10 +26,37 @@ following properties:
 
 class StadsdelenExportConfig:
 
+    query_actueel = '''
+{
+  gebiedenStadsdelen {
+    edges {
+      node {
+        identificatie
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        geometrie
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced&ndjson=true',
+            'api_type': 'graphql',
             'filename': 'CSV_Actueel/GBD_stadsdeel_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -47,11 +74,12 @@ class StadsdelenExportConfig:
                     'formatter': format_geometry,
                     'value': 'geometrie'
                 },
-            }
+            },
+            'query': query_actueel
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/stadsdelen/?view=enhanced&ndjson=true',
+            'api_type': 'graphql',
             'filename': 'SHP/GBD_stadsdeel.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -78,7 +106,8 @@ class StadsdelenExportConfig:
                     'filename': 'SHP/GBD_stadsdeel.prj',
                     'mime_type': 'application/octet-stream'
                 },
-            ]
+            ],
+            'query': query_actueel
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
@@ -140,10 +169,46 @@ class StadsdelenExportConfig:
 
 class GGPGebiedenExportConfig:
 
+    query_actueel = '''
+{
+  gebiedenGgpgebieden {
+    edges {
+      node {
+        identificatie
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        geometrie
+        ligtInStadsdeel {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+              ligtInGemeente {
+                edges {
+                  node {
+                    identificatie
+                    naam
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced&ndjson=true',
+            'api_type': 'graphql',
             'filename': 'CSV_Actueel/GBD_ggw_praktijkgebied_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -164,12 +229,12 @@ class GGPGebiedenExportConfig:
                     'formatter': format_geometry,
                     'value': 'geometrie'
                 },
-
-            }
+            },
+            'query': query_actueel
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/ggpgebieden/?view=enhanced&ndjson=true',
+            'api_type': 'graphql',
             'filename': 'SHP/GBD_ggw_praktijkgebied.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -199,7 +264,8 @@ class GGPGebiedenExportConfig:
                     'filename': 'SHP/GBD_ggw_praktijkgebied.prj',
                     'mime_type': 'application/octet-stream'
                 },
-            ]
+            ],
+            'query': query_actueel
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
@@ -277,10 +343,46 @@ class GGPGebiedenExportConfig:
 
 class GGWGebiedenExportConfig:
 
+    query_actueel = '''
+{
+  gebiedenGgwgebieden {
+    edges {
+      node {
+        identificatie
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        geometrie
+        ligtInStadsdeel {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+              ligtInGemeente {
+                edges {
+                  node {
+                    identificatie
+                    naam
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/ggwgebieden/?view=enhanced&ndjson=true',
+            'api_type': 'graphql',
             'filename': 'CSV_Actueel/GBD_ggw_gebied_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -301,11 +403,12 @@ class GGWGebiedenExportConfig:
                     'formatter': format_geometry,
                     'value': 'geometrie'
                 },
-            }
+            },
+            'query': query_actueel
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/ggwgebieden/?view=enhanced&ndjson=true',
+            'api_type': 'graphql',
             'filename': 'SHP/GBD_ggw_gebied.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -335,7 +438,8 @@ class GGWGebiedenExportConfig:
                     'filename': 'SHP/GBD_ggw_gebied.prj',
                     'mime_type': 'application/octet-stream'
                 },
-            ]
+            ],
+            'query': query_actueel
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
@@ -413,10 +517,56 @@ class GGWGebiedenExportConfig:
 
 class WijkenExportConfig:
 
+    query_actueel = '''
+{
+  gebiedenWijken {
+    edges {
+      node {
+        identificatie
+        code
+        naam
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        cbsCode
+        geometrie
+        LigtInGgwgebied {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+            }
+          }
+        }
+        ligtInStadsdeel {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+              ligtInGemeente {
+                edges {
+                  node {
+                    identificatie
+                    naam
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
     products = {
         'csv_actueel': {
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/wijken/?view=enhanced&ndjson=true',
+            'api_type': 'graphql',
             'filename': 'CSV_Actueel/GBD_wijk_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -428,9 +578,9 @@ class WijkenExportConfig:
                 'documentdatum': 'documentdatum',
                 'documentnummer': 'documentnummer',
                 'cbsCode': 'cbsCode',
-                'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
-                'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
+                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
@@ -441,11 +591,12 @@ class WijkenExportConfig:
                     'formatter': format_geometry,
                     'value': 'geometrie'
                 },
-            }
+            },
+            'query': query_actueel
         },
         'esri_actueel': {
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/wijken/?view=enhanced&ndjson=true',
+            'api_type': 'graphql',
             'filename': 'SHP/GBD_wijk.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -457,9 +608,9 @@ class WijkenExportConfig:
                 'docdatum': 'documentdatum',
                 'docnummer': 'documentnummer',
                 'CBS_code': 'cbsCode',
-                'ggw_id': 'ligtInGgwgebied.identificatie',
-                'ggw_code': 'ligtInGgwgebied.code',
-                'ggw_naam': 'ligtInGgwgebied.naam',
+                'ggw_id': 'LigtInGgwgebied.identificatie',
+                'ggw_code': 'LigtInGgwgebied.code',
+                'ggw_naam': 'LigtInGgwgebied.naam',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_code': 'ligtInStadsdeel.code',
                 'sdl_naam': 'ligtInStadsdeel.naam',
@@ -479,7 +630,8 @@ class WijkenExportConfig:
                     'filename': 'SHP/GBD_wijk.prj',
                     'mime_type': 'application/octet-stream'
                 },
-            ]
+            ],
+            'query': query_actueel
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
@@ -575,10 +727,74 @@ class WijkenExportConfig:
 
 class BuurtenExportConfig:
 
+    query_actueel = '''
+{
+  gebiedenBuurten {
+    edges {
+      node {
+        identificatie
+        code
+        naam
+        cbsCode
+        beginGeldigheid
+        eindGeldigheid
+        documentdatum
+        documentnummer
+        geometrie
+        LigtInGgpgebied {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+            }
+          }
+        }
+        ligtInWijk {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+              LigtInGgwgebied {
+                edges {
+                  node {
+                    identificatie
+                    code
+                    naam
+                  }
+                }
+              }
+              ligtInStadsdeel {
+                edges {
+                  node {
+                    identificatie
+                    code
+                    naam
+                    ligtInGemeente {
+                      edges {
+                        node {
+                          identificatie
+                          naam
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
     products = {
         'csv_actueel': {
+            'api_type': 'graphql',
             'exporter': csv_exporter,
-            'endpoint': '/gob/gebieden/buurten/?view=enhanced&ndjson=true',
             'filename': 'CSV_Actueel/GBD_buurt_Actueel.csv',
             'mime_type': 'plain/text',
             'format': {
@@ -593,12 +809,12 @@ class BuurtenExportConfig:
                 'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
-                'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
-                'ligtIn:GBD.GGP.identificatie': 'ligtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.code': 'ligtInGgpgebied.code',
-                'ligtIn:GBD.GGP.naam': 'ligtInGgpgebied.naam',
+                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
+                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
+                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
+                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
+                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
@@ -609,11 +825,12 @@ class BuurtenExportConfig:
                     'formatter': format_geometry,
                     'value': 'geometrie'
                 },
-            }
+            },
+            'query': query_actueel
         },
         'esri_actueel': {
+            'api_type': 'graphql_streaming',
             'exporter': esri_exporter,
-            'endpoint': '/gob/gebieden/buurten/?view=enhanced&ndjson=true',
             'filename': 'SHP/GBD_buurt.shp',
             'mime_type': 'application/octet-stream',
             'format': {
@@ -628,12 +845,12 @@ class BuurtenExportConfig:
                 'wijk_id': 'ligtInWijk.identificatie',
                 'wijk_code': 'ligtInWijk.code',
                 'wijk_naam': 'ligtInWijk.naam',
-                'ggw_id': 'ligtInGgwgebied.identificatie',
-                'ggw_code': 'ligtInGgwgebied.code',
-                'ggw_naam': 'ligtInGgwgebied.naam',
-                'ggp_id': 'ligtInGgpgebied.identificatie',
-                'ggp_code': 'ligtInGgpgebied.code',
-                'ggp_naam': 'ligtInGgpgebied.naam',
+                'ggw_id': 'LigtInGgwgebied.identificatie',
+                'ggw_code': 'LigtInGgwgebied.code',
+                'ggw_naam': 'LigtInGgwgebied.naam',
+                'ggp_id': 'LigtInGgpgebied.identificatie',
+                'ggp_code': 'LigtInGgpgebied.code',
+                'ggp_naam': 'LigtInGgpgebied.naam',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_code': 'ligtInStadsdeel.code',
                 'sdl_naam': 'ligtInStadsdeel.naam',
@@ -653,7 +870,8 @@ class BuurtenExportConfig:
                     'filename': 'SHP/GBD_buurt.prj',
                     'mime_type': 'application/octet-stream'
                 },
-            ]
+            ],
+            'query': query_actueel
         },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
