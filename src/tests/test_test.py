@@ -427,7 +427,7 @@ class TestExportTest(TestCase):
             {'connection': 'Any connection', 'container': 'development'},
             'any catalogue',
             {},
-            {'matched filename': {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
+            {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
 
         mock_get_checks.return_value = {
             filename: {

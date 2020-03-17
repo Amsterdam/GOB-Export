@@ -99,16 +99,16 @@ def test(catalogue):
                 check = _get_check(checks, filename)
 
                 # Report results with the name of the matched file
-                filename = obj_info['name'] if obj_info else filename
+                matched_filename = obj_info['name'] if obj_info else filename
 
                 if obj_info is None:
                     logger.error(f"{filename} MISSING")
                 elif check:
                     stats = _get_analysis(obj_info, obj)
-                    if _check_file(check, filename, stats, checks):
-                        logger.info(f"{filename} OK")
+                    if _check_file(check, matched_filename, stats, checks):
+                        logger.info(f"{matched_filename} OK")
                     else:
-                        logger.info(f"{filename} FAILED")
+                        logger.info(f"{matched_filename} FAILED")
                 else:
                     logger.warning(f"{filename} UNCHECKED")
                     _propose_check_file(proposals, filename, obj_info, obj)
