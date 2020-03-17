@@ -98,6 +98,9 @@ def test(catalogue):
                 obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
                 check = _get_check(checks, filename)
 
+                # Report results with the name of the matched file
+                filename = obj_info['name'] if obj_info else filename
+
                 if obj_info is None:
                     logger.error(f"{filename} MISSING")
                 elif check:
