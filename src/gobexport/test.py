@@ -415,11 +415,7 @@ def _check_csv(lines, obj_info, check):
     :param obj_info:
     :return:
     """
-    cols = {}
     if obj_info['content_type'] in ["text/csv"] or obj_info['name'][-4:].lower() == ".csv":
-        columnInspector = CSVInspector(obj_info['name'], check)
-        for line in [l for l in lines[1:] if l]:
-            columns = line.split(";")
-            columnInspector.check_columns(columns)
-        cols = columnInspector.cols
-    return cols
+        return CSVInspector(obj_info['name'], check).check_lines(lines)
+    else:
+        return {}
