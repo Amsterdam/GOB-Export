@@ -139,7 +139,8 @@ def _to_geometry(value, *args):
     :return:
     """
     assert(type(value) is dict or value is None)
-    return '' if value is None else f"{value['type'].upper()} ({value['coordinates'][0]} {value['coordinates'][1]})"\
+    return '' if value is None else \
+        f"{value['type'].upper()} ({value['coordinates'][0]:.1f} {value['coordinates'][1]:.1f})"\
         .replace(',', '')
 
 
