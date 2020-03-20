@@ -129,7 +129,7 @@ def _to_geometry(value, *args):
         {
             type: "Point",
             coordinates: [
-                119411.7,
+                1,9411.7,
                 487201.6
             ]
         }
@@ -139,9 +139,13 @@ def _to_geometry(value, *args):
     :return:
     """
     assert(type(value) is dict or value is None)
-    return '' if value is None else \
-        f"{value['type'].upper()} ({float(value['coordinates'][0])} {float(value['coordinates'][1])})"\
-        .replace(',', '')
+    if value is None:
+        return ''
+    else:
+        # Input is 1,000.0; 1000; 1000.1. Remove the ',' and convert to float.
+        # Output must be a float with a precision of at least 1.
+        coords = [float(c.replace(",", "")) if isinstance(c, str) else float(c) for c in value['coordinates']]
+        return f"{value['type'].upper()} ({coords[0]} {coords[1]})"
 
 
 def _to_coord(value, coord):
