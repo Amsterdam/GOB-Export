@@ -26,7 +26,14 @@ alphas       % alphabetic characters
 lowers       % lowercase characters of all alphabetic characters
 uppers       % uppercase characters of all alphabetic characters
 
+For CSV exports only (content_type = "text/csv" or filename extension = ".csv":
+
+min_col_n   minimum length of column n, e.g. [0, 2]
+max_col_n   maximum length of column n, e.g. [10, 15]
+unique_cols array of array of columns that should have unique values, e.g. [ [1], [2, 3] ]
+
 """
+import math
 import re
 import json
 import hashlib
@@ -42,6 +49,7 @@ from gobexport.config import CONTAINER_BASE
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.exporter import CONFIG_MAPPING
 from gobexport.utils import resolve_config_filenames, json_loads
+from gobexport.csv_inspector import CSVInspector
 
 # Collect all export configs
 _export_config = {cat: configs.values() for cat, configs in CONFIG_MAPPING.items()}
@@ -104,8 +112,8 @@ def test(catalogue):
                 if obj_info is None:
                     logger.error(f"{filename} MISSING")
                 elif check:
-                    stats = _get_analysis(obj_info, obj)
-                    if _check_file(check, matched_filename, stats, checks):
+                    stats = _get_analysis(obj_info, obj, check)
+                    if _check_file(check, matched_filename, stats):
                         logger.info(f"{matched_filename} OK")
                     else:
                         logger.info(f"{matched_filename} FAILED")
@@ -267,10 +275,24 @@ def _get_low_high(value):
         high += dist
     assert low < value < high
 
+    if isinstance(value, int):
+        # Use integer bounds for integer values
+        low = math.floor(low)
+        high = math.ceil(high)
+
     return low, high
 
 
-def _check_file(check, filename, stats, checks):
+def _check_uniqueness(check):
+    if check.get('unique_cols'):
+        # Replace the unique_cols key by the outcome of the unique checks
+        check.update(
+            {f"{str(uniques)}_is_unique": [True] for uniques in check['unique_cols']}
+        )
+        del check['unique_cols']
+
+
+def _check_file(check, filename, stats):
     """
     Test if all checks that have been defined for the given file are OK
 
@@ -280,6 +302,8 @@ def _check_file(check, filename, stats, checks):
     :return: True if all checks succeed
     """
     total_result = True
+    _check_uniqueness(check)
+
     for key, margin in check.items():
         # Get corresponding value for check
         if key not in stats:
@@ -313,7 +337,7 @@ def _check_file(check, filename, stats, checks):
     return total_result
 
 
-def _get_analysis(obj_info, obj):
+def _get_analysis(obj_info, obj, check=None):
     """
     Get statistics for the given file (object)
 
@@ -322,6 +346,7 @@ def _get_analysis(obj_info, obj):
     :return:
     """
     ENCODING = 'utf-8'
+    check = check or {}
 
     last_modified = obj_info["last_modified"]
     age = datetime.datetime.now() - dateutil.parser.parse(last_modified)
@@ -345,13 +370,7 @@ def _get_analysis(obj_info, obj):
 
     lines = content.split('\n')
 
-    cols = {}
-    if obj_info['content_type'] in ["text/csv"] or obj_info['name'][-4:].lower() == ".csv":
-        for line in [l for l in lines[1:] if l]:
-            for i, column in enumerate(line.split(";")):
-                column_len = len(column)
-                cols[f"min_col_{i+1}"] = min(column_len, cols.get(f"min_col_{i+1}", column_len))
-                cols[f"max_col_{i+1}"] = max(column_len, cols.get(f"max_col_{i+1}", column_len))
+    cols = _check_csv(lines, obj_info, check)
 
     analyses = range(min(max(_NTH.keys()), len(lines)))
     lines_analysis = {f"{_NTH[n + 1]}_line": hashlib.md5(lines[n].encode(ENCODING)).hexdigest() for n in analyses}
@@ -386,3 +405,17 @@ def _get_analysis(obj_info, obj):
         "uppers": 0 if uppers == 0 else uppers / alphas,
         **cols
     }
+
+
+def _check_csv(lines, obj_info, check):
+    """
+    Check a csv file for column lengths and duplicate values
+
+    :param lines:
+    :param obj_info:
+    :return:
+    """
+    if obj_info['content_type'] in ["text/csv"] or obj_info['name'][-4:].lower() == ".csv":
+        return CSVInspector(obj_info['name'], check).check_lines(lines)
+    else:
+        return {}
