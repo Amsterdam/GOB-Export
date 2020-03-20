@@ -41,7 +41,13 @@ def test_to_number():
     assert(_to_number('-5.1324234', 2) == '-5,13')
     assert(_to_number('0.0', 1) == '0,0')
     assert(_to_number(0.0, 1) == '0,0')
-    
+
+    # Test to export '' when input is 0 and 
+    assert(_to_number(0, 0, True) == '')
+    assert(_to_number(5, 1, True) == '5,0')
+    assert(_to_number(0, 1, False) == '0,0')
+    assert(_to_number('0.0', 1, True) == '')
+
     for v in ['', True, [], {}]:
         with pytest.raises(AssertionError):
             assert(_to_number(v))

@@ -67,7 +67,7 @@ def _to_boolean(value, *args):
     return _to_string('' if value is True else 'N')
 
 
-def _to_number(value, precision=None):
+def _to_number(value, precision=None, zeroToNothing=False):
     """Convert to number
 
     The decimal dot is replaced by a comma
@@ -79,6 +79,8 @@ def _to_number(value, precision=None):
     :return:
     """
     assert(type(value) in [int, float, str, decimal.Decimal] or value is None)
+    # Return '' if input is 0
+    value = None if zeroToNothing and float(value) == 0 else value
     value = format(float(value), f'.{precision}f') if precision and value is not None else value
     return '' if value is None else str(value)\
         .replace('.', ',')
