@@ -35,12 +35,12 @@ class TestExportTest(TestCase):
         self.assertEqual(high, 0.53)
 
         low, high = test._get_low_high(0)
-        self.assertEqual(low, -0.01)
-        self.assertEqual(high, 0.01)
+        self.assertEqual(low, -1)
+        self.assertEqual(high, 1)
 
         low, high = test._get_low_high(1)
-        self.assertEqual(low, 0.95)
-        self.assertEqual(high, 1.05)
+        self.assertEqual(low, 0)
+        self.assertEqual(high, 2)
 
         low, high = test._get_low_high(100)
         self.assertEqual(low, 95)
