@@ -46,7 +46,7 @@ def test_to_number():
     assert(_to_number(0, 0, True) == '')
     assert(_to_number(5, 1, True) == '5,0')
     assert(_to_number(0, 1, False) == '0,0')
-    assert(_to_number('0.0', 1, True) == '')
+    assert(_to_number('0.0', 1, True) == '0.0')
 
     for v in ['', True, [], {}]:
         with pytest.raises(AssertionError):
