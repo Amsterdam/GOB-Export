@@ -71,6 +71,11 @@ class CSVInspector:
         """
         Check the column lengths
 
+        Why min and max per column?
+        Suppose you want to assure that a column is either 3 or 8 characters long, but not 5
+        Then specify that min is between 3 and 3 and max is between 8 and 8
+        If any column should ever have length 5 the constraint is violated
+
         :param columns:
         :return:
         """

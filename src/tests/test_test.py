@@ -153,6 +153,7 @@ class TestExportTest(TestCase):
 
         obj = b"a;b;c\n12;;1234\n1;123;1234\n"
         obj_info = {
+            "name": "any name",
             "last_modified": datetime.datetime.now().isoformat(),
             "bytes": len(obj),
             "content_type": "text/csv"
@@ -193,64 +194,54 @@ class TestExportTest(TestCase):
         stats = {
             'equal': 1
         }
-        checks = {
-            filename: {
-                'equal': [1]
-            }
+        check = {
+            'equal': [1]
         }
-        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), True)
+        self.assertEqual(test._check_file(check, filename, stats), True)
         stats['equal'] = 2
-        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
+        self.assertEqual(test._check_file(check, filename, stats), False)
 
         stats = {
             '<=': 1
         }
-        checks = {
-            filename: {
-                '<=': [None, 2]
-            }
+        check = {
+            '<=': [None, 2]
         }
-        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), True)
+        self.assertEqual(test._check_file(check, filename, stats), True)
         stats['<='] = 3
-        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
+        self.assertEqual(test._check_file(check, filename, stats), False)
 
         stats = {
             '>=': 1
         }
-        checks = {
-            filename: {
-                '>=': [0, None]
-            }
+        check = {
+            '>=': [0, None]
         }
-        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), True)
+        self.assertEqual(test._check_file(check, filename, stats), True)
         stats['>='] = -1
-        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
+        self.assertEqual(test._check_file(check, filename, stats), False)
 
         stats = {
             'between': 1
         }
-        checks = {
-            filename: {
-                'between': [0, 2]
-            }
+        check = {
+            'between': [0, 2]
         }
-        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), True)
+        self.assertEqual(test._check_file(check, filename, stats), True)
         stats['between'] = 3
-        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
+        self.assertEqual(test._check_file(check, filename, stats), False)
         stats['between'] = -1
-        self.assertEqual(test._check_file(checks[filename], filename, stats, checks), False)
+        self.assertEqual(test._check_file(check, filename, stats), False)
 
     @patch('gobexport.test.logger')
     def test_check_file_warning(self, mock_logger):
         filename = 'fname'
-        checks = {
-            'fname': {
-                'k1': 'margin',
-            }
+        check = {
+            'k1': 'margin',
         }
         stats = []
 
-        test._check_file(checks[filename], filename, stats, checks)
+        test._check_file(check, filename, stats)
         mock_logger.warning.assert_called_with('Value missing for k1 check in fname')
 
     @patch('gobexport.test.logger', MagicMock())
@@ -457,3 +448,22 @@ class TestExportTest(TestCase):
         mock_get_file.return_value = None, None
         test.test(catalogue)
         mock_logger.error.assert_called_with("any filename MISSING")
+
+    def test_check_uniqueness(self):
+        check = {}
+        test._check_uniqueness(check)
+        self.assertEqual(check, {})
+
+        check = {'unique_cols': [[1]]}
+        test._check_uniqueness(check)
+        self.assertEqual(check, {
+            '[1]_is_unique': [True]
+        })
+
+        check = {'unique_cols': [[1], [2,3,4]]}
+        test._check_uniqueness(check)
+        self.assertEqual(check, {
+            '[1]_is_unique': [True],
+            '[2, 3, 4]_is_unique': [True]
+
+        })
