@@ -94,8 +94,11 @@ def test_to_date():
 
 def test_to_geometry():
     assert(_to_geometry({"type": "Point", "coordinates": [1, 2]}) == 'POINT (1.0 2.0)')
+    assert(_to_geometry({"type": "Point", "coordinates": [1.00, 2]}) == 'POINT (1.0 2.0)')
     assert(_to_geometry({"type": "Point", "coordinates": [1.1, 2.2]}) == 'POINT (1.1 2.2)')
     assert(_to_geometry({"type": "Point", "coordinates": [1.12, 2.21]}) == 'POINT (1.12 2.21)')
+    assert(_to_geometry({"type": "Point", "coordinates": ['1,121.0', 2.21]}) == 'POINT (1121.0 2.21)')
+    assert(_to_geometry({"type": "Point", "coordinates": [',5', 2.21]}) == 'POINT (5.0 2.21)')
     assert(_to_geometry(None) == '')
 
     with pytest.raises(ValueError):
