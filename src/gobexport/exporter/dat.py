@@ -80,10 +80,12 @@ def _to_number(value, precision=None, zeroToNothing=False):
     """
     assert(type(value) in [int, float, str, decimal.Decimal] or value is None)
     # Return '' if input is 0
-    value = None if zeroToNothing and float(value) == 0 else value
-    value = format(float(value), f'.{precision}f') if precision and value is not None else value
-    return '' if value is None else str(value)\
-        .replace('.', ',')
+    if value is None or (zeroToNothing and not value):
+        return ''
+    else:
+        value = format(float(value), f'.{precision}f') if precision and value is not None else value
+        return '' if value is None else str(value)\
+            .replace('.', ',')
 
 
 def _to_number_string(value, precision=None):
