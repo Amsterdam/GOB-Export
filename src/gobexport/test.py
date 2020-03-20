@@ -33,6 +33,7 @@ max_col_n   maximum length of column n, e.g. [10, 15]
 unique_cols array of array of columns that should have unique values, e.g. [ [1], [2, 3] ]
 
 """
+import math
 import re
 import json
 import hashlib
@@ -273,6 +274,11 @@ def _get_low_high(value):
     if high <= value:
         high += dist
     assert low < value < high
+
+    if isinstance(value, int):
+        # Use integer bounds for integer values
+        low = math.floor(low)
+        high = math.ceil(high)
 
     return low, high
 
