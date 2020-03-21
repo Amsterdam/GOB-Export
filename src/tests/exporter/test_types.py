@@ -1,6 +1,6 @@
 import pytest
 
-from gobexport.exporter.dat import _to_plain, _to_string, _to_boolean, _to_number, _to_number_string, _to_date, _to_geometry, _to_coord, type_convert
+from gobexport.exporter.dat import _to_plain, _to_string, _to_boolean, _to_number, _to_number_zero, _to_number_string, _to_date, _to_geometry, _to_coord, type_convert
 
 
 def test_to_string():
@@ -42,12 +42,6 @@ def test_to_number():
     assert(_to_number('0.0', 1) == '0,0')
     assert(_to_number(0.0, 1) == '0,0')
 
-    # Test to export '' when input is 0 and 
-    assert(_to_number(0, 0, True) == '')
-    assert(_to_number(5, 1, True) == '5,0')
-    assert(_to_number(0, 1, False) == '0,0')
-    assert(_to_number('0.0', 1, True) == '0,0')
-
     for v in ['', True, [], {}]:
         with pytest.raises(AssertionError):
             assert(_to_number(v))
@@ -57,6 +51,14 @@ def test_to_number():
         assert(_to_number('geen nummer', 1))
     with pytest.raises(ValueError):
         assert(_to_number('', 1))
+
+def test_to_number_zero():
+    # Test to export '' when input is 0 and
+    assert(_to_number_zero(0, 0) == '')
+    assert(_to_number_zero(5, 1) == '5,0')
+    assert(_to_number_zero(0, 1) == '')
+    assert(_to_number_zero('0.0', 1) == '')
+    assert(_to_number_zero('0.000', 5) == '')
 
 def test_to_number_string():
     assert(_to_number_string(5) == '$$5$$')

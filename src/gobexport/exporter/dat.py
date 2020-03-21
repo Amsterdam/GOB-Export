@@ -67,7 +67,7 @@ def _to_boolean(value, *args):
     return _to_string('' if value is True else 'N')
 
 
-def _to_number(value, precision=None, zeroToNothing=False):
+def _to_number(value, precision=None):
     """Convert to number
 
     The decimal dot is replaced by a comma
@@ -79,13 +79,28 @@ def _to_number(value, precision=None, zeroToNothing=False):
     :return:
     """
     assert(type(value) in [int, float, str, decimal.Decimal] or value is None)
-    # Return '' if input is 0
-    if value is None or (zeroToNothing and not value):
-        return ''
-    else:
-        value = format(float(value), f'.{precision}f') if precision and value is not None else value
-        return '' if value is None else str(value)\
-            .replace('.', ',')
+    value = format(float(value), f'.{precision}f') if precision and value is not None else value
+    return '' if value is None else str(value)\
+        .replace('.', ',')
+
+
+def _to_number_zero(value, precision=None):
+    """Convert to number
+
+    Any zero result will be replaced by an empty string
+
+    Example:
+        0 => ''
+        0.0 => ''
+        0.0000 => ''
+        2.5 => 2,5
+
+    :param value:
+    :param precision:
+    :return:
+    """
+    result = _to_number(value, precision)
+    return '' if re.match(r'^0(\,0*)?$', result) else result
 
 
 def _to_number_string(value, precision=None):
@@ -195,6 +210,7 @@ def type_convert(type_name, value, *args):
         'str': _to_string,
         'bool': _to_boolean,
         'num': _to_number,
+        'numz': _to_number_zero,
         'numstr': _to_number_string,
         'dat': _to_date,
         'geo': _to_geometry,
