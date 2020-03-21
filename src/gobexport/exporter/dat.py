@@ -100,7 +100,7 @@ def _to_number_zero(value, precision=None):
     :return:
     """
     result = _to_number(value, precision)
-    return '' if re.match(r'^0(\,0*)?$', result) else result
+    return '' if re.match(r'^0*(,0*)?$', result) else result
 
 
 def _to_number_string(value, precision=None):
