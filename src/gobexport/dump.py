@@ -111,7 +111,7 @@ class Dumper():
         Dump a catalog collection into a remote database in the given schema
 
         If the dump fails the operation is retried with a maximum of MAX_TRIES
-        and a wait between each try of RETRY_TIMEOUT
+        and a wait between each try of RETRY_TIMEOUT seconds
         :param schema:
         :param catalog_name:
         :param collection_name:
@@ -122,9 +122,11 @@ class Dumper():
             tries += 1
             logger.info(f"Try {tries}: dump {catalog_name} - {collection_name}")
             if self.try_dump_collection(schema, catalog_name, collection_name):
+                # On Successful dump
                 return
-            # Wait a little before next try
+            # Wait RETRY_TIMEOUT seconds before next try
             time.sleep(self.RETRY_TIMEOUT)
+        logger.error(f'Export {catalog_name}-{collection_name} failed after {Dumper.MAX_TRIES}')
 
     def try_dump_collection(self, schema, catalog_name, collection_name):
         """
@@ -173,11 +175,11 @@ class Dumper():
                 logger.info(f"{lastline} ({(end_line - start_line):.2f} / {(end_line - start_request):.2f} secs)")
                 start_line = time.time()
         except Exception as e:
-            logger.error(f'Export {catalog_name}-{collection_name} failed: {str(e)}')
+            logger.warning(f'Export {catalog_name}-{collection_name} failed: {str(e)}')
         else:
             success = re.match(r'Export completed', lastline) is not None
             if not success:
-                logger.error(f'Export {catalog_name}-{collection_name} completed with errors')
+                logger.warning(f'Export {catalog_name}-{collection_name} completed with errors')
         finally:
             end_request = time.time()
             logger.info(f"Elapsed time: {(end_request - start_request):.2f} secs")
