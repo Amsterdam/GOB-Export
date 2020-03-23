@@ -166,7 +166,7 @@ class MetingenExportConfig:
                       'hoortBijMeetbout.identificatie:str|refereertAanReferentiepunten.[0].identificatie:str|'
                       'refereertAanReferentiepunten.[1].identificatie:str|'
                       'refereertAanReferentiepunten.[2].identificatie:str|zakkingssnelheid:num:1|'
-                      'zakkingCumulatief:num:1|isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:num|'
+                      'zakkingCumulatief:num:1|isGemetenDoor:str|hoeveelsteMeting:num|aantalDagen:numz|'
                       'pandmsl:str|ligtInStadsdeel.code:str|wijzeVanInwinnen.code:str:{1:"W",2:"T",3:"G"}',
             'query': query_metingen
         }
