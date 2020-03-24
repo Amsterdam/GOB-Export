@@ -155,11 +155,11 @@ def _export_collection(host, catalogue, collection, product_name, destination):
                                               fp,
                                               file['mime_type'])
                 except GOBException as e:
-                    logger.error(f"Failed to distribute to {destination} on location: {container}{file['distribution']}. \
+                    logger.error(f"Failed to copy to {destination} on location: {container}{file['distribution']}. \
                                  Error: {e}")
                     return False
 
-            logger.info(f"File distributed to {destination} on location: {container}{file['distribution']}.")
+            logger.info(f"File copied to {destination} on location: {container}{file['distribution']}.")
 
             cleanup_datefiles(connection, CONTAINER_BASE, f"{EXPORT_DIR}/{catalogue}/{file['distribution']}")
 

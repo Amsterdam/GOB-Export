@@ -104,6 +104,7 @@ def test(catalogue):
             filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
 
             for filename in filenames:
+                # Check the previously exported file at its temporary location
                 obj_info, obj = _get_file(conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}")
                 check = _get_check(checks, filename)
 
@@ -111,16 +112,18 @@ def test(catalogue):
                 matched_filename = obj_info['name'] if obj_info else filename
 
                 if obj_info is None:
-                    logger.error(f"{filename} MISSING")
+                    logger.error(f"File {filename} MISSING")
                 elif check:
                     stats = _get_analysis(obj_info, obj, check)
                     if _check_file(check, matched_filename, stats):
-                        logger.info(f"{matched_filename} OK")
+                        logger.info(f"Check {matched_filename} OK")
+                        # Copy the file to its final location
                         distribute_file(conn_info, matched_filename)
                     else:
-                        logger.info(f"{matched_filename} FAILED")
+                        logger.info(f"Check {matched_filename} FAILED")
                 else:
-                    logger.warning(f"{filename} UNCHECKED")
+                    logger.warning(f"File {filename} UNCHECKED")
+                    # Do not copy unchecked files
                     _propose_check_file(proposals, filename, obj_info, obj)
 
     # Write out any missing test definitions
@@ -129,7 +132,12 @@ def test(catalogue):
 
 def distribute_file(conn_info, filename):
     """
-    Distribute the checked file to its final location
+    Copy the checked file to its final location
+
+    Check and copy is implemented as a indivisible action.
+    If the check is OK then the file is copied to its final location in one action.
+    The time between the check and the copy action is as short as possible
+    So no extra workflow step has been introduced (possible queueing)
 
     :param conn_info:
     :param filename:
@@ -137,8 +145,14 @@ def distribute_file(conn_info, filename):
     """
     # Remove export dir from filename to get destination file name
     dst = re.sub(rf'^{EXPORT_DIR}/', '', filename)
-    logger.info(f"Copy {filename} to {dst}")
+
+    # Copy the file to the destination location
+    logger.info(f"Distribute to {dst}")
     conn_info['connection'].copy_object(CONTAINER_BASE, filename, f"{CONTAINER_BASE}/{dst}")
+
+    # Do not delete the file from its temporary location because a re-run would cause missing file errors
+
+    # Cleanup any date files at the destination location
     cleanup_datefiles(conn_info['connection'], CONTAINER_BASE, dst)
 
 
