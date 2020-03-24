@@ -374,8 +374,9 @@ class TestExportTest(TestCase):
     @patch('gobexport.test._write_proposals')
     @patch('gobexport.test._get_checks')
     @patch('gobexport.test.connect_to_objectstore')
+    @patch('gobexport.test.distribute_file')
     @patch('gobexport.test.CONTAINER_BASE', 'development')
-    def test_test(self, mock_connect_to_objectstore, mock_get_checks, mock_write_proposals, mock_get_file, mock_logger):
+    def test_test(self, mock_distribute, mock_connect_to_objectstore, mock_get_checks, mock_write_proposals, mock_get_file, mock_logger):
         catalogue = "any catalogue"
         mock_connect_to_objectstore.return_value = "Any connection", None
         config = MockConfig()
@@ -431,6 +432,7 @@ class TestExportTest(TestCase):
             'any catalogue',
             {filename: {'bytes': [100]}},
             {})
+        mock_distribute.assert_called()
 
         mock_get_checks.return_value = {
             filename: {
@@ -447,7 +449,7 @@ class TestExportTest(TestCase):
         # Check case in which check is defined, but filename is missing
         mock_get_file.return_value = None, None
         test.test(catalogue)
-        mock_logger.error.assert_called_with("any filename MISSING")
+        mock_logger.error.assert_called_with("File any filename MISSING")
 
     def test_check_uniqueness(self):
         check = {}
@@ -467,3 +469,21 @@ class TestExportTest(TestCase):
             '[2, 3, 4]_is_unique': [True]
 
         })
+
+    @patch('gobexport.test.logger', MagicMock())
+    @patch("gobexport.test.cleanup_datefiles")
+    def test_distribute_file(self, mock_cleanup_datefiles):
+        conn_info = {
+            'connection': MagicMock(),
+            'container': "any container"
+        }
+        filename = f"{test.EXPORT_DIR}/any filename"
+        test.distribute_file(conn_info, filename)
+        conn_info['connection'].copy_object.assert_called_with(
+            test.CONTAINER_BASE,
+            filename,
+            f"{test.CONTAINER_BASE}/any filename")
+        mock_cleanup_datefiles.assert_called_with(
+            conn_info['connection'],
+            test.CONTAINER_BASE,
+            "any filename")
