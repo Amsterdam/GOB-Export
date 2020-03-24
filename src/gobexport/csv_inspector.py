@@ -81,8 +81,8 @@ class CSVInspector:
         """
         for i, column in enumerate(columns):
             column_len = len(column)
-            self.cols[f"min_col_{i + 1}"] = min(column_len, self.cols.get(f"min_col_{i + 1}", column_len))
-            self.cols[f"max_col_{i + 1}"] = max(column_len, self.cols.get(f"max_col_{i + 1}", column_len))
+            self.cols[f"minlength_col_{i + 1}"] = min(column_len, self.cols.get(f"minlength_col_{i + 1}", column_len))
+            self.cols[f"maxlength_col_{i + 1}"] = max(column_len, self.cols.get(f"maxlength_col_{i + 1}", column_len))
 
     def check_columns(self, columns):
         """

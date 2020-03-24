@@ -28,8 +28,8 @@ uppers       % uppercase characters of all alphabetic characters
 
 For CSV exports only (content_type = "text/csv" or filename extension = ".csv":
 
-min_col_n   minimum length of column n, e.g. [0, 2]
-max_col_n   maximum length of column n, e.g. [10, 15]
+minlength_col_n   minimum length of column n, e.g. [0, 2]
+maxlength_col_n   maximum length of column n, e.g. [10, 15]
 unique_cols array of array of columns that should have unique values, e.g. [ [1], [2, 3] ]
 
 """
