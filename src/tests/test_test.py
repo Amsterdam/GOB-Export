@@ -180,12 +180,12 @@ class TestExportTest(TestCase):
             'spaces': mock.ANY,
             'lowers': mock.ANY,
             'uppers': mock.ANY,
-            'min_col_1': 1,
-            'max_col_1': 2,
-            'min_col_2': 0,
-            'max_col_2': 3,
-            'min_col_3': 4,
-            'max_col_3': 4
+            'minlength_col_1': 1,
+            'maxlength_col_1': 2,
+            'minlength_col_2': 0,
+            'maxlength_col_2': 3,
+            'minlength_col_3': 4,
+            'maxlength_col_3': 4
         })
 
     @patch('gobexport.test.logger', MagicMock())
