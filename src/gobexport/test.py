@@ -45,11 +45,12 @@ from objectstore.objectstore import get_full_container_list, get_object, put_obj
 
 from gobcore.logging.logger import logger
 
-from gobexport.config import CONTAINER_BASE
+from gobexport.config import CONTAINER_BASE, EXPORT_DIR
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.exporter import CONFIG_MAPPING
 from gobexport.utils import resolve_config_filenames, json_loads
 from gobexport.csv_inspector import CSVInspector
+from gobexport.export import cleanup_datefiles
 
 # Collect all export configs
 _export_config = {cat: configs.values() for cat, configs in CONFIG_MAPPING.items()}
@@ -103,7 +104,7 @@ def test(catalogue):
             filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
 
             for filename in filenames:
-                obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
+                obj_info, obj = _get_file(conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}")
                 check = _get_check(checks, filename)
 
                 # Report results with the name of the matched file
@@ -115,6 +116,7 @@ def test(catalogue):
                     stats = _get_analysis(obj_info, obj, check)
                     if _check_file(check, matched_filename, stats):
                         logger.info(f"{matched_filename} OK")
+                        distribute_file(conn_info, matched_filename)
                     else:
                         logger.info(f"{matched_filename} FAILED")
                 else:
@@ -123,6 +125,21 @@ def test(catalogue):
 
     # Write out any missing test definitions
     _write_proposals(conn_info, catalogue, checks, proposals)
+
+
+def distribute_file(conn_info, filename):
+    """
+    Distribute the checked file to its final location
+
+    :param conn_info:
+    :param filename:
+    :return:
+    """
+    # Remove export dir from filename to get destination file name
+    dst = re.sub(rf'^{EXPORT_DIR}/', '', filename)
+    logger.info(f"Copy {filename} to {dst}")
+    conn_info['connection'].copy_object(CONTAINER_BASE, filename, f"{CONTAINER_BASE}/{dst}")
+    cleanup_datefiles(conn_info['connection'], CONTAINER_BASE, dst)
 
 
 def _get_file(conn_info, filename):
