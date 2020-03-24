@@ -121,6 +121,7 @@ def test(catalogue):
                         distribute_file(conn_info, matched_filename)
                     else:
                         logger.info(f"Check {matched_filename} FAILED")
+                    _propose_check_file(proposals, filename, obj_info, obj)
                 else:
                     logger.warning(f"File {filename} UNCHECKED")
                     # Do not copy unchecked files
