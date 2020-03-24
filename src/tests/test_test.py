@@ -431,7 +431,7 @@ class TestExportTest(TestCase):
             {'connection': 'Any connection', 'container': 'development'},
             'any catalogue',
             {filename: {'bytes': [100]}},
-            {})
+            {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
         mock_distribute.assert_called()
 
         mock_get_checks.return_value = {
@@ -444,7 +444,7 @@ class TestExportTest(TestCase):
             {'connection': 'Any connection', 'container': 'development'},
             'any catalogue',
             {filename: {'bytes': [0]}},
-            {})
+            {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
 
         # Check case in which check is defined, but filename is missing
         mock_get_file.return_value = None, None
