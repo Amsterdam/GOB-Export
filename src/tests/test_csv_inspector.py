@@ -78,12 +78,12 @@ class TestCSVInspector(TestCase):
         i._check_lengths(['', 'a', 'bc'])
 
         self.assertEqual(i.cols, {
-            'min_col_1': 0,
-            'max_col_1': 0,
-            'min_col_2': 1,
-            'max_col_2': 5,
-            'min_col_3': 2,
-            'max_col_3': 2
+            'minlength_col_1': 0,
+            'maxlength_col_1': 0,
+            'minlength_col_2': 1,
+            'maxlength_col_2': 5,
+            'minlength_col_3': 2,
+            'maxlength_col_3': 2
         })
 
     def test_check_columns(self):

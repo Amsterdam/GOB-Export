@@ -180,12 +180,12 @@ class TestExportTest(TestCase):
             'spaces': mock.ANY,
             'lowers': mock.ANY,
             'uppers': mock.ANY,
-            'min_col_1': 1,
-            'max_col_1': 2,
-            'min_col_2': 0,
-            'max_col_2': 3,
-            'min_col_3': 4,
-            'max_col_3': 4
+            'minlength_col_1': 1,
+            'maxlength_col_1': 2,
+            'minlength_col_2': 0,
+            'maxlength_col_2': 3,
+            'minlength_col_3': 4,
+            'maxlength_col_3': 4
         })
 
     @patch('gobexport.test.logger', MagicMock())
@@ -374,8 +374,9 @@ class TestExportTest(TestCase):
     @patch('gobexport.test._write_proposals')
     @patch('gobexport.test._get_checks')
     @patch('gobexport.test.connect_to_objectstore')
+    @patch('gobexport.test.distribute_file')
     @patch('gobexport.test.CONTAINER_BASE', 'development')
-    def test_test(self, mock_connect_to_objectstore, mock_get_checks, mock_write_proposals, mock_get_file, mock_logger):
+    def test_test(self, mock_distribute, mock_connect_to_objectstore, mock_get_checks, mock_write_proposals, mock_get_file, mock_logger):
         catalogue = "any catalogue"
         mock_connect_to_objectstore.return_value = "Any connection", None
         config = MockConfig()
@@ -430,7 +431,8 @@ class TestExportTest(TestCase):
             {'connection': 'Any connection', 'container': 'development'},
             'any catalogue',
             {filename: {'bytes': [100]}},
-            {})
+            {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
+        mock_distribute.assert_called()
 
         mock_get_checks.return_value = {
             filename: {
@@ -442,12 +444,12 @@ class TestExportTest(TestCase):
             {'connection': 'Any connection', 'container': 'development'},
             'any catalogue',
             {filename: {'bytes': [0]}},
-            {})
+            {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
 
         # Check case in which check is defined, but filename is missing
         mock_get_file.return_value = None, None
         test.test(catalogue)
-        mock_logger.error.assert_called_with("any filename MISSING")
+        mock_logger.error.assert_called_with("File any filename MISSING")
 
     def test_check_uniqueness(self):
         check = {}
@@ -467,3 +469,21 @@ class TestExportTest(TestCase):
             '[2, 3, 4]_is_unique': [True]
 
         })
+
+    @patch('gobexport.test.logger', MagicMock())
+    @patch("gobexport.test.cleanup_datefiles")
+    def test_distribute_file(self, mock_cleanup_datefiles):
+        conn_info = {
+            'connection': MagicMock(),
+            'container': "any container"
+        }
+        filename = f"{test.EXPORT_DIR}/any filename"
+        test.distribute_file(conn_info, filename)
+        conn_info['connection'].copy_object.assert_called_with(
+            test.CONTAINER_BASE,
+            filename,
+            f"{test.CONTAINER_BASE}/any filename")
+        mock_cleanup_datefiles.assert_called_with(
+            conn_info['connection'],
+            test.CONTAINER_BASE,
+            "any filename")

@@ -15,7 +15,7 @@ from objectstore.objectstore import delete_object, get_full_container_list
 from gobcore.exceptions import GOBException
 from gobcore.logging.logger import logger
 
-from gobexport.config import get_host, CONTAINER_BASE
+from gobexport.config import get_host, CONTAINER_BASE, EXPORT_DIR
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.distributor.objectstore import distribute_to_objectstore
 from gobexport.exporter import CONFIG_MAPPING, export_to_file, product_source
@@ -145,8 +145,8 @@ def _export_collection(host, catalogue, collection, product_name, destination):
     for file in files:
         logger.info(f"Write file '{file['distribution']}'.")
         if destination == "Objectstore":
-            # Distribute to final location
-            container = f'{CONTAINER_BASE}/{catalogue}/'
+            # Distribute to pre-final location
+            container = f'{CONTAINER_BASE}/{EXPORT_DIR}/{catalogue}/'
             with open(file['temp_location'], 'rb') as fp:
                 try:
                     distribute_to_objectstore(connection,
@@ -155,13 +155,13 @@ def _export_collection(host, catalogue, collection, product_name, destination):
                                               fp,
                                               file['mime_type'])
                 except GOBException as e:
-                    logger.error(f"Failed to distribute to {destination} on location: {container}{file['distribution']}. \
+                    logger.error(f"Failed to copy to {destination} on location: {container}{file['distribution']}. \
                                  Error: {e}")
                     return False
 
-            logger.info(f"File distributed to {destination} on location: {container}{file['distribution']}.")
+            logger.info(f"File copied to {destination} on location: {container}{file['distribution']}.")
 
-            cleanup_datefiles(connection, CONTAINER_BASE, f"{catalogue}/{file['distribution']}")
+            cleanup_datefiles(connection, CONTAINER_BASE, f"{EXPORT_DIR}/{catalogue}/{file['distribution']}")
 
             # Delete temp file
             os.remove(file['temp_location'])

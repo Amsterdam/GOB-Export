@@ -28,8 +28,8 @@ uppers       % uppercase characters of all alphabetic characters
 
 For CSV exports only (content_type = "text/csv" or filename extension = ".csv":
 
-min_col_n   minimum length of column n, e.g. [0, 2]
-max_col_n   maximum length of column n, e.g. [10, 15]
+minlength_col_n   minimum length of column n, e.g. [0, 2]
+maxlength_col_n   maximum length of column n, e.g. [10, 15]
 unique_cols array of array of columns that should have unique values, e.g. [ [1], [2, 3] ]
 
 """
@@ -45,11 +45,12 @@ from objectstore.objectstore import get_full_container_list, get_object, put_obj
 
 from gobcore.logging.logger import logger
 
-from gobexport.config import CONTAINER_BASE
+from gobexport.config import CONTAINER_BASE, EXPORT_DIR
 from gobexport.connector.objectstore import connect_to_objectstore
 from gobexport.exporter import CONFIG_MAPPING
 from gobexport.utils import resolve_config_filenames, json_loads
 from gobexport.csv_inspector import CSVInspector
+from gobexport.export import cleanup_datefiles
 
 # Collect all export configs
 _export_config = {cat: configs.values() for cat, configs in CONFIG_MAPPING.items()}
@@ -103,26 +104,57 @@ def test(catalogue):
             filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
 
             for filename in filenames:
-                obj_info, obj = _get_file(conn_info, f"{catalogue}/{filename}")
+                # Check the previously exported file at its temporary location
+                obj_info, obj = _get_file(conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}")
                 check = _get_check(checks, filename)
 
                 # Report results with the name of the matched file
                 matched_filename = obj_info['name'] if obj_info else filename
 
                 if obj_info is None:
-                    logger.error(f"{filename} MISSING")
+                    logger.error(f"File {filename} MISSING")
                 elif check:
                     stats = _get_analysis(obj_info, obj, check)
                     if _check_file(check, matched_filename, stats):
-                        logger.info(f"{matched_filename} OK")
+                        logger.info(f"Check {matched_filename} OK")
+                        # Copy the file to its final location
+                        distribute_file(conn_info, matched_filename)
                     else:
-                        logger.info(f"{matched_filename} FAILED")
+                        logger.info(f"Check {matched_filename} FAILED")
+                    _propose_check_file(proposals, filename, obj_info, obj)
                 else:
-                    logger.warning(f"{filename} UNCHECKED")
+                    logger.warning(f"File {filename} UNCHECKED")
+                    # Do not copy unchecked files
                     _propose_check_file(proposals, filename, obj_info, obj)
 
     # Write out any missing test definitions
     _write_proposals(conn_info, catalogue, checks, proposals)
+
+
+def distribute_file(conn_info, filename):
+    """
+    Copy the checked file to its final location
+
+    Check and copy is implemented as a indivisible action.
+    If the check is OK then the file is copied to its final location in one action.
+    The time between the check and the copy action is as short as possible
+    So no extra workflow step has been introduced (possible queueing)
+
+    :param conn_info:
+    :param filename:
+    :return:
+    """
+    # Remove export dir from filename to get destination file name
+    dst = re.sub(rf'^{EXPORT_DIR}/', '', filename)
+
+    # Copy the file to the destination location
+    logger.info(f"Distribute to {dst}")
+    conn_info['connection'].copy_object(CONTAINER_BASE, filename, f"{CONTAINER_BASE}/{dst}")
+
+    # Do not delete the file from its temporary location because a re-run would cause missing file errors
+
+    # Cleanup any date files at the destination location
+    cleanup_datefiles(conn_info['connection'], CONTAINER_BASE, dst)
 
 
 def _get_file(conn_info, filename):

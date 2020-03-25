@@ -16,6 +16,9 @@ from gobcore.exceptions import GOBException
 _DEFAULT_API_HOST = 'http://localhost:8141'
 CONTAINER_BASE = os.getenv('CONTAINER_BASE', 'development')
 
+# Let export write products to tmp folder within the container base
+EXPORT_DIR = "_tmp"
+
 OIDC_TOKEN_ENDPOINT = os.getenv("OIDC_TOKEN_ENDPOINT")
 OIDC_CLIENT_ID = os.getenv("OIDC_CLIENT_ID")
 OIDC_CLIENT_SECRET = os.getenv("OIDC_CLIENT_SECRET")
