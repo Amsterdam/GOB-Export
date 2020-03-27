@@ -2,18 +2,18 @@
 
 De checks zijn uitgebreid met test op kolom lengte. Voorbeeld:
 
-    "min_col_1": [
+    "minlength_col_1": [
         1,
         2
     ],
-    "max_col_1": [
+    "maxlength_col_1": [
         3,
         5
     ],
 
-Specificeert dat de minimum lengte van kolom 1 tussen 1 en 2 moet liggen en de maximum lengte tussen 3 en 5.
+Specificeert dat kolom 1 een minimale lengte moeten hebben van 1 t/m 2 en de maximale lengte tussen 3 en 5 (inclusief 3 en 5 zelf).
 
-Zo kunnen niet alleen verplichte attributen worden getest maar kan ook worden getest op andere attribuut eigenschappen. Bijvoorbeeld dat een id altijd 14 karakters lang is:
+Zo kunnen niet alleen verplichte attributen worden getest, maar kan ook worden getest op andere attribuut eigenschappen. Bijvoorbeeld dat een id altijd 14 karakters lang is:
 
     "min_col_1": [
         14,
@@ -35,7 +35,7 @@ Zo kunnen niet alleen verplichte attributen worden getest maar kan ook worden ge
          14
      ],
  
-  En verder kan worden opgegeven of een kolom, of een combinatie van kolommen, of combinaties daarvan uniek moeten zijn.
+  Verder kan worden opgegeven of een kolom, of een combinatie van kolommen, of combinaties daarvan uniek moeten zijn.
   
   Om bijvoorbeeld aan te geven dat de waarden in kolom 1 en de waarden in  kolom 3 + kolom 7 uniek moeten zijn:
   
