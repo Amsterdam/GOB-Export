@@ -7,6 +7,10 @@ import datetime
 from gobcore.message_broker.config import WORKFLOW_EXCHANGE, EXPORT_QUEUE, EXPORT_TEST_QUEUE, EXPORT_RESULT_KEY, \
     EXPORT_TEST_RESULT_KEY
 from gobcore.message_broker.messagedriven_service import messagedriven_service
+from gobcore.message_broker.notifications import listen_to_notifications, get_notification
+from gobcore.message_broker.config import EXPORT
+from gobcore.workflow.start_workflow import start_workflow
+
 from gobcore.logging.logger import logger
 
 from gobexport.export import export
@@ -23,7 +27,8 @@ def handle_export_dump_msg(msg):
     header = msg['header']
     logger.configure(msg, "DUMP")
     Dumper().dump_catalog(catalog_name=header['catalogue'],
-                          collection_name=header['collection'])
+                          collection_name=header['collection'],
+                          include_relations=header.get('include_relations', True))
 
 
 def handle_export_file_msg(msg):
@@ -103,6 +108,28 @@ def handle_export_test_msg(msg):
     }
 
 
+def handle_dump(msg):
+    """
+    On any creation of events, update the analysis database for the new changes
+
+    :param msg:
+    :return:
+    """
+    notification = get_notification(msg)
+
+    # Start an export cat-col to db workflow to update the analysis database
+    workflow = {
+        'workflow_name': EXPORT
+    }
+    arguments = {
+        'catalogue': notification.header.get('catalogue'),
+        'collection': notification.header.get('collection'),
+        'destination': 'Database',
+        'include_relations': False
+    }
+    start_workflow(workflow, arguments)
+
+
 SERVICEDEFINITION = {
     'export_request': {
         'queue': EXPORT_QUEUE,
@@ -119,6 +146,10 @@ SERVICEDEFINITION = {
             'exchange': WORKFLOW_EXCHANGE,
             'key': EXPORT_TEST_RESULT_KEY,
         }
+    },
+    'dump': {
+        'queue': listen_to_notifications("dump", 'events'),
+        'handler': handle_dump
     }
 }
 
