@@ -1,13 +1,10 @@
 # flake8: noqa
-from gobexport.exporter.config.brk.aantekeningen import AantekeningenExportConfig
 from gobexport.exporter.config.brk.aardzakelijkerechten import AardzakelijkerechtenExportConfig
-from gobexport.exporter.config.brk.bijpijling import BijpijlingExportConfig
-from gobexport.exporter.config.brk.brkbag import BrkBagExportConfig
+from gobexport.exporter.config.brk.aantekeningenrechten import AantekeningenrechtenExportConfig
 from gobexport.exporter.config.brk.gemeentes import GemeentesExportConfig
 from gobexport.exporter.config.brk.kadastralegemeentes import KadastraleGemeentecodesExportConfig
 from gobexport.exporter.config.brk.kadastraleobjecten import KadastraleobjectenExportConfig
 from gobexport.exporter.config.brk.kadastralesecties import KadastralesectiesExportConfig
 from gobexport.exporter.config.brk.kadastralesubjecten import KadastralesubjectenExportConfig
-from gobexport.exporter.config.brk.perceelnummer import PerceelnummerExportConfig
 from gobexport.exporter.config.brk.stukdelen import StukdelenExportConfig
 from gobexport.exporter.config.brk.zakelijkerechten import ZakelijkerechtenExportConfig

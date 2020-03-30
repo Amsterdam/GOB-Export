@@ -1,16 +1,16 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from gobexport.exporter.config.brk.brkbag import BrkBagExportConfig
+from gobexport.exporter.config.brk.kadastraleobjecten import KadastraleobjectenExportConfig
 
 
-@patch("gobexport.exporter.config.brk.brkbag.NotEmptyFilter", MagicMock())
-@patch("gobexport.exporter.config.brk.brkbag.BrkBagCsvFormat", MagicMock())
+@patch("gobexport.exporter.config.brk.kadastraleobjecten.NotEmptyFilter", MagicMock())
+@patch("gobexport.exporter.config.brk.kadastraleobjecten.BrkBagCsvFormat", MagicMock())
 class TestBrkBagExportConfig(TestCase):
 
-    @patch("gobexport.exporter.config.brk.brkbag.get_entity_value", lambda entity, field: entity[field])
+    @patch("gobexport.exporter.config.brk.kadastraleobjecten.get_entity_value", lambda entity, field: entity[field])
     def test_vot_filter(self):
-        config = BrkBagExportConfig()
+        config = KadastraleobjectenExportConfig()
         vot_filter = config.VotFilter()
 
         entity = {
