@@ -108,7 +108,7 @@ def handle_export_test_msg(msg):
     }
 
 
-def handle_dump(msg):
+def dump_on_new_events(msg):
     """
     On any creation of events, update the analysis database for the new changes
 
@@ -149,7 +149,7 @@ SERVICEDEFINITION = {
     },
     'dump': {
         'queue': listen_to_notifications("dump", 'events'),
-        'handler': handle_dump
+        'handler': dump_on_new_events
     }
 }
 
