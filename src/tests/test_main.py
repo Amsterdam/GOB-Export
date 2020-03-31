@@ -65,7 +65,7 @@ def test_main(mocked_messagedriven_service, mocked_dump, mocked_export, mocked_t
     mock_notification.header = header
 
     msg = 'any msg'
-    __main__.handle_dump(msg)
+    __main__.dump_on_new_events(msg)
     expected_arguments = {
         'catalogue': 'any catalogue',
         'collection': 'any collection',
