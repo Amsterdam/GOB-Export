@@ -3,7 +3,7 @@ from gobexport.filters.notempty_filter import NotEmptyFilter
 from gobexport.exporter.config.brk.utils import brk_filename, format_timestamp
 
 
-class AantekeningenExportConfig:
+class AantekeningenrechtenExportConfig:
     art_query = '''
 {
   brkAantekeningenrechten {

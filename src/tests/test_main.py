@@ -1,11 +1,14 @@
 from unittest import mock
 
-@mock.patch('gobexport.__main__.logger', mock.MagicMock())
+@mock.patch('gobcore.logging.logger.logger', mock.MagicMock())
+@mock.patch('gobcore.message_broker.notifications.listen_to_notifications', mock.MagicMock())
+@mock.patch('gobcore.message_broker.notifications.get_notification')
+@mock.patch('gobcore.workflow.start_workflow.start_workflow')
 @mock.patch('gobexport.test.test')
 @mock.patch('gobexport.export.export')
 @mock.patch('gobexport.dump.Dumper')
 @mock.patch('gobcore.message_broker.messagedriven_service.messagedriven_service')
-def test_main(mocked_messagedriven_service, mocked_dump, mocked_export, mocked_test):
+def test_main(mocked_messagedriven_service, mocked_dump, mocked_export, mocked_test, mock_start_workflow, mock_get_notification):
 
     from gobexport import __main__
 
@@ -51,3 +54,23 @@ def test_main(mocked_messagedriven_service, mocked_dump, mocked_export, mocked_t
     __main__.handle_export_test_msg(msg)
 
     mocked_test.assert_called_with("catalogue")
+
+    header = {
+        'catalogue': 'any catalogue',
+        'collection': 'any collection'
+    }
+
+    mock_notification = mock.MagicMock()
+    mock_get_notification.return_value = mock_notification
+    mock_notification.header = header
+
+    msg = 'any msg'
+    __main__.dump_on_new_events(msg)
+    expected_arguments = {
+        'catalogue': 'any catalogue',
+        'collection': 'any collection',
+        'destination': 'Database',
+        'include_relations': False
+    }
+    mock_start_workflow.assert_called_with({'workflow_name': 'export'}, expected_arguments)
+

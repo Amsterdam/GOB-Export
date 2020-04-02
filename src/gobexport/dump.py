@@ -86,7 +86,7 @@ class Dumper():
         relations = result['_embedded']['collections']
         return [collection for collection in relations if collection['name'].startswith(abbreviation)]
 
-    def dump_catalog(self, catalog_name, collection_name):
+    def dump_catalog(self, catalog_name, collection_name, include_relations=True):
         """
         Dump a catalog. If a collection is specified only dump the given catalog collection.
 
@@ -103,8 +103,9 @@ class Dumper():
         schema = catalog_name
         for collection in collections:
             self.dump_collection(schema, catalog_name, collection['name'])
-            for relation in self.get_relations(catalog, collection):
-                self.dump_collection(schema, "rel", relation['name'])
+            if include_relations:
+                for relation in self.get_relations(catalog, collection):
+                    self.dump_collection(schema, "rel", relation['name'])
 
     def dump_collection(self, schema, catalog_name, collection_name):
         """
