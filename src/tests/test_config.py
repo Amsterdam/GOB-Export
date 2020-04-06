@@ -1,9 +1,5 @@
 import importlib
 import os
-import unittest
-
-from gobcore.exceptions import GOBException
-from gobexport.config import get_objectstore_config, OBJECTSTORE_CONFIGS
 
 
 class MockArgumentParser:
@@ -33,21 +29,3 @@ def test_host(monkeypatch):
     from gobexport.config import get_host
 
     assert(get_host() == os.getenv('API_HOST', 'http://localhost:8141'))
-
-
-class TestGetConfig(unittest.TestCase):
-
-    def test_get_objectstore_config(self):
-        name = "Basisinformatie"
-        result = get_objectstore_config(name)
-
-        expected = OBJECTSTORE_CONFIGS[name].copy()
-        expected['name'] = name
-
-        self.assertEqual(expected, result)
-
-    def test_get_nonexistend_objectstore_config(self):
-        name = 'NonExistent'
-
-        with self.assertRaises(GOBException):
-            get_objectstore_config(name)

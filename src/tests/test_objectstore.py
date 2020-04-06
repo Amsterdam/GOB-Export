@@ -3,52 +3,43 @@ import random
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from gobexport.objectstore import ObjectstoreFile
+from gobexport.objectstore import ObjectstoreFile, ObjectDatastore
 
 
 class TestObjectstoreFile(TestCase):
     
-    @patch("gobexport.objectstore.get_objectstore_config")
-    @patch("gobexport.objectstore.connect_to_objectstore")
-    @patch("gobexport.objectstore.query_objectstore")
-    def test_objectstore(self, mock_query_objectstore, mock_connect, mock_get_objectstore_config):
+    @patch("gobexport.objectstore.get_datastore_config")
+    @patch("gobexport.objectstore.DatastoreFactory")
+    def test_objectstore(self, mock_factory, mock_get_datastore_config):
         mock_config = {
             'objectstore': 'the objectstore',
         }
         
-        mock_get_objectstore_config.return_value = {
+        mock_get_datastore_config.return_value = {
             'TENANT_NAME': 'mock_objectstore'
         }
+        mock_factory.get_datastore.return_value = MagicMock(spec=ObjectDatastore)
         
-        mock_objectstore_config = mock_get_objectstore_config.return_value
-        mock_connect.return_value = ('mock_connection', 'mock_user')
-
         objectstore = ObjectstoreFile(mock_config, row_formatter=None)
-        mock_connect.assert_called_with(mock_objectstore_config)
-        
-        mock_query_objectstore.return_value = [1,2,3]
-        
+        mock_factory.get_datastore.assert_called_with(mock_get_datastore_config.return_value, mock_config)
+        mock_factory.get_datastore.return_value.query.return_value = [1, 2, 3]
+
         result = [i for i in objectstore]
         self.assertEqual(result, [1, 2, 3])
-        
-        mock_query_objectstore.assert_called_with(objectstore.connection, objectstore.config)
-        
+
         assert(str(objectstore) == 'ObjectstoreFile mock_objectstore')
 
-    @patch("gobexport.objectstore.get_objectstore_config")
-    @patch("gobexport.objectstore.connect_to_objectstore")
-    @patch("gobexport.objectstore.query_objectstore")
-    def test_objectstore_with_formatter(self, mock_query_objectstore, mock_connect, mock_get_objectstore_config):
+    @patch("gobexport.objectstore.get_datastore_config")
+    @patch("gobexport.objectstore.DatastoreFactory")
+    def test_objectstore_with_formatter(self, mock_factory, mock_get_datastore_config):
         mock_config = {
             'objectstore': 'the objectstore',
         }
-
+        mock_factory.get_datastore.return_value = MagicMock(spec=ObjectDatastore)
         row_formatter = lambda x: x + 1
-
-        mock_connect.return_value = ('mock_connection', 'mock_user')
-
         objectstore = ObjectstoreFile(mock_config, row_formatter=row_formatter)
-        mock_query_objectstore.return_value = [1,2,3]
+
+        mock_factory.get_datastore.return_value.query.return_value = [1, 2, 3]
 
         result = [i for i in objectstore]
         self.assertEqual(result, [2, 3, 4])

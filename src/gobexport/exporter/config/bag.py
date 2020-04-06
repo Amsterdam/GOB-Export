@@ -1,3 +1,5 @@
+import dateutil.parser as dt_parser
+
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
@@ -1733,4 +1735,100 @@ class BrondocumentenExportConfig:
                 'typeBrondocument': 'typeBrondocument',
             }
         },
+    }
+
+
+def format_date(dt_str):
+    if not dt_str:
+        return None
+
+    try:
+        dt = dt_parser.parse(dt_str)
+        return dt.strftime('%Y-%m-%d')
+    except ValueError:
+        return dt_str
+
+
+class OnderzoekExportConfig:
+
+    actueel_query = '''
+{
+    bagOnderzoek(inOnderzoek:"J") {
+        edges {
+          node {
+            objectIdentificatie
+            objecttype
+            kenmerk
+            inOnderzoek
+            documentnummer
+            documentdatum
+            beginGeldigheid
+            eindGeldigheid
+            tijdstipRegistratie
+            eindRegistratie
+          }
+        }
+    }
+}
+'''
+
+    history_query = '''
+{
+    bagOnderzoek(active: false) {
+        edges {
+          node {
+            objectIdentificatie
+            objecttype
+            kenmerk
+            inOnderzoek
+            documentnummer
+            documentdatum
+            beginGeldigheid
+            eindGeldigheid
+            tijdstipRegistratie
+            eindRegistratie
+          }
+        }
+    }
+}
+'''
+
+    format = {
+        'objectIdentificatie': 'objectIdentificatie',
+        'objecttype': 'objecttype',
+        'kenmerk': 'kenmerk',
+        'inOnderzoek': 'inOnderzoek',
+        'documentnummer': 'documentnummer',
+        'documentdatum': 'documentdatum',
+        'beginGeldigheid': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'beginGeldigheid',
+        },
+        'eindGeldigheid': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'eindGeldigheid',
+        },
+        'tijdstripRegistratie': 'tijdstipRegistratie',
+        'eindRegistratie': 'eindRegistratie',
+    }
+
+    products = {
+        'csv_actueel': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql_streaming',
+            'filename': 'CSV_Actueel/BAG_onderzoek_Actueel.csv',
+            'mime_type': 'plain/text',
+            'query': actueel_query,
+            'format': format
+        },
+        'csv_history': {
+            'exporter': csv_exporter,
+            'api_type': 'graphql_streaming',
+            'filename': 'CSV_Actueel/BAG_onderzoek_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'query': history_query,
+            'format': format
+        }
     }

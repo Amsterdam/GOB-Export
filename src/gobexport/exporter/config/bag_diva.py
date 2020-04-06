@@ -3,6 +3,7 @@ import re
 from datetime import date
 import dateutil.parser as dt_parser
 
+from gobexport.config import BASISINFORMATIE_OBJECTSTORE
 from gobexport.exporter.config import bag
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.dat import dat_exporter
@@ -335,7 +336,7 @@ def get_codetabel_format(abbreviation, encoding='ascii'):
             'file_filter': f'BAG/UVA2/BAG_Actueel/ASCII/{abbreviation}_.+\\.UVA2$',
             'file_type': 'UVA2',
             'container': 'basisinformatie',
-            'objectstore': 'Basisinformatie',
+            'objectstore': BASISINFORMATIE_OBJECTSTORE,
             'encoding': encoding,
         },
         'format': {
