@@ -14,9 +14,11 @@ from objectstore.objectstore import delete_object, get_full_container_list
 
 from gobcore.exceptions import GOBException
 from gobcore.logging.logger import logger
+from gobcore.datastore.factory import DatastoreFactory
+from gobcore.datastore.objectstore import ObjectDatastore
+from gobconfig.datastore.config import get_datastore_config
 
-from gobexport.config import get_host, CONTAINER_BASE, EXPORT_DIR
-from gobexport.connector.objectstore import connect_to_objectstore
+from gobexport.config import get_host, CONTAINER_BASE, EXPORT_DIR, GOB_OBJECTSTORE
 from gobexport.distributor.objectstore import distribute_to_objectstore
 from gobexport.exporter import CONFIG_MAPPING, export_to_file, product_source
 from gobexport.buffered_iterable import with_buffered_iterable
@@ -138,8 +140,14 @@ def _export_collection(host, catalogue, collection, product_name, destination):
 
     if destination == "Objectstore":
         # Get objectstore connection
-        connection, user = connect_to_objectstore()
-        logger.info(f"Connection to {destination} {user} has been made.")
+        config = get_datastore_config(GOB_OBJECTSTORE)
+        datastore = DatastoreFactory.get_datastore(config)
+        datastore.connect()
+
+        assert isinstance(datastore, ObjectDatastore)
+
+        connection = datastore.connection
+        logger.info(f"Connection to {destination} {datastore.user} has been made.")
 
     # Start distribution of all resulting files
     for file in files:
