@@ -88,7 +88,6 @@ def test(catalogue):
     config = get_datastore_config(GOB_OBJECTSTORE)
     datastore = DatastoreFactory.get_datastore(config)
     datastore.connect()
-    # connection, _ = connect_to_objectstore()
     container_name = CONTAINER_BASE
 
     logger.info(f"Load files from {container_name}")
