@@ -102,6 +102,7 @@ class WoonplaatsenExportConfig:
         eindGeldigheid
         documentdatum
         documentnummer
+        registratiedatum
         status
         ligtInGemeente {
           edges {
