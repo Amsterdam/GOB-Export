@@ -373,22 +373,25 @@ class TestExportTest(TestCase):
     @patch('gobexport.test._get_file')
     @patch('gobexport.test._write_proposals')
     @patch('gobexport.test._get_checks')
-    @patch('gobexport.test.connect_to_objectstore')
+    @patch('gobexport.test.get_datastore_config')
+    @patch('gobexport.test.DatastoreFactory.get_datastore')
     @patch('gobexport.test.distribute_file')
     @patch('gobexport.test.CONTAINER_BASE', 'development')
-    def test_test(self, mock_distribute, mock_connect_to_objectstore, mock_get_checks, mock_write_proposals, mock_get_file, mock_logger):
+    def test_test(self, mock_distribute, mock_get_datastore, mock_get_datastore_config, mock_get_checks, mock_write_proposals, mock_get_file, mock_logger):
         catalogue = "any catalogue"
-        mock_connect_to_objectstore.return_value = "Any connection", None
+        connection = mock_get_datastore.return_value.connection
         config = MockConfig()
 
         test._export_config[catalogue] = []
         mock_get_checks.return_value = {}
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
-            {'connection': 'Any connection', 'container': 'development'},
+            {'connection': connection, 'container': 'development'},
             'any catalogue',
             {},
             {})
+
+        mock_get_datastore.assert_called_with(mock_get_datastore_config.return_value)
 
         filename = 'any filename'
         config.products = {
@@ -403,7 +406,7 @@ class TestExportTest(TestCase):
 
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
-            {'connection': 'Any connection', 'container': 'development'},
+            {'connection': connection, 'container': 'development'},
             'any catalogue',
             {},
             {})
@@ -416,7 +419,7 @@ class TestExportTest(TestCase):
                                      }, b"123"
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
-            {'connection': 'Any connection', 'container': 'development'},
+            {'connection': connection, 'container': 'development'},
             'any catalogue',
             {},
             {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
@@ -428,7 +431,7 @@ class TestExportTest(TestCase):
         }
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
-            {'connection': 'Any connection', 'container': 'development'},
+            {'connection': connection, 'container': 'development'},
             'any catalogue',
             {filename: {'bytes': [100]}},
             {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
@@ -441,7 +444,7 @@ class TestExportTest(TestCase):
         }
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
-            {'connection': 'Any connection', 'container': 'development'},
+            {'connection': connection, 'container': 'development'},
             'any catalogue',
             {filename: {'bytes': [0]}},
             {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})

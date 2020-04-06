@@ -45,8 +45,9 @@ from objectstore.objectstore import get_full_container_list, get_object, put_obj
 
 from gobcore.logging.logger import logger
 
-from gobexport.config import CONTAINER_BASE, EXPORT_DIR
-from gobexport.connector.objectstore import connect_to_objectstore
+from gobexport.config import CONTAINER_BASE, EXPORT_DIR, GOB_OBJECTSTORE
+from gobconfig.datastore.config import get_datastore_config
+from gobcore.datastore.factory import DatastoreFactory
 from gobexport.exporter import CONFIG_MAPPING
 from gobexport.utils import resolve_config_filenames, json_loads
 from gobexport.csv_inspector import CSVInspector
@@ -83,12 +84,16 @@ def test(catalogue):
     logger.info(f"Test export for catalogue {catalogue}")
 
     logger.info(f"Connect to Objectstore")
-    connection, _ = connect_to_objectstore()
+
+    config = get_datastore_config(GOB_OBJECTSTORE)
+    datastore = DatastoreFactory.get_datastore(config)
+    datastore.connect()
+    # connection, _ = connect_to_objectstore()
     container_name = CONTAINER_BASE
 
     logger.info(f"Load files from {container_name}")
     conn_info = {
-        "connection": connection,
+        "connection": datastore.connection,
         "container": container_name
     }
 

@@ -40,6 +40,7 @@ CONFIG_MAPPING = {
         'standplaatsen': bag.StandplaatsenExportConfig,
         'panden': bag.PandenExportConfig,
         'brondocumenten': bag.BrondocumentenExportConfig,
+        'onderzoek': bag.OnderzoekExportConfig,
     },
     'brk': {
         'kadastralesubjecten': brk.KadastralesubjectenExportConfig,
