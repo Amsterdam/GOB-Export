@@ -73,7 +73,8 @@ def test_main(mocked_messagedriven_service, mocked_dump, mocked_export, mocked_t
         'catalogue': 'any catalogue',
         'collection': 'any collection',
         'destination': 'Database',
-        'include_relations': False
+        'include_relations': False,
+        'wait_if_job_already_runs': True
     }
     mock_start_workflow.assert_not_called()
     mock_notification.contents = {
