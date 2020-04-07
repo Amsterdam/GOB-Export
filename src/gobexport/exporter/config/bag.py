@@ -1,5 +1,3 @@
-import dateutil.parser as dt_parser
-
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
 
@@ -1739,17 +1737,6 @@ class BrondocumentenExportConfig:
     }
 
 
-def format_date(dt_str):
-    if not dt_str:
-        return None
-
-    try:
-        dt = dt_parser.parse(dt_str)
-        return dt.strftime('%Y-%m-%d')
-    except ValueError:
-        return dt_str
-
-
 class OnderzoekExportConfig:
 
     actueel_query = '''
@@ -1801,17 +1788,9 @@ class OnderzoekExportConfig:
         'inOnderzoek': 'inOnderzoek',
         'documentnummer': 'documentnummer',
         'documentdatum': 'documentdatum',
-        'beginGeldigheid': {
-            'action': 'format',
-            'formatter': format_date,
-            'value': 'beginGeldigheid',
-        },
-        'eindGeldigheid': {
-            'action': 'format',
-            'formatter': format_date,
-            'value': 'eindGeldigheid',
-        },
-        'tijdstripRegistratie': 'tijdstipRegistratie',
+        'beginGeldigheid': 'beginGeldigheid',
+        'eindGeldigheid': 'eindGeldigheid',
+        'tijdstipRegistratie': 'tijdstipRegistratie',
         'eindRegistratie': 'eindRegistratie',
     }
 
