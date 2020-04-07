@@ -61,6 +61,9 @@ def test_main(mocked_messagedriven_service, mocked_dump, mocked_export, mocked_t
     }
 
     mock_notification = mock.MagicMock()
+    mock_notification.contents = {
+        'last_event': [1, 1]
+    }
     mock_get_notification.return_value = mock_notification
     mock_notification.header = header
 
@@ -72,5 +75,10 @@ def test_main(mocked_messagedriven_service, mocked_dump, mocked_export, mocked_t
         'destination': 'Database',
         'include_relations': False
     }
+    mock_start_workflow.assert_not_called()
+    mock_notification.contents = {
+        'last_event': [1, 2]
+    }
+    __main__.dump_on_new_events(msg)
     mock_start_workflow.assert_called_with({'workflow_name': 'export'}, expected_arguments)
 
