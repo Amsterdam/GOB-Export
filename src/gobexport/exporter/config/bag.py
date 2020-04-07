@@ -1811,7 +1811,7 @@ class OnderzoekExportConfig:
             'formatter': format_date,
             'value': 'eindGeldigheid',
         },
-        'tijdstripRegistratie': 'tijdstipRegistratie',
+        'tijdstipRegistratie': 'tijdstipRegistratie',
         'eindRegistratie': 'eindRegistratie',
     }
 
