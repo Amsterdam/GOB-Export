@@ -129,7 +129,8 @@ def dump_on_new_events(msg):
         'catalogue': notification.header.get('catalogue'),
         'collection': notification.header.get('collection'),
         'destination': 'Database',
-        'include_relations': False
+        'include_relations': False,
+        'wait_if_job_already_runs': True
     }
     start_workflow(workflow, arguments)
 
