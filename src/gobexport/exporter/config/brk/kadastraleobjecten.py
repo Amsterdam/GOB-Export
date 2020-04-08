@@ -898,7 +898,7 @@ class KadastraleobjectenExportConfig:
     tenaamstellingen have an even aandeel, sort the tenaamstellingen by its subject's geslachtsnaam.
     """
     products = {
-        'csv': {
+        'kot_csv': {
             'merge_result': {
                 'api_type': 'graphql_streaming',
                 'attributes': ['isOntstaanUitGPerceel'],
@@ -916,7 +916,7 @@ class KadastraleobjectenExportConfig:
             'format': csv_format.get_format(),
             'sort': sort,
         },
-        'esri_actueel': {
+        'kot_esri_actueel': {
             'api_type': 'graphql_streaming',
             'secure': True,
             'exporter': esri_exporter,
@@ -940,7 +940,7 @@ class KadastraleobjectenExportConfig:
             ],
             'query': esri_query,
         },
-        'esri_actueel_no_subjects': {
+        'kot_esri_actueel_no_subjects': {
             'api_type': 'graphql_streaming',
             'secure': True,
             'exporter': esri_exporter,
@@ -963,7 +963,7 @@ class KadastraleobjectenExportConfig:
             ],
             'query': esri_query,
         },
-        'shape': {
+        'bijpijling_shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
             'secure': True,
