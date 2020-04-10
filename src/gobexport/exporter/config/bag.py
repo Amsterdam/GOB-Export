@@ -1869,7 +1869,7 @@ class OnderzoekExportConfig:
         'csv_history': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'filename': 'CSV_Actueel/BAG_onderzoek_ActueelEnHistorie.csv',
+            'filename': 'CSV_ActueelEnHistorie/BAG_onderzoek_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
             'query': history_query,
             'format': history_format
