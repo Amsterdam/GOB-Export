@@ -3,6 +3,7 @@ from gobexport.exporter.esri import esri_exporter
 
 from gobexport.formatter.geometry import format_geometry
 
+import dateutil.parser as dt_parser
 
 """BAG export config
 
@@ -22,6 +23,8 @@ following properties:
                  well. For example the esri product creates .dbf, .shx and .prj
                  files.
 """
+
+TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
 
 class BAGDefaultFormat:
@@ -53,6 +56,19 @@ class BAGDefaultFormat:
 
     def get_format(self):
         return self.format
+
+
+def format_date(datetimestr):
+    if not datetimestr:
+        # Input variable may be empty
+        return None
+
+    try:
+        dt = dt_parser.parse(datetimestr)
+        return dt.strftime(TIMESTAMP_FORMAT)
+    except ValueError:
+        # If invalid datetimestr, just return the original string so that no data is lost
+        return datetimestr
 
 
 class WoonplaatsenExportConfig:
@@ -1766,6 +1782,7 @@ class OnderzoekExportConfig:
         edges {
           node {
             objectIdentificatie
+            volgnummer
             objecttype
             kenmerk
             inOnderzoek
@@ -1782,16 +1799,62 @@ class OnderzoekExportConfig:
 '''
 
     format = {
-        'objectIdentificatie': 'objectIdentificatie',
+        'gerelateerdAan:BAG.identificatie': 'objectIdentificatie',
         'objecttype': 'objecttype',
         'kenmerk': 'kenmerk',
         'inOnderzoek': 'inOnderzoek',
         'documentnummer': 'documentnummer',
         'documentdatum': 'documentdatum',
-        'beginGeldigheid': 'beginGeldigheid',
-        'eindGeldigheid': 'eindGeldigheid',
-        'tijdstipRegistratie': 'tijdstipRegistratie',
-        'eindRegistratie': 'eindRegistratie',
+        'beginGeldigheid': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'beginGeldigheid',
+        },
+        'eindGeldigheid': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'eindGeldigheid',
+        },
+        'tijdstipRegistratie': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'tijdstipRegistratie',
+        },
+        'eindRegistratie': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'eindRegistratie',
+        },
+    }
+
+    history_format = {
+        'gerelateerdAan:BAG.identificatie': 'objectIdentificatie',
+        'volgnummer': 'volgnummer',
+        'objecttype': 'objecttype',
+        'kenmerk': 'kenmerk',
+        'inOnderzoek': 'inOnderzoek',
+        'documentnummer': 'documentnummer',
+        'documentdatum': 'documentdatum',
+        'beginGeldigheid': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'beginGeldigheid',
+        },
+        'eindGeldigheid': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'eindGeldigheid',
+        },
+        'tijdstipRegistratie': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'tijdstipRegistratie',
+        },
+        'eindRegistratie': {
+            'action': 'format',
+            'formatter': format_date,
+            'value': 'eindRegistratie',
+        },
     }
 
     products = {
@@ -1809,6 +1872,6 @@ class OnderzoekExportConfig:
             'filename': 'CSV_Actueel/BAG_onderzoek_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
             'query': history_query,
-            'format': format
+            'format': history_format
         }
     }
