@@ -451,7 +451,33 @@ def _check_csv(lines, obj_info, check):
     :param obj_info:
     :return:
     """
+    def replace_header_references(uniques: list, header: list):
+        """
+        Replaces column names in a uniques list with column indexes (1-based)
+
+        Example, with header A;B;C;D;E;F :
+            replace_header_references(['A', 'B', 'D']) => [1, 2, 4]
+            replace_header_references([1, 2, 5]) => [1, 2, 5]  # Leave as is
+
+        :param uniques:
+        :param header:
+        :return:
+        """
+        replaced = [header.index(col) + 1 if isinstance(col, str) else col for col in uniques]
+
+        if uniques != replaced:
+            logger.info(f"Interpreting columns {str(uniques)} as {str(replaced)}")
+
+        return replaced
+
     if obj_info['content_type'] in ["text/csv"] or obj_info['name'][-4:].lower() == ".csv":
+        # encode in utf-8 and decode as utf-8-sig to get rid of UTF-8 BOM
+        header = lines[0].encode('utf-8').decode('utf-8-sig').strip().split(';')
+
+        if check.get('unique_cols'):
+            # Replace column names with column indexes
+            check['unique_cols'] = [replace_header_references(uniques, header) for uniques in check['unique_cols']]
+
         return CSVInspector(obj_info['name'], check).check_lines(lines)
     else:
         return {}
