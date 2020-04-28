@@ -40,6 +40,7 @@ import hashlib
 import statistics
 import datetime
 import dateutil.parser
+import copy
 
 from objectstore.objectstore import get_full_container_list, get_object, put_object
 
@@ -110,7 +111,9 @@ def test(catalogue):
             for filename in filenames:
                 # Check the previously exported file at its temporary location
                 obj_info, obj = _get_file(conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}")
-                check = _get_check(checks, filename)
+
+                # Clone check so that changes to the check file don't affect other runs
+                check = copy.deepcopy(_get_check(checks, filename))
 
                 # Report results with the name of the matched file
                 matched_filename = obj_info['name'] if obj_info else filename
