@@ -9,7 +9,7 @@ datapunt-config-loader==1.1.0
 -e git+https://github.com/Amsterdam/objectstore.git@v1.0.1#egg=objectstore
 debtcollector==1.20.0
 flake8==3.5.0
-GDAL==2.1.3
+GDAL==2.4.4
 GeoAlchemy2==0.5.0
 geomet==0.2.0.post2
 -e git+https://github.com/Amsterdam/GOB-Core.git@v0.14.5.dataquality#egg=gobcore
