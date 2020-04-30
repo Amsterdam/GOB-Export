@@ -58,6 +58,6 @@ statements (line 37 of 41).
 That's it!
 
 ## Initial setup
-Run both both default_roles.sql and maatwerkbasisinformatie_permissions.sql on the new analyse database.
+Run both default_roles.sql and maatwerkbasisinformatie_permissions.sql on the new analyse database.
 Make sure the database is already filled with data once, so that the schemas for the registrations are
 already present.

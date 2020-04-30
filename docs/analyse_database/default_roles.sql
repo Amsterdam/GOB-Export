@@ -39,10 +39,3 @@ grant bag_read, gebieden_read, wkpb_read, nap_read, meetbouten_read, bgt_read, m
 -- Create agm_plus role (read BRK and write to maatwerkbasisinformatie schema)
 create role agm_plus;
 grant brk_read, maatwerkbasisinformatie_write to agm_plus;
-
--- ADDING A NEW REGISTRATION with name 'newregistration':
--- 1. Create read role
-select create_default_read_role_for_schema('newregistration');
--- 2. Choose role to add read privileges to (replace AGM_ROLE with either agm_basis or agm_plus)
-grant newregistration_read to AGM_ROLE;
--- 3. Add previous two steps
