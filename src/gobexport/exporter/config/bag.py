@@ -1753,7 +1753,7 @@ class BrondocumentenExportConfig:
     }
 
 
-class OnderzoekExportConfig:
+class OnderzoekenExportConfig:
 
     actueel_query = '''
 {
