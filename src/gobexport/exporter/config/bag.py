@@ -1757,7 +1757,7 @@ class OnderzoekenExportConfig:
 
     actueel_query = '''
 {
-    bagOnderzoek(inOnderzoek:"J") {
+    bagOnderzoeken(inOnderzoek:"J") {
         edges {
           node {
             objectIdentificatie
@@ -1778,7 +1778,7 @@ class OnderzoekenExportConfig:
 
     history_query = '''
 {
-    bagOnderzoek(active: false) {
+    bagOnderzoeken(active: false) {
         edges {
           node {
             objectIdentificatie
