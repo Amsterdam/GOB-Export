@@ -1753,11 +1753,11 @@ class BrondocumentenExportConfig:
     }
 
 
-class OnderzoekExportConfig:
+class OnderzoekenExportConfig:
 
     actueel_query = '''
 {
-    bagOnderzoek(inOnderzoek:"J") {
+    bagOnderzoeken(inOnderzoek:"J") {
         edges {
           node {
             objectIdentificatie
@@ -1778,7 +1778,7 @@ class OnderzoekExportConfig:
 
     history_query = '''
 {
-    bagOnderzoek(active: false) {
+    bagOnderzoeken(active: false) {
         edges {
           node {
             objectIdentificatie
