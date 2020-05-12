@@ -333,9 +333,8 @@ def get_codetabel_format(abbreviation, encoding='ascii'):
         'filename': lambda: get_uva2_filename(abbreviation),
         'mime_type': 'plain/text',
         'config': {
-            'file_filter': f'BAG/UVA2/BAG_Actueel/ASCII/{abbreviation}_.+\\.UVA2$',
+            'file_filter': f'bag/uva2_codetabellen/{abbreviation}_.+\\.UVA2$',
             'file_type': 'UVA2',
-            'container': 'basisinformatie',
             'objectstore': BASISINFORMATIE_OBJECTSTORE,
             'encoding': encoding,
         },
