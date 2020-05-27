@@ -7,7 +7,8 @@ import datetime
 from gobcore.message_broker.config import WORKFLOW_EXCHANGE, EXPORT_QUEUE, EXPORT_TEST_QUEUE, EXPORT_RESULT_KEY, \
     EXPORT_TEST_RESULT_KEY
 from gobcore.message_broker.messagedriven_service import messagedriven_service
-from gobcore.message_broker.notifications import listen_to_notifications, get_notification
+from gobcore.message_broker.notifications import listen_to_notifications, get_notification, DumpNotification, \
+    add_notification
 from gobcore.message_broker.config import EXPORT
 from gobcore.workflow.start_workflow import start_workflow
 
@@ -29,6 +30,8 @@ def handle_export_dump_msg(msg):
     Dumper().dump_catalog(catalog_name=header['catalogue'],
                           collection_name=header['collection'],
                           include_relations=header.get('include_relations', True))
+
+    add_notification(msg, DumpNotification(header['catalogue'], header['collection']))
 
 
 def handle_export_file_msg(msg):
@@ -70,6 +73,7 @@ def handle_export_msg(msg):
         logger.error(f"Unrecognized destination for export {catalogue} {collection}: {destination}")
 
     return {
+        **msg,
         "header": msg.get("header"),
         "summary": {
             "warnings": logger.get_warnings(),
@@ -153,9 +157,15 @@ SERVICEDEFINITION = {
         }
     },
     'dump': {
-        'queue': listen_to_notifications("dump", 'events'),
+        'queue': lambda: listen_to_notifications("dump", 'events'),
         'handler': dump_on_new_events
     }
 }
 
-messagedriven_service(SERVICEDEFINITION, "Export")
+
+def init():
+    if __name__ == "__main__":
+        messagedriven_service(SERVICEDEFINITION, "Export")
+
+
+init()
