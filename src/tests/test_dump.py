@@ -8,18 +8,13 @@ from gobexport.dump import Dumper
 @patch('gobexport.dump.get_host', lambda : "host/")
 @patch('gobexport.dump.get_secure_header', lambda : {'secure': "header"})
 @patch('gobexport.dump.logger', MagicMock())
+@patch('gobexport.dump.get_datastore_config', lambda x: {'datastore': 'config'} if x == 'GOBAnalyse' else None)
 class TestDumper(TestCase):
 
-    @patch('gobexport.dump.os.getenv', lambda s: s)
     def test_create(self):
         dumper = Dumper()
-        self.assertEqual(dumper.config['ANALYSE_DATABASE_USER'], "ANALYSE_DATABASE_USER")
+        self.assertEqual({'datastore': 'config'}, dumper.db_config)
         self.assertEqual(dumper.dump_api, "host/secure_url")
-
-    @patch('gobexport.dump.os.getenv', lambda s: None)
-    def test_create_with_missing_env(self):
-        dumper = Dumper()
-        self.assertEqual(dumper.config['ANALYSE_DATABASE_USER'], None)
 
     def test_update_headers_secure(self):
         dumper = Dumper()
