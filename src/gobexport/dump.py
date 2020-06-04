@@ -2,17 +2,19 @@
 Dumps GOB data to the analysis database
 
 """
-import os
 import json
 import requests
 import re
 import time
 
 from gobcore.logging.logger import logger
+from gobconfig.datastore.config import get_datastore_config
 
 from gobexport.config import PUBLIC_URL, SECURE_URL, get_host
 from gobexport.keycloak import get_secure_header
 from gobexport.requests import get
+
+ANALYSE_DB_DATASTORE_ID = 'GOBAnalyse'
 
 
 class Dumper():
@@ -35,16 +37,7 @@ class Dumper():
         api_host = get_host()
         api_url = PUBLIC_URL if "localhost" in api_host else SECURE_URL
         self.dump_api = f"{api_host}{api_url}"
-
-        self.config = {
-            variable: os.getenv(variable) for variable in [
-                "ANALYSE_DATABASE_USER",
-                "ANALYSE_DATABASE_PASSWORD",
-                "ANALYSE_DATABASE_HOST_OVERRIDE",
-                "ANALYSE_DATABASE_PORT_OVERRIDE"
-            ]}
-        if None in self.config.values():
-            logger.error(f"Environment variable(s) not set")
+        self.db_config = get_datastore_config(ANALYSE_DB_DATASTORE_ID)
 
     def update_headers(self, url, headers=None):
         """
@@ -142,13 +135,7 @@ class Dumper():
         """
         url = f"{self.dump_api}/dump/{catalog_name}/{collection_name}/"
         data = json.dumps({
-            "db": {
-                "drivername": "postgres",
-                "username": self.config['ANALYSE_DATABASE_USER'],
-                "password": self.config['ANALYSE_DATABASE_PASSWORD'],
-                "host": self.config['ANALYSE_DATABASE_HOST_OVERRIDE'],
-                "port": self.config['ANALYSE_DATABASE_PORT_OVERRIDE']
-            },
+            "db": self.db_config,
             "schema": schema,
             "include_relations": False
         })
