@@ -120,10 +120,6 @@ def dump_on_new_events(msg):
     :return:
     """
     notification = get_notification(msg)
-    last_event_before, last_event_after = notification.contents['last_event']
-    if last_event_before == last_event_after:
-        # Nothing changed
-        return
 
     # Start an export cat-col to db workflow to update the analysis database
     workflow = {
@@ -134,7 +130,7 @@ def dump_on_new_events(msg):
         'collection': notification.header.get('collection'),
         'destination': 'Database',
         'include_relations': False,
-        'wait_if_job_already_runs': True
+        'retry_time': 10 * 60   # retry for max 10 minutes if already running
     }
     start_workflow(workflow, arguments)
 
