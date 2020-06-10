@@ -83,9 +83,11 @@ class TestMain(TestCase):
             'collection': 'any collection',
             'destination': 'Database',
             'include_relations': False,
-            'wait_if_job_already_runs': True
+            'retry_time': mock.ANY
         }
-        mock_start_workflow.assert_not_called()
+        # workflow is also started if nothing has changed
+        mock_start_workflow.assert_called()
+        mock_start_workflow.reset_mock()
         mock_notification.contents = {
             'last_event': [1, 2]
         }
