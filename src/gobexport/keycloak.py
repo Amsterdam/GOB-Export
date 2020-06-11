@@ -1,9 +1,24 @@
 import requests
 
 from gobexport.config import OIDC_TOKEN_ENDPOINT, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET
+from gobexport.credential_store import CredentialStore
 
 _ACCESS_TOKEN = "access_token"
 _TOKEN_TYPE = "token_type"
+
+_credential_store = None
+
+
+def _init_credential_store():
+    """
+    Initialize the Credential Store
+
+    :return:
+    """
+    global _credential_store
+
+    if not _credential_store:
+        _credential_store = CredentialStore(get_credentials=get_credentials, refresh_credentials=refresh_credentials)
 
 
 def get_secure_header():
@@ -11,7 +26,8 @@ def get_secure_header():
     Get the request header to access secure endpoints
 
     """
-    credentials = get_credentials()
+    _init_credential_store()
+    credentials = _credential_store.get_credentials()
     return {
         'Authorization': f"{credentials[_TOKEN_TYPE]} {credentials[_ACCESS_TOKEN]}"
     }
