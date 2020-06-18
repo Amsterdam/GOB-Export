@@ -6,8 +6,10 @@ services:
     build: src
     container_name: gobexport
     environment:
+      ANALYSE_DATABASE_PORT_OVERRIDE: 5432
+      ANALYSE_DATABASE_HOST_OVERRIDE: analyse_database
       MESSAGE_BROKER_ADDRESS: rabbitmq
-      API_HOST: http://gobapi:8000
+      API_HOST: http://gobapi:8001
       OIDC_TOKEN_ENDPOINT: ${OIDC_TOKEN_ENDPOINT}
       OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
       OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
