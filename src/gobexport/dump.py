@@ -35,7 +35,7 @@ class Dumper():
         :return:
         """
         api_host = get_host()
-        api_url = PUBLIC_URL if "localhost" in api_host else SECURE_URL
+        api_url = PUBLIC_URL if any(host in api_host for host in ["localhost", "gobapi"]) else SECURE_URL
         self.dump_api = f"{api_host}{api_url}"
         self.db_config = get_datastore_config(ANALYSE_DB_DATASTORE_ID)
 
