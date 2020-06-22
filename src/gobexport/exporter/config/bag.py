@@ -742,8 +742,14 @@ class StandplaatsenExportConfig:
     edges {
       node {
         identificatie
-        aanduidingInOnderzoek
         geconstateerd
+        heeftOnderzoeken(inOnderzoek: "J") {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         heeftHoofdadres {
           edges {
             node {
@@ -852,7 +858,13 @@ class StandplaatsenExportConfig:
         identificatie
         volgnummer
         registratiedatum
-        aanduidingInOnderzoek
+        heeftOnderzoeken(inOnderzoek: "J") {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         geconstateerd
         heeftHoofdadres(active: false) {
           edges {
@@ -965,7 +977,18 @@ class StandplaatsenExportConfig:
 
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
         'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
@@ -1050,7 +1073,18 @@ class StandplaatsenExportConfig:
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
