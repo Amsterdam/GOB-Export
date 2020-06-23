@@ -66,7 +66,8 @@ class TestMain(TestCase):
 
         header = {
             'catalogue': 'any catalogue',
-            'collection': 'any collection'
+            'collection': 'any collection',
+            'application': 'any application',
         }
 
         mock_notification = mock.MagicMock()
@@ -81,6 +82,7 @@ class TestMain(TestCase):
         expected_arguments = {
             'catalogue': 'any catalogue',
             'collection': 'any collection',
+            'application': 'any application',
             'destination': 'Database',
             'include_relations': False,
             'retry_time': mock.ANY

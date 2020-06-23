@@ -51,7 +51,7 @@ def handle_export_msg(msg):
     collection = header['collection']
     product = header.get('product', None)
     destination = header['destination']
-    application = "GOBExport"
+    application = header.get('application', "GOBExport")
 
     start_timestamp = int(datetime.datetime.utcnow().replace(microsecond=0).timestamp())
     process_id = f"{start_timestamp}.{destination}.{collection}"
@@ -128,6 +128,7 @@ def dump_on_new_events(msg):
     arguments = {
         'catalogue': notification.header.get('catalogue'),
         'collection': notification.header.get('collection'),
+        'application': notification.header.get('application'),
         'destination': 'Database',
         'include_relations': False,
         'retry_time': 10 * 60   # retry for max 10 minutes if already running
