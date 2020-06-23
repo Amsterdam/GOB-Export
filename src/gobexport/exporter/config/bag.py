@@ -1032,7 +1032,18 @@ class StandplaatsenExportConfig:
 
     esri_format = BAGDefaultFormat({
         'id': 'identificatie',
-        'onderzoek': 'aanduidingInOnderzoek',
+        'onderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconst': 'geconstateerd',
         'num_id_hfd': 'heeftHoofdadres.identificatie',
         'huisnr_hfd': 'heeftHoofdadres.huisnummer',
