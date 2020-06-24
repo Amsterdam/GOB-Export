@@ -79,7 +79,13 @@ class WoonplaatsenExportConfig:
     edges {
       node {
         identificatie
-        aanduidingInOnderzoek
+        heeftOnderzoeken(inOnderzoek: "J") {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         geconstateerd
         naam
         beginGeldigheid
@@ -109,7 +115,13 @@ class WoonplaatsenExportConfig:
       node {
         identificatie
         volgnummer
-        aanduidingInOnderzoek
+        heeftOnderzoeken(inOnderzoek: "J", active: false) {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         geconstateerd
         naam
         beginGeldigheid
@@ -135,7 +147,18 @@ class WoonplaatsenExportConfig:
 
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'naam': 'naam',
         'beginGeldigheid': 'beginGeldigheid',
@@ -154,7 +177,18 @@ class WoonplaatsenExportConfig:
 
     esri_format = BAGDefaultFormat({
         'id': 'identificatie',
-        'onderzoek': 'aanduidingInOnderzoek',
+        'onderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconst': 'geconstateerd',
         'naam': 'naam',
         'begindatum': 'beginGeldigheid',
@@ -170,7 +204,18 @@ class WoonplaatsenExportConfig:
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'naam': 'naam',
         'beginGeldigheid': 'beginGeldigheid',
@@ -742,8 +787,14 @@ class StandplaatsenExportConfig:
     edges {
       node {
         identificatie
-        aanduidingInOnderzoek
         geconstateerd
+        heeftOnderzoeken(inOnderzoek: "J") {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         heeftHoofdadres {
           edges {
             node {
@@ -852,7 +903,13 @@ class StandplaatsenExportConfig:
         identificatie
         volgnummer
         registratiedatum
-        aanduidingInOnderzoek
+        heeftOnderzoeken(inOnderzoek: "J", active: false) {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         geconstateerd
         heeftHoofdadres(active: false) {
           edges {
@@ -965,7 +1022,18 @@ class StandplaatsenExportConfig:
 
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
         'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
@@ -1009,7 +1077,18 @@ class StandplaatsenExportConfig:
 
     esri_format = BAGDefaultFormat({
         'id': 'identificatie',
-        'onderzoek': 'aanduidingInOnderzoek',
+        'onderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconst': 'geconstateerd',
         'num_id_hfd': 'heeftHoofdadres.identificatie',
         'huisnr_hfd': 'heeftHoofdadres.huisnummer',
@@ -1050,7 +1129,18 @@ class StandplaatsenExportConfig:
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
