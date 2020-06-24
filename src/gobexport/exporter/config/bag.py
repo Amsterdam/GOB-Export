@@ -1242,7 +1242,13 @@ class LigplaatsenExportConfig:
     edges {
       node {
         identificatie
-        aanduidingInOnderzoek
+        heeftOnderzoeken(inOnderzoek: "J") {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         geconstateerd
         heeftHoofdadres {
           edges {
@@ -1352,7 +1358,13 @@ class LigplaatsenExportConfig:
         identificatie
         volgnummer
         registratiedatum
-        aanduidingInOnderzoek
+        heeftOnderzoeken(inOnderzoek: "J", active: false) {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         geconstateerd
         heeftHoofdadres(active: false) {
           edges {
@@ -1465,7 +1477,18 @@ class LigplaatsenExportConfig:
 
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
         'huisnummerHoofdadres': 'heeftHoofdadres.huisnummer',
@@ -1509,7 +1532,18 @@ class LigplaatsenExportConfig:
 
     esri_format = BAGDefaultFormat({
         'id': 'identificatie',
-        'onderzoek': 'aanduidingInOnderzoek',
+        'onderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconst': 'geconstateerd',
         'num_id_hfd': 'heeftHoofdadres.identificatie',
         'huisnr_hfd': 'heeftHoofdadres.huisnummer',
@@ -1550,7 +1584,18 @@ class LigplaatsenExportConfig:
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'heeftIn:BAG.NAG.identificatieHoofdadres': 'heeftHoofdadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerHoofdadres': 'heeftHoofdadres.volgnummer',
