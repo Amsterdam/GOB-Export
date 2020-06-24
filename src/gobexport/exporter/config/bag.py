@@ -79,7 +79,13 @@ class WoonplaatsenExportConfig:
     edges {
       node {
         identificatie
-        aanduidingInOnderzoek
+        heeftOnderzoeken(inOnderzoek: "J") {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         geconstateerd
         naam
         beginGeldigheid
@@ -109,7 +115,13 @@ class WoonplaatsenExportConfig:
       node {
         identificatie
         volgnummer
-        aanduidingInOnderzoek
+        heeftOnderzoeken(inOnderzoek: "J", active: false) {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
         geconstateerd
         naam
         beginGeldigheid
@@ -135,7 +147,18 @@ class WoonplaatsenExportConfig:
 
     format = BAGDefaultFormat({
         'identificatie': 'identificatie',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'naam': 'naam',
         'beginGeldigheid': 'beginGeldigheid',
@@ -154,7 +177,18 @@ class WoonplaatsenExportConfig:
 
     esri_format = BAGDefaultFormat({
         'id': 'identificatie',
-        'onderzoek': 'aanduidingInOnderzoek',
+        'onderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconst': 'geconstateerd',
         'naam': 'naam',
         'begindatum': 'beginGeldigheid',
@@ -170,7 +204,18 @@ class WoonplaatsenExportConfig:
         'identificatie': 'identificatie',
         'volgnummer': 'volgnummer',
         'registratiedatum': 'registratiedatum',
-        'aanduidingInOnderzoek': 'aanduidingInOnderzoek',
+        'aanduidingInOnderzoek': {
+            'condition': 'isempty',
+            'reference': 'heeftOnderzoeken.[0].identificatie',
+            'trueval': {
+                'action': 'literal',
+                'value': 'N',
+            },
+            'falseval': {
+                'action': 'literal',
+                'value': 'J'
+            }
+        },
         'geconstateerd': 'geconstateerd',
         'naam': 'naam',
         'beginGeldigheid': 'beginGeldigheid',
@@ -858,7 +903,7 @@ class StandplaatsenExportConfig:
         identificatie
         volgnummer
         registratiedatum
-        heeftOnderzoeken(inOnderzoek: "J") {
+        heeftOnderzoeken(inOnderzoek: "J", active: false) {
           edges {
             node {
               identificatie
