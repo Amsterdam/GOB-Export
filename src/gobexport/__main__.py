@@ -54,7 +54,7 @@ def handle_export_msg(msg):
     application = header.get('application', "GOBExport")
 
     start_timestamp = int(datetime.datetime.utcnow().replace(microsecond=0).timestamp())
-    process_id = f"{start_timestamp}.{destination}.{collection}"
+    process_id = header.get('process_id', f"{start_timestamp}.{destination}.{collection}")
 
     msg["header"].update({
         'process_id': process_id,
@@ -90,7 +90,7 @@ def handle_export_test_msg(msg):
     catalogue = header['catalogue']
 
     start_timestamp = int(datetime.datetime.utcnow().replace(microsecond=0).timestamp())
-    process_id = f"{start_timestamp}.export_test.{catalogue}"
+    process_id = header.get('process_id', f"{start_timestamp}.export_test.{catalogue}")
 
     msg["header"].update({
         'process_id': process_id,
@@ -129,6 +129,7 @@ def dump_on_new_events(msg):
         'catalogue': notification.header.get('catalogue'),
         'collection': notification.header.get('collection'),
         'application': notification.header.get('application'),
+        'process_id': notification.header.get('process_id'),
         'destination': 'Database',
         'include_relations': False,
         'retry_time': 10 * 60   # retry for max 10 minutes if already running
