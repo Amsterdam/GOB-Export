@@ -1,5 +1,6 @@
 from unittest import mock, TestCase
 
+from freezegun import freeze_time
 from gobexport import __main__
 
 
@@ -68,6 +69,7 @@ class TestMain(TestCase):
             'catalogue': 'any catalogue',
             'collection': 'any collection',
             'application': 'any application',
+            'process_id': 'the process id',
         }
 
         mock_notification = mock.MagicMock()
@@ -83,6 +85,7 @@ class TestMain(TestCase):
             'catalogue': 'any catalogue',
             'collection': 'any collection',
             'application': 'any application',
+            'process_id': 'the process id',
             'destination': 'Database',
             'include_relations': False,
             'retry_time': mock.ANY
@@ -117,3 +120,46 @@ class TestMain(TestCase):
 
         mock_add_notification.assert_called_with(msg, mock_dump_notification.return_value)
         mock_dump_notification.assert_called_with('CAT', 'COLL')
+
+    @mock.patch("gobexport.__main__.export", mock.MagicMock())
+    @mock.patch("gobexport.__main__.test", mock.MagicMock())
+    @mock.patch("gobexport.__main__.Dumper", mock.MagicMock())
+    @mock.patch("gobexport.__main__.add_notification", mock.MagicMock())
+    @mock.patch("gobexport.__main__.DumpNotification", mock.MagicMock())
+    def test_init_process_id(self):
+        msg = {
+            'header': {
+                'catalogue': 'any catalogue',
+                'collection': 'any collection',
+                'application': 'any application',
+                'destination': 'any destination',
+                'process_id': 'the process id',
+            }
+        }
+
+        # Test both handle_export_msg and handle_export_test_msg for copying the process id
+        res = __main__.handle_export_msg(msg)
+        self.assertEqual('the process id', res['header']['process_id'])
+
+        res = __main__.handle_export_test_msg(msg)
+        self.assertEqual('the process id', res['header']['process_id'])
+
+        msg = {
+            'header': {
+                'catalogue': 'any catalogue',
+                'collection': 'any collection',
+                'application': 'any application',
+                'destination': 'any destination',
+            }
+        }
+
+        # Test both handle_export_msg and handle_export_test_msg for setting a new process_id
+        with freeze_time("2020-09-06 00:00:00"):
+            expected_ts = '1599350400'
+
+            res = __main__.handle_export_msg(msg)
+            self.assertEqual(f'{expected_ts}.any destination.any collection', res['header']['process_id'])
+            del msg['header']['process_id']
+
+            res = __main__.handle_export_test_msg(msg)
+            self.assertEqual(f'{expected_ts}.export_test.any catalogue', res['header']['process_id'])
