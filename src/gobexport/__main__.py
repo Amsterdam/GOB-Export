@@ -53,11 +53,7 @@ def handle_export_msg(msg):
     destination = header['destination']
     application = header.get('application', "GOBExport")
 
-    start_timestamp = int(datetime.datetime.utcnow().replace(microsecond=0).timestamp())
-    process_id = header.get('process_id', f"{start_timestamp}.{destination}.{collection}")
-
     msg["header"].update({
-        'process_id': process_id,
         'destination': destination,
         'application': application,
         'catalogue': catalogue,
