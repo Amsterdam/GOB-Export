@@ -93,3 +93,14 @@ class TestCSVInspector(TestCase):
         i.check_columns('any columns')
         i._check_uniqueness.assert_called_with('any columns')
         i._check_lengths.assert_called_with('any columns')
+
+    def test_check_lines(self):
+        i = CSVInspector('any filename', {})
+        i.check_columns = MagicMock()
+        lines = [
+            'HEADERS',
+            'A;B;C\n'
+        ]
+
+        i.check_lines(lines)
+        i.check_columns.assert_called_with(['A', 'B', 'C'])
