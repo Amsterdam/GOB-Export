@@ -88,7 +88,13 @@ class TestDumper(TestCase):
         dumper.try_dump_collection.return_value = True
         dumper.dump_collection('any schema', 'any catalog', 'any collection')
         mock_sleep.assert_not_called()
-        dumper.try_dump_collection.assert_called_with('any schema', 'any catalog', 'any collection')
+        dumper.try_dump_collection.assert_called_with('any schema', 'any catalog', 'any collection', False)
+
+        # With force_full True
+        dumper.dump_collection('any schema', 'any catalog', 'any collection', force_full=True)
+        mock_sleep.assert_not_called()
+        dumper.try_dump_collection.assert_called_with('any schema', 'any catalog', 'any collection', True)
+
         # Retry
         dumper.try_dump_collection.side_effect = [False, True]
         dumper.dump_collection('any schema', 'any catalog', 'any collection')
@@ -114,3 +120,30 @@ class TestDumper(TestCase):
         mock_post.return_value.iter_lines.return_value = [b"line 1", b"line 2", b"Export completed"]
         result = dumper.try_dump_collection('any schema', 'any catalog', 'any collection')
         self.assertTrue(result)
+        mock_post.assert_called_with(
+            url='host/secure_url/dump/any catalog/any collection/',
+            json={
+                "db": {"datastore": "config"},
+                "schema": "any schema",
+                "include_relations": False,
+                "force_full": False,
+            },
+            headers={'Content-Type': 'application/json', 'secure': 'header'},
+            stream=True,
+        )
+
+        # Assert post is called with the correct arguments if force_full True
+        mock_post.return_value.iter_lines.return_value = [123]
+        result = dumper.try_dump_collection('any schema', 'any catalog', 'any collection', True)
+        self.assertFalse(result)
+        mock_post.assert_called_with(
+            url='host/secure_url/dump/any catalog/any collection/',
+            json={
+                "db": {"datastore": "config"},
+                "schema": "any schema",
+                "include_relations": False,
+                "force_full": True,
+            },
+            headers={'Content-Type': 'application/json', 'secure': 'header'},
+            stream=True,
+        )
