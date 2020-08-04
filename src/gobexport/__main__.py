@@ -29,7 +29,8 @@ def handle_export_dump_msg(msg):
     logger.configure(msg, "DUMP")
     Dumper().dump_catalog(catalog_name=header['catalogue'],
                           collection_name=header['collection'],
-                          include_relations=header.get('include_relations', True))
+                          include_relations=header.get('include_relations', True),
+                          force_full=header.get('full', False))
 
     add_notification(msg, DumpNotification(header['catalogue'], header['collection']))
 
