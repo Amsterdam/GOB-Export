@@ -108,15 +108,26 @@ class TestMain(TestCase):
             'header': {
                 'catalogue': 'CAT',
                 'collection': 'COLL',
-                'include_relations': 'TrueOrFalse'
             }
         }
 
+        # With default values for include_relations and force_full
         __main__.handle_export_dump_msg(msg)
 
         mock_dumper().dump_catalog.assert_called_with(catalog_name='CAT',
                                                       collection_name='COLL',
-                                                      include_relations='TrueOrFalse')
+                                                      include_relations=True,
+                                                      force_full=False)
 
         mock_add_notification.assert_called_with(msg, mock_dump_notification.return_value)
         mock_dump_notification.assert_called_with('CAT', 'COLL')
+
+        # Check that force_full and include_relations are passed with provided values
+        msg['header']['full'] = True
+        msg['header']['include_relations'] = False
+
+        __main__.handle_export_dump_msg(msg)
+        mock_dumper().dump_catalog.assert_called_with(catalog_name='CAT',
+                                                      collection_name='COLL',
+                                                      include_relations=False,
+                                                      force_full=True)

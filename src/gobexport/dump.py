@@ -2,7 +2,6 @@
 Dumps GOB data to the analysis database
 
 """
-import json
 import requests
 import re
 import time
@@ -79,7 +78,7 @@ class Dumper():
         relations = result['_embedded']['collections']
         return [collection for collection in relations if collection['name'].startswith(abbreviation)]
 
-    def dump_catalog(self, catalog_name, collection_name, include_relations=True):
+    def dump_catalog(self, catalog_name, collection_name, include_relations=True, force_full=False):
         """
         Dump a catalog. If a collection is specified only dump the given catalog collection.
 
@@ -95,12 +94,12 @@ class Dumper():
 
         schema = catalog_name
         for collection in collections:
-            self.dump_collection(schema, catalog_name, collection['name'])
+            self.dump_collection(schema, catalog_name, collection['name'], force_full)
             if include_relations:
                 for relation in self.get_relations(catalog, collection):
-                    self.dump_collection(schema, "rel", relation['name'])
+                    self.dump_collection(schema, "rel", relation['name'], force_full)
 
-    def dump_collection(self, schema, catalog_name, collection_name):
+    def dump_collection(self, schema, catalog_name, collection_name, force_full=False):
         """
         Dump a catalog collection into a remote database in the given schema
 
@@ -115,14 +114,14 @@ class Dumper():
         while tries < Dumper.MAX_TRIES:
             tries += 1
             logger.info(f"Try {tries}: dump {catalog_name} - {collection_name}")
-            if self.try_dump_collection(schema, catalog_name, collection_name):
+            if self.try_dump_collection(schema, catalog_name, collection_name, force_full):
                 # On Successful dump
                 return
             # Wait RETRY_TIMEOUT seconds before next try
             time.sleep(self.RETRY_TIMEOUT)
         logger.error(f'Export {catalog_name}-{collection_name} failed after {Dumper.MAX_TRIES}')
 
-    def try_dump_collection(self, schema, catalog_name, collection_name):
+    def try_dump_collection(self, schema, catalog_name, collection_name, force_full=False):
         """
         Try to dump the given catalog collection in the given schema
 
@@ -134,11 +133,12 @@ class Dumper():
         :return:
         """
         url = f"{self.dump_api}/dump/{catalog_name}/{collection_name}/"
-        data = json.dumps({
+        data = {
             "db": self.db_config,
             "schema": schema,
-            "include_relations": False
-        })
+            "include_relations": False,
+            "force_full": force_full,
+        }
         headers = {
             "Content-Type": "application/json"
         }
@@ -149,8 +149,7 @@ class Dumper():
         try:
             result = requests.post(
                 url=url,
-                json=None,
-                data=data,
+                json=data,
                 headers=self.update_headers(url, headers),
                 stream=True
             )
