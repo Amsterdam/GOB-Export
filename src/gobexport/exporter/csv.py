@@ -36,6 +36,12 @@ def _get_headers_from_file(file: str) -> list:
 
 
 def _ensure_fieldnames_match_existing_file(fieldnames, file):
+    """Raises GOBException if fieldnames don't match the header names present in file
+
+    :param fieldnames:
+    :param file:
+    :return:
+    """
     existing_headers = _get_headers_from_file(file)
 
     if existing_headers != fieldnames:
@@ -74,7 +80,7 @@ def csv_exporter(api, file, format=None, append=False, filter: EntityFilter=None
     :param api: the API wrapper which can be iterated through
     :param file: the local file to write to
     :param format: format definition, see above for examples
-    :param append:
+    :param append: the file the result of this export will be appended to, or False
     :return:
     """
     row_count = 0
@@ -83,7 +89,7 @@ def csv_exporter(api, file, format=None, append=False, filter: EntityFilter=None
     fieldnames = [*mapping.keys()]
 
     if append:
-        _ensure_fieldnames_match_existing_file(fieldnames, file)
+        _ensure_fieldnames_match_existing_file(fieldnames, append)
 
     with open(file, 'a' if append else 'w', encoding='utf-8-sig') as fp, \
             ProgressTicker(f"Export entities", 10000) as progress:
