@@ -1,14 +1,19 @@
 import pytest
+import tempfile
+import os
+
 from unittest import mock, TestCase
 from unittest.mock import call, mock_open, patch
 
 from gobcore.exceptions import GOBException
 
+from gobexport.exporter.csv import csv_exporter
 from gobexport.export import (
     cleanup_datefiles,
     get_cleanup_pattern,
     export,
     _export_collection,
+    _append_to_file
 )
 
 def fail(msg):
@@ -22,6 +27,22 @@ class TestExport(TestCase):
 
     def tearDown(self):
         pass
+
+    def test_append_to_file(self):
+        file1 = tempfile.mkstemp()[1]
+        file2 = tempfile.mkstemp()[1]
+
+        with open(file1, 'w') as f1, open(file2, 'w') as f2:
+            f1.write('A')
+            f2.write('B')
+
+        _append_to_file(file1, file2)
+
+        with open(file2, 'r') as f:
+            self.assertEqual('BA', f.read())
+
+        os.remove(file1)
+        os.remove(file2)
 
     @patch('gobexport.export.logger', mock.MagicMock())
     @patch('gobexport.export.time.sleep', lambda n: None)
@@ -87,6 +108,66 @@ class TestExport(TestCase):
         self.assertEqual(result, None)
         mock_distribute.assert_not_called()
         mock_clean.assert_not_called()
+
+    @patch('gobexport.export.logger', mock.MagicMock())
+    @patch('gobexport.export.time.sleep', lambda n: None)
+    @mock.patch('builtins.open', mock_open())
+    @mock.patch('gobexport.export.os.remove', lambda f: None)
+    @patch('gobexport.export.distribute_to_objectstore')
+    @patch('gobexport.export._get_filename', lambda x: '/tmpfile/' + x)
+    @patch('gobexport.export.export_to_file')
+    @patch('gobexport.export.cleanup_datefiles')
+    @patch('gobexport.export._append_to_file')
+    def test_export_collection_append(self, mock_append, mock_clean, mock_export_to_file, mock_distribute):
+        products = {
+            'prod1': {
+                'api_type': 'graphql_streaming',
+                'exporter': csv_exporter,
+                'query': 'q1',
+                'filename': 'the/filename.csv',
+                'mime_type': 'mime/type'
+            },
+            'prod2': {
+                'api_type': 'graphql_streaming',
+                'exporter': csv_exporter,
+                'query': 'q1',
+                'append': True,
+                'filename': 'the/filename.csv',
+                'mime_type': 'mime/type'
+            }
+        }
+
+        config_object = type('Config', (), {
+            'products': products
+        })
+        config = {
+            'cat': {
+                'coll': config_object
+            }
+        }
+        mock_export_to_file.side_effect = lambda *args, **kwargs: True
+
+        with patch("gobexport.export.CONFIG_MAPPING", config):
+            result = _export_collection("host", "cat", "coll", None, "File")
+
+        mock_export_to_file.assert_has_calls([
+            call('host', products['prod1'], 'the/filename.csv', 'cat', 'coll', buffer_items=True),
+            call('host', products['prod2'], '/tmpfile/the/filename.csv.to_append', 'cat', 'coll', buffer_items=True)
+        ])
+
+        mock_append.assert_called_with('/tmpfile/the/filename.csv.to_append', 'the/filename.csv')
+
+        # Objectstore, uses two tmp files
+        mock_export_to_file.reset_mock()
+        with patch("gobexport.export.CONFIG_MAPPING", config):
+            result = _export_collection("host", "cat", "coll", None, "Objectstore")
+
+        mock_export_to_file.assert_has_calls([
+            call('host', products['prod1'], '/tmpfile/the/filename.csv', 'cat', 'coll', buffer_items=True),
+            call('host', products['prod2'], '/tmpfile/the/filename.csv.to_append', 'cat', 'coll', buffer_items=True)
+        ])
+
+        mock_append.assert_called_with('/tmpfile/the/filename.csv.to_append', '/tmpfile/the/filename.csv')
 
     @patch('gobexport.export.logger', mock.MagicMock())
     @patch('gobexport.export.time.sleep', lambda n: None)

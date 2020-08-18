@@ -74,6 +74,17 @@ def _with_retries(method, max_tries=_MAX_TRIES, retry_timeout=_RETRY_TIMEOUT, ex
             time.sleep(retry_timeout)
 
 
+def _append_to_file(src_file: str, dst_file: str):
+    """Appends src_file to dst_file
+
+    :param src_file:
+    :param dst_file:
+    :return:
+    """
+    with open(dst_file, 'a') as dst, open(src_file, 'r') as src:
+        dst.write(src.read())
+
+
 @with_buffered_iterable  # noqa: C901
 def _export_collection(host, catalogue, collection, product_name, destination):
     """Export a collection from a catalog
@@ -107,6 +118,10 @@ def _export_collection(host, catalogue, collection, product_name, destination):
         # Get name of local file to write results to
         results_file = _get_filename(product['filename']) if destination == "Objectstore" else product['filename']
 
+        if product.get('append', False):
+            # Add .to_append to avoid writing to the previously created file
+            results_file = _get_filename(f"{product['filename']}.to_append")
+
         # Buffer items if they are used multiple times. This prevents calling API multiple times for same data
         source = product_source(product)
         buffer_items = len(list(filter(lambda p: product_source(p) == source, config.products.values()))) > 1
@@ -125,7 +140,14 @@ def _export_collection(host, catalogue, collection, product_name, destination):
         else:
             logger.info(f"{row_count} records exported to local file {name}.")
 
-            if not product.get('append', False):
+            if product.get('append', False):
+                # Append temporary file to existing file and cleanup temp file
+                _append_to_file(results_file,
+                                _get_filename(product['filename'])
+                                if destination == 'Objectstore'
+                                else product['filename'])
+                os.remove(results_file)
+            else:
                 # Do not add file to files again when appending
                 files.append({
                     'temp_location': results_file,
