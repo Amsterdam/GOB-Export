@@ -121,6 +121,9 @@ def _export_collection(host, catalogue, collection, product_name, destination):
         if product.get('append', False):
             # Add .to_append to avoid writing to the previously created file
             results_file = _get_filename(f"{product['filename']}.to_append")
+            product['append_to_filename'] = _get_filename(product['filename']) \
+                if destination == "Objectstore" \
+                else product['filename']
 
         # Buffer items if they are used multiple times. This prevents calling API multiple times for same data
         source = product_source(product)
@@ -142,10 +145,7 @@ def _export_collection(host, catalogue, collection, product_name, destination):
 
             if product.get('append', False):
                 # Append temporary file to existing file and cleanup temp file
-                _append_to_file(results_file,
-                                _get_filename(product['filename'])
-                                if destination == 'Objectstore'
-                                else product['filename'])
+                _append_to_file(results_file, product['append_to_filename'])
                 os.remove(results_file)
             else:
                 # Do not add file to files again when appending

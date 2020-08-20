@@ -134,7 +134,7 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
     kwargs['filter'] = filter
 
     row_count = exporter(buffered_api, file, format,
-                         append=product.get('append', False) and product['filename'],
+                         append=product.get('append', False) and product['append_to_filename'],
                          **kwargs)
 
     # Reset the entity filter(s)
