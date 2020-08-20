@@ -72,10 +72,7 @@ def handle_export_msg(msg):
     return {
         **msg,
         "header": msg.get("header"),
-        "summary": {
-            "warnings": logger.get_warnings(),
-            "errors": logger.get_errors()
-        },
+        "summary": logger.get_summary(),
         "contents": None
     }
 
@@ -101,10 +98,7 @@ def handle_export_test_msg(msg):
 
     return {
         "header": msg.get("header"),
-        "summary": {
-            "warnings": logger.get_warnings(),
-            "errors": logger.get_errors()
-        },
+        "summary": logger.get_summary(),
         "contents": None
     }
 
