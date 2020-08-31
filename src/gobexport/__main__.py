@@ -8,7 +8,7 @@ from gobcore.message_broker.config import WORKFLOW_EXCHANGE, EXPORT_QUEUE, EXPOR
     EXPORT_TEST_RESULT_KEY
 from gobcore.message_broker.messagedriven_service import messagedriven_service
 from gobcore.message_broker.notifications import listen_to_notifications, get_notification, DumpNotification, \
-    add_notification
+    ExportTestNotification, add_notification
 from gobcore.message_broker.config import EXPORT
 from gobcore.workflow.start_workflow import start_workflow
 
@@ -96,11 +96,20 @@ def handle_export_test_msg(msg):
 
     test(catalogue)
 
-    return {
+    summary = logger.get_summary()
+    msg = {
         "header": msg.get("header"),
-        "summary": logger.get_summary(),
+        "summary": summary,
         "contents": None
     }
+
+    # Send out a notification for a successfull export test
+    if len(summary['errors']) == 0:
+        add_notification(msg, ExportTestNotification(header['catalogue'],
+                                                     header.get('collection'),
+                                                     header.get('product')))
+
+    return msg
 
 
 def dump_on_new_events(msg):
