@@ -6,7 +6,7 @@ import datetime
 
 from gobcore.message_broker.config import WORKFLOW_EXCHANGE, EXPORT_QUEUE, EXPORT_TEST_QUEUE, EXPORT_RESULT_KEY, \
     EXPORT_TEST_RESULT_KEY
-from gobcore.message_broker.messagedriven_service import messagedriven_service
+from gobcore.message_broker.messagedriven_service import messagedriven_service, RUNS_IN_OWN_THREAD
 from gobcore.message_broker.notifications import listen_to_notifications, get_notification, DumpNotification, \
     ExportTestNotification, add_notification
 from gobcore.message_broker.config import EXPORT
@@ -156,7 +156,8 @@ SERVICEDEFINITION = {
     },
     'dump': {
         'queue': lambda: listen_to_notifications("dump", 'events'),
-        'handler': dump_on_new_events
+        'handler': dump_on_new_events,
+        RUNS_IN_OWN_THREAD: True
     }
 }
 
