@@ -29,6 +29,7 @@ GOB_OBJECTSTORE = 'GOBObjectstore'
 BASISINFORMATIE_OBJECTSTORE = 'Basisinformatie'
 
 GOB_EXPORT_API_PORT = os.getenv('GOB_EXPORT_API_PORT', 8168)
+API_BASE_PATH = os.getenv("BASE_PATH", default="")
 
 
 def get_host():
