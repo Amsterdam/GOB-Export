@@ -28,6 +28,8 @@ SECURE_URL = '/gob/secure'
 GOB_OBJECTSTORE = 'GOBObjectstore'
 BASISINFORMATIE_OBJECTSTORE = 'Basisinformatie'
 
+GOB_EXPORT_API_PORT = os.getenv('GOB_EXPORT_API_PORT', 8168)
+
 
 def get_host():
     """API Host
