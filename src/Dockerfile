@@ -28,4 +28,4 @@ COPY tests tests
 COPY .flake8 .flake8
 COPY test.sh test.sh
 
-CMD ["python", "-m", "gobexport"]
+CMD uwsgi
