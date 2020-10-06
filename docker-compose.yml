@@ -5,6 +5,8 @@ services:
   gobexport:
     build: src
     container_name: gobexport
+    ports:
+      - "8168:8000"
     environment:
       ANALYSE_DATABASE_PORT_OVERRIDE: 5432
       ANALYSE_DATABASE_HOST_OVERRIDE: analyse_database
