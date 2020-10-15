@@ -927,7 +927,6 @@ class StandplaatsenExportConfig:
             }
           }
         }
-        feitelijkGebruik
         status
         beginGeldigheid
         eindGeldigheid
@@ -1052,7 +1051,6 @@ class StandplaatsenExportConfig:
             }
           }
         }
-        feitelijkGebruik
         status
         beginGeldigheid
         eindGeldigheid
@@ -1093,7 +1091,7 @@ class StandplaatsenExportConfig:
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.[0].identificatie',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': '',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1148,7 +1146,7 @@ class StandplaatsenExportConfig:
         'gme_naam': 'ligtInGemeente.naam',
         'num_id_nvn': 'heeftNevenadres.identificatie',
         'status': 'status.omschrijving',
-        'soort_obj': 'feitelijkGebruik.omschrijving',
+        'soort_obj': '',
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
         'docdatum': 'documentdatum',
@@ -1205,7 +1203,7 @@ class StandplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': '',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1382,7 +1380,6 @@ class LigplaatsenExportConfig:
             }
           }
         }
-        feitelijkGebruik
         status
         beginGeldigheid
         eindGeldigheid
@@ -1507,7 +1504,6 @@ class LigplaatsenExportConfig:
             }
           }
         }
-        feitelijkGebruik
         status
         beginGeldigheid
         eindGeldigheid
@@ -1548,7 +1544,7 @@ class LigplaatsenExportConfig:
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': '',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1603,7 +1599,7 @@ class LigplaatsenExportConfig:
         'gme_naam': 'ligtInGemeente.naam',
         'num_id_nvn': 'heeftNevenadres.identificatie',
         'status': 'status.omschrijving',
-        'soort_obj': 'feitelijkGebruik.omschrijving',
+        'soort_obj': '',
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
         'docdatum': 'documentdatum',
@@ -1660,7 +1656,7 @@ class LigplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': 'feitelijkGebruik.omschrijving',
+        'is:WOZ.WOB.soortObject': '',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
