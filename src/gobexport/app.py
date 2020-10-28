@@ -1,4 +1,6 @@
 import datetime
+import os
+
 from threading import Thread
 
 from gobcore.logging.logger import logger
@@ -160,7 +162,12 @@ SERVICEDEFINITION = {
 
 
 def run_message_thread():
-    messagedriven_service(SERVICEDEFINITION, "Export")
+    try:
+        messagedriven_service(SERVICEDEFINITION, "Export")
+    except:  # noqa: E722 do not use bare 'except'
+        pass
+    print(f"ERROR: no connection with GOB message broker, application is stopped")
+    os._exit(os.EX_UNAVAILABLE)
 
 
 def get_app():
