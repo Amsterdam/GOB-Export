@@ -123,11 +123,15 @@ class TestApp(TestCase):
                                                       include_relations=False,
                                                       force_full=True)
 
+    @mock.patch("gobexport.app.os._exit")
     @mock.patch("gobexport.app.messagedriven_service")
-    def test_run_message_thread(self, mock_messagedriven_service):
+    def test_run_message_thread(self, mock_messagedriven_service, mock_os_exit):
         run_message_thread()
 
         mock_messagedriven_service.assert_called_with(SERVICEDEFINITION, "Export")
+
+        mock_messagedriven_service.side_effect = Exception
+        run_message_thread()
 
     @mock.patch("gobexport.app.Thread")
     @mock.patch("gobexport.app.get_flask_app")

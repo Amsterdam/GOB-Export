@@ -19,9 +19,7 @@ services:
       UWSGI_HTTP: ":8000"
       UWSGI_MODULE: "gobexport.wsgi"
       UWSGI_CALLABLE: "app"
-      UWSGI_MASTER: 1
       UWSGI_PROCESSES: "4"
-      UWSGI_LAZY: "1"
       UWSGI_ENABLE_THREADS: ""
       UWSGI_THREADS: ""
     env_file: .env
