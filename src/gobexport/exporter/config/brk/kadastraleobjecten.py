@@ -330,7 +330,16 @@ class KadastraleobjectenEsriNoSubjectsFormat(KadastraleobjectenEsriFormat):
 
 
 class KadastraleobjectenDIAFormat(KadastraleobjectenCsvFormat):
-    def get_mapping(self):
+    def if_vot_relation(self, trueval: str, falseval: str):
+        return {
+            'condition': 'isempty',
+            'reference': 'heeftEenRelatieMetVerblijfsobject.[0].identificatie',
+            'negate': True,
+            'trueval': trueval,
+            'falseval': falseval,
+        }
+
+    def get_format(self):
         return {
             'kot_kadastrale_aanduiding': 'identificatie',
             'kot_volgnummer': 'volnummer',
