@@ -329,6 +329,103 @@ class KadastraleobjectenEsriNoSubjectsFormat(KadastraleobjectenEsriFormat):
         }
 
 
+class KadastraleobjectenDIAFormat(KadastraleobjectenCsvFormat):
+    def if_vot_relation(self, trueval: str, falseval: str):
+        return {
+            'condition': 'isempty',
+            'reference': 'heeftEenRelatieMetVerblijfsobject.[0].identificatie',
+            'negate': True,
+            'trueval': trueval,
+            'falseval': falseval,
+        }
+
+    def get_format(self):
+        return {
+            'kot_kadastrale_aanduiding': 'identificatie',
+            'kot_volgnummer': 'volnummer',
+            'kot_begin_geldigheid': 'begin_geldigheid',
+            'kot_eind_geldigheid': 'eind_geldigheid',
+            'kot_heeft_een_relatie_met_verblijfsobject': 'heeftEenRelatieMetVerblijfsobject.[0].bronwaarde',
+            'kot_koopsom': 'koopsom',
+            'kot_koopsom_valuta': 'koopsomValutacode',
+            'kot_koopjaar': 'koopjaar',
+            'kot_indicatie_meer_objecten': 'indicatieMeerObjecten',
+            'kot_soort_cultuur_bebouwd': self.if_empty_geenWaarde(
+                self.concat_with_comma('soortCultuurBebouwd.omschrijving')
+            ),
+            'kot_soort_cultuur_onbebouwd': 'soortCultuurOnbebouwd.omschrijving',
+            'zrt_aard_zakelijk_recht':
+                'invRustOpKadastraalobjectBrkZakelijkerechten.[0].aardZakelijkRecht.omschrijving',
+            'sjt_aandeel_teller': self.if_vve(
+                trueval={
+                    'action': 'literal',
+                    'value': '1'
+                },
+                falseval={
+                    'condition': 'isempty',
+                    'reference': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
+                    'negate': True,
+                    'trueval': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
+                    'falseval': {
+                        'action': 'literal',
+                        'value': 'ONBEKEND',
+                    }
+                }
+            ),
+            'sjt_aandeel_noemer': self.if_vve(
+                trueval={
+                    'action': 'literal',
+                    'value': '1'
+                },
+                falseval={
+                    'condition': 'isempty',
+                    'reference': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.noemer',
+                    'negate': True,
+                    'trueval': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.noemer',
+                    'falseval': {
+                        'action': 'literal',
+                        'value': 'ONBEKEND',
+                    }
+                }
+            ),
+            'sjt_type_subject': self.vve_or_subj('typeSubject'),
+            'sjt_heeft_bsn_voor': 'vanKadastraalsubject.[0].heeftBsnVoor',
+            'sjt_heeft_kvknummer_voor': 'betrokkenBijAppartementsrechtsplitsingVve.[0].heeftKvknummerVoor',
+            'sjt_voornamen': 'vanKadastraalsubject.[0].voornamen',
+            'sjt_voorvoegsels': 'vanKadastraalsubject.[0].voorvoegsels',
+            'sjt_geslachtsnaam': 'vanKadastraalsubject.[0].geslachtsnaam',
+            'sjt_geslacht': 'vanKadastraalsubject.[0].geslacht.code',
+            'sjt_indicatie_overleden': 'vanKadastraalsubject.[0].indicatieOverleden',
+            'sjt_rechtsvorm': 'KOT_CULTUURCODEBEBOUWD_OMS',
+            'sjt_statutaire_naam': self.vve_or_subj('statutaireNaam'),
+            'sjt_statutaire_zetel': self.vve_or_subj('statutaireZetel'),
+            'sjt_woonadres_openbareruimtenaam': self.if_vot_relation(
+                trueval='ligtAanOpenbareruimte.naam',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.openbareruimtenaam'
+            ),
+            'sjt_woonadres_huisnummer': self.if_vot_relation(
+                trueval='heeftHoofdadres.huisnummer',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisnummer'
+            ),
+            'sjt_woonadres_huisletter': self.if_vot_relation(
+                trueval='heeftHoofdadres.huisletter',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisletter'
+            ),
+            'sjt_woonadres_huisnummertoevoeging': self.if_vot_relation(
+                trueval='heeftHoofdadres.huisnummertoevoeging',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisnummertoevoeging'
+            ),
+            'sjt_woonadres_postcode': self.if_vot_relation(
+                trueval='heeftHoofdadres.postcode',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.postcode'
+            ),
+            'sjt_woonadres_woonplaatsnaam': self.if_vot_relation(
+                trueval='ligtInWoonplaats.naam',
+                falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam'
+            )
+        }
+
+
 class PerceelnummerEsriFormat:
 
     def format_rotatie(self, value):
@@ -446,6 +543,7 @@ class KadastraleobjectenExportConfig:
     csv_format = KadastraleobjectenCsvFormat()
     esri_format = KadastraleobjectenEsriFormat()
     esri_format_no_subjects = KadastraleobjectenEsriNoSubjectsFormat()
+    csv_dia_format = KadastraleobjectenDIAFormat()
     perceelnummer_esri_format = PerceelnummerEsriFormat()
     brk_bag_format = BrkBagCsvFormat()
 
@@ -563,6 +661,73 @@ class KadastraleobjectenExportConfig:
                           heeftKvknummerVoor
                           heeftBsnVoor
                           rechtsvorm
+                          statutaireNaam
+                          statutaireZetel
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'''
+
+    dia_query = '''
+{
+  brkKadastraleobjecten {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        beginGeldigheid
+        eindGeldigheid
+        koopsom
+        koopsomValutacode
+        koopjaar
+        indicatieMeerObjecten
+        soortCultuurOnbebouwd
+        soortCultuurBebouwd
+        invRustOpKadastraalobjectBrkZakelijkerechten(akrAardZakelijkRecht:"VE") {
+          edges {
+            node {
+              identificatie
+              aardZakelijkRecht
+              betrokkenBijAppartementsrechtsplitsingVve {
+                edges {
+                  node {
+                    identificatie
+                    statutaireNaam
+                    typeSubject
+                    heeftKvknummerVoor
+                    heeftBsnVoor
+                    statutaireNaam
+                    statutaireZetel
+                  }
+                }
+              }
+              invVanZakelijkrechtBrkTenaamstellingen {
+                edges {
+                  node {
+                    aandeel
+                    vanKadastraalsubject {
+                      edges {
+                        node {
+                          identificatie
+                          voornamen
+                          voorvoegsels
+                          geslachtsnaam
+                          geslacht
+                          statutaireNaam
+                          typeSubject
+                          indicatieOverleden
+                          heeftKvknummerVoor
+                          heeftBsnVoor
                           statutaireNaam
                           statutaireZetel
                         }
@@ -962,6 +1127,24 @@ class KadastraleobjectenExportConfig:
                 },
             ],
             'query': esri_query,
+        },
+        'kot_dia_csv': {
+            'merge_result': {
+                'api_type': 'graphql_streaming',
+                'attributes': ['isOntstaanUitGPerceel'],
+                'query': gperc_query,
+                'match_attributes': ['identificatie', 'volgnummer'],
+                'row_formatter': csv_dia_format.row_formatter,
+                'secure': True,
+            },
+            'exporter': csv_exporter,
+            'api_type': 'graphql_streaming',
+            'secure': True,
+            'query': dia_query,
+            'filename': lambda: brk_filename('dia_export_kadastraal_object'),
+            'mime_type': 'plain/text',
+            'format': csv_dia_format.get_format(),
+            'sort': sort,
         },
         'bijpijling_shape': {
             'exporter': esri_exporter,
