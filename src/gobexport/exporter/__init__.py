@@ -3,6 +3,7 @@ from gobexport.api import API
 from gobexport.exporter.config import bag, brk, bgt, gebieden, meetbouten, nap, test, wkpb
 from gobexport.exporter.config.bag_diva import add_bag_diva_products
 from gobexport.exporter.config.gebieden_uva2 import add_gebieden_uva2_products
+from gobexport.exporter.encryption import encrypt_file
 from gobexport.graphql import GraphQL
 from gobexport.graphql_streaming import GraphQLStreaming
 from gobexport.buffered_iterable import BufferedIterable
@@ -136,6 +137,9 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
     row_count = exporter(buffered_api, file, format,
                          append=product.get('append', False) and product['append_to_filename'],
                          **kwargs)
+
+    if product.get('encryption_key'):
+        encrypt_file(file, product.get('encryption_key'))
 
     # Reset the entity filter(s)
     if filter:

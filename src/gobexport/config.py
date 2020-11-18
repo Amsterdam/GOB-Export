@@ -11,6 +11,21 @@ The collection and file are retrieved from the command line arguments
 import os
 
 
+def _getenv(varname, default_value=None, is_optional=False):
+    """
+    Returns the value of the environment variable "varname"
+    or the default value if the environment variable is not set
+
+    :param varname: name of the environment variable
+    :param default_value: value to return if variable is not set
+    :raises AssertionError: if variable not set or value is empty
+    :return: the value of the given variable
+    """
+    value = os.getenv(varname, default_value)
+    assert is_optional or value, f"Environment variable '{varname}' not set or empty"
+    return value
+
+
 _DEFAULT_API_HOST = 'http://localhost:8141'
 CONTAINER_BASE = os.getenv('CONTAINER_BASE', 'development')
 
@@ -38,3 +53,11 @@ def get_host():
     :return: The API host to get the collection from
     """
     return os.getenv('API_HOST', _DEFAULT_API_HOST)
+
+
+def get_public_key(key_name):
+    """Public SSH key
+
+    :return: The public ssh key to encrypt a file
+    """
+    return _getenv(f'PUBLIC_KEY_{key_name.upper()}')
