@@ -342,9 +342,9 @@ class KadastraleobjectenDIAFormat(KadastraleobjectenCsvFormat):
     def get_format(self):
         return {
             'kot_kadastrale_aanduiding': 'identificatie',
-            'kot_volgnummer': 'volnummer',
-            'kot_begin_geldigheid': 'begin_geldigheid',
-            'kot_eind_geldigheid': 'eind_geldigheid',
+            'kot_volgnummer': 'volgnummer',
+            'kot_begin_geldigheid': 'beginGeldigheid',
+            'kot_eind_geldigheid': 'eindGeldigheid',
             'kot_heeft_een_relatie_met_verblijfsobject': 'heeftEenRelatieMetVerblijfsobject.[0].bronwaarde',
             'kot_koopsom': 'koopsom',
             'kot_koopsom_valuta': 'koopsomValutacode',
@@ -730,6 +730,41 @@ class KadastraleobjectenExportConfig:
                           heeftBsnVoor
                           statutaireNaam
                           statutaireZetel
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        heeftEenRelatieMetVerblijfsobject {
+          edges {
+            node {
+              identificatie
+              bronwaarde
+              status
+              broninfo
+                heeftHoofdadres {
+                edges {
+                  node {
+                    identificatie
+                    ligtAanOpenbareruimte {
+                      edges {
+                        node {
+                          naam
+                        }
+                      }
+                    }
+                    huisnummer
+                    huisletter
+                    huisnummertoevoeging
+                    postcode
+                    ligtInWoonplaats {
+                      edges {
+                        node {
+                          naam
                         }
                       }
                     }
@@ -1129,14 +1164,6 @@ class KadastraleobjectenExportConfig:
             'query': esri_query,
         },
         'kot_dia_csv': {
-            'merge_result': {
-                'api_type': 'graphql_streaming',
-                'attributes': ['isOntstaanUitGPerceel'],
-                'query': gperc_query,
-                'match_attributes': ['identificatie', 'volgnummer'],
-                'row_formatter': csv_dia_format.row_formatter,
-                'secure': True,
-            },
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
             'secure': True,
