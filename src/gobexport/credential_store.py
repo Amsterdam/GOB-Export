@@ -6,7 +6,7 @@ class CredentialStore:
     # Refresh or request new credentials when the credentials age is past the THRESHOLD of its validity
     THRESHOLD = 0.75
 
-    def __init__(self, get_credentials, refresh_credentials):
+    def __init__(self, get_credentials, refresh_credentials, secure_user=None):
         """
         Initialize the store
 
@@ -15,10 +15,12 @@ class CredentialStore:
         :param get_credentials:
         :param refresh_credentials:
         """
+        assert secure_user, "A secure user is required to know which client id and secret to use"
         self._credentials = None
         self._timestamp = None
         self._get_credentials = get_credentials
         self._refresh_credentials = refresh_credentials
+        self._secure_user = secure_user
 
     def _now(self):
         """
@@ -56,7 +58,7 @@ class CredentialStore:
                 pass
             elif age < refresh_expires_in * self.THRESHOLD:
                 # Refresh credentials
-                credentials = self._refresh_credentials(self._credentials)
+                credentials = self._refresh_credentials(self._credentials, self._secure_user)
                 self._save_credentials(credentials)
             else:
                 # Invalidate credentials
@@ -65,7 +67,7 @@ class CredentialStore:
 
         if not self._credentials:
             # (re)new token
-            credentials = self._get_credentials()
+            credentials = self._get_credentials(self._secure_user)
             self._save_credentials(credentials)
 
         return self._credentials

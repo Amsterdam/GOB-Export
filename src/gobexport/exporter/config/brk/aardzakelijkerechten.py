@@ -27,7 +27,7 @@ class AardzakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql',
-            'secure': True,
+            'secure_user': 'gob',
             'query': query,
             'filename': lambda: brk_filename("c_aard_zakelijkrecht"),
             'mime_type': 'plain/text',

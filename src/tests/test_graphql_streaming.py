@@ -31,7 +31,7 @@ class TestGraphQLStreaming(TestCase):
         api = GraphQLStreaming('host', 'query')
         self.assertEqual(api.url, f'host{STREAMING_GRAPHQL_PUBLIC_ENDPOINT}')
 
-        api = GraphQLStreaming('host', 'query', secure=True)
+        api = GraphQLStreaming('host', 'query', secure_user='any user')
         self.assertEqual(api.url, f'host{STREAMING_GRAPHQL_SECURE_ENDPOINT}')
 
     @patch("gobexport.graphql_streaming.post_stream")
@@ -42,7 +42,7 @@ class TestGraphQLStreaming(TestCase):
         result = graphql_streaming._execute_query('the query')
 
         self.assertEqual(['a', 'b', 'c', 'd'], list(result))
-        mock_post.assert_called_with(f'host{STREAMING_GRAPHQL_PUBLIC_ENDPOINT}', {'query': 'the query'})
+        mock_post.assert_called_with(f'host{STREAMING_GRAPHQL_PUBLIC_ENDPOINT}', {'query': 'the query'}, secure_user=None)
 
     @patch("gobexport.graphql_streaming.json_loads", lambda x: x)
     def test_query_all(self, mock_formatter):

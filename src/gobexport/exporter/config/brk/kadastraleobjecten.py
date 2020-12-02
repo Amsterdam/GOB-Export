@@ -342,9 +342,9 @@ class KadastraleobjectenDIAFormat(KadastraleobjectenCsvFormat):
     def get_format(self):
         return {
             'kot_kadastrale_aanduiding': 'identificatie',
-            'kot_volgnummer': 'volnummer',
-            'kot_begin_geldigheid': 'begin_geldigheid',
-            'kot_eind_geldigheid': 'eind_geldigheid',
+            'kot_volgnummer': 'volgnummer',
+            'kot_begin_geldigheid': 'beginGeldigheid',
+            'kot_eind_geldigheid': 'eindGeldigheid',
             'kot_heeft_een_relatie_met_verblijfsobject': 'heeftEenRelatieMetVerblijfsobject.[0].bronwaarde',
             'kot_koopsom': 'koopsom',
             'kot_koopsom_valuta': 'koopsomValutacode',
@@ -389,8 +389,8 @@ class KadastraleobjectenDIAFormat(KadastraleobjectenCsvFormat):
                 }
             ),
             'sjt_type_subject': self.vve_or_subj('typeSubject'),
-            'sjt_heeft_bsn_voor': 'vanKadastraalsubject.[0].heeftBsnVoor',
-            'sjt_heeft_kvknummer_voor': 'betrokkenBijAppartementsrechtsplitsingVve.[0].heeftKvknummerVoor',
+            'sjt_heeft_bsn_voor': 'vanKadastraalsubject.[0].heeftBsnVoor.bronwaarde',
+            'sjt_heeft_kvknummer_voor': 'betrokkenBijAppartementsrechtsplitsingVve.[0].heeftKvknummerVoor.bronwaarde',
             'sjt_voornamen': 'vanKadastraalsubject.[0].voornamen',
             'sjt_voorvoegsels': 'vanKadastraalsubject.[0].voorvoegsels',
             'sjt_geslachtsnaam': 'vanKadastraalsubject.[0].geslachtsnaam',
@@ -739,6 +739,41 @@ class KadastraleobjectenExportConfig:
             }
           }
         }
+        heeftEenRelatieMetVerblijfsobject {
+          edges {
+            node {
+              identificatie
+              bronwaarde
+              status
+              broninfo
+                heeftHoofdadres {
+                edges {
+                  node {
+                    identificatie
+                    ligtAanOpenbareruimte {
+                      edges {
+                        node {
+                          naam
+                        }
+                      }
+                    }
+                    huisnummer
+                    huisletter
+                    huisnummertoevoeging
+                    postcode
+                    ligtInWoonplaats {
+                      edges {
+                        node {
+                          naam
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -1070,11 +1105,11 @@ class KadastraleobjectenExportConfig:
                 'query': gperc_query,
                 'match_attributes': ['identificatie', 'volgnummer'],
                 'row_formatter': csv_format.row_formatter,
-                'secure': True,
+                'secure_user': 'gob',
             },
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'query': csv_query,
             'filename': lambda: brk_filename('kadastraal_object'),
             'mime_type': 'plain/text',
@@ -1083,7 +1118,7 @@ class KadastraleobjectenExportConfig:
         },
         'kot_esri_actueel': {
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'exporter': esri_exporter,
             'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shp',
             'mime_type': 'application/octet-stream',
@@ -1107,7 +1142,7 @@ class KadastraleobjectenExportConfig:
         },
         'kot_esri_actueel_no_subjects': {
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'exporter': esri_exporter,
             'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shp',
             'mime_type': 'application/octet-stream',
@@ -1129,19 +1164,12 @@ class KadastraleobjectenExportConfig:
             'query': esri_query,
         },
         'kot_dia_csv': {
-            'merge_result': {
-                'api_type': 'graphql_streaming',
-                'attributes': ['isOntstaanUitGPerceel'],
-                'query': gperc_query,
-                'match_attributes': ['identificatie', 'volgnummer'],
-                'row_formatter': csv_dia_format.row_formatter,
-                'secure': True,
-            },
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'encryption_key': 'dia',
+            'secure_user': 'dia',
             'query': dia_query,
-            'filename': lambda: brk_filename('dia_export_kadastraal_object'),
+            'filename': lambda: brk_filename('dia_export_kadastraal_object', 'dia_csv'),
             'mime_type': 'plain/text',
             'format': csv_dia_format.get_format(),
             'sort': sort,
@@ -1149,7 +1177,7 @@ class KadastraleobjectenExportConfig:
         'bijpijling_shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'filename': lambda: brk_filename('bijpijling', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('bijpijlingGeometrie'),
@@ -1189,7 +1217,7 @@ class KadastraleobjectenExportConfig:
         'perceel_shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'filename': lambda: brk_filename('perceelnummer', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('plaatscoordinaten'),
@@ -1219,7 +1247,7 @@ class KadastraleobjectenExportConfig:
                 VotFilter(),
             ],
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'unfold': True,
             'query': brk_bag_query,
             'filename': lambda: brk_filename("BRK_BAG"),

@@ -24,7 +24,7 @@ class GemeentesExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql',
-            'secure': True,
+            'secure_user': 'gob',
             'query': query,
             'filename': lambda: brk_filename('Gemeente', type='csv'),
             'mime_type': 'plain/text',
@@ -41,7 +41,7 @@ class GemeentesExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql',
-            'secure': True,
+            'secure_user': 'gob',
             'filename': f'{brk_directory("shp")}/{shp_filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {

@@ -3,6 +3,7 @@ from gobexport.api import API
 from gobexport.exporter.config import bag, brk, bgt, gebieden, meetbouten, nap, test, wkpb
 from gobexport.exporter.config.bag_diva import add_bag_diva_products
 from gobexport.exporter.config.gebieden_uva2 import add_gebieden_uva2_products
+from gobexport.exporter.encryption import encrypt_file
 from gobexport.graphql import GraphQL
 from gobexport.graphql_streaming import GraphQLStreaming
 from gobexport.buffered_iterable import BufferedIterable
@@ -74,20 +75,19 @@ def product_source(product):
 
 def _init_api(product: dict, host: str, catalogue: str, collection: str):
     unfold = product.get('unfold', False)
+    secure_user = product.get('secure_user')
 
     if product.get('api_type') == 'graphql':
         # Use GraphQL
         query = product['query']
         expand_history = product.get('expand_history')
         sort = product.get('sort')
-        secure = product.get('secure', False)
-        api = GraphQL(host, query, catalogue, collection, expand_history, sort=sort, unfold=unfold, secure=secure,
-                      row_formatter=product.get('row_formatter'),
+        api = GraphQL(host, query, catalogue, collection, expand_history, sort=sort, unfold=unfold,
+                      secure_user=secure_user, row_formatter=product.get('row_formatter'),
                       cross_relations=product.get('cross_relations', False))
     elif product.get('api_type') == 'graphql_streaming':
         query = product['query']
-        secure = product.get('secure', False)
-        api = GraphQLStreaming(host, query, unfold=unfold, sort=product.get('sort'), secure=secure,
+        api = GraphQLStreaming(host, query, unfold=unfold, sort=product.get('sort'), secure_user=secure_user,
                                row_formatter=product.get('row_formatter'),
                                cross_relations=product.get('cross_relations', False),
                                batch_size=product.get('batch_size'))
@@ -97,7 +97,7 @@ def _init_api(product: dict, host: str, catalogue: str, collection: str):
     else:
         # Use the REST API
         endpoint = product.get('endpoint')
-        api = API(host=host, path=endpoint, row_formatter=product.get('row_formatter'))
+        api = API(host=host, path=endpoint, row_formatter=product.get('row_formatter'), secure_user=secure_user)
 
     if product.get('merge_result'):
         # A secondary API is defined. Return a new MergedAPI object that combines the results from both API's.
@@ -136,6 +136,9 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
     row_count = exporter(buffered_api, file, format,
                          append=product.get('append', False) and product['append_to_filename'],
                          **kwargs)
+
+    if product.get('encryption_key'):
+        encrypt_file(file, product.get('encryption_key'))
 
     # Reset the entity filter(s)
     if filter:
