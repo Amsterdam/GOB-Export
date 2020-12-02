@@ -29,6 +29,10 @@ FILE_TYPE_MAPPING = {
         'dir': 'SHP_Actueel',
         'extension': 'prj'
     },
+    'dia_csv': {
+        'dir': 'DIA_Export',
+        'extension': 'csv'
+    },
 }
 
 
