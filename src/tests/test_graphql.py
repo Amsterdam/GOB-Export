@@ -124,7 +124,7 @@ class TestGraphQl(TestCase):
         api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen')
         self.assertEqual(api.url, f'host{GRAPHQL_PUBLIC_ENDPOINT}')
 
-        api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', secure=True)
+        api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', secure_user='any user')
         self.assertEqual(api.url, f'host{GRAPHQL_SECURE_ENDPOINT}')
 
     @patch("gobexport.graphql.requests.post")

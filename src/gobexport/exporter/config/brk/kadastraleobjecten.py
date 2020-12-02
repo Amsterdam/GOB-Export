@@ -1105,11 +1105,11 @@ class KadastraleobjectenExportConfig:
                 'query': gperc_query,
                 'match_attributes': ['identificatie', 'volgnummer'],
                 'row_formatter': csv_format.row_formatter,
-                'secure': True,
+                'secure_user': 'gob',
             },
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'query': csv_query,
             'filename': lambda: brk_filename('kadastraal_object'),
             'mime_type': 'plain/text',
@@ -1118,7 +1118,7 @@ class KadastraleobjectenExportConfig:
         },
         'kot_esri_actueel': {
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'exporter': esri_exporter,
             'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shp',
             'mime_type': 'application/octet-stream',
@@ -1142,7 +1142,7 @@ class KadastraleobjectenExportConfig:
         },
         'kot_esri_actueel_no_subjects': {
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'exporter': esri_exporter,
             'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shp',
             'mime_type': 'application/octet-stream',
@@ -1166,10 +1166,9 @@ class KadastraleobjectenExportConfig:
         'kot_dia_csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
             'encryption_key': 'dia',
+            'secure_user': 'dia',
             'query': dia_query,
-            'filename': lambda: brk_filename('dia_export_kadastraal_object'),
             'filename': lambda: brk_filename('dia_export_kadastraal_object', 'dia_csv'),
             'mime_type': 'plain/text',
             'format': csv_dia_format.get_format(),
@@ -1178,7 +1177,7 @@ class KadastraleobjectenExportConfig:
         'bijpijling_shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'filename': lambda: brk_filename('bijpijling', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('bijpijlingGeometrie'),
@@ -1218,7 +1217,7 @@ class KadastraleobjectenExportConfig:
         'perceel_shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'filename': lambda: brk_filename('perceelnummer', type='shp', append_date=False),
             'entity_filters': [
                 NotEmptyFilter('plaatscoordinaten'),
@@ -1248,7 +1247,7 @@ class KadastraleobjectenExportConfig:
                 VotFilter(),
             ],
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'unfold': True,
             'query': brk_bag_query,
             'filename': lambda: brk_filename("BRK_BAG"),

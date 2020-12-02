@@ -13,10 +13,12 @@ STREAMING_GRAPHQL_SECURE_ENDPOINT = f'{SECURE_URL}/graphql/streaming/'
 class GraphQLStreaming:
 
     def __init__(self, host, query, unfold=False, sort=None, row_formatter=None, cross_relations=False,
-                 batch_size=None, secure=False):
+                 batch_size=None, secure_user=None):
         self.host = host
         self.query = query
-        self.url = self.host + (STREAMING_GRAPHQL_SECURE_ENDPOINT if secure else STREAMING_GRAPHQL_PUBLIC_ENDPOINT)
+        self.secure_user = secure_user
+        self.url = self.host + (STREAMING_GRAPHQL_SECURE_ENDPOINT if self.secure_user
+                                else STREAMING_GRAPHQL_PUBLIC_ENDPOINT)
         self.batch_size = batch_size
 
         self.formatter = GraphQLResultFormatter(sort=sort, unfold=unfold, row_formatter=row_formatter,
@@ -25,7 +27,7 @@ class GraphQLStreaming:
         self.current_page = None
 
     def _execute_query(self, query):
-        yield from post_stream(self.url, {'query': query})
+        yield from post_stream(self.url, {'query': query}, secure_user=self.secure_user)
 
     def _query_all(self):
         """Query on the input query as is. Don't add pagination.

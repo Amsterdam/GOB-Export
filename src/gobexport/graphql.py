@@ -22,7 +22,7 @@ class GraphQL:
     sorter = None
 
     def __init__(self, host, query, catalogue, collection, expand_history=False, sort=None, unfold=False,
-                 row_formatter=None, cross_relations=False, secure=False):
+                 row_formatter=None, cross_relations=False, secure_user=None):
         """Constructor
 
         Lazy loading, Just register host and query and wait for the iterator to be called
@@ -34,7 +34,8 @@ class GraphQL:
         :param collection:
         """
         self.host = host
-        self.url = self.host + (GRAPHQL_SECURE_ENDPOINT if secure else GRAPHQL_PUBLIC_ENDPOINT)
+        self.secure_user = secure_user
+        self.url = self.host + (GRAPHQL_SECURE_ENDPOINT if self.secure_user else GRAPHQL_PUBLIC_ENDPOINT)
         self.catalogue = catalogue
         self.collection = collection
         self.schema_collection_name = f'{self.catalogue}{self.collection.title()}'
@@ -67,7 +68,7 @@ class GraphQL:
         while self.has_next_page:
             start = time.time()
             print(f"Request {num_records} rows...")
-            response = requests.post(self.url, json={'query': self.query})
+            response = requests.post(self.url, json={'query': self.query}, secure_user=self.secure_user)
             end = time.time()
             duration = round(end - start, 2)
             # Adjust number of records to get to the target duration
