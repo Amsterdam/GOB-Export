@@ -23,6 +23,9 @@ COPY gobexport gobexport
 # Copy sftp test
 COPY sftp sftp
 
+# Copy public keys
+COPY keys/*.pub /keys/
+
 # Copy tests
 COPY tests tests
 COPY .flake8 .flake8
