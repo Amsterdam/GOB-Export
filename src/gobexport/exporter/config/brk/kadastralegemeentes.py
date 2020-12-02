@@ -36,7 +36,7 @@ class KadastraleGemeentecodesExportConfig:
         'shape': {
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'filename': f'{brk_directory("shp")}/{filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {

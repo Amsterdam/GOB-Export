@@ -4,19 +4,18 @@ from gobexport.keycloak import get_credentials, refresh_credentials, get_secure_
 
 
 @mock.patch('gobexport.keycloak.OIDC_TOKEN_ENDPOINT', "any keycloak url")
-@mock.patch('gobexport.keycloak.OIDC_CLIENT_ID', "any keycloak client id")
-@mock.patch('gobexport.keycloak.OIDC_CLIENT_SECRET', "any keycloak secret")
+@mock.patch('gobexport.keycloak.get_oidc_client', lambda x: {'id': f'{x}_id', 'secret': f'{x}_secret'})
 class TestKeycloak(TestCase):
 
     @mock.patch('gobexport.keycloak.requests.post')
     def test_get_credentials(self, mock_post):
-        credentials = get_credentials()
+        credentials = get_credentials('any secure user')
 
         mock_post.assert_called_with(
             data={
                 'grant_type': 'client_credentials',
-                'client_id': 'any keycloak client id',
-                'client_secret': 'any keycloak secret'
+                'client_id': 'any secure user_id',
+                'client_secret': 'any secure user_secret'
             },
             headers={
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -29,12 +28,12 @@ class TestKeycloak(TestCase):
         credentials = {
             'refresh_token': "any refresh token"
         }
-        credentials = refresh_credentials(credentials)
+        credentials = refresh_credentials(credentials, 'any secure user')
         mock_post.assert_called_with(
             data={
                 'grant_type': 'refresh_token',
-                'client_id': 'any keycloak client id',
-                'client_secret': 'any keycloak secret',
+                'client_id': 'any secure user_id',
+                'client_secret': 'any secure user_secret',
                 'refresh_token': 'any refresh token'
             },
             headers={
@@ -49,4 +48,4 @@ class TestKeycloak(TestCase):
             'access_token': "any access token",
             'token_type': "any token type"
         }
-        self.assertEqual(get_secure_header(), {'Authorization': 'any token type any access token'})
+        self.assertEqual(get_secure_header('any secure user'), {'Authorization': 'any token type any access token'})

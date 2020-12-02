@@ -156,7 +156,7 @@ class StukdelenExportConfig:
         'csv_tng': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'batch_size': 10000,
             'unfold': True,
             'query': query_tng,
@@ -170,7 +170,7 @@ class StukdelenExportConfig:
         'csv_art': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'batch_size': 10000,
             'unfold': True,
             'query': query_art,
@@ -187,7 +187,7 @@ class StukdelenExportConfig:
         'csv_akt': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'batch_size': 10000,
             'unfold': True,
             'query': query_akt,
@@ -204,7 +204,7 @@ class StukdelenExportConfig:
         'csv_zrt': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'batch_size': 10000,
             'unfold': True,
             'append': True,

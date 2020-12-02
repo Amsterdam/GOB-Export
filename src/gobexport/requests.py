@@ -59,19 +59,21 @@ def _exec(method, url, headers, **kwargs):
     raise APIException(f"Request '{request}' failed, tried {n_tries} times")
 
 
-def _updated_headers(url, headers=None):
+def _updated_headers(url, headers=None, secure_user=None):
     if _SECURE_URL in url:
         headers = headers or {}
-        headers.update(get_secure_header())
+        headers.update(get_secure_header(secure_user))
     return headers
 
 
-def get(url):
-    return _exec(requests.get, url=url, headers=_updated_headers(url), timeout=_REQUEST_TIMEOUT)
+def get(url, secure_user=None):
+    return _exec(requests.get, url=url, headers=_updated_headers(url, secure_user=secure_user),
+                 timeout=_REQUEST_TIMEOUT)
 
 
-def post(url, json):
-    return _exec(requests.post, url=url, headers=_updated_headers(url), json=json, timeout=_REQUEST_TIMEOUT)
+def post(url, json, secure_user=None):
+    return _exec(requests.post, url=url, headers=_updated_headers(url, secure_user=secure_user), json=json,
+                 timeout=_REQUEST_TIMEOUT)
 
 
 def handle_streaming_gob_response(func):
@@ -97,11 +99,12 @@ def handle_streaming_gob_response(func):
 
 
 @handle_streaming_gob_response
-def get_stream(url):
+def get_stream(url, secure_user=None):
 
     result = None
     try:
-        result = requests.get(url=url, headers=_updated_headers(url, Worker.headers), stream=True)
+        result = requests.get(url=url, headers=_updated_headers(url, Worker.headers, secure_user=secure_user),
+                              stream=True)
         result.raise_for_status()
         result = Worker.handle_response(result)
     except requests.exceptions.RequestException as e:
@@ -110,11 +113,12 @@ def get_stream(url):
 
 
 @handle_streaming_gob_response
-def post_stream(url, json, **kwargs):
+def post_stream(url, json, secure_user=None, **kwargs):
 
     result = None
     try:
-        result = requests.post(url, headers=_updated_headers(url, Worker.headers), stream=True, json=json, **kwargs)
+        result = requests.post(url, headers=_updated_headers(url, Worker.headers, secure_user),
+                               stream=True, json=json, **kwargs)
         result.raise_for_status()
         result = Worker.handle_response(result)
     except requests.exceptions.RequestException as e:

@@ -508,7 +508,7 @@ class ZakelijkerechtenExportConfig:
         'csv': {
             'exporter': csv_exporter,
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'unfold': True,
             'row_formatter': format.row_formatter,
             'entity_filters': [

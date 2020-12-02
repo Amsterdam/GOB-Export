@@ -1,6 +1,6 @@
 import requests
 
-from gobexport.config import OIDC_TOKEN_ENDPOINT, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET
+from gobexport.config import OIDC_TOKEN_ENDPOINT, get_oidc_client
 from gobexport.credential_store import CredentialStore
 
 _ACCESS_TOKEN = "access_token"
@@ -9,7 +9,7 @@ _TOKEN_TYPE = "token_type"
 _credential_store = None
 
 
-def _init_credential_store():
+def _init_credential_store(secure_user):
     """
     Initialize the Credential Store
 
@@ -18,22 +18,24 @@ def _init_credential_store():
     global _credential_store
 
     if not _credential_store:
-        _credential_store = CredentialStore(get_credentials=get_credentials, refresh_credentials=refresh_credentials)
+        _credential_store = CredentialStore(get_credentials=get_credentials, refresh_credentials=refresh_credentials,
+                                            secure_user=secure_user)
 
 
-def get_secure_header():
+def get_secure_header(secure_user):
     """
     Get the request header to access secure endpoints
 
     """
-    _init_credential_store()
+    assert secure_user, "A secure_user must be defined to request a secure url"
+    _init_credential_store(secure_user)
     credentials = _credential_store.get_credentials()
     return {
         'Authorization': f"{credentials[_TOKEN_TYPE]} {credentials[_ACCESS_TOKEN]}"
     }
 
 
-def get_credentials():
+def get_credentials(secure_user):
     """
     Get Keycloak credentials
 
@@ -44,10 +46,13 @@ def get_credentials():
     refresh_expires_in: number of seconds that the refresh token remains valid (normally 1800 seconds)
     token_type:         token type to set in the Authorization header
     """
+    assert secure_user, "A secure user is needed to get the client id and secret"
+    oidc_client = get_oidc_client(secure_user)
+
     data = {
         'grant_type': "client_credentials",
-        'client_id': OIDC_CLIENT_ID,
-        'client_secret': OIDC_CLIENT_SECRET
+        'client_id': oidc_client.get('id'),
+        'client_secret': oidc_client.get('secret')
     }
     headers = {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -57,15 +62,17 @@ def get_credentials():
     return result.json()
 
 
-def refresh_credentials(credentials):
+def refresh_credentials(credentials, secure_user):
     """
     Refresh Keycloak credentials
 
     """
+    oidc_client = get_oidc_client(secure_user)
+
     data = {
         'grant_type': "refresh_token",
-        'client_id': OIDC_CLIENT_ID,
-        'client_secret': OIDC_CLIENT_SECRET,
+        'client_id': oidc_client.get('id'),
+        'client_secret': oidc_client.get('secret'),
         'refresh_token': credentials['refresh_token']
     }
     headers = {

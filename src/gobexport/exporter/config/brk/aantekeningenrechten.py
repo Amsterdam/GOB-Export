@@ -167,7 +167,7 @@ class AantekeningenrechtenExportConfig:
     products = {
         'csv_art': {
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'unfold': True,
             'cross_relations': True,
             'entity_filters': [
@@ -182,7 +182,7 @@ class AantekeningenrechtenExportConfig:
         },
         'csv_akt': {
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'gob',
             'unfold': True,
             'entity_filters': [
                 NotEmptyFilter('heeftBetrekkingOpKadastraalObject.[0].identificatie'),

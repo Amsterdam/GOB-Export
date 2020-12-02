@@ -33,8 +33,6 @@ CONTAINER_BASE = os.getenv('CONTAINER_BASE', 'development')
 EXPORT_DIR = "_tmp"
 
 OIDC_TOKEN_ENDPOINT = os.getenv("OIDC_TOKEN_ENDPOINT")
-OIDC_CLIENT_ID = os.getenv("OIDC_CLIENT_ID")
-OIDC_CLIENT_SECRET = os.getenv("OIDC_CLIENT_SECRET")
 
 # Definition of URLs for public and secure endpoints
 PUBLIC_URL = '/gob'
@@ -53,6 +51,18 @@ def get_host():
     :return: The API host to get the collection from
     """
     return os.getenv('API_HOST', _DEFAULT_API_HOST)
+
+
+def get_oidc_client(client_name):
+    """Get the OIDC client id and secret
+
+    :return:
+    """
+    client_name = client_name.upper()
+    return {
+        'id': _getenv(f'OIDC_CLIENT_ID_{client_name}'),
+        'secret': _getenv(f'OIDC_CLIENT_SECRET_{client_name}'),
+    }
 
 
 def get_public_key(key_name):

@@ -4,7 +4,7 @@ import os
 import unittest
 from unittest import mock
 
-from gobexport.config import _getenv, get_public_key
+from gobexport.config import _getenv, get_public_key, get_oidc_client
 
 class MockArgumentParser:
 
@@ -78,3 +78,9 @@ class TestConfig(unittest.TestCase):
         get_public_key("value")
 
         mock_getenv.assert_called_with('PUBLIC_KEY_VALUE')
+
+    @mock.patch("gobexport.config._getenv")
+    def test_get_oidc_client(self, mock_getenv):
+        get_oidc_client("value")
+
+        mock_getenv.has_calls(['OIDC_CLIENT_ID_VALUE', 'OIDC_CLIENT_SECRET_VALUE'])

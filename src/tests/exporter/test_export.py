@@ -23,7 +23,7 @@ objectstore_records = [{'Code': '1', 'Omschrijving': 'Code 1'}]
 
 
 class MockAPI:
-    def __init__(self, host=None, path=None, row_formatter=None):
+    def __init__(self, host=None, path=None, row_formatter=None, secure_user=None):
         pass
 
     def __iter__(self):
@@ -34,7 +34,7 @@ class MockAPI:
 
 class MockGraphQL:
     def __init__(self, host=None, query=None, catalogue=None, collection=None, expand_history=None, sort=None,
-                 unfold=False, row_formatter=None, cross_relations=False, batch_size=None, secure=False):
+                 unfold=False, row_formatter=None, cross_relations=False, batch_size=None, secure_user=None):
         pass
 
     def __iter__(self):
@@ -181,14 +181,15 @@ class TestExportToFile(TestCase):
 
         product = {
             'api_type': 'graphql_streaming',
-            'secure': True,
+            'secure_user': 'any secure user',
             'query': 'some query',
             'exporter': MagicMock(),
             'format': 'the format',
         }
         result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
         mock_graphql_streaming.assert_called_with('host', product['query'], row_formatter=None, sort=None,
-                                                  unfold=False, cross_relations=False, batch_size=None, secure=True)
+                                                  unfold=False, cross_relations=False, batch_size=None,
+                                                  secure_user='any secure user')
 
         mock_buffered_iterable.assert_called_with(mock_graphql_streaming.return_value, 'source', buffer_items=False)
         product['exporter'].assert_called_with(mock_buffered_iterable.return_value, 'file', 'the format',
@@ -211,7 +212,8 @@ class TestExportToFile(TestCase):
         }
         result = export_to_file('host', product, 'file', 'catalogue', 'collection', False)
         mock_graphql_streaming.assert_called_with('host', product['query'], unfold='true_or_false', sort='sorter',
-                                                  row_formatter='row_form', cross_relations=False, batch_size=None, secure=False)
+                                                  row_formatter='row_form', cross_relations=False, batch_size=None,
+                                                  secure_user=None)
 
     @patch("gobexport.exporter.GraphQLStreaming")
     @patch("gobexport.exporter.BufferedIterable")
