@@ -203,6 +203,7 @@ class KadastralesubjectenExportConfig:
     products = {
         'csv': {
             'endpoint': '/gob/secure/brk/kadastralesubjecten/?view=enhanced&ndjson=true',
+            'secure_user': 'gob',
             'exporter': csv_exporter,
             'filename': lambda: brk_filename("kadastraal_subject"),
             'mime_type': 'plain/text',
