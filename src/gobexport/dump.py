@@ -14,6 +14,7 @@ from gobexport.keycloak import get_secure_header
 from gobexport.requests import get
 
 ANALYSE_DB_DATASTORE_ID = 'GOBAnalyse'
+SECURE_USER = 'gob'
 
 
 class Dumper():
@@ -59,7 +60,7 @@ class Dumper():
         :return:
         """
         url = f"{self.dump_api}/{catalog_name}/"
-        result = get(url).json()
+        result = get(url, secure_user=SECURE_USER).json()
         catalog = {key: value for key, value in result.items() if key not in ['_links', '_embedded']}
         collections = result['_embedded']['collections']
         return catalog, collections
@@ -73,7 +74,7 @@ class Dumper():
         :return:
         """
         url = f"{self.dump_api}/rel/"
-        result = get(url).json()
+        result = get(url, secure_user=SECURE_USER).json()
         abbreviation = f"{catalog['abbreviation']}_{collection['abbreviation']}".lower()
         relations = result['_embedded']['collections']
         return [collection for collection in relations if collection['name'].startswith(abbreviation)]
