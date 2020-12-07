@@ -15,6 +15,7 @@ class TestEntityExportConfig:
         },
         'sec': {
             'exporter': ndjson_exporter,
+            'secure_user': 'gob',
             'endpoint': '/gob/secure/test_catalogue/secure/',
             'filename': 'test_secure.ndjson',
             'mime_type': 'application/x-ndjson',
