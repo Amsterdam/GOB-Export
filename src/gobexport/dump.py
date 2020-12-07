@@ -49,7 +49,7 @@ class Dumper():
         """
         headers = headers or {}
         if SECURE_URL in url:
-            headers.update(get_secure_header())
+            headers.update(get_secure_header(SECURE_USER))
         return headers
 
     def get_catalog_collections(self, catalog_name):
