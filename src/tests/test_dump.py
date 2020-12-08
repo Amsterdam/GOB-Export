@@ -6,7 +6,8 @@ from gobexport.dump import Dumper
 @patch('gobexport.dump.PUBLIC_URL', "public_url")
 @patch('gobexport.dump.SECURE_URL', "secure_url")
 @patch('gobexport.dump.get_host', lambda : "host/")
-@patch('gobexport.dump.get_secure_header', lambda : {'secure': "header"})
+@patch('gobexport.dump.get_secure_header', lambda x: {'secure user': x})
+@patch('gobexport.dump.SECURE_USER', "any secure user")
 @patch('gobexport.dump.logger', MagicMock())
 @patch('gobexport.dump.get_datastore_config', lambda x: {'datastore': 'config'} if x == 'GOBAnalyse' else None)
 class TestDumper(TestCase):
@@ -19,7 +20,7 @@ class TestDumper(TestCase):
     def test_update_headers_secure(self):
         dumper = Dumper()
         result = dumper.update_headers("secure_url")
-        self.assertEqual(result, {'secure': "header"})
+        self.assertEqual(result, {'secure user': "any secure user"})
 
     def test_update_headers_public(self):
         dumper = Dumper()
@@ -128,7 +129,7 @@ class TestDumper(TestCase):
                 "include_relations": False,
                 "force_full": False,
             },
-            headers={'Content-Type': 'application/json', 'secure': 'header'},
+            headers={'Content-Type': 'application/json', 'secure user': 'any secure user'},
             stream=True,
         )
 
@@ -144,6 +145,6 @@ class TestDumper(TestCase):
                 "include_relations": False,
                 "force_full": True,
             },
-            headers={'Content-Type': 'application/json', 'secure': 'header'},
+            headers={'Content-Type': 'application/json', 'secure user': 'any secure user'},
             stream=True,
         )
