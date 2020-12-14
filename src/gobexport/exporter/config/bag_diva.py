@@ -259,7 +259,7 @@ def row_formatter_verblijfsobjecten(row):
         node = row  # export via enhanced views
 
     # Get the first gebruiksdoel, sorted by code
-    sorted_gebruiksdoel = sorted(node['gebruiksdoel'], key=lambda i: int(i.get('code', 0)]))
+    sorted_gebruiksdoel = sorted(node['gebruiksdoel'], key=lambda i: int(i.get('code', 0)))
     gebruiksdoel = sorted_gebruiksdoel[0]['omschrijving']
 
     # Overwrite if we have a woonfunctie or gezondheidszorgfunctie
