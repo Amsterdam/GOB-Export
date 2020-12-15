@@ -35,8 +35,8 @@ EXPORT_DIR = "_tmp"
 OIDC_TOKEN_ENDPOINT = os.getenv("OIDC_TOKEN_ENDPOINT")
 
 # Definition of URLs for public and secure endpoints
-PUBLIC_URL = '/gob'
-SECURE_URL = '/gob/secure'
+PUBLIC_URL = '/gob/public'
+SECURE_URL = '/gob'
 
 GOB_OBJECTSTORE = 'GOBObjectstore'
 BASISINFORMATIE_OBJECTSTORE = 'Basisinformatie'
