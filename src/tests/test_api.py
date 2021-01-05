@@ -5,6 +5,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from gobexport.api import API
+from gobexport.requests import PUBLIC_URL
 
 
 next = None
@@ -45,18 +46,18 @@ def test_api(monkeypatch):
 
     from gobexport.api import API
 
-    api = API('host', 'path')
+    api = API(f'host/{PUBLIC_URL}/', 'path')
     for e in api:
         assert(e is not None)
 
     monkeypatch.setattr(requests, 'get', mock_get(ok=False))
     with pytest.raises(AssertionError):
-        api = API('host', 'path')
+        api = API(f'host/{PUBLIC_URL}/', 'path')
         for e in api:
             assert(e is not None)
 
     monkeypatch.setattr(requests, 'get', mock_get(ok=True, results=[1, 2, 3]))
-    api = API('host', 'path')
+    api = API(f'host/{PUBLIC_URL}/', 'path')
     cnt = 0
     for e in api:
         cnt += 1
@@ -64,13 +65,13 @@ def test_api(monkeypatch):
 
     global next
     next = 'has next'
-    api = API('host', 'path')
+    api = API(f'host/{PUBLIC_URL}/', 'path')
     cnt = 0
     for e in api:
         cnt += 1
     assert(cnt == 6)
 
-    assert(str(api) == 'API hostNone')
+    assert(str(api) == f'API host/{PUBLIC_URL}/None')
 
 class TestStream(TestCase):
 

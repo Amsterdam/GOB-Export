@@ -3,7 +3,7 @@ import time
 
 import urllib.request
 
-from gobexport.config import SECURE_URL
+from gobexport.config import PUBLIC_URL
 from gobexport.keycloak import get_secure_header
 from gobexport.worker import Worker
 
@@ -16,8 +16,8 @@ _RETRY_TIMEOUT = 60            # Seconds between consecetive retries
 # - the time it will wait on a response once your client has established a connection
 _REQUEST_TIMEOUT = (60, 7200)  # Request timout to 60 seconds to connect and 2 hours for the data
 
-# String that identifies a secure GOB url. If an url contains this string it is the url of a secure endpoint
-_SECURE_URL = f'{SECURE_URL}/'
+# String that identifies a public GOB url. If an url contains this string it is the url of a public endpoint
+_PUBLIC_URL = f'{PUBLIC_URL}/'
 
 
 class APIException(IOError):
@@ -60,7 +60,7 @@ def _exec(method, url, headers, **kwargs):
 
 
 def _updated_headers(url, headers=None, secure_user=None):
-    if _SECURE_URL in url:
+    if _PUBLIC_URL not in url:
         headers = headers or {}
         headers.update(get_secure_header(secure_user))
     return headers
