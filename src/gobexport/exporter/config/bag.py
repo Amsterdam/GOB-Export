@@ -573,14 +573,14 @@ class NummeraanduidingenExportConfig:
 
     products = {
         'csv_actueel': {
-            'endpoint': '/gob/bag/nummeraanduidingen/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/public/bag/nummeraanduidingen/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_nummeraanduiding_Actueel.csv',
             'mime_type': 'plain/text',
             'format': format.get_format(),
         },
         'csv_history': {
-            'endpoint': '/gob/bag/nummeraanduidingen/?view=enhanced_history&ndjson=true',
+            'endpoint': '/gob/public/bag/nummeraanduidingen/?view=enhanced_history&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/BAG_nummeraanduiding_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -786,14 +786,14 @@ class VerblijfsobjectenExportConfig:
 
     products = {
         'csv_actueel': {
-            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/public/bag/verblijfsobjecten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_verblijfsobject_Actueel.csv',
             'mime_type': 'plain/text',
             'format': format.get_format(),
         },
         'esri_actueel': {
-            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/public/bag/verblijfsobjecten/?view=enhanced&ndjson=true',
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_verblijfsobject.shp',
             'mime_type': 'application/octet-stream',
@@ -814,7 +814,7 @@ class VerblijfsobjectenExportConfig:
             ],
         },
         'csv_history': {
-            'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced_history&ndjson=true',
+            'endpoint': '/gob/public/bag/verblijfsobjecten/?view=enhanced_history&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/BAG_verblijfsobject_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -1857,14 +1857,14 @@ class PandenExportConfig:
 
     products = {
         'csv_actueel': {
-            'endpoint': '/gob/bag/panden/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/public/bag/panden/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_pand_Actueel.csv',
             'mime_type': 'plain/text',
             'format': format.get_format(),
         },
         'esri_actueel': {
-            'endpoint': '/gob/bag/panden/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/public/bag/panden/?view=enhanced&ndjson=true',
             'exporter': esri_exporter,
             'filename': 'SHP/BAG_pand.shp',
             'mime_type': 'application/octet-stream',
@@ -1885,7 +1885,7 @@ class PandenExportConfig:
             ],
         },
         'csv_history': {
-            'endpoint': '/gob/bag/panden/?view=enhanced_history&ndjson=true',
+            'endpoint': '/gob/public/bag/panden/?view=enhanced_history&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/BAG_pand_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',
@@ -1899,7 +1899,7 @@ class BrondocumentenExportConfig:
 
     products = {
         'csv_actueel': {
-            'endpoint': '/gob/bag/brondocumenten/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/public/bag/brondocumenten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/BAG_brondocument_Actueel.csv',
             'mime_type': 'plain/text',
@@ -1913,7 +1913,7 @@ class BrondocumentenExportConfig:
             }
         },
         'csv_history': {
-            'endpoint': '/gob/bag/brondocumenten/?view=enhanced_history&ndjson=true',
+            'endpoint': '/gob/public/bag/brondocumenten/?view=enhanced_history&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_ActueelEnHistorie/BAG_brondocument_ActueelEnHistorie.csv',
             'mime_type': 'plain/text',

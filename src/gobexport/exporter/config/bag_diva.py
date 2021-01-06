@@ -1109,7 +1109,7 @@ def _add_ligplaatsen_diva_config():
 
     # ADRESOBJECT
     bag.LigplaatsenExportConfig.products['uva2_adresobject'] = {
-        'endpoint': '/gob/bag/ligplaatsen/?view=enhanced_uva2&ndjson=true',
+        'endpoint': '/gob/public/bag/ligplaatsen/?view=enhanced_uva2&ndjson=true',
         'exporter': uva2_exporter,
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
@@ -1508,7 +1508,7 @@ def _add_standplaatsen_diva_config():
 
     # ADRESOBJECT
     bag.StandplaatsenExportConfig.products['uva2_adresobject'] = {
-        'endpoint': '/gob/bag/standplaatsen/?view=enhanced_uva2&ndjson=true',
+        'endpoint': '/gob/public/bag/standplaatsen/?view=enhanced_uva2&ndjson=true',
         'exporter': uva2_exporter,
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),
@@ -2128,7 +2128,7 @@ def _add_verblijfsobjecten_diva_config():
 
     # ADRESOBJECT
     bag.VerblijfsobjectenExportConfig.products['uva2_adresobject'] = {
-        'endpoint': '/gob/bag/verblijfsobjecten/?view=enhanced_uva2&ndjson=true',
+        'endpoint': '/gob/public/bag/verblijfsobjecten/?view=enhanced_uva2&ndjson=true',
         'exporter': uva2_exporter,
         'entity_filters': [
             NotEmptyFilter('amsterdamseSleutel'),

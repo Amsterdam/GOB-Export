@@ -37,7 +37,7 @@ FILE_TYPE_MAPPING = {
 
 
 def _get_filename_date():
-    response = requests.get(f"{get_host()}/gob/brk/meta/1")
+    response = requests.get(f"{get_host()}/gob/public/brk/meta/1")
 
     try:
         response.raise_for_status()

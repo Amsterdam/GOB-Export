@@ -51,7 +51,7 @@ class BeperkingenExportConfig:
 
     products = {
         'csv_actueel': {
-            'endpoint': '/gob/wkpb/beperkingen/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/public/wkpb/beperkingen/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/WKPB_beperking.csv',
             'mime_type': 'plain/text',
@@ -93,7 +93,7 @@ class BeperkingenExportConfig:
             'query': query_orgaan
         },
         'csv_kadastraal_object': {
-            'endpoint': '/gob/wkpb/beperkingen/?view=kadastraalobject&ndjson=true',
+            'endpoint': '/gob/public/wkpb/beperkingen/?view=kadastraalobject&ndjson=true',
             'exporter': csv_exporter,
             'entity_filters': [
                 NotEmptyFilter('kadastraalObject'),
@@ -117,7 +117,7 @@ class BrondocumentenExportConfig:
 
     products = {
         'csv_actueel': {
-            'endpoint': '/gob/wkpb/brondocumenten/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/public/wkpb/brondocumenten/?view=enhanced&ndjson=true',
             'exporter': csv_exporter,
             'filename': 'CSV_Actueel/WKPB_brondocument.csv',
             'mime_type': 'plain/text',
