@@ -48,4 +48,5 @@ class TestKeycloak(TestCase):
             'access_token': "any access token",
             'token_type': "any token type"
         }
-        self.assertEqual(get_secure_header('any secure user'), {'Authorization': 'any token type any access token'})
+        # Token type should be capitalized
+        self.assertEqual(get_secure_header('any secure user'), {'Authorization': 'Any token type any access token'})

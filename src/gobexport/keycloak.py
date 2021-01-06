@@ -31,7 +31,7 @@ def get_secure_header(secure_user):
     _init_credential_store(secure_user)
     credentials = _credential_store.get_credentials()
     return {
-        'Authorization': f"{credentials[_TOKEN_TYPE]} {credentials[_ACCESS_TOKEN]}"
+        'Authorization': f"{credentials[_TOKEN_TYPE].capitalize()} {credentials[_ACCESS_TOKEN]}"
     }
 
 

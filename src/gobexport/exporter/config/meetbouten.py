@@ -104,7 +104,7 @@ class MetingenExportConfig:
 
     Example:
         metingid: 621:
-        http://localhost:5000/gob/meetbouten/metingen/621/
+        http://localhost:5000/gob/public/meetbouten/metingen/621/
         =>
         621|$$19561003$$|$$N$$|,9169|1|$$14481027$$|$$13688000$$|$$$$|$$$$|1,00901442307691|2,29999999999997
         |$$Fugro$$|3|274||$$K$$|$$W$$
@@ -177,7 +177,7 @@ class ReferentiepuntenExportConfig:
     """
     Example:
         referentiepuntid: 25280009:
-        http://localhost:5000/gob/meetbouten/referentiepunten/25280009/
+        http://localhost:5000/gob/public/meetbouten/referentiepunten/25280009/
         =>
         $$25280009$$|121155|489090|2,2005|$$19790101$$|$$Zoutkeetsgracht 2 hoek Bokkinghangen$$
         |POINT (121155.0 489090.0)
@@ -186,7 +186,7 @@ class ReferentiepuntenExportConfig:
     products = {
         'dat': {
             'exporter': dat_exporter,
-            'endpoint': '/gob/meetbouten/referentiepunten/?view=enhanced&ndjson=true',
+            'endpoint': '/gob/public/meetbouten/referentiepunten/?view=enhanced&ndjson=true',
             'filename': 'DAT/MBT_REFERENTIEPUNT.dat',
             'mime_type': 'plain/text',
             'format': 'identificatie:str|geometrie:coo:x|geometrie:coo:y|'
@@ -199,7 +199,7 @@ class RollagenExportConfig:
     """
     Example:
         rollaagid: AK25:
-        http://localhost:5000/gob/meetbouten/rollagen/AK25/
+        http://localhost:5000/gob/public/meetbouten/rollagen/AK25/
         =>
         $$AK25$$|1|121287|485235|POINT (121287.0 485245.0)
 
