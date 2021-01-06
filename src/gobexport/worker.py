@@ -11,6 +11,8 @@ class Worker():
     _WORKER_RESULT_OK = "OK"
     _WORKER_RESULT_FAILURE = "FAILURE"
 
+    _WORKER_API = f"{get_host()}/gob/public/worker"
+
     headers = {
         _WORKER_REQUEST: 'true'
     }
@@ -47,7 +49,7 @@ class Worker():
             print(f"Worker result {worker_id} OK")
             try:
                 # Request result
-                url = f"{get_host()}/gob/worker/{worker_id}"
+                url = f"{cls._WORKER_API}/{worker_id}"
                 result = requests.get(url=url, stream=True)
                 result.raise_for_status()
 
@@ -61,6 +63,6 @@ class Worker():
             finally:
                 # Always try to cleanup worker files (even if an exception has occurred)
                 print(f"Worker result {worker_id} clear...")
-                url = f"{get_host()}/gob/worker/end/{worker_id}"
+                url = f"{cls._WORKER_API}/end/{worker_id}"
                 result = requests.delete(url=url)
                 result.raise_for_status()
