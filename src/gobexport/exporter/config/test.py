@@ -8,7 +8,7 @@ class TestEntityExportConfig:
     products = {
         'dat': {
             'exporter': ndjson_exporter,
-            'endpoint': '/gob/test_catalogue/test_entity/',
+            'endpoint': '/gob/public/test_catalogue/test_entity/',
             'filename': 'test_output.ndjson',
             'mime_type': 'application/x-ndjson',
             'format': None
@@ -16,7 +16,7 @@ class TestEntityExportConfig:
         'sec': {
             'exporter': ndjson_exporter,
             'secure_user': 'gob',
-            'endpoint': '/gob/secure/test_catalogue/secure/',
+            'endpoint': '/gob/test_catalogue/secure/',
             'filename': 'test_secure.ndjson',
             'mime_type': 'application/x-ndjson',
             'format': None
