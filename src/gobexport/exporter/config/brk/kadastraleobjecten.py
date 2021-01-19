@@ -1173,6 +1173,7 @@ class KadastraleobjectenExportConfig:
             'mime_type': 'plain/text',
             'format': csv_dia_format.get_format(),
             'sort': sort,
+            'unfold': True,
         },
         'bijpijling_shape': {
             'exporter': esri_exporter,
