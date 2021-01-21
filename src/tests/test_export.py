@@ -76,7 +76,7 @@ class TestExport(TestCase):
         result = _export_collection("host", "gebieden", "stadsdelen", None, "Objectstore")
         self.assertEqual(result, None)
         mock_distribute.assert_called()
-        self.assertEqual(mock_distribute.call_count, 8)
+        self.assertEqual(mock_distribute.call_count, 6)
 
     @patch('gobexport.export.logger', mock.MagicMock())
     @patch('gobexport.export.time.sleep', lambda n: None)
