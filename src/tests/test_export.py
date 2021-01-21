@@ -16,6 +16,7 @@ from gobexport.export import (
     _append_to_file
 )
 
+
 def fail(msg):
     raise Exception(msg)
 
@@ -212,16 +213,24 @@ class TestExport(TestCase):
 
         mock_list.return_value = [{'name': '..f20201231..'}]
         cleanup_datefiles(connection, container, '..f20201231..')
+
         mock_list.assert_called_with(connection, container)
         mock_delete.assert_not_called()
 
-        mock_list.return_value = [{'name': name}
-            for name in ['..f20201229..', '..f20201230..', '..f20201231..']]
+        mock_list.return_value = [
+            {'name': name} for name in ['..f20201229..', '..f20201230..', '..f20201231..']
+        ]
+
         cleanup_datefiles(connection, container, '..f20201231..')
         mock_list.assert_called_with(connection, container)
-        calls = [call(connection, container, {'name': name})
-            for name in ['..f20201229..', '..f20201230..']]
+
+        calls = [call(connection, container, {'name': name}) for name in ['..f20201229..', '..f20201230..']]
         mock_delete.assert_has_calls(calls)
+
+        # cleanup_datefiles should not raise
+        mock_list.side_effect = Exception
+        mock_delete.side_effect = Exception
+        cleanup_datefiles(connection, container, 'any filename')
 
 
 @pytest.mark.parametrize(
