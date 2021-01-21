@@ -227,10 +227,13 @@ class TestExport(TestCase):
         calls = [call(connection, container, {'name': name}) for name in ['..f20201229..', '..f20201230..']]
         mock_delete.assert_has_calls(calls)
 
-        # cleanup_datefiles should not raise
-        mock_list.side_effect = Exception
-        mock_delete.side_effect = Exception
-        cleanup_datefiles(connection, container, 'any filename')
+        mock_list.return_value = 12  # raises TypeError, not iterable
+        result = cleanup_datefiles(connection, container, '..f20201231..')
+        self.assertEqual(result, None)
+
+        mock_list.return_value = [{'not_name': 12}]  # raises KeyError
+        result = cleanup_datefiles(connection, container, '..f20201231..')
+        self.assertEqual(result, None)
 
 
 @pytest.mark.parametrize(
