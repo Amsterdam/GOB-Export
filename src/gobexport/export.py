@@ -214,13 +214,10 @@ def cleanup_datefiles(connection, container, filename):
 
     logger.info(f'Clean previous files for {filename}.')
 
-    try:
-        for item in get_full_container_list(connection, container):
-            if re.match(cleanup_pattern, item['name']) and item['name'] != filename:
-                delete_object(connection, container, item)
-                logger.info(f'File {item["name"]} deleted.')
-    except (TypeError, KeyError):
-        pass
+    for item in get_full_container_list(connection, container):
+        if re.match(cleanup_pattern, item['name']) and item['name'] != filename:
+            delete_object(connection, container, item)
+            logger.info(f'File {item["name"]} deleted.')
 
 
 def get_cleanup_pattern(filename):

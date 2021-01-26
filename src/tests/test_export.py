@@ -16,7 +16,6 @@ from gobexport.export import (
     _append_to_file
 )
 
-
 def fail(msg):
     raise Exception(msg)
 
@@ -77,7 +76,7 @@ class TestExport(TestCase):
         result = _export_collection("host", "gebieden", "stadsdelen", None, "Objectstore")
         self.assertEqual(result, None)
         mock_distribute.assert_called()
-        self.assertEqual(mock_distribute.call_count, 6)
+        self.assertEqual(mock_distribute.call_count, 8)
 
     @patch('gobexport.export.logger', mock.MagicMock())
     @patch('gobexport.export.time.sleep', lambda n: None)
@@ -213,27 +212,16 @@ class TestExport(TestCase):
 
         mock_list.return_value = [{'name': '..f20201231..'}]
         cleanup_datefiles(connection, container, '..f20201231..')
-
         mock_list.assert_called_with(connection, container)
         mock_delete.assert_not_called()
 
-        mock_list.return_value = [
-            {'name': name} for name in ['..f20201229..', '..f20201230..', '..f20201231..']
-        ]
-
+        mock_list.return_value = [{'name': name}
+            for name in ['..f20201229..', '..f20201230..', '..f20201231..']]
         cleanup_datefiles(connection, container, '..f20201231..')
         mock_list.assert_called_with(connection, container)
-
-        calls = [call(connection, container, {'name': name}) for name in ['..f20201229..', '..f20201230..']]
+        calls = [call(connection, container, {'name': name})
+            for name in ['..f20201229..', '..f20201230..']]
         mock_delete.assert_has_calls(calls)
-
-        mock_list.return_value = 12  # raises TypeError, not iterable
-        result = cleanup_datefiles(connection, container, '..f20201231..')
-        self.assertEqual(result, None)
-
-        mock_list.return_value = [{'not_name': 12}]  # raises KeyError
-        result = cleanup_datefiles(connection, container, '..f20201231..')
-        self.assertEqual(result, None)
 
 
 @pytest.mark.parametrize(
