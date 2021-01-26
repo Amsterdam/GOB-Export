@@ -1,7 +1,6 @@
 from gobexport.api import API
 
 from gobexport.exporter.config import bag, brk, bgt, gebieden, meetbouten, nap, test, wkpb
-from gobexport.exporter.config.bag_diva import add_bag_diva_products
 from gobexport.exporter.encryption import encrypt_file
 from gobexport.graphql import GraphQL
 from gobexport.graphql_streaming import GraphQLStreaming
@@ -62,9 +61,6 @@ CONFIG_MAPPING = {
         'brondocumenten': wkpb.BrondocumentenExportConfig,
     }
 }
-
-# Add DIVA products to exports
-add_bag_diva_products()
 
 
 def product_source(product):
