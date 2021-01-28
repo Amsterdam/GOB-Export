@@ -927,6 +927,13 @@ class StandplaatsenExportConfig:
             }
           }
         }
+        invIsVerbondenMetStandplaatsWozWozdeelobjecten {
+          edges {
+            node {
+              soortobject
+            }
+          }
+        }
         status
         beginGeldigheid
         eindGeldigheid
@@ -1051,6 +1058,13 @@ class StandplaatsenExportConfig:
             }
           }
         }
+        invIsVerbondenMetStandplaatsWozWozdeelobjecten {
+          edges {
+            node {
+              soortobject
+            }
+          }
+        }
         status
         beginGeldigheid
         eindGeldigheid
@@ -1091,7 +1105,7 @@ class StandplaatsenExportConfig:
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.[0].identificatie',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': '',
+        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1146,7 +1160,7 @@ class StandplaatsenExportConfig:
         'gme_naam': 'ligtInGemeente.naam',
         'num_id_nvn': 'heeftNevenadres.identificatie',
         'status': 'status.omschrijving',
-        'soort_obj': '',
+        'soort_obj': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject',
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
         'docdatum': 'documentdatum',
@@ -1203,7 +1217,7 @@ class StandplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': '',
+        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
