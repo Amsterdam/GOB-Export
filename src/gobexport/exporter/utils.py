@@ -186,6 +186,8 @@ def _get_value_from_list(entity, key, default):
     If the key is an index, which is defined by an integer wrapped in
     brackets e.g. [1], we select a single value. Otherwise a pipe delimited
     string is returned.
+    If the list contains dict of dict, a remapped dict with unnested keys and
+    values as pipe delimited strings is returned.
     """
     # If we've received an specific index, try to get the value
     index = re.match(r'\[(\d+)\]', key)
@@ -196,8 +198,22 @@ def _get_value_from_list(entity, key, default):
         except IndexError:
             entity = default
     else:
-        # Return a pipe delimited string of the values by key
-        entity = '|'.join([str(d[key]) if d[key] else "" for d in entity if key in d])
+        if entity and isinstance(entity[0][key], dict):
+            # Un-nest keys in dict of dict and join values as string, separated by '|'
+
+            nested_objs = [ent[key] for ent in entity]
+            res = {new_key: [] for nested in nested_objs for new_key in nested}
+
+            for nested in nested_objs:
+                for new_key in res:
+                    value = nested[new_key]
+                    res[new_key].append(str(value))
+
+            entity = {new_key: '|'.join(res[new_key]) for new_key in res}
+
+        else:
+            # Return a pipe delimited string of the values by key
+            entity = '|'.join([str(d[key]) if d[key] else "" for d in entity if key in d])
 
     return entity
 

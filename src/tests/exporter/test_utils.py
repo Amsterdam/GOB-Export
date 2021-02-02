@@ -478,6 +478,12 @@ class TestUtils(TestCase):
         result = _get_value_from_list(entity, key, None)
         self.assertEqual('|keyC', result)
 
+        entity = [{"a": {"b": 1, "c": "12"}}, {"a": {"b": 2, "c": "13"}}]
+        key = 'a'
+        result = _get_value_from_list(entity, key, None)
+        self.assertEqual({'b': '1|2', 'c': '12|13'}, result)
+
+
 def foo(x):
     return x
 
