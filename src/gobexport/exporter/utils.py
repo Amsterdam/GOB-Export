@@ -198,7 +198,7 @@ def _get_value_from_list(entity, key, default):
         except IndexError:
             entity = default
     else:
-        if entity and isinstance(entity[0][key], dict):
+        if entity and key in entity[0] and isinstance(entity[0][key], dict):
             # Un-nest keys in dict of dict and join values as string, separated by '|'
 
             nested_objs = [ent[key] for ent in entity]
