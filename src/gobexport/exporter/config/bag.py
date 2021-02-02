@@ -1160,7 +1160,7 @@ class StandplaatsenExportConfig:
         'gme_naam': 'ligtInGemeente.naam',
         'num_id_nvn': 'heeftNevenadres.identificatie',
         'status': 'status.omschrijving',
-        'soort_obj': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject',
+        'soort_obj': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
         'docdatum': 'documentdatum',
@@ -1217,7 +1217,7 @@ class StandplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject',
+        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1258,36 +1258,36 @@ class StandplaatsenExportConfig:
             'format': format.get_format(),
             'query': query_actueel
         },
-        # 'esri_actueel': {
-        #     'api_type': 'graphql',
-        #     'exporter': esri_exporter,
-        #     'filename': 'SHP/BAG_standplaats.shp',
-        #     'mime_type': 'application/octet-stream',
-        #     'format': esri_format.get_format(),
-        #     'extra_files': [
-        #         {
-        #             'filename': 'SHP/BAG_standplaats.dbf',
-        #             'mime_type': 'application/octet-stream'
-        #         },
-        #         {
-        #             'filename': 'SHP/BAG_standplaats.shx',
-        #             'mime_type': 'application/octet-stream'
-        #         },
-        #         {
-        #             'filename': 'SHP/BAG_standplaats.prj',
-        #             'mime_type': 'application/octet-stream'
-        #         },
-        #     ],
-        #     'query': query_actueel
-        # },
-        # 'csv_history': {
-        #     'api_type': 'graphql',
-        #     'exporter': csv_exporter,
-        #     'filename': 'CSV_ActueelEnHistorie/BAG_standplaats_ActueelEnHistorie.csv',
-        #     'mime_type': 'plain/text',
-        #     'format': history_format.get_format(),
-        #     'query': query_history
-        # },
+        'esri_actueel': {
+            'api_type': 'graphql',
+            'exporter': esri_exporter,
+            'filename': 'SHP/BAG_standplaats.shp',
+            'mime_type': 'application/octet-stream',
+            'format': esri_format.get_format(),
+            'extra_files': [
+                {
+                    'filename': 'SHP/BAG_standplaats.dbf',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/BAG_standplaats.shx',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/BAG_standplaats.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+            ],
+            'query': query_actueel
+        },
+        'csv_history': {
+            'api_type': 'graphql',
+            'exporter': csv_exporter,
+            'filename': 'CSV_ActueelEnHistorie/BAG_standplaats_ActueelEnHistorie.csv',
+            'mime_type': 'plain/text',
+            'format': history_format.get_format(),
+            'query': query_history
+        },
     }
 
 
