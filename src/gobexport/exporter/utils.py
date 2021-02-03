@@ -184,10 +184,9 @@ def _get_value_from_list(entity, key, default):
     """
     Tries to get the value from a list based on a key.
     If the key is an index, which is defined by an integer wrapped in
-    brackets e.g. [1], we select a single value. Otherwise a pipe delimited
-    string is returned.
-    If the list contains dict of dict, a remapped dict with unnested keys and
-    values as pipe delimited strings is returned.
+    brackets e.g. [1], we select a single value.
+    If the list contains dicts, get the mapped data based on key.
+    Otherwise a pipe delimited string is returned.
     """
     # If we've received an specific index, try to get the value
     index = re.match(r'\[(\d+)\]', key)
@@ -198,22 +197,12 @@ def _get_value_from_list(entity, key, default):
         except IndexError:
             entity = default
     else:
-        if entity and key in entity[0] and isinstance(entity[0][key], dict):
-            # Un-nest keys in dict of dict and join values as string, separated by '|'
+        # Collect all list items
+        entity_items = [d[key] for d in entity if key in d]
 
-            nested_objs = [ent[key] for ent in entity]
-            res = {new_key: [] for nested in nested_objs for new_key in nested}
-
-            for nested in nested_objs:
-                for new_key in res:
-                    value = nested[new_key]
-                    res[new_key].append(str(value))
-
-            entity = {new_key: '|'.join(res[new_key]) for new_key in res}
-
-        else:
-            # Return a pipe delimited string of the values by key
-            entity = '|'.join([str(d[key]) if d[key] else "" for d in entity if key in d])
+        # If the list consists of dicts return for further traversing, else return a pipe delimited string
+        entity = entity_items if entity_items and isinstance(entity_items[0], dict) else \
+            '|'.join(str(x) if x else "" for x in entity_items)
 
     return entity
 
