@@ -184,8 +184,9 @@ def _get_value_from_list(entity, key, default):
     """
     Tries to get the value from a list based on a key.
     If the key is an index, which is defined by an integer wrapped in
-    brackets e.g. [1], we select a single value. Otherwise a pipe delimited
-    string is returned.
+    brackets e.g. [1], we select a single value.
+    If the list contains dicts, get the mapped data based on key.
+    Otherwise a pipe delimited string is returned.
     """
     # If we've received an specific index, try to get the value
     index = re.match(r'\[(\d+)\]', key)
@@ -196,8 +197,12 @@ def _get_value_from_list(entity, key, default):
         except IndexError:
             entity = default
     else:
-        # Return a pipe delimited string of the values by key
-        entity = '|'.join([str(d[key]) if d[key] else "" for d in entity if key in d])
+        # Collect all list items
+        entity_items = [d[key] for d in entity if key in d]
+
+        # If the list consists of dicts return for further traversing, else return a pipe delimited string
+        entity = entity_items if entity_items and isinstance(entity_items[0], dict) else \
+            '|'.join(str(x) if x else "" for x in entity_items)
 
     return entity
 
