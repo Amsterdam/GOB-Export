@@ -940,6 +940,7 @@ class StandplaatsenExportConfig:
         documentdatum
         documentnummer
         geometrie
+        gebruiksdoel
       }
     }
   }
@@ -1071,6 +1072,7 @@ class StandplaatsenExportConfig:
         documentdatum
         documentnummer
         geometrie
+        gebruiksdoel
       }
     }
   }
@@ -1104,6 +1106,7 @@ class StandplaatsenExportConfig:
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.[0].identificatie',
+        'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
         'is:WOZ.WOB.soortObject': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -1159,6 +1162,7 @@ class StandplaatsenExportConfig:
         'gme_id': 'ligtInGemeente.identificatie',
         'gme_naam': 'ligtInGemeente.naam',
         'num_id_nvn': 'heeftNevenadres.identificatie',
+        'gebr_doel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
         'soort_obj': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
         'begindatum': 'beginGeldigheid',
@@ -1216,6 +1220,7 @@ class StandplaatsenExportConfig:
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
+        'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
         'is:WOZ.WOB.soortObject': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -1394,12 +1399,20 @@ class LigplaatsenExportConfig:
             }
           }
         }
+        invIsVerbondenMetLigplaatsWozWozdeelobjecten {
+          edges {
+            node {
+              soortobject
+            }
+          }
+        }
         status
         beginGeldigheid
         eindGeldigheid
         documentdatum
         documentnummer
         geometrie
+        gebruiksdoel
       }
     }
   }
@@ -1518,12 +1531,20 @@ class LigplaatsenExportConfig:
             }
           }
         }
+        invIsVerbondenMetLigplaatsWozWozdeelobjecten {
+          edges {
+            node {
+              soortobject
+            }
+          }
+        }
         status
         beginGeldigheid
         eindGeldigheid
         documentdatum
         documentnummer
         geometrie
+        gebruiksdoel
       }
     }
   }
@@ -1557,8 +1578,9 @@ class LigplaatsenExportConfig:
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
+        'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': '',
+        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1612,8 +1634,9 @@ class LigplaatsenExportConfig:
         'gme_id': 'ligtInGemeente.identificatie',
         'gme_naam': 'ligtInGemeente.naam',
         'num_id_nvn': 'heeftNevenadres.identificatie',
+        'gebr_doel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
-        'soort_obj': '',
+        'soort_obj': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
         'docdatum': 'documentdatum',
@@ -1669,8 +1692,9 @@ class LigplaatsenExportConfig:
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
+        'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': '',
+        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
