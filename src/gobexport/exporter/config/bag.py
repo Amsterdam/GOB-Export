@@ -71,6 +71,10 @@ def format_date(datetimestr):
         return datetimestr
 
 
+def format_soort_object(value):
+    return '|'.join(dict.fromkeys(value.split('|')).keys()) if value else value
+
+
 class WoonplaatsenExportConfig:
 
     query_actueel = '''
@@ -1108,7 +1112,11 @@ class StandplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.[0].identificatie',
         'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        'is:WOZ.WOB.soortObject': {
+            'action': 'format',
+            'formatter': format_soort_object,
+            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1164,7 +1172,11 @@ class StandplaatsenExportConfig:
         'num_id_nvn': 'heeftNevenadres.identificatie',
         'gebr_doel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
-        'soort_obj': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        'soort_obj': {
+            'action': 'format',
+            'formatter': format_soort_object,
+            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        },
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
         'docdatum': 'documentdatum',
@@ -1222,7 +1234,11 @@ class StandplaatsenExportConfig:
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
         'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        'is:WOZ.WOB.soortObject': {
+            'action': 'format',
+            'formatter': format_soort_object,
+            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1580,7 +1596,11 @@ class LigplaatsenExportConfig:
         'heeftIn:BAG.NAG.identificatieNevenadres': 'heeftNevenadres.identificatie',
         'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        'is:WOZ.WOB.soortObject': {
+            'action': 'format',
+            'formatter': format_soort_object,
+            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
@@ -1636,7 +1656,11 @@ class LigplaatsenExportConfig:
         'num_id_nvn': 'heeftNevenadres.identificatie',
         'gebr_doel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
-        'soort_obj': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        'soort_obj': {
+            'action': 'format',
+            'formatter': format_soort_object,
+            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        },
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
         'docdatum': 'documentdatum',
@@ -1694,7 +1718,11 @@ class LigplaatsenExportConfig:
         'heeftIn:BAG.NAG.volgnummerNevenadres': 'heeftNevenadres.volgnummer',
         'gebruiksdoel': 'gebruiksdoel.omschrijving',
         'status': 'status.omschrijving',
-        'is:WOZ.WOB.soortObject': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        'is:WOZ.WOB.soortObject': {
+            'action': 'format',
+            'formatter': format_soort_object,
+            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+        },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
         'documentdatum': 'documentdatum',
