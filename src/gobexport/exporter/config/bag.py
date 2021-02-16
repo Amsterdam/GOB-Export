@@ -853,19 +853,19 @@ class StandplaatsenExportConfig:
                   node {
                     identificatie
                     naam
-                  }
-                }
-              }
-              ligtInWoonplaats {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                    ligtInGemeente {
+                    ligtInWoonplaats {
                       edges {
                         node {
                           identificatie
                           naam
+                          ligtInGemeente {
+                            edges {
+                              node {
+                                identificatie
+                                naam
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -978,20 +978,20 @@ class StandplaatsenExportConfig:
                     identificatie
                     volgnummer
                     naam
-                  }
-                }
-              }
-              ligtInWoonplaats(active: false) {
-                edges {
-                  node {
-                    identificatie
-                    volgnummer
-                    naam
-                    ligtInGemeente(active: false) {
+                    ligtInWoonplaats(active: false) {
                       edges {
                         node {
                           identificatie
+                          volgnummer
                           naam
+                          ligtInGemeente(active: false) {
+                            edges {
+                              node {
+                                identificatie
+                                naam
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -1325,19 +1325,19 @@ class LigplaatsenExportConfig:
                   node {
                     identificatie
                     naam
-                  }
-                }
-              }
-              ligtInWoonplaats {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                    ligtInGemeente {
+                    ligtInWoonplaats {
                       edges {
                         node {
                           identificatie
                           naam
+                          ligtInGemeente {
+                            edges {
+                              node {
+                                identificatie
+                                naam
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -1450,20 +1450,20 @@ class LigplaatsenExportConfig:
                     identificatie
                     volgnummer
                     naam
-                  }
-                }
-              }
-              ligtInWoonplaats(active: false) {
-                edges {
-                  node {
-                    identificatie
-                    volgnummer
-                    naam
-                    ligtInGemeente(active: false) {
+                    ligtInWoonplaats(active: false) {
                       edges {
                         node {
                           identificatie
+                          volgnummer
                           naam
+                          ligtInGemeente(active: false) {
+                            edges {
+                              node {
+                                identificatie
+                                naam
+                              }
+                            }
+                          }
                         }
                       }
                     }
