@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 from gobexport.exporter.config.bag import (
-    format_date,
+    format_date, format_soort_object 
 )
 
 
@@ -15,3 +15,9 @@ def test_format_timestamp():
 
     for inp in [None, 'Invalid date']:
         assert(format_date(inp) == inp)
+
+def test_format_soort_object():
+    assert(format_soort_object('any object|any object') == 'any object')
+    assert(format_soort_object('any object|any other object|any object') == 'any object|any other object')
+    assert(format_soort_object('') == '')
+    assert(format_soort_object(None) == None)
