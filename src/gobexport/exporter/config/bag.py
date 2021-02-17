@@ -1599,7 +1599,7 @@ class LigplaatsenExportConfig:
         'is:WOZ.WOB.soortObject': {
             'action': 'format',
             'formatter': format_soort_object,
-            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+            'value': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
         },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
@@ -1659,7 +1659,7 @@ class LigplaatsenExportConfig:
         'soort_obj': {
             'action': 'format',
             'formatter': format_soort_object,
-            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+            'value': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
         },
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
@@ -1721,7 +1721,7 @@ class LigplaatsenExportConfig:
         'is:WOZ.WOB.soortObject': {
             'action': 'format',
             'formatter': format_soort_object,
-            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+            'value': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
         },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
