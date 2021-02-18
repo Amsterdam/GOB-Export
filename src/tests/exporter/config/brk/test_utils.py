@@ -1,10 +1,12 @@
 from unittest import TestCase
-from unittest.mock import patch
+
 from datetime import datetime
-
+from freezegun import freeze_time
 from requests.exceptions import HTTPError
+from unittest.mock import patch
 
-from gobexport.exporter.config.brk.utils import brk_filename, sort_attributes, format_timestamp, _get_filename_date
+import gobexport.exporter.config.brk.utils as brk_utils
+from gobexport.exporter.config.brk.utils import _get_filename_date, brk_filename, format_timestamp, sort_attributes
 
 
 class TestBrkConfigHelpers(TestCase):
@@ -90,10 +92,27 @@ class TestBrkConfigHelpers(TestCase):
         }
 
         expected_date = datetime(year=2019, month=9, day=3)
-        self.assertEqual(expected_date, _get_filename_date())
+        with freeze_time("2021-02-18T00:00:00"):
+            self.assertEqual(expected_date, _get_filename_date())
+            self.assertEqual(expected_date, brk_utils._filename_date)
+            expected_expires_date = datetime(year=2021, month=2, day=18, second=10)
+            self.assertEqual(expected_expires_date, brk_utils._filename_date_expires_at)
+            mock_request_get.assert_called_once()
 
+        mock_request_get.reset_mock()
+        with freeze_time("2021-02-18T00:00:09"):
+            # Should be cached
+            self.assertEqual(expected_date, _get_filename_date())
+            mock_request_get.assert_not_called()
+
+        with freeze_time("2021-02-18T00:00:11"):
+            self.assertEqual(expected_date, _get_filename_date())
+            mock_request_get.assert_called_once()
+
+    @patch("gobexport.exporter.config.brk.utils._filename_date_expires_at", None)
     @patch("gobexport.exporter.config.brk.utils.requests.get")
     def test_get_filename_date_no_meta(self, mock_request_get):
+
         mock_request_get.return_value.raise_for_status.side_effect = HTTPError
 
         self.assertIsNone(_get_filename_date())
