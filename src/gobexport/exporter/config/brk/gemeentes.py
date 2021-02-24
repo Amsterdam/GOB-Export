@@ -26,7 +26,7 @@ class GemeentesExportConfig:
             'api_type': 'graphql',
             'secure_user': 'gob',
             'query': query,
-            'filename': lambda: brk_filename('Gemeente', type='csv'),
+            'filename': lambda: brk_filename('Gemeente', type='csv', use_sensitive_dir=False),
             'mime_type': 'plain/text',
             'format': {
                 'naam': 'naam',
@@ -42,22 +42,22 @@ class GemeentesExportConfig:
             'exporter': esri_exporter,
             'api_type': 'graphql',
             'secure_user': 'gob',
-            'filename': f'{brk_directory("shp")}/{shp_filename}.shp',
+            'filename': f'{brk_directory("shp", use_sensitive_dir=False)}/{shp_filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
                 'GEMEENTE': 'naam',
             },
             'extra_files': [
                 {
-                    'filename': f'{brk_directory("dbf")}/{shp_filename}.dbf',
+                    'filename': f'{brk_directory("dbf", use_sensitive_dir=False)}/{shp_filename}.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': f'{brk_directory("shx")}/{shp_filename}.shx',
+                    'filename': f'{brk_directory("shx", use_sensitive_dir=False)}/{shp_filename}.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': f'{brk_directory("prj")}/{shp_filename}.prj',
+                    'filename': f'{brk_directory("prj", use_sensitive_dir=False)}/{shp_filename}.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],

@@ -36,8 +36,8 @@ FILE_TYPE_MAPPING = {
         'extension': 'prj'
     },
     'dia_csv': {
-        'dir': 'DIA_Export',
-        'dir_sensitive': '',
+        'dir': '',
+        'dir_sensitive': 'DIA_Export',
         'extension': 'csv'
     },
 }
@@ -67,20 +67,20 @@ def _get_filename_date():
     return _filename_date
 
 
-def brk_directory(type='csv', is_sensitive=False):
+def brk_directory(type='csv', use_sensitive_dir=True):
     dir_part, sensitive_dir_part = itemgetter('dir', 'dir_sensitive')(FILE_TYPE_MAPPING[type])
-    return f'AmsterdamRegio/{sensitive_dir_part}' if is_sensitive else f'AmsterdamRegio/{dir_part}'
+    return f'AmsterdamRegio/{sensitive_dir_part}' if use_sensitive_dir else f'AmsterdamRegio/{dir_part}'
 
 
-def brk_filename(name, type='csv', append_date=True, is_sensitive=False):
+def brk_filename(name, type='csv', append_date=True, use_sensitive_dir=True):
     assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
     extension = itemgetter('extension')(FILE_TYPE_MAPPING[type])
     if append_date:
         date = _get_filename_date()
         datestr = f"_{date.strftime('%Y%m%d') if date else '00000000'}"
-        return f'{brk_directory(type,is_sensitive)}/BRK_{name}{datestr}.{extension}'
+        return f'{brk_directory(type,use_sensitive_dir)}/BRK_{name}{datestr}.{extension}'
     else:
-        return f'{brk_directory(type,is_sensitive)}/BRK_{name}.{extension}'
+        return f'{brk_directory(type,use_sensitive_dir)}/BRK_{name}.{extension}'
 
 
 def format_timestamp(datetimestr: str, format: str = '%Y%m%d%H%M%S') -> Optional[str]:
