@@ -516,7 +516,7 @@ class ZakelijkerechtenExportConfig:
                                'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie'),
             ],
             'query': query,
-            'filename': lambda: brk_filename("zakelijk_recht"),
+            'filename': lambda: brk_filename("zakelijk_recht", is_sensitive=True),
             'mime_type': 'plain/text',
             'format': format.get_format(),
         }

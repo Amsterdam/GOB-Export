@@ -12,26 +12,32 @@ from gobexport.config import get_host
 FILE_TYPE_MAPPING = {
     'csv': {
         'dir': 'CSV_Actueel',
+        'dir_sensitive': 'CSV_ActueelMetSubj',
         'extension': 'csv'
     },
     'shp': {
         'dir': 'SHP_Actueel',
+        'dir_sensitive': 'SHP_ActueelMetSubj',
         'extension': 'shp'
     },
     'dbf': {
         'dir': 'SHP_Actueel',
+        'dir_sensitive': 'SHP_ActueelMetSubj',
         'extension': 'dbf'
     },
     'shx': {
         'dir': 'SHP_Actueel',
+        'dir_sensitive': 'SHP_ActueelMetSubj',
         'extension': 'shx'
     },
     'prj': {
         'dir': 'SHP_Actueel',
+        'dir_sensitive': 'SHP_ActueelMetSubj',
         'extension': 'prj'
     },
     'dia_csv': {
         'dir': 'DIA_Export',
+        'dir_sensitive': '',
         'extension': 'csv'
     },
 }
@@ -61,17 +67,20 @@ def _get_filename_date():
     return _filename_date
 
 
-def brk_directory(type='csv'):
-    type_dir, _ = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
-    return f"AmsterdamRegio/{type_dir}"
+def brk_directory(type='csv', is_sensitive=False):
+    dir_part, sensitive_dir_part = itemgetter('dir', 'dir_sensitive')(FILE_TYPE_MAPPING[type])
+    return f'AmsterdamRegio/{sensitive_dir_part}' if is_sensitive else f'AmsterdamRegio/{dir_part}'
 
 
-def brk_filename(name, type='csv', append_date=True):
+def brk_filename(name, type='csv', append_date=True, is_sensitive=False):
     assert type in FILE_TYPE_MAPPING.keys(), "Invalid file type"
-    _, extension = itemgetter('dir', 'extension')(FILE_TYPE_MAPPING[type])
-    date = _get_filename_date()
-    datestr = f"_{date.strftime('%Y%m%d') if date else '00000000'}" if append_date else ""
-    return f'{brk_directory(type)}/BRK_{name}{datestr}.{extension}'
+    extension = itemgetter('extension')(FILE_TYPE_MAPPING[type])
+    if append_date:
+        date = _get_filename_date()
+        datestr = f"_{date.strftime('%Y%m%d') if date else '00000000'}"
+        return f'{brk_directory(type,is_sensitive)}/BRK_{name}{datestr}.{extension}'
+    else:
+        return f'{brk_directory(type,is_sensitive)}/BRK_{name}.{extension}'
 
 
 def format_timestamp(datetimestr: str, format: str = '%Y%m%d%H%M%S') -> Optional[str]:

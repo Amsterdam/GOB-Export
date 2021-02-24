@@ -29,7 +29,7 @@ class AardzakelijkerechtenExportConfig:
             'api_type': 'graphql',
             'secure_user': 'gob',
             'query': query,
-            'filename': lambda: brk_filename("c_aard_zakelijkrecht"),
+            'filename': lambda: brk_filename("c_aard_zakelijkrecht", is_sensitive=True),
             'mime_type': 'plain/text',
             'format': format,
         }
