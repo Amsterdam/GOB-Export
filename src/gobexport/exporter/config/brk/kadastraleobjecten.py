@@ -1144,20 +1144,20 @@ class KadastraleobjectenExportConfig:
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
             'exporter': esri_exporter,
-            'filename': lambda: brk_filename('Adam_totaal_G_zonderSubjecten', type='shp', append_date=False),
+            'filename': f'{brk_directory("shp")}/BRK_Adam_totaal_G_zonderSubjecten.shp',
             'mime_type': 'application/octet-stream',
             'format': esri_format_no_subjects.get_format(),
             'extra_files': [
                 {
-                    'filename': lambda: brk_filename('Adam_totaal_G_zonderSubjecten', type='dbf', append_date=False),
+                    'filename': f'{brk_directory("dbf")}/BRK_Adam_totaal_G_zonderSubjecten.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('Adam_totaal_G_zonderSubjecten', type='shx', append_date=False),
+                    'filename': f'{brk_directory("shx")}/BRK_Adam_totaal_G_zonderSubjecten.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('Adam_totaal_G_zonderSubjecten', type='prj', append_date=False),
+                    'filename': f'{brk_directory("prj")}/BRK_Adam_totaal_G_zonderSubjecten.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
