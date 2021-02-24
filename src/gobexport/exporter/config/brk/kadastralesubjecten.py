@@ -205,7 +205,7 @@ class KadastralesubjectenExportConfig:
             'endpoint': '/gob/brk/kadastralesubjecten/?view=enhanced&ndjson=true',
             'secure_user': 'gob',
             'exporter': csv_exporter,
-            'filename': lambda: brk_filename('kadastraal_subject', is_sensitive=True),
+            'filename': lambda: brk_filename('kadastraal_subject', use_sensitive_dir=True),
             'mime_type': 'plain/text',
             'format': format.get_format(),
         }

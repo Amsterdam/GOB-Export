@@ -160,7 +160,7 @@ class StukdelenExportConfig:
             'batch_size': 10000,
             'unfold': True,
             'query': query_tng,
-            'filename': lambda: brk_filename('stukdeel', is_sensitive=True),
+            'filename': lambda: brk_filename('stukdeel', use_sensitive_dir=True),
             'mime_type': 'plain/text',
             'format': format,
             'entity_filters': [
@@ -175,7 +175,7 @@ class StukdelenExportConfig:
             'unfold': True,
             'query': query_art,
             'append': True,
-            'filename': lambda: brk_filename('stukdeel', is_sensitive=True),
+            'filename': lambda: brk_filename('stukdeel', use_sensitive_dir=True),
             'mime_type': 'plain/text',
             'format': format,
             'entity_filters': [
@@ -192,7 +192,7 @@ class StukdelenExportConfig:
             'unfold': True,
             'query': query_akt,
             'append': True,
-            'filename': lambda: brk_filename('stukdeel', is_sensitive=True),
+            'filename': lambda: brk_filename('stukdeel', use_sensitive_dir=True),
             'mime_type': 'plain/text',
             'format': format,
             'entity_filters': [
@@ -209,7 +209,7 @@ class StukdelenExportConfig:
             'unfold': True,
             'append': True,
             'query': query_zrt,
-            'filename': lambda: brk_filename('stukdeel', is_sensitive=True),
+            'filename': lambda: brk_filename('stukdeel', use_sensitive_dir=True),
             'mime_type': 'plain/text',
             'format': format,
             'entity_filters': [
