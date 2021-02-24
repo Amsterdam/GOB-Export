@@ -37,7 +37,7 @@ class KadastraleGemeentecodesExportConfig:
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
-            'filename': f'{brk_directory("shp")}/{filename}.shp',
+            'filename': f'{brk_directory("shp", use_sensitive_dir = False)}/{filename}.shp',
             'mime_type': 'application/octet-stream',
             'format': {
                 'GEMEENTE': 'ligtInGemeente.[0].naam',
@@ -46,15 +46,15 @@ class KadastraleGemeentecodesExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': f'{brk_directory("dbf")}/{filename}.dbf',
+                    'filename': f'{brk_directory("dbf", use_sensitive_dir = False)}/{filename}.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': f'{brk_directory("shx")}/{filename}.shx',
+                    'filename': f'{brk_directory("shx", use_sensitive_dir = False)}/{filename}.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': f'{brk_directory("prj")}/{filename}.prj',
+                    'filename': f'{brk_directory("prj", use_sensitive_dir = False)}/{filename}.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
