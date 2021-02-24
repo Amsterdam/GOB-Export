@@ -6,7 +6,7 @@ from gobexport.exporter.utils import convert_format, get_entity_value
 from gobexport.formatter.geometry import format_geometry
 from gobexport.filters.notempty_filter import NotEmptyFilter
 from gobexport.filters.entity_filter import EntityFilter
-from gobexport.exporter.config.brk.utils import brk_filename, format_timestamp
+from gobexport.exporter.config.brk.utils import brk_filename, brk_directory, format_timestamp
 
 
 class KadastraleobjectenCsvFormat:
@@ -1111,7 +1111,7 @@ class KadastraleobjectenExportConfig:
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
             'query': csv_query,
-            'filename': lambda: brk_filename('kadastraal_object'),
+            'filename': lambda: brk_filename('kadastraal_object', use_sensitive_dir=True),
             'mime_type': 'plain/text',
             'format': csv_format.get_format(),
             'sort': sort,
@@ -1120,21 +1120,21 @@ class KadastraleobjectenExportConfig:
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
             'exporter': esri_exporter,
-            'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shp',
+            'filename': f'{brk_directory("shp", use_sensitive_dir=True)}/BRK_Adam_totaal_G.shp',
             'mime_type': 'application/octet-stream',
             'format': esri_format.get_format(),
             'sort': sort,
             'extra_files': [
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.dbf',
+                    'filename': f'{brk_directory("dbf", use_sensitive_dir=True)}/BRK_Adam_totaal_G.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shx',
+                    'filename': f'{brk_directory("shx", use_sensitive_dir=True)}/BRK_Adam_totaal_G.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.prj',
+                    'filename': f'{brk_directory("prj", use_sensitive_dir=True)}/BRK_Adam_totaal_G.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1144,20 +1144,23 @@ class KadastraleobjectenExportConfig:
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
             'exporter': esri_exporter,
-            'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shp',
+            'filename': f'{brk_directory("shp", use_sensitive_dir=False)}/BRK_Adam_totaal_G_zonderSubjecten.shp',
             'mime_type': 'application/octet-stream',
             'format': esri_format_no_subjects.get_format(),
             'extra_files': [
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.dbf',
+                    'filename': f'{brk_directory("dbf", use_sensitive_dir=False)}'
+                                '/BRK_Adam_totaal_G_zonderSubjecten.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shx',
+                    'filename': f'{brk_directory("shx", use_sensitive_dir=False)}'
+                                '/BRK_Adam_totaal_G_zonderSubjecten.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.prj',
+                    'filename': f'{brk_directory("prj", use_sensitive_dir=False)}'
+                                '/BRK_Adam_totaal_G_zonderSubjecten.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1169,7 +1172,7 @@ class KadastraleobjectenExportConfig:
             'encryption_key': 'dia',
             'secure_user': 'dia',
             'query': dia_query,
-            'filename': lambda: brk_filename('dia_export_kadastraal_object', 'dia_csv'),
+            'filename': lambda: brk_filename('dia_export_kadastraal_object', 'dia_csv', use_sensitive_dir=True),
             'mime_type': 'plain/text',
             'format': csv_dia_format.get_format(),
             'sort': sort,
@@ -1179,7 +1182,7 @@ class KadastraleobjectenExportConfig:
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
-            'filename': lambda: brk_filename('bijpijling', type='shp', append_date=False),
+            'filename': f'{brk_directory("shp", use_sensitive_dir=False)}/BRK_bijpijling.shp',
             'entity_filters': [
                 NotEmptyFilter('bijpijlingGeometrie'),
             ],
@@ -1201,15 +1204,15 @@ class KadastraleobjectenExportConfig:
             },
             'extra_files': [
                 {
-                    'filename': lambda: brk_filename('bijpijling', type='dbf', append_date=False),
+                    'filename': f'{brk_directory("dbf", use_sensitive_dir=False)}/BRK_bijpijling.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('bijpijling', type='shx', append_date=False),
+                    'filename': f'{brk_directory("shx", use_sensitive_dir=False)}/BRK_bijpijling.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('bijpijling', type='prj', append_date=False),
+                    'filename': f'{brk_directory("prj", use_sensitive_dir=False)}/BRK_bijpijling.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1219,7 +1222,7 @@ class KadastraleobjectenExportConfig:
             'exporter': esri_exporter,
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
-            'filename': lambda: brk_filename('perceelnummer', type='shp', append_date=False),
+            'filename': f'{brk_directory("shp", use_sensitive_dir=False)}/BRK_perceelnummer.shp',
             'entity_filters': [
                 NotEmptyFilter('plaatscoordinaten'),
             ],
@@ -1227,15 +1230,15 @@ class KadastraleobjectenExportConfig:
             'format': perceelnummer_esri_format.get_format(),
             'extra_files': [
                 {
-                    'filename': lambda: brk_filename('perceelnummer', type='dbf', append_date=False),
+                    'filename': f'{brk_directory("dbf", use_sensitive_dir=False)}/BRK_perceelnummer.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('perceelnummer', type='shx', append_date=False),
+                    'filename': f'{brk_directory("shx", use_sensitive_dir=False)}/BRK_perceelnummer.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': lambda: brk_filename('perceelnummer', type='prj', append_date=False),
+                    'filename': f'{brk_directory("prj", use_sensitive_dir=False)}/BRK_perceelnummer.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1251,7 +1254,7 @@ class KadastraleobjectenExportConfig:
             'secure_user': 'gob',
             'unfold': True,
             'query': brk_bag_query,
-            'filename': lambda: brk_filename("BRK_BAG"),
+            'filename': lambda: brk_filename("BRK_BAG", use_sensitive_dir=False),
             'mime_type': 'plain/text',
             'format': brk_bag_format.get_format(),
         }

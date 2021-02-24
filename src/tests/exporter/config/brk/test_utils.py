@@ -6,20 +6,20 @@ from requests.exceptions import HTTPError
 from unittest.mock import patch
 
 import gobexport.exporter.config.brk.utils as brk_utils
-from gobexport.exporter.config.brk.utils import _get_filename_date, brk_filename, format_timestamp, sort_attributes
+from gobexport.exporter.config.brk.utils import _get_filename_date, brk_filename, brk_directory, format_timestamp, sort_attributes
 
 
 class TestBrkConfigHelpers(TestCase):
 
     @patch("gobexport.exporter.config.brk.utils._get_filename_date", datetime.now)
     def test_brk_filename(self):
-        self.assertEqual(f"AmsterdamRegio/CSV_Actueel/BRK_FileName_{datetime.now().strftime('%Y%m%d')}.csv",
+        self.assertEqual(f"AmsterdamRegio/CSV_ActueelMetSubj/BRK_FileName_{datetime.now().strftime('%Y%m%d')}.csv",
                          brk_filename('FileName'))
 
-        self.assertEqual(f"AmsterdamRegio/SHP_Actueel/BRK_FileName_{datetime.now().strftime('%Y%m%d')}.shp",
+        self.assertEqual(f"AmsterdamRegio/SHP_ActueelMetSubj/BRK_FileName_{datetime.now().strftime('%Y%m%d')}.shp",
                          brk_filename('FileName', type='shp'))
 
-        self.assertEqual(f"AmsterdamRegio/SHP_Actueel/BRK_FileName.prj",
+        self.assertEqual(f"AmsterdamRegio/SHP_ActueelMetSubj/BRK_FileName.prj",
                          brk_filename('FileName', type='prj', append_date=False, ))
 
         # Assert undefined file type raises error
@@ -28,8 +28,16 @@ class TestBrkConfigHelpers(TestCase):
 
     @patch("gobexport.exporter.config.brk.utils._get_filename_date", lambda: None)
     def test_brk_filename_none_date(self):
-        self.assertEqual(f"AmsterdamRegio/CSV_Actueel/BRK_FileName_00000000.csv",
+        self.assertEqual(f"AmsterdamRegio/CSV_ActueelMetSubj/BRK_FileName_00000000.csv",
                          brk_filename('FileName'))
+
+    def test_brk_filename_sensitive(self):
+        self.assertEqual(f"AmsterdamRegio/CSV_ActueelMetSubj/BRK_FileName.csv",
+                        brk_filename('FileName',append_date=False,use_sensitive_dir=True))
+
+    def test_brk_directory(self):
+        self.assertEqual(f"AmsterdamRegio/CSV_Actueel",
+                        brk_directory(use_sensitive_dir=False))
 
     def test_sort_attributes(self):
         attrs = {
