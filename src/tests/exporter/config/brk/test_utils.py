@@ -6,7 +6,7 @@ from requests.exceptions import HTTPError
 from unittest.mock import patch
 
 import gobexport.exporter.config.brk.utils as brk_utils
-from gobexport.exporter.config.brk.utils import _get_filename_date, brk_filename, format_timestamp, sort_attributes
+from gobexport.exporter.config.brk.utils import _get_filename_date, brk_filename, brk_directory, format_timestamp, sort_attributes
 
 
 class TestBrkConfigHelpers(TestCase):
@@ -30,6 +30,14 @@ class TestBrkConfigHelpers(TestCase):
     def test_brk_filename_none_date(self):
         self.assertEqual(f"AmsterdamRegio/CSV_Actueel/BRK_FileName_00000000.csv",
                          brk_filename('FileName'))
+
+    def test_brk_filename_sensitive(self):
+        self.assertEqual(f"AmsterdamRegio/CSV_ActueelMetSubj/BRK_FileName.csv",
+                        brk_filename('FileName',append_date=False,is_sensitive=True))
+
+    def test_brk_directory(self):
+        self.assertEqual(f"AmsterdamRegio/CSV_ActueelMetSubj",
+                        brk_directory(is_sensitive=True))
 
     def test_sort_attributes(self):
         attrs = {

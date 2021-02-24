@@ -6,7 +6,7 @@ from gobexport.exporter.utils import convert_format, get_entity_value
 from gobexport.formatter.geometry import format_geometry
 from gobexport.filters.notempty_filter import NotEmptyFilter
 from gobexport.filters.entity_filter import EntityFilter
-from gobexport.exporter.config.brk.utils import brk_filename, format_timestamp
+from gobexport.exporter.config.brk.utils import brk_filename, brk_directory, format_timestamp
 
 
 class KadastraleobjectenCsvFormat:
@@ -1111,7 +1111,7 @@ class KadastraleobjectenExportConfig:
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
             'query': csv_query,
-            'filename': lambda: brk_filename('kadastraal_object'),
+            'filename': lambda: brk_filename('kadastraal_object', is_sensitive=True),
             'mime_type': 'plain/text',
             'format': csv_format.get_format(),
             'sort': sort,
@@ -1120,21 +1120,21 @@ class KadastraleobjectenExportConfig:
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
             'exporter': esri_exporter,
-            'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shp',
+            'filename': f'{brk_directory("shp", is_sensitive=True)}/BRK_Adam_totaal_G.shp',
             'mime_type': 'application/octet-stream',
             'format': esri_format.get_format(),
             'sort': sort,
             'extra_files': [
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.dbf',
+                    'filename': f'{brk_directory("dbf", is_sensitive=True)}/BRK_Adam_totaal_G.dbf',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.shx',
+                    'filename': f'{brk_directory("shx", is_sensitive=True)}/BRK_Adam_totaal_G.shx',
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G.prj',
+                    'filename': f'{brk_directory("prj", is_sensitive=True)}/BRK_Adam_totaal_G.prj',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1144,20 +1144,20 @@ class KadastraleobjectenExportConfig:
             'api_type': 'graphql_streaming',
             'secure_user': 'gob',
             'exporter': esri_exporter,
-            'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shp',
+            'filename': lambda: brk_filename('Adam_totaal_G_zonderSubjecten', type='shp', append_date=False),
             'mime_type': 'application/octet-stream',
             'format': esri_format_no_subjects.get_format(),
             'extra_files': [
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.dbf',
+                    'filename': lambda: brk_filename('Adam_totaal_G_zonderSubjecten', type='dbf', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.shx',
+                    'filename': lambda: brk_filename('Adam_totaal_G_zonderSubjecten', type='shx', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
                 {
-                    'filename': 'AmsterdamRegio/SHP_Actueel/BRK_Adam_totaal_G_zonderSubjecten.prj',
+                    'filename': lambda: brk_filename('Adam_totaal_G_zonderSubjecten', type='prj', append_date=False),
                     'mime_type': 'application/octet-stream'
                 },
             ],
