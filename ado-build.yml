@@ -1,0 +1,39 @@
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  VERSION_TAG: 'x.y.z'
+
+resources:
+  repositories:
+  - repository: gob-api
+    type: github
+    endpoint: Amsterdam
+    name: Amsterdam/Gob-API
+
+
+steps:
+- checkout: self
+
+- task: CmdLine@2
+  displayName: initiatePipelineVars
+  inputs:
+    script: |
+      echo "##vso[task.setvariable variable=timeStamp]$(date +%y%m%d%H%M%S)"
+      echo "##vso[task.setvariable variable=productName]$(echo ${SYSTEM_DEFINITIONNAME}| tr '[:upper:]' '[:lower:]')"
+      echo "##vso[task.setvariable variable=productRepo]${SYSTEM_DEFINITIONNAME}"
+      #echo $(productRepo)-$(productName)
+      #workingDirectory: # Optional
+      #failOnStderr: false # Optional
+
+- task: Docker@2
+  displayName: BuildPush
+  inputs:
+    containerRegistry: 'Container Registry - piosupportacr'
+    repository: $(productName)
+    command: 'buildAndPush'
+    Dockerfile: 'src/Dockerfile'
+    tags: |
+      $(Build.BuildId)-$(timeStamp)
+      latest
+
