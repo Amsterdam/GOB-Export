@@ -6,7 +6,7 @@ from gobexport.credential_store import CredentialStore
 _ACCESS_TOKEN = "access_token"
 _TOKEN_TYPE = "token_type"
 
-_credential_store = None
+_credential_store = 'test'
 
 
 def _init_credential_store(secure_user):
@@ -17,7 +17,8 @@ def _init_credential_store(secure_user):
     """
     global _credential_store
 
-    if not _credential_store:
+    # Recreate the credential store for a new secure user
+    if not _credential_store or secure_user != _credential_store.get_secure_user():
         _credential_store = CredentialStore(get_credentials=get_credentials, refresh_credentials=refresh_credentials,
                                             secure_user=secure_user)
 

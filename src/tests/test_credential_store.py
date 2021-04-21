@@ -19,6 +19,10 @@ class TestCredentialStore(TestCase):
         self.assertIsNone(cs._credentials)
         self.assertEqual(cs._secure_user, 'any user')
 
+    def test_get_secure_user(self):
+        cs = CredentialStore('get', 'refresh', secure_user='any user')
+        self.assertEqual(cs.get_secure_user(), 'any user')
+
     def test_save_credentials(self):
         cs = CredentialStore('get', 'refresh', 'any user')
         self.assertIsNone(cs._credentials)
