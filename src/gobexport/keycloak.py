@@ -17,7 +17,8 @@ def _init_credential_store(secure_user):
     """
     global _credential_store
 
-    if not _credential_store:
+    # Recreate the credential store for a new secure user
+    if not _credential_store or secure_user != _credential_store.get_secure_user():
         _credential_store = CredentialStore(get_credentials=get_credentials, refresh_credentials=refresh_credentials,
                                             secure_user=secure_user)
 
