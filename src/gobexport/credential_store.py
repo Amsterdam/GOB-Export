@@ -38,6 +38,9 @@ class CredentialStore:
         """
         return (self._now() - self._timestamp).total_seconds()
 
+    def get_secure_user(self):
+        return self._secure_user
+
     def get_credentials(self):
         """
         Get credentials
