@@ -9,7 +9,7 @@ datapunt-config-loader==1.1.0
 debtcollector==1.20.0
 flake8==3.5.0
 Flask==1.1.2
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 freezegun==0.3.15
 GDAL==2.4.4
 GeoAlchemy2==0.5.0

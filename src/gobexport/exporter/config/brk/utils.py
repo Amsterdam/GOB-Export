@@ -35,11 +35,6 @@ FILE_TYPE_MAPPING = {
         'dir_sensitive': 'SHP_ActueelMetSubj',
         'extension': 'prj'
     },
-    'dia_csv': {
-        'dir': '',
-        'dir_sensitive': 'DIA_Export',
-        'extension': 'csv'
-    },
 }
 
 _FILENAME_DATE_MAX_AGE_SECONDS = 10
