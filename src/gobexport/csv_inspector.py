@@ -96,7 +96,7 @@ class CSVInspector:
 
     def check_lines(self, lines):
         # Start at line 1 (skip header) and stop at end of lines. Skip any (possibly trailing) empty line
-        for line in [l for l in lines[1:] if l]:
+        for line in [lin for lin in lines[1:] if lin]:
             columns = line.strip().split(";")
             self.check_columns(columns)
         return self.cols

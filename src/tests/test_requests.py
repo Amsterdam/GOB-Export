@@ -84,7 +84,7 @@ class TestRequests(TestCase):
         mock_get.raise_for_status = MagicMock(side_effect=RequestException)
         mock_requests_get.return_value = mock_get
 
-        with self.assertRaisesRegexp(gobexport.requests.APIException, 'Request failed due to API exception'):
+        with self.assertRaisesRegex(gobexport.requests.APIException, 'Request failed due to API exception'):
             list(gobexport.requests.get_stream('any url'))
 
     @patch('gobexport.requests._updated_headers', lambda *args, **kwargs: {'updated': 'headers'})
@@ -115,7 +115,7 @@ class TestRequests(TestCase):
         mock_get.raise_for_status = MagicMock(side_effect=RequestException)
         mock_requests_post.return_value = mock_get
 
-        with self.assertRaisesRegexp(gobexport.requests.APIException, 'Request failed due to API exception'):
+        with self.assertRaisesRegex(gobexport.requests.APIException, 'Request failed due to API exception'):
             list(gobexport.requests.post_stream('any url', True))
 
     @patch('gobexport.requests._updated_headers', lambda *args, **kwargs: {})

@@ -63,7 +63,7 @@ def _with_retries(method, max_tries=_MAX_TRIES, retry_timeout=_RETRY_TIMEOUT, ex
             return method()
         except exc as e:
             if max_tries == 0:
-                logger.warning(f"Operation failed, no retries left")
+                logger.warning("Operation failed, no retries left")
                 raise e
 
             print("Caught exception:")
@@ -85,8 +85,8 @@ def _append_to_file(src_file: str, dst_file: str):
         dst.write(src.read())
 
 
-@with_buffered_iterable  # noqa: C901
-def _export_collection(host, catalogue, collection, product_name, destination):
+@with_buffered_iterable
+def _export_collection(host, catalogue, collection, product_name, destination):  # noqa: C901
     """Export a collection from a catalog
 
     :param host: The API host to retrieve the catalog and collection from
@@ -222,7 +222,7 @@ def cleanup_datefiles(connection, container, filename):
 
 def get_cleanup_pattern(filename):
     """Detect dates and replace the date by it's regex."""
-    return re.sub(r"\d{8}", "\\\d{8}", filename)
+    return re.sub(r"\d{8}", r"\\d{8}", filename)
 
 
 def export(catalogue, collection, product, destination):
