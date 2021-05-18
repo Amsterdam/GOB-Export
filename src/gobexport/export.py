@@ -85,7 +85,7 @@ def _append_to_file(src_file: str, dst_file: str):
         dst.write(src.read())
 
 
-@with_buffered_iterable
+@with_buffered_iterable  # noqa: C901
 def _export_collection(host, catalogue, collection, product_name, destination):  # noqa: C901
     """Export a collection from a catalog
 
