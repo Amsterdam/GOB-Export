@@ -219,7 +219,7 @@ def type_convert(type_name, value, *args):
     return converters[type_name](value, *args)
 
 
-def dat_exporter(api, file, format=None, append=False, filter: EntityFilter=None):
+def dat_exporter(api, file, format=None, append=False, filter: EntityFilter = None):
     """Exports a single entity
 
     Headers:       None
@@ -237,7 +237,7 @@ def dat_exporter(api, file, format=None, append=False, filter: EntityFilter=None
         raise NotImplementedError("Appending not implemented for this exporter")
 
     row_count = 0
-    with open(file, 'w') as fp, ProgressTicker(f"Export entities", 10000) as progress:
+    with open(file, 'w') as fp, ProgressTicker("Export entities", 10000) as progress:
         # Get the headers from the first record in the API
         for entity in api:
             if filter and not filter.filter(entity):
@@ -247,7 +247,7 @@ def dat_exporter(api, file, format=None, append=False, filter: EntityFilter=None
             row_count += 1
             entity['row_count'] = row_count
 
-            pattern = re.compile('([\[\]\w.]+):(\w+):?({[\d\w\s:",]*}|\w+)?\|?')
+            pattern = re.compile('([\\[\\]\\w.]+):(\\w+):?({[\\d\\w\\s:",]*}|\\w+)?\\|?')
             export = []
             for (attr_name, attr_type, args) in re.findall(pattern, format):
                 # Get the nested value if a '.' is in the attr_name

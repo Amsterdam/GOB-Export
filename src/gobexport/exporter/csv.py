@@ -48,7 +48,7 @@ def _ensure_fieldnames_match_existing_file(fieldnames, file):
         raise GOBException('Fields from existing file do not match fields to append')
 
 
-def csv_exporter(api, file, format=None, append=False, filter: EntityFilter=None):
+def csv_exporter(api, file, format=None, append=False, filter: EntityFilter = None):
     """CSV Exporter
 
     Exports the output of the API to a ; delimited csv file.
@@ -92,7 +92,7 @@ def csv_exporter(api, file, format=None, append=False, filter: EntityFilter=None
         _ensure_fieldnames_match_existing_file(fieldnames, append)
 
     with open(file, 'a' if append else 'w', encoding='utf-8-sig') as fp, \
-            ProgressTicker(f"Export entities", 10000) as progress:
+            ProgressTicker("Export entities", 10000) as progress:
         # Get the fieldnames from the mapping
         writer = csv.DictWriter(fp, fieldnames=fieldnames, delimiter=';')
 

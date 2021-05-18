@@ -99,10 +99,10 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
 
         return result
 
-    def _flatten_list(self, l: list):
+    def _flatten_list(self, lst: list):
         flatlist = []
 
-        for item in l:
+        for item in lst:
             if isinstance(item, list):
                 flatlist.extend(self._flatten_list(item))
             else:

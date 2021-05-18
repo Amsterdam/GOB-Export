@@ -96,17 +96,17 @@ class GraphQL:
         :return: updated query
         """
         # First check if the query has a filter
-        filters = re.search(f'{self.schema_collection_name}\s*\((.+)?\)', query)
+        filters = re.search(f'{self.schema_collection_name}\\s*\\((.+)?\\)', query)
         if filters:
 
             # check if the query has a filter on 'first'
-            match = re.search('first:\s?(([\d]+)?)', query)
+            match = re.search('first:\\s?(([\\d]+)?)', query)
             if match:
                 # adjust number of records to request
                 query = query.replace(match[1], f"{num_records}", 1)
 
             # Try to find the after parameter, or else add it
-            match = re.search('after:\s?("([a-zA-Z\d=]+)?")', query)
+            match = re.search('after:\\s?("([a-zA-Z\\d=]+)?")', query)
             if match:
                 query = query.replace(match[1], f'"{self.end_cursor}"')
             else:

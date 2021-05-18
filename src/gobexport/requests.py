@@ -93,7 +93,7 @@ def handle_streaming_gob_response(func):
                 yield item
 
         if last_item != b'':
-            raise APIException(f"Incomplete request received from API. See API logs for more info.")
+            raise APIException("Incomplete request received from API. See API logs for more info.")
 
     return wrapper
 
@@ -107,7 +107,7 @@ def get_stream(url, secure_user=None):
                               stream=True)
         result.raise_for_status()
         result = Worker.handle_response(result)
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException:
         raise APIException(f"Request failed due to API exception, response code {result and result.status_code}")
     return result
 
@@ -121,7 +121,7 @@ def post_stream(url, json, secure_user=None, **kwargs):
                                stream=True, json=json, **kwargs)
         result.raise_for_status()
         result = Worker.handle_response(result)
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException:
         raise APIException(f"Request failed due to API exception, response code {result and result.status_code}")
     return result
 

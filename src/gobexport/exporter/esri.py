@@ -1,5 +1,6 @@
 import os
 
+import osgeo
 from osgeo import gdal, ogr, osr
 from shapely.geometry import shape
 
@@ -9,6 +10,7 @@ from gobexport.exporter.utils import split_field_reference, get_entity_value
 from gobexport.filters.entity_filter import EntityFilter
 
 
+GDAL_MAJOR = int(osgeo.__version__.split('.')[0])
 gdal.UseExceptions()
 os.environ['SHAPE_ENCODING'] = "utf-8"
 
@@ -17,6 +19,13 @@ spatialref_rd.ImportFromEPSG(28992)
 
 spatialref_wgs84 = osr.SpatialReference()
 spatialref_wgs84.ImportFromEPSG(4326)
+
+# Make GDAL 2.x.x and 3.x.x compliant
+# See https://gdal.org/tutorials/osr_api_tut.html#crs-and-axis-order for detail
+if GDAL_MAJOR > 2:  # pragma: no cover
+    spatialref_rd.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    spatialref_wgs84.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
 
 transform = osr.CoordinateTransformation(spatialref_rd, spatialref_wgs84)
 COORDINATE_PRECISION = 7
@@ -54,7 +63,7 @@ def _get_geometry_type(entity_geometry):
     return geometry_type
 
 
-def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=None):
+def esri_exporter(api, file, format=None, append=False, filter: EntityFilter = None):
     """ESRI Exporter
 
     This function will transform the output of an API to ESRI shape files. The
@@ -81,7 +90,7 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter=Non
 
     geometry_field = format['geometrie'] if 'geometrie' in format.keys() else 'geometrie'
 
-    with ProgressTicker(f"Export entities", 10000) as progress:
+    with ProgressTicker("Export entities", 10000) as progress:
         # Get records from the API and build the esri file
         for entity in api:
             if filter and not filter.filter(entity):
