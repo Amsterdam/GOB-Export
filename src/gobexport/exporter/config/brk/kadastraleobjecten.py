@@ -412,7 +412,8 @@ class BrkBagCsvFormat:
                 falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.postcode'
             ),
             'AOT_WOONPLAATSNAAM': self.if_vot_relation(
-                trueval='ligtInWoonplaats.naam',
+                trueval='heeftEenRelatieMetVerblijfsobject.[0].heeftHoofdadres.[0].'
+                        'ligtAanOpenbareruimte.[0].ligtInWoonplaats.[0].naam',
                 falseval='heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam'
             ),
             'BRON_RELATIE': {
@@ -833,6 +834,13 @@ class KadastraleobjectenExportConfig:
                       edges {
                         node {
                           naam
+                          ligtInWoonplaats {
+                            edges {
+                              node {
+                                naam
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -840,13 +848,6 @@ class KadastraleobjectenExportConfig:
                     huisletter
                     huisnummertoevoeging
                     postcode
-                    ligtInWoonplaats {
-                      edges {
-                        node {
-                          naam
-                        }
-                      }
-                    }
                   }
                 }
               }
