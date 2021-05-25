@@ -54,16 +54,16 @@ class GraphQLStreaming:
                 arguments['after'] = after
 
             args_string = ", ".join([f'{k}: {v}' for k, v in arguments.items()])
-            paginated_query = existing_arguments_pattern.sub(f'\g<1>\g<2>({args_string})', query, count=1)
+            paginated_query = existing_arguments_pattern.sub(f'\\g<1>\\g<2>({args_string})', query, count=1)
 
         else:
             after_str = f", after: {after}" if after is not None else ""
             # Query does not have any arguments. Add arguments after first word
-            paginated_query = re.sub(r'(\w+)', f'\g<0>(first: {batch_size}{after_str})', query, count=1)
+            paginated_query = re.sub(r'(\w+)', f'\\g<0>(first: {batch_size}{after_str})', query, count=1)
 
         # Add cursor to query if not yet exists on root level.
         if not re.search(r'^\s*{\s*\w+\s*\(?[^\n]*\)?\s*{\s*edges\s*{\s*node\s*{[^{]*cursor', paginated_query):
-            return re.sub(r'(node\s*{)(\s*)(\w*)', '\g<1>\g<2>cursor\g<2>\g<3>', paginated_query, count=1)
+            return re.sub(r'(node\s*{)(\s*)(\w*)', '\\g<1>\\g<2>cursor\\g<2>\\g<3>', paginated_query, count=1)
 
         return paginated_query
 

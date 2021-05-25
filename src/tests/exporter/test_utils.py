@@ -300,7 +300,7 @@ class TestUtils(TestCase):
         }
 
         res = _evaluate_format_action(entity, action)
-        self.assertEquals(formatter.return_value, res)
+        self.assertEqual(formatter.return_value, res)
         mock_get_entity_value.assert_called_with(entity, 'the_value')
         formatter.assert_called_with(mock_get_entity_value.return_value)
 
@@ -316,7 +316,7 @@ class TestUtils(TestCase):
         }
 
         res = _evaluate_format_action(entity, action)
-        self.assertEquals(formatter.return_value, res)
+        self.assertEqual(formatter.return_value, res)
         mock_get_entity_value.assert_called_with(entity, 'the_value')
         formatter.assert_called_with(mock_get_entity_value.return_value, a='A', b='B')
 

@@ -60,7 +60,7 @@ _export_config = {cat: configs.values() for cat, configs in CONFIG_MAPPING.items
 # Allow for variables in filenames. A variable will be converted into a regular expression
 # and vice versa for a generated proposal
 _REPLACEMENTS = {
-    "{DATE}": "\d{8}"
+    "{DATE}": "\\d{8}"
 }
 
 # Definition of test values
@@ -84,7 +84,7 @@ def test(catalogue):
     """
     logger.info(f"Test export for catalogue {catalogue}")
 
-    logger.info(f"Connect to Objectstore")
+    logger.info("Connect to Objectstore")
 
     config = get_datastore_config(GOB_OBJECTSTORE)
     datastore = DatastoreFactory.get_datastore(config)
