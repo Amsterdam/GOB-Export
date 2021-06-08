@@ -861,24 +861,14 @@ class KadastraleobjectenExportConfig:
 '''
 
     class VotFilter(EntityFilter):
-        """Only include rows with VOT statuses, for VOT's where status is defined:
-        2   Niet gerealiseerd verblijfsobject
-        3   Verblijfsobject in gebruik (niet ingemeten)
-        4   Verblijfsobject in gebruik
-        6   Verblijfsobject buiten gebruik
-
+        """ Only include rows if vot identificatie is not set and city is not Amsterdam or Weesp
         """
-        valid_status_codes = [2, 3, 4, 6]
         vot_identificatie = 'heeftEenRelatieMetVerblijfsobject.[0].identificatie'
-        status_code = 'heeftEenRelatieMetVerblijfsobject.[0].status.code'
         city = 'heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam'
 
         def filter(self, entity: dict):
-            if get_entity_value(entity, self.vot_identificatie):
-                status_code = get_entity_value(entity, self.status_code)
-                return status_code and int(status_code) in self.valid_status_codes
-            elif get_entity_value(entity, self.city):
-                return not get_entity_value(entity, self.city).lower().startswith('amsterdam')
+            if not get_entity_value(entity, self.vot_identificatie) and get_entity_value(entity, self.city):
+                return not get_entity_value(entity, self.city).lower().startswith(('amsterdam', 'weesp'))
 
             return True
 
