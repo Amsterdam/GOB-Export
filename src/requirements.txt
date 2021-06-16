@@ -4,8 +4,8 @@ Flask==1.1.2
 Flask-Cors==3.0.9
 monotonic==1.5
 pysftp==0.2.9
--e git+https://github.com/Amsterdam/GOB-Core.git@v0.17.11t#egg=gobcore
--e git+https://github.com/Amsterdam/GOB-Config.git@v0.4.12b#egg=gobconfig
+-e git+https://github.com/Amsterdam/GOB-Core.git@v0.17.12e#egg=gobcore
+-e git+https://github.com/Amsterdam/GOB-Config.git@v0.4.14o#egg=gobconfig
 pytest
 pytest-cov
 flake8
