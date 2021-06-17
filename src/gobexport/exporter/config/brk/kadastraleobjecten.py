@@ -390,7 +390,7 @@ class BrkBagCsvFormat:
             'KOT_STATUS_CODE': 'status',
             'KOT_MODIFICATION': '',
             'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.[0].bronwaarde',
-            'BAG_VOT_STATUS': 'heeftEenRelatieMetVerblijfsobject.[0].status.code',
+            'BAG_VOT_STATUS': 'heeftEenRelatieMetVerblijfsobject.[0].status.omschrijving',
             'DIVA_VOT_ID': '',
             'AOT_OPENBARERUIMTENAAM': self.if_vot_relation(
                 trueval='ligtAanOpenbareruimte.naam',
