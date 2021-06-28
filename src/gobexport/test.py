@@ -42,7 +42,7 @@ import datetime
 import dateutil.parser
 import copy
 
-from objectstore.objectstore import get_full_container_list, get_object, put_object
+from gobcore.datastore.objectstore import get_full_container_list, get_object, put_object
 
 from gobcore.logging.logger import logger
 
@@ -73,6 +73,9 @@ _NTH = {
 _MAXIMUM_VALUES = ["age_hours"]
 _MINIMUM_VALUES = ["bytes", "chars", "lines"]
 _ABSOLUTE_VALUES = ["empty_lines", "first_bytes", "first_lines"] + [f"{nth}_line" for nth in _NTH.values()]
+
+# chunksize for downloading from objectstore, must be < 2gb
+_CHUNKSIZE = 500_000_000
 
 
 def test(catalogue):
@@ -186,7 +189,7 @@ def _get_file(conn_info, filename):
         if item_name == filename and (obj_info is None or item['last_modified'] > obj_info['last_modified']):
             # If multiple matches, match with the most recent item
             obj_info = dict(item)
-            obj = get_object(conn_info['connection'], item, conn_info['container'])
+            obj = get_object(conn_info['connection'], item, conn_info['container'], chunk_size=_CHUNKSIZE)
 
     return obj_info, obj
 
