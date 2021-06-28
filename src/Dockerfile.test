@@ -1,4 +1,4 @@
-FROM amsterdam/python:3.7-buster
+FROM amsterdam/python:3.9-buster
 MAINTAINER datapunt@amsterdam.nl
 
 # Install GDAL
