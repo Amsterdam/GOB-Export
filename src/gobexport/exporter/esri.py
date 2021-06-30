@@ -102,7 +102,9 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter = N
             if row_count == 0:
                 # Please note that it will fail if a file with the same name already exists
                 geometry_type = _get_geometry_type(entity_geometry)
-                dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=geometry_type)
+
+                # Auto reduce field sizes, see https://gdal.org/drivers/vector/shapefile.html#layer-creation-options
+                dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=geometry_type, options=['RESIZE=YES'])
 
                 # Add all field definitions, but skip geometrie
                 all_fields = {k: v for k, v in format.items() if k is not geometry_field}
