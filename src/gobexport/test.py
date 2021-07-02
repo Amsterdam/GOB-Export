@@ -354,16 +354,16 @@ def _check_file(check, filename, stats):
         value = stats[key]
         if len(margin) == 1:
             result = value == margin[0]
-            formatted_margin = f"= {margin[0]}"
+            formatted_margin = f"= {margin[0]:,}"
         elif margin[0] is None:
             result = value <= margin[1]
-            formatted_margin = f"<= {margin[1]}"
+            formatted_margin = f"<= {margin[1]:,}"
         elif margin[1] is None:
             result = value >= margin[0]
-            formatted_margin = f">= {margin[0]}"
+            formatted_margin = f">= {margin[0]:,}"
         else:
             result = margin[0] <= value <= margin[1]
-            formatted_margin = f"{margin[0]} - {margin[1]}"
+            formatted_margin = f"{margin[0]:,} - {margin[1]:,}"
         total_result = total_result and result
 
         # Report any errors for the given filename as a group
