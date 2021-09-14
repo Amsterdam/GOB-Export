@@ -72,11 +72,11 @@ class TestExport(TestCase):
     @patch('gobexport.export.export_to_file')
     def test_export_objectstore_all_products(self, mock_export_to_file, mock_distribute):
         mock_export_to_file.side_effect = lambda *args, **kwargs: True
-        # All products (6 files) should be exported
+        # All products (7 files) should be exported
         result = _export_collection("host", "gebieden", "stadsdelen", None, "Objectstore")
         self.assertEqual(result, None)
         mock_distribute.assert_called()
-        self.assertEqual(mock_distribute.call_count, 6)
+        self.assertEqual(mock_distribute.call_count, 7)
 
     @patch('gobexport.export.logger', mock.MagicMock())
     @patch('gobexport.export.time.sleep', lambda n: None)

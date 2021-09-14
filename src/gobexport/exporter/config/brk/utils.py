@@ -35,6 +35,11 @@ FILE_TYPE_MAPPING = {
         'dir_sensitive': 'SHP_ActueelMetSubj',
         'extension': 'prj'
     },
+    'cpg': {
+        'dir': 'SHP_Actueel',
+        'dir_sensitive': 'SHP_ActueelMetSubj',
+        'extension': 'cpg'
+    },
 }
 
 _FILENAME_DATE_MAX_AGE_SECONDS = 10

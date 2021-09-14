@@ -265,6 +265,10 @@ class WoonplaatsenExportConfig:
                     'filename': 'SHP/BAG_woonplaats.prj',
                     'mime_type': 'application/octet-stream'
                 },
+                {
+                    'filename': 'SHP/BAG_woonplaats.cpg',
+                    'mime_type': 'application/octet-stream'
+                },
             ],
             'query': query_actueel
         },
@@ -478,6 +482,10 @@ class OpenbareruimtesExportConfig:
                 },
                 {
                     'filename': 'SHP/BAG_openbare_ruimte.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/BAG_openbare_ruimte.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -813,6 +821,10 @@ class VerblijfsobjectenExportConfig:
                 },
                 {
                     'filename': 'SHP/BAG_verblijfsobject.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/BAG_verblijfsobject.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1296,6 +1308,10 @@ class StandplaatsenExportConfig:
                 },
                 {
                     'filename': 'SHP/BAG_standplaats.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/BAG_standplaats.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1782,6 +1798,10 @@ class LigplaatsenExportConfig:
                     'filename': 'SHP/BAG_ligplaats.prj',
                     'mime_type': 'application/octet-stream'
                 },
+                {
+                    'filename': 'SHP/BAG_ligplaats.cpg',
+                    'mime_type': 'application/octet-stream'
+                },
             ],
             'query': query_actueel
         },
@@ -1946,6 +1966,10 @@ class PandenExportConfig:
                 },
                 {
                     'filename': 'SHP/BAG_pand.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/BAG_pand.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],

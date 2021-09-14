@@ -106,6 +106,10 @@ class StadsdelenExportConfig:
                     'filename': 'SHP/GBD_stadsdeel.prj',
                     'mime_type': 'application/octet-stream'
                 },
+                {
+                    'filename': 'SHP/GBD_stadsdeel.cpg',
+                    'mime_type': 'application/octet-stream'
+                },
             ],
             'query': query_actueel
         },
@@ -262,6 +266,10 @@ class GGPGebiedenExportConfig:
                 },
                 {
                     'filename': 'SHP/GBD_ggw_praktijkgebied.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/GBD_ggw_praktijkgebied.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -436,6 +444,10 @@ class GGWGebiedenExportConfig:
                 },
                 {
                     'filename': 'SHP/GBD_ggw_gebied.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/GBD_ggw_gebied.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -628,6 +640,10 @@ class WijkenExportConfig:
                 },
                 {
                     'filename': 'SHP/GBD_wijk.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/GBD_wijk.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -868,6 +884,10 @@ class BuurtenExportConfig:
                 },
                 {
                     'filename': 'SHP/GBD_buurt.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/GBD_buurt.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -1143,6 +1163,10 @@ class BouwblokkenExportConfig:
                 },
                 {
                     'filename': 'SHP/GBD_bouwblok.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': 'SHP/GBD_bouwblok.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],
