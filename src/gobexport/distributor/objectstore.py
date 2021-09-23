@@ -2,7 +2,7 @@ import swiftclient
 
 from gobcore.exceptions import GOBException
 
-from objectstore.objectstore import put_object
+from gobcore.datastore.objectstore import put_object
 
 
 def distribute_to_objectstore(connection, container, object_name, contents, content_type):

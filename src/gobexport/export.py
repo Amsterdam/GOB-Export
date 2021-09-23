@@ -10,12 +10,10 @@ import sys
 import traceback
 import re
 
-from objectstore.objectstore import delete_object, get_full_container_list
-
 from gobcore.exceptions import GOBException
 from gobcore.logging.logger import logger
 from gobcore.datastore.factory import DatastoreFactory
-from gobcore.datastore.objectstore import ObjectDatastore
+from gobcore.datastore.objectstore import ObjectDatastore, delete_object, get_full_container_list
 from gobconfig.datastore.config import get_datastore_config
 
 from gobexport.config import get_host, CONTAINER_BASE, EXPORT_DIR, GOB_OBJECTSTORE
