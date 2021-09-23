@@ -7,7 +7,7 @@ from gobcore.logging.logger import logger
 from gobcore.message_broker.config import EXPORT, EXPORT_QUEUE, EXPORT_RESULT_KEY, EXPORT_TEST_QUEUE, \
     EXPORT_TEST_RESULT_KEY, WORKFLOW_EXCHANGE
 from gobcore.message_broker.messagedriven_service import RUNS_IN_OWN_THREAD, messagedriven_service
-from gobcore.message_broker.notifications import DumpNotification, ExportTestNotification, add_notification, \
+from gobcore.message_broker.notifications import DumpNotification, add_notification, \
     get_notification, listen_to_notifications
 from gobcore.workflow.start_workflow import start_workflow
 
@@ -102,12 +102,16 @@ def handle_export_test_msg(msg):
         "contents": None
     }
 
+    # To overcome distribute problems of locked files,
+    # distribute is decoupled and starts at a certain
+    # time triggered by in Jenkins.
+    #
     # Send out a notification for a successfull export test
-    if len(summary['errors']) == 0:
-        add_notification(msg, ExportTestNotification(header['catalogue'],
-                                                     header.get('collection'),
-                                                     header.get('product')))
-
+    #
+    # if len(summary['errors']) == 0:
+    #     add_notification(msg, ExportTestNotification(header['catalogue'],
+    #                                                  header.get('collection'),
+    #                                                  header.get('product')))
     return msg
 
 
