@@ -47,6 +47,7 @@ class TestEsriExporter(TestCase):
             esri_exporter(api, filepath, format={field: field})
 
             # make sure SHAPE_ENCODING is not set, let ogr figure it out
+            # Fails if encoding is latin1
             with patch.dict('os.environ', {'SHAPE_ENCODING': ''}):
                 driver = ogr.GetDriverByName("ESRI Shapefile")
                 tmp_shp = driver.Open(tmpdir, 0)
