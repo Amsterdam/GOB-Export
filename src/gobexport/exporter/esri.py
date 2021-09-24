@@ -13,8 +13,6 @@ from gobexport.filters.entity_filter import EntityFilter
 GDAL_MAJOR = int(osgeo.__version__.split('.')[0])
 gdal.UseExceptions()
 
-# set initial encoding to latin1 w.r.t diacritics
-# convert to utf-8 when creating layer
 ENCODING = 'UTF-8'
 os.environ['SHAPE_ENCODING'] = ENCODING
 
