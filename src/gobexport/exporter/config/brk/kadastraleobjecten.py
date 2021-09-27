@@ -929,6 +929,10 @@ class KadastraleobjectenExportConfig:
                     'filename': f'{brk_directory("prj", use_sensitive_dir=True)}/BRK_Adam_totaal_G.prj',
                     'mime_type': 'application/octet-stream'
                 },
+                {
+                    'filename': f'{brk_directory("cpg", use_sensitive_dir=True)}/BRK_Adam_totaal_G.cpg',
+                    'mime_type': 'application/octet-stream'
+                },
             ],
             'query': esri_query,
         },
@@ -953,6 +957,11 @@ class KadastraleobjectenExportConfig:
                 {
                     'filename': f'{brk_directory("prj", use_sensitive_dir=False)}'
                                 '/BRK_Adam_totaal_G_zonderSubjecten.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("cpg", use_sensitive_dir=False)}'
+                                '/BRK_Adam_totaal_G_zonderSubjecten.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],
@@ -995,6 +1004,10 @@ class KadastraleobjectenExportConfig:
                     'filename': f'{brk_directory("prj", use_sensitive_dir=False)}/BRK_bijpijling.prj',
                     'mime_type': 'application/octet-stream'
                 },
+                {
+                    'filename': f'{brk_directory("cpg", use_sensitive_dir=False)}/BRK_bijpijling.cpg',
+                    'mime_type': 'application/octet-stream'
+                },
             ],
             'query': bijpijling_query
         },
@@ -1019,6 +1032,10 @@ class KadastraleobjectenExportConfig:
                 },
                 {
                     'filename': f'{brk_directory("prj", use_sensitive_dir=False)}/BRK_perceelnummer.prj',
+                    'mime_type': 'application/octet-stream'
+                },
+                {
+                    'filename': f'{brk_directory("cpg", use_sensitive_dir=False)}/BRK_perceelnummer.cpg',
                     'mime_type': 'application/octet-stream'
                 },
             ],

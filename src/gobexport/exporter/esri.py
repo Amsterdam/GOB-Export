@@ -12,7 +12,9 @@ from gobexport.filters.entity_filter import EntityFilter
 
 GDAL_MAJOR = int(osgeo.__version__.split('.')[0])
 gdal.UseExceptions()
-os.environ['SHAPE_ENCODING'] = "utf-8"
+
+ENCODING = 'UTF-8'
+os.environ['SHAPE_ENCODING'] = ENCODING
 
 spatialref_rd = osr.SpatialReference()
 spatialref_rd.ImportFromEPSG(28992)
@@ -63,6 +65,18 @@ def _get_geometry_type(entity_geometry):
     return geometry_type
 
 
+def _create_cpg(filepath: str):
+    """
+    Write cpg file to the same destination, which specifies the encoding of the .dbf file.
+
+    :param filepath: filepath including extension
+    """
+    path, ext = os.path.splitext(filepath)
+
+    with open(path + '.cpg', mode='w') as cpg_file:
+        cpg_file.write(ENCODING)
+
+
 def esri_exporter(api, file, format=None, append=False, filter: EntityFilter = None):
     """ESRI Exporter
 
@@ -103,8 +117,11 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter = N
                 # Please note that it will fail if a file with the same name already exists
                 geometry_type = _get_geometry_type(entity_geometry)
 
-                # Auto reduce field sizes, see https://gdal.org/drivers/vector/shapefile.html#layer-creation-options
-                dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=geometry_type, options=['RESIZE=YES'])
+                # Auto-reduce field sizes, encode data to utf-8
+                # see https://gdal.org/drivers/vector/shapefile.html#layer-creation-options
+                dstlayer = dstfile.CreateLayer(
+                    "layer", spatialref, geom_type=geometry_type, options=['RESIZE=YES', f'ENCODING={ENCODING}']
+                )
 
                 # Add all field definitions, but skip geometrie
                 all_fields = {k: v for k, v in format.items() if k is not geometry_field}
@@ -133,6 +150,7 @@ def esri_exporter(api, file, format=None, append=False, filter: EntityFilter = N
     dstlayer = dstfile.CreateLayer("layer", spatialref, geom_type=ogr.wkbPolygon) if row_count == 0 else dstlayer
 
     dstfile.Destroy()
+    _create_cpg(file)
 
     return row_count
 

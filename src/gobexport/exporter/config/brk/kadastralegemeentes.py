@@ -57,6 +57,10 @@ class KadastraleGemeentecodesExportConfig:
                     'filename': f'{brk_directory("prj", use_sensitive_dir = False)}/{filename}.prj',
                     'mime_type': 'application/octet-stream'
                 },
+                {
+                    'filename': f'{brk_directory("cpg", use_sensitive_dir=False)}/{filename}.cpg',
+                    'mime_type': 'application/octet-stream'
+                },
             ],
             'query': query
         },
