@@ -189,6 +189,17 @@ class TestExportTest(TestCase):
         })
 
     @patch('gobexport.test.logger', MagicMock())
+    def test_check_file_margin_string(self):
+        filename = 'any filename'
+        stats = {
+            'equal': 'string'
+        }
+        check = {
+            'equal': ['string']
+        }
+        self.assertEqual(test._check_file(check, filename, stats), True)
+
+    @patch('gobexport.test.logger', MagicMock())
     def test_check_file(self):
         filename = 'any filename'
         stats = {
