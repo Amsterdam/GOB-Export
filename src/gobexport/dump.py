@@ -17,7 +17,7 @@ ANALYSE_DB_DATASTORE_ID = 'GOBAnalyse'
 SECURE_USER = 'gob'
 
 
-class Dumper():
+class Dumper:
 
     MAX_TRIES = 3
     RETRY_TIMEOUT = 300
@@ -155,17 +155,17 @@ class Dumper():
                 stream=True
             )
 
-            lastline = ""
+            last_line = ""
             start_line = time.time()
-            for line in result.iter_lines(chunk_size=1):
-                lastline = line.decode()
+            for line in result.iter_lines(chsunk_size=1):
+                last_line = line.decode()
                 end_line = time.time()
-                logger.info(f"{lastline} ({(end_line - start_line):.2f} / {(end_line - start_request):.2f} secs)")
+                logger.info(f"{last_line} ({(end_line - start_line):.2f} / {(end_line - start_request):.2f} secs)")
                 start_line = time.time()
         except Exception as e:
             logger.warning(f'Export {catalog_name}-{collection_name} failed: {str(e)}')
         else:
-            success = re.match(r'Export completed', lastline) is not None
+            success = re.match(r'Export completed', last_line) is not None
             if not success:
                 logger.warning(f'Export {catalog_name}-{collection_name} completed with errors')
         finally:

@@ -1,8 +1,11 @@
+import logging
 from collections import Generator
 
 import requests
 
 from gobexport.config import get_host
+
+logger = logging.getLogger(__name__)
 
 
 class Worker:
@@ -12,6 +15,7 @@ class Worker:
     _WORKER_ID_RESPONSE = "X-Worker-Id"
     _WORKER_RESULT_OK = "OK"
     _WORKER_RESULT_FAILURE = "FAILURE"
+    _REQUEST_ID = "X-Request-ID"
 
     _WORKER_API = f"{get_host()}/gob/public/worker"
 
@@ -31,38 +35,37 @@ class Worker:
 
         :param response: The response from the request made.
         """
-        worker_id = response.headers[cls._WORKER_ID_RESPONSE]
-
-        print(f"Worker response {worker_id} started")
-        lastline = None
+        worker_id = response.headers.get(cls._WORKER_ID_RESPONSE)
+        current_request_id = response.headers.get(cls._REQUEST_ID)
+        logger.info(f"Worker response {worker_id} started", extra={"x-request_id": current_request_id})
+        last_line = None
         for line in response.iter_lines():
-            lastline = line
+            last_line = line
 
-        lastline = lastline.decode()
-        if lastline == cls._WORKER_RESULT_FAILURE:
-            print(f"Worker response {worker_id} failed")
+        last_line = last_line.decode()
+        if last_line == cls._WORKER_RESULT_FAILURE:
+            logger.info(f"Worker response {worker_id} failed", extra={"x-request_id": current_request_id})
             raise requests.exceptions.RequestException("Worker response failed")
-        elif lastline != cls._WORKER_RESULT_OK:
-            print(f"Worker response {worker_id} ended prematurely")
+        elif last_line != cls._WORKER_RESULT_OK:
+            logger.info(f"Worker response {worker_id} ended prematurely", extra={"x-request_id": current_request_id})
             raise requests.exceptions.RequestException("Worker response ended prematurely")
         else:
-            print(f"Worker result {worker_id} OK")
+            logger.info(f"Worker result {worker_id} OK", extra={"x-request_id": current_request_id})
             try:
-                # Request result
+                # Request worker result
                 url = f"{cls._WORKER_API}/{worker_id}"
+                print(url)
                 response = requests.get(url=url, stream=True)
                 response.raise_for_status()
 
-                # yield result
                 for line in response.iter_lines():
                     yield line
             except Exception as e:
-                print(f"Worker result {worker_id} failed")
-                # Re-raise exception
+                logger.info(f"Worker result {worker_id} failed")
                 raise e
             finally:
                 # Always try to cleanup worker files (even if an exception has occurred)
-                print(f"Worker result {worker_id} clear...")
+                logger.info(f"Worker result {worker_id} clear...", extra={"x-request_id": current_request_id})
                 url = f"{cls._WORKER_API}/end/{worker_id}"
                 response = requests.delete(url=url)
                 response.raise_for_status()

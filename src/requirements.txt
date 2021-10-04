@@ -4,3 +4,4 @@ pysftp==0.2.9
 -e git+https://github.com/Amsterdam/GOB-Core.git@v0.17.12s#egg=gobcore
 -e git+https://github.com/Amsterdam/GOB-Config.git@v0.4.14t#egg=gobconfig
 freezegun==1.1.0
+requests_mock~=1.9.3

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import requests
 
 from gobexport.config import OIDC_TOKEN_ENDPOINT, get_oidc_client
@@ -6,7 +8,7 @@ from gobexport.credential_store import CredentialStore
 _ACCESS_TOKEN = "access_token"
 _TOKEN_TYPE = "token_type"
 
-_credential_store = None
+_credential_store: Optional[CredentialStore] = None
 
 
 def _init_credential_store(secure_user):
@@ -26,9 +28,7 @@ def _init_credential_store(secure_user):
 def get_secure_header(secure_user):
     """
     Get the request header to access secure endpoints
-
     """
-    assert secure_user, "A secure_user must be defined to request a secure url"
     _init_credential_store(secure_user)
     credentials = _credential_store.get_credentials()
     return {
