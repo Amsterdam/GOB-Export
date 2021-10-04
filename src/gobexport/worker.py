@@ -61,7 +61,7 @@ class Worker:
                 for line in response.iter_lines():
                     yield line
             except Exception as e:
-                logger.info(f"Worker result {worker_id} failed")
+                logger.error(f"Worker result {worker_id} failed", exc_info=True)
                 raise e
             finally:
                 # Always try to cleanup worker files (even if an exception has occurred)
