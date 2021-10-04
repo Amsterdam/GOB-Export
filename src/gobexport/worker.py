@@ -1,9 +1,11 @@
+from collections import Generator
+
 import requests
 
 from gobexport.config import get_host
 
 
-class Worker():
+class Worker:
 
     # Header values for Worker Requests and Responses
     _WORKER_REQUEST = "X-Worker-Request"
@@ -18,9 +20,8 @@ class Worker():
     }
 
     @classmethod
-    def handle_response(cls, result):
-        """
-        Handle a worker response.
+    def handle_response(cls, response: requests.models.Response) -> Generator[str, None, None]:
+        """Handle a worker response.
 
         Read all lines
         Check if last line is OK
@@ -28,14 +29,13 @@ class Worker():
         And stream its contents
         Finally delete the response file from the server
 
-        :param result:
-        :return:
+        :param response: The response from the request made.
         """
-        worker_id = result.headers[cls._WORKER_ID_RESPONSE]
+        worker_id = response.headers[cls._WORKER_ID_RESPONSE]
 
         print(f"Worker response {worker_id} started")
         lastline = None
-        for line in result.iter_lines():
+        for line in response.iter_lines():
             lastline = line
 
         lastline = lastline.decode()
@@ -50,11 +50,11 @@ class Worker():
             try:
                 # Request result
                 url = f"{cls._WORKER_API}/{worker_id}"
-                result = requests.get(url=url, stream=True)
-                result.raise_for_status()
+                response = requests.get(url=url, stream=True)
+                response.raise_for_status()
 
                 # yield result
-                for line in result.iter_lines():
+                for line in response.iter_lines():
                     yield line
             except Exception as e:
                 print(f"Worker result {worker_id} failed")
@@ -64,5 +64,5 @@ class Worker():
                 # Always try to cleanup worker files (even if an exception has occurred)
                 print(f"Worker result {worker_id} clear...")
                 url = f"{cls._WORKER_API}/end/{worker_id}"
-                result = requests.delete(url=url)
-                result.raise_for_status()
+                response = requests.delete(url=url)
+                response.raise_for_status()

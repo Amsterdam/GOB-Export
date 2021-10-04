@@ -1,9 +1,5 @@
-from gobexport.app import run as run_app
+from gobexport import app
 
-
-def init():
-    if __name__ == "__main__":
-        run_app()
-
-
-init()
+if __name__ == "__main__":
+    # pragma: no cover
+    app.run()

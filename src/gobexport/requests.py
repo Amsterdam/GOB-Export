@@ -100,30 +100,29 @@ def handle_streaming_gob_response(func):
 
 @handle_streaming_gob_response
 def get_stream(url, secure_user=None):
-
-    result = None
+    response = None
     try:
-        result = requests.get(url=url, headers=_updated_headers(url, Worker.headers, secure_user=secure_user),
-                              stream=True)
-        result.raise_for_status()
-        result = Worker.handle_response(result)
-    except requests.exceptions.RequestException:
-        raise APIException(f"Request failed due to API exception, response code {result and result.status_code}")
-    return result
+        response = requests.get(url=url, headers=_updated_headers(url, Worker.headers, secure_user=secure_user),
+                                stream=True)
+        response.raise_for_status()
+        return Worker.handle_response(response)
+    except requests.exceptions.RequestException as e:
+        raise APIException(
+            f"Request failed due to API exception, response code {response and response.status_code}"
+        ) from e
 
 
 @handle_streaming_gob_response
 def post_stream(url, json, secure_user=None, **kwargs):
-
-    result = None
     try:
-        result = requests.post(url, headers=_updated_headers(url, Worker.headers, secure_user),
-                               stream=True, json=json, **kwargs)
-        result.raise_for_status()
-        result = Worker.handle_response(result)
-    except requests.exceptions.RequestException:
-        raise APIException(f"Request failed due to API exception, response code {result and result.status_code}")
-    return result
+        response = requests.post(
+            url, headers=_updated_headers(url, Worker.headers, secure_user), stream=True, json=json, **kwargs)
+        response.raise_for_status()
+        return Worker.handle_response(response)
+    except requests.exceptions.RequestException as e:
+        raise APIException(
+            f"Request failed due to API exception, response code {response and response.status_code}"
+        ) from e
 
 
 def urlopen(url):
