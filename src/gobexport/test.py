@@ -33,14 +33,15 @@ maxlength_col_n   maximum length of column n, e.g. [10, 15]
 unique_cols array of array of columns that should have unique values, e.g. [ [1], [2, 3] ]
 
 """
-import math
-import re
-import json
-import hashlib
-import statistics
+import copy
 import datetime
 import dateutil.parser
-import copy
+import hashlib
+import json
+import math
+import re
+import statistics
+import numbers
 
 from gobcore.datastore.objectstore import get_full_container_list, get_object, put_object
 
@@ -334,6 +335,10 @@ def _check_uniqueness(check):
         del check['unique_cols']
 
 
+def _fmt(margin):
+    return '{:,}'.format(margin) if isinstance(margin, numbers.Number) else '{}'.format(margin)
+
+
 def _check_file(check, filename, stats):
     """
     Test if all checks that have been defined for the given file are OK
@@ -354,16 +359,16 @@ def _check_file(check, filename, stats):
         value = stats[key]
         if len(margin) == 1:
             result = value == margin[0]
-            formatted_margin = f"= {margin[0]:,}"
+            formatted_margin = f"= {_fmt(margin[0])}"
         elif margin[0] is None:
             result = value <= margin[1]
-            formatted_margin = f"<= {margin[1]:,}"
+            formatted_margin = f"<= {_fmt(margin[1])}"
         elif margin[1] is None:
             result = value >= margin[0]
-            formatted_margin = f">= {margin[0]:,}"
+            formatted_margin = f">= {_fmt(margin[0])}"
         else:
             result = margin[0] <= value <= margin[1]
-            formatted_margin = f"{margin[0]:,} - {margin[1]:,}"
+            formatted_margin = f"{_fmt(margin[0])} - {_fmt(margin[1])}"
         total_result = total_result and result
 
         # Report any errors for the given filename as a group
