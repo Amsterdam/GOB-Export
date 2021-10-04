@@ -15,7 +15,6 @@ class MockResponse:
 
     def raise_for_status(self):
         raise self.exc("Any reason")
-    
 
 
 class MockGet:
@@ -26,9 +25,6 @@ class MockGet:
 
 
 class TestRequests(TestCase):
-
-    def setUp(self):
-        pass
 
     @patch('gobexport.requests._updated_headers', lambda url, **kwargs: {})
     @patch("gobexport.requests.requests")
@@ -66,7 +62,6 @@ class TestRequests(TestCase):
     @patch("gobexport.requests.requests")
     @patch("gobexport.requests.Worker")
     def test_stream(self, mock_worker, mock_requests):
-
         mock_get = MockGet()
         mock_get.iter_lines = MagicMock(return_value=['some item', b''])
         mock_worker.handle_response = mock_get.iter_lines

@@ -164,7 +164,7 @@ def get_centroid(wkt):
 
 
 def get_x(wkt):
-    """Get X coordinate from Centroid of WKT geomentry.
+    """Get X coordinate from Centroid of WKT geometry.
 
     Also cast it to integer.
     """
@@ -172,7 +172,7 @@ def get_x(wkt):
 
 
 def get_y(wkt):
-    """Get Y coordinate from Centroid of WKT geomentry.
+    """Get Y coordinate from Centroid of WKT geometry.
 
     Also cast it to integer.
     """
@@ -180,9 +180,9 @@ def get_y(wkt):
 
 
 def get_longitude(wkt):
-    """Get Longitude coordinate (WGS84) from Centroid of WKT geomentry.
+    """Get Longitude coordinate (WGS84) from Centroid of WKT geometry.
 
-    Also round it to COORDINATE_PRECISION (decimal percision).
+    Also round it to COORDINATE_PRECISION (decimal precision).
     """
     centroid = get_centroid(wkt)
     centroid.Transform(transform)
@@ -190,9 +190,9 @@ def get_longitude(wkt):
 
 
 def get_latitude(wkt):
-    """Get Latitude coordinate (WGS84) from Centroid of WKT geomentry.
+    """Get Latitude coordinate (WGS84) from Centroid of WKT geometry.
 
-    Also round it to COORDINATE_PRECISION (decimal percision).
+    Also round it to COORDINATE_PRECISION (decimal precision).
     """
     centroid = get_centroid(wkt)
     centroid.Transform(transform)
