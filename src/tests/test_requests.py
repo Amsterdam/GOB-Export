@@ -1,4 +1,4 @@
-from unittest import TestCase, mock
+from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -131,7 +131,7 @@ class TestRequests(TestCase):
             'some key': "some value",
             'secure key': "some obsolete value"
         }
-        result = gobexport.requests._updated_headers(url, headers)
+        result = gobexport.requests._updated_headers(url, headers, secure_user="TEST_SECURE_USER")
         self.assertEqual(result, {
             'some key': 'some value',
             'secure key': 'secure value'

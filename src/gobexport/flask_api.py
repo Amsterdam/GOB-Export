@@ -1,6 +1,9 @@
+from logging.config import dictConfig
+from typing import Dict, Optional
+
 from flask import Flask
 from flask_cors import CORS
-from gobexport.config import API_BASE_PATH
+from gobexport.config import API_BASE_PATH, API_LOGGING
 from gobexport.exporter import CONFIG_MAPPING
 
 
@@ -55,13 +58,14 @@ def _products():
     return result
 
 
-def get_flask_app():
+def get_flask_app(config: Optional[Dict[str, any]] = None):
     """
     Initializes the Flask App
 
+    :param config: dictionary to update the flask configuration with.
     :return: Flask App
     """
-
+    dictConfig(API_LOGGING)
     ROUTES = [
         # Health check URL
         ('/status/health/', _health, ['GET']),
@@ -69,6 +73,8 @@ def get_flask_app():
     ]
 
     app = Flask(__name__)
+    if config is not None:
+        app.config.update(config)
     CORS(app)
 
     for route, view_func, methods in ROUTES:

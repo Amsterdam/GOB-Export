@@ -44,6 +44,35 @@ BASISINFORMATIE_OBJECTSTORE = 'Basisinformatie'
 GOB_EXPORT_API_PORT = os.getenv('GOB_EXPORT_API_PORT', 8168)
 API_BASE_PATH = os.getenv("BASE_PATH", default="")
 
+# Logging for the API.
+# Logging for services is configured in services.py
+API_LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "default"
+        },
+    },
+    "loggers": {
+        "tests": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
+        "gobexport": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+    }
+}
+
 
 def get_host():
     """API Host
