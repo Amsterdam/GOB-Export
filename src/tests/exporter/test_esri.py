@@ -5,7 +5,8 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
-from gobexport.exporter.esri import get_centroid, get_x, get_y, get_longitude, get_latitude, esri_exporter, ogr
+from gobexport.exporter.esri import get_centroid, get_x, get_y, get_longitude, get_latitude, esri_exporter, ogr, \
+    COORDINATE_PRECISION
 
 
 class TestEsriExporter(TestCase):
@@ -86,5 +87,7 @@ def test_get_centroid(wkt, expected):
 def test_get_coordinates(wkt, x, y, longitude, latitude):
     assert get_x(wkt) == x
     assert get_y(wkt) == y
-    assert get_longitude(wkt) == longitude
-    assert get_latitude(wkt) == latitude
+    # Coordinates should match. Due to differences on math libraries in operating systems a precision of 0.0000001m is
+    # not realistic. 1cm (0.01) is enough for land coordinates.
+    assert abs(get_longitude(wkt) - longitude) < 0.01
+    assert abs(get_latitude(wkt) - latitude) < 0.01
