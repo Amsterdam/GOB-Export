@@ -17,4 +17,3 @@ def app() -> Generator[Flask, None, None]:
     app = get_flask_app({"TESTING": True})
     with app.app_context():
         yield app
-
