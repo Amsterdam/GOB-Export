@@ -167,10 +167,10 @@ SERVICEDEFINITION = {
 def run_message_thread():
     try:
         messagedriven_service(SERVICEDEFINITION, "Export")
-    except Exception as e:  # noqa: E722 do not use bare 'except'
+    except Exception as e:
         print("ERROR: no connection with GOB message broker, application is stopped")
         print(e)
-        os._exit(os.EX_UNAVAILABLE)
+    os._exit(os.EX_UNAVAILABLE)
 
 
 def get_app():

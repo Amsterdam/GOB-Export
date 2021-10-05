@@ -1,6 +1,6 @@
 import logging
 import urllib.request
-from typing import Optional
+from typing import Optional, Callable
 
 import requests
 import time
@@ -28,7 +28,7 @@ class APIException(IOError):
     pass
 
 
-def _exec(method, url, secure_user: Optional[str] = None, **kwargs):
+def _exec(method: Callable[..., requests.models.Response], url: str, secure_user: Optional[str] = None, **kwargs):
     """
     Execute method _MAX_TRIES times to get a result
 
@@ -62,7 +62,18 @@ def _exec(method, url, secure_user: Optional[str] = None, **kwargs):
     raise APIException(f"Request '{request}' failed, tried {n_tries} times")
 
 
-def _updated_headers(url, headers=None, secure_user=None):
+def _updated_headers(
+        url: str,
+        headers: Optional[dict[str, str]] = None,
+        secure_user: Optional[str] = None
+) -> dict[str, str]:
+    """Update headers with credentials if url is not public.
+
+    :param url: The url to update the headers for
+    :param headers: Add secure user to possible existing headers
+    :param secure_user: The user id to add the credentials for
+    :return: Updated headers
+    """
     if _PUBLIC_URL not in url:
         logger.info(f"Updating secure headers for user {secure_user}")
         assert secure_user, f"A secure_user must be defined to request secure url {url}"
@@ -123,7 +134,6 @@ def post_stream(url, json, secure_user=None, **kwargs):
         response.raise_for_status()
         return Worker.handle_response(response)
     except requests.exceptions.RequestException as e:
-        # add request id here
         raise APIException(
             f"Request failed due to API exception, response code {response and response.status_code}"
         ) from e

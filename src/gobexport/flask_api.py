@@ -58,7 +58,7 @@ def _products():
     return result
 
 
-def get_flask_app(config: Optional[Dict[str, any]] = None):
+def get_flask_app(config: Optional[Dict[str, any]] = None) -> Flask:
     """
     Initializes the Flask App
 
