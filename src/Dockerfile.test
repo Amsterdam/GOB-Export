@@ -23,6 +23,7 @@ COPY gobexport gobexport
 # Copy tests
 COPY tests tests
 COPY .flake8 .flake8
+COPY .coveragerc .coveragerc
 COPY test.sh test.sh
 
 # Copy jenkins files
