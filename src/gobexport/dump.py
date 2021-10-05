@@ -157,7 +157,7 @@ class Dumper:
 
             last_line = ""
             start_line = time.time()
-            for line in result.iter_lines(chsunk_size=1):
+            for line in result.iter_lines(chunk_size=1):
                 last_line = line.decode()
                 end_line = time.time()
                 logger.info(f"{last_line} ({(end_line - start_line):.2f} / {(end_line - start_request):.2f} secs)")
