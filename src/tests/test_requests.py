@@ -1,4 +1,4 @@
-from unittest import TestCase, mock
+from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -15,7 +15,6 @@ class MockResponse:
 
     def raise_for_status(self):
         raise self.exc("Any reason")
-    
 
 
 class MockGet:
@@ -26,9 +25,6 @@ class MockGet:
 
 
 class TestRequests(TestCase):
-
-    def setUp(self):
-        pass
 
     @patch('gobexport.requests._updated_headers', lambda url, **kwargs: {})
     @patch("gobexport.requests.requests")
@@ -66,7 +62,6 @@ class TestRequests(TestCase):
     @patch("gobexport.requests.requests")
     @patch("gobexport.requests.Worker")
     def test_stream(self, mock_worker, mock_requests):
-
         mock_get = MockGet()
         mock_get.iter_lines = MagicMock(return_value=['some item', b''])
         mock_worker.handle_response = mock_get.iter_lines
@@ -136,7 +131,7 @@ class TestRequests(TestCase):
             'some key': "some value",
             'secure key': "some obsolete value"
         }
-        result = gobexport.requests._updated_headers(url, headers)
+        result = gobexport.requests._updated_headers(url, headers, secure_user="TEST_SECURE_USER")
         self.assertEqual(result, {
             'some key': 'some value',
             'secure key': 'secure value'

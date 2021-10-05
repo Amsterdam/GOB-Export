@@ -8,3 +8,5 @@
 **/htmlcov
 
 .env*
+.idea
+esri.cpg

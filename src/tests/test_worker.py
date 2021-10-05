@@ -1,12 +1,17 @@
-from unittest import TestCase, mock
+from unittest import mock
+
+import pytest
+import requests
+import requests_mock
 
 from gobexport.worker import Worker
 
-@mock.patch("gobexport.worker.get_host", lambda : 'host')
-class TestWorker(TestCase):
 
+class TestWorker:
+
+    @mock.patch("gobexport.worker.get_host", lambda: 'host')
     @mock.patch("gobexport.worker.requests")
-    def test_handle_response(self, mock_request):
+    def test_handle_response(self, mock_request, app):
         mock_result = mock.MagicMock()
         mock_result.iter_lines.return_value = [b'1', b'2', b'OK']
 
@@ -15,22 +20,41 @@ class TestWorker(TestCase):
         mock_worker_result.iter_lines.return_value = ['line1', 'line2']
 
         result = [line for line in Worker.handle_response(mock_result)]
-        self.assertEqual(result, ['line1', 'line2'])
+        assert result == ['line1', 'line2']
         mock_request.delete.assert_called()
         mock_request.delete.reset_mock()
 
         mock_request.get.side_effect = mock.Mock(side_effect=Exception('Test'))
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             result = [line for line in Worker.handle_response(mock_result)]
+
         mock_request.delete.assert_called()
         mock_request.delete.reset_mock()
 
         mock_result.iter_lines.return_value = [b'1', b'2', b'FAILURE']
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             result = [line for line in Worker.handle_response(mock_result)]
         mock_request.delete.assert_not_called()
 
         mock_result.iter_lines.return_value = [b'1', b'2']
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             result = [line for line in Worker.handle_response(mock_result)]
         mock_request.delete.assert_not_called()
+
+    def test_handle_response_logs_request_id(self, app, caplog):
+        """Make sure logging is correctly setup and adds the x-request-id."""
+        with requests_mock.Mocker() as m:
+            m.get(
+                "mock://gobapi.nl",
+                content=b"1\n2\nOK",
+                headers={
+                    Worker._WORKER_ID_RESPONSE: "test-id",
+                    Worker._REQUEST_ID: "test-request-id"
+                }
+            )
+            m.get("http://localhost:8141/gob/public/worker/test-id", content=b"")
+            m.delete("http://localhost:8141/gob/public/worker/end/test-id", content=b"")
+            response = requests.get("mock://gobapi.nl")
+            list(Worker.handle_response(response))
+
+        assert getattr(caplog.records[0], "x-request_id") == "test-request-id"

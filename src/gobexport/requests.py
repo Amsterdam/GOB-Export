@@ -1,11 +1,15 @@
+import logging
+import urllib.request
+from typing import Optional, Callable
+
 import requests
 import time
-
-import urllib.request
 
 from gobexport.config import PUBLIC_URL
 from gobexport.keycloak import get_secure_header
 from gobexport.worker import Worker
+
+logger = logging.getLogger(__name__)
 
 _MAX_TRIES = 60                # Maximum number of times to try the request
 _RETRY_TIMEOUT = 60            # Seconds between consecetive retries
@@ -24,7 +28,7 @@ class APIException(IOError):
     pass
 
 
-def _exec(method, url, headers, **kwargs):
+def _exec(method: Callable[..., requests.models.Response], url: str, secure_user: Optional[str] = None, **kwargs):
     """
     Execute method _MAX_TRIES times to get a result
 
@@ -35,6 +39,7 @@ def _exec(method, url, headers, **kwargs):
     """
     n_tries = 0
     while n_tries < _MAX_TRIES:
+        headers = _updated_headers(url, secure_user=secure_user)
         try:
             response = method(url=url, headers=headers, **kwargs)
             response.raise_for_status()
@@ -52,28 +57,37 @@ def _exec(method, url, headers, **kwargs):
             print(f"Request exception: '{str(e)}'")
             print(f"Retry in {_RETRY_TIMEOUT} seconds, retries left: {_MAX_TRIES - n_tries}")
             time.sleep(_RETRY_TIMEOUT)
-            # Update headers because access token might be expired
-            headers = _updated_headers(url=url, headers=headers)
 
     request = ', '.join([f"{k}='{v}'" for k, v in kwargs.items()])
     raise APIException(f"Request '{request}' failed, tried {n_tries} times")
 
 
-def _updated_headers(url, headers=None, secure_user=None):
+def _updated_headers(
+        url: str,
+        headers: Optional[dict[str, str]] = None,
+        secure_user: Optional[str] = None
+) -> dict[str, str]:
+    """Update headers with credentials if url is not public.
+
+    :param url: The url to update the headers for
+    :param headers: Add secure user to possible existing headers
+    :param secure_user: The user id to add the credentials for
+    :return: Updated headers
+    """
     if _PUBLIC_URL not in url:
+        logger.info(f"Updating secure headers for user {secure_user}")
+        assert secure_user, f"A secure_user must be defined to request secure url {url}"
         headers = headers or {}
         headers.update(get_secure_header(secure_user))
     return headers
 
 
 def get(url, secure_user=None):
-    return _exec(requests.get, url=url, headers=_updated_headers(url, secure_user=secure_user),
-                 timeout=_REQUEST_TIMEOUT)
+    return _exec(requests.get, url=url, timeout=_REQUEST_TIMEOUT, secure_user=secure_user)
 
 
 def post(url, json, secure_user=None):
-    return _exec(requests.post, url=url, headers=_updated_headers(url, secure_user=secure_user), json=json,
-                 timeout=_REQUEST_TIMEOUT)
+    return _exec(requests.post, url=url, json=json, timeout=_REQUEST_TIMEOUT, secure_user=secure_user)
 
 
 def handle_streaming_gob_response(func):
@@ -100,30 +114,29 @@ def handle_streaming_gob_response(func):
 
 @handle_streaming_gob_response
 def get_stream(url, secure_user=None):
-
-    result = None
+    response = None
     try:
-        result = requests.get(url=url, headers=_updated_headers(url, Worker.headers, secure_user=secure_user),
-                              stream=True)
-        result.raise_for_status()
-        result = Worker.handle_response(result)
-    except requests.exceptions.RequestException:
-        raise APIException(f"Request failed due to API exception, response code {result and result.status_code}")
-    return result
+        response = requests.get(url=url, headers=_updated_headers(url, Worker.headers, secure_user=secure_user),
+                                stream=True)
+        response.raise_for_status()
+        return Worker.handle_response(response)
+    except requests.exceptions.RequestException as e:
+        raise APIException(
+            f"Request failed due to API exception, response code {response and response.status_code}"
+        ) from e
 
 
 @handle_streaming_gob_response
 def post_stream(url, json, secure_user=None, **kwargs):
-
-    result = None
     try:
-        result = requests.post(url, headers=_updated_headers(url, Worker.headers, secure_user),
-                               stream=True, json=json, **kwargs)
-        result.raise_for_status()
-        result = Worker.handle_response(result)
-    except requests.exceptions.RequestException:
-        raise APIException(f"Request failed due to API exception, response code {result and result.status_code}")
-    return result
+        response = requests.post(
+            url, headers=_updated_headers(url, Worker.headers, secure_user), stream=True, json=json, **kwargs)
+        response.raise_for_status()
+        return Worker.handle_response(response)
+    except requests.exceptions.RequestException as e:
+        raise APIException(
+            f"Request failed due to API exception, response code {response and response.status_code}"
+        ) from e
 
 
 def urlopen(url):
