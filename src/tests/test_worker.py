@@ -57,4 +57,4 @@ class TestWorker:
             response = requests.get("mock://gobapi.nl")
             list(Worker.handle_response(response))
 
-        assert getattr(caplog.records[0], "x-request_id") == "test-request-id"
+        assert "test-request-id" in caplog.records[0].message
