@@ -37,24 +37,24 @@ class Worker:
         """
         worker_id = response.headers.get(cls._WORKER_ID_RESPONSE)
         current_request_id = response.headers.get(cls._REQUEST_ID)
-        logger.info(f"Worker response {worker_id} started", extra={"x-request_id": current_request_id})
+        logger.info(f"Worker response {worker_id} (request {current_request_id}) started.")
         last_line = None
         for line in response.iter_lines():
             last_line = line
 
         last_line = last_line.decode()
+        # Deze id's zitten er nog niet in. Gaan we json loggen naar de console? Is dat een idee?
         if last_line == cls._WORKER_RESULT_FAILURE:
-            logger.info(f"Worker response {worker_id} failed", extra={"x-request_id": current_request_id})
+            logger.info(f"Worker response {worker_id} (request {current_request_id}) failed")
             raise requests.exceptions.RequestException("Worker response failed")
         elif last_line != cls._WORKER_RESULT_OK:
-            logger.info(f"Worker response {worker_id} ended prematurely", extra={"x-request_id": current_request_id})
+            logger.info(f"Worker response {worker_id} (request {current_request_id}) ended prematurely")
             raise requests.exceptions.RequestException("Worker response ended prematurely")
         else:
-            logger.info(f"Worker result {worker_id} OK", extra={"x-request_id": current_request_id})
+            logger.info(f"Worker result {worker_id} (request {current_request_id}) OK")
             try:
                 # Request worker result
                 url = f"{cls._WORKER_API}/{worker_id}"
-                print(url)
                 response = requests.get(url=url, stream=True)
                 response.raise_for_status()
 
@@ -65,7 +65,7 @@ class Worker:
                 raise e
             finally:
                 # Always try to cleanup worker files (even if an exception has occurred)
-                logger.info(f"Worker result {worker_id} clear...", extra={"x-request_id": current_request_id})
+                logger.info(f"Worker result {worker_id} (request {current_request_id}) clear...")
                 url = f"{cls._WORKER_API}/end/{worker_id}"
                 response = requests.delete(url=url)
                 response.raise_for_status()
