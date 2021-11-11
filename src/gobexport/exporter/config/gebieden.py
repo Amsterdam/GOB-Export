@@ -543,7 +543,7 @@ class WijkenExportConfig:
         documentnummer
         cbsCode
         geometrie
-        LigtInGgwgebied {
+        ligtInGgwgebied {
           edges {
             node {
               identificatie
@@ -590,9 +590,9 @@ class WijkenExportConfig:
                 'documentdatum': 'documentdatum',
                 'documentnummer': 'documentnummer',
                 'cbsCode': 'cbsCode',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+                'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
+                'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
+                'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
@@ -620,9 +620,9 @@ class WijkenExportConfig:
                 'docdatum': 'documentdatum',
                 'docnummer': 'documentnummer',
                 'CBS_code': 'cbsCode',
-                'ggw_id': 'LigtInGgwgebied.identificatie',
-                'ggw_code': 'LigtInGgwgebied.code',
-                'ggw_naam': 'LigtInGgwgebied.naam',
+                'ggw_id': 'ligtInGgwgebied.identificatie',
+                'ggw_code': 'ligtInGgwgebied.code',
+                'ggw_naam': 'ligtInGgwgebied.naam',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_code': 'ligtInStadsdeel.code',
                 'sdl_naam': 'ligtInStadsdeel.naam',
@@ -665,10 +665,10 @@ class WijkenExportConfig:
                 'documentdatum': 'documentdatum',
                 'documentnummer': 'documentnummer',
                 'cbsCode': 'cbsCode',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
+                'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
+                'ligtIn:GBD.GGW.volgnummer': 'ligtInGgwgebied.volgnummer',
+                'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
+                'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
                 'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
@@ -698,7 +698,7 @@ class WijkenExportConfig:
         documentnummer
         cbsCode
         geometrie
-        LigtInGgwgebied(active: false) {
+        ligtInGgwgebied(active: false) {
           edges {
             node {
               identificatie
@@ -757,7 +757,7 @@ class BuurtenExportConfig:
         documentdatum
         documentnummer
         geometrie
-        LigtInGgpgebied {
+        ligtInGgpgebied {
           edges {
             node {
               identificatie
@@ -772,7 +772,7 @@ class BuurtenExportConfig:
               identificatie
               code
               naam
-              LigtInGgwgebied {
+              ligtInGgwgebied {
                 edges {
                   node {
                     identificatie
@@ -825,12 +825,12 @@ class BuurtenExportConfig:
                 'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
-                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
-                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+                'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
+                'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
+                'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
+                'ligtIn:GBD.GGP.identificatie': 'ligtInGgpgebied.identificatie',
+                'ligtIn:GBD.GGP.code': 'ligtInGgpgebied.code',
+                'ligtIn:GBD.GGP.naam': 'ligtInGgpgebied.naam',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
@@ -861,10 +861,10 @@ class BuurtenExportConfig:
                 'wijk_id': 'ligtInWijk.identificatie',
                 'wijk_code': 'ligtInWijk.code',
                 'wijk_naam': 'ligtInWijk.naam',
-                'ggw_id': 'LigtInGgwgebied.identificatie',
+                'ggw_id': 'ligtInGgwgebied.identificatie',
                 'ggw_code': 'LigtInGgwgebied.code',
                 'ggw_naam': 'LigtInGgwgebied.naam',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
+                'ggp_id': 'ligtInGgpgebied.identificatie',
                 'ggp_code': 'LigtInGgpgebied.code',
                 'ggp_naam': 'LigtInGgpgebied.naam',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
@@ -913,14 +913,14 @@ class BuurtenExportConfig:
                 'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
-                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
-                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
-                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+                'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
+                'ligtIn:GBD.GGW.volgnummer': 'ligtInGgwgebied.volgnummer',
+                'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
+                'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
+                'ligtIn:GBD.GGP.identificatie': 'ligtInGgpgebied.identificatie',
+                'ligtIn:GBD.GGP.volgnummer': 'ligtInGgpgebied.volgnummer',
+                'ligtIn:GBD.GGP.code': 'ligtInGgpgebied.code',
+                'ligtIn:GBD.GGP.naam': 'ligtInGgpgebied.naam',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
                 'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
@@ -950,7 +950,7 @@ class BuurtenExportConfig:
         documentnummer
         cbsCode
         geometrie
-        LigtInGgwgebied(active: false) {
+        ligtInGgwgebied(active: false) {
           edges {
             node {
               identificatie
@@ -962,7 +962,7 @@ class BuurtenExportConfig:
             }
           }
         }
-        LigtInGgpgebied(active: false) {
+        ligtInGgpgebied(active: false) {
           edges {
             node {
               identificatie
@@ -1035,7 +1035,7 @@ class BouwblokkenExportConfig:
               identificatie
               code
               naam
-              LigtInGgpgebied {
+              ligtInGgpgebied {
                 edges {
                   node {
                     identificatie
@@ -1044,7 +1044,7 @@ class BouwblokkenExportConfig:
                   }
                 }
               }
-              LigtInGgwgebied {
+              ligtInGgwgebied {
                 edges {
                   node {
                     identificatie
@@ -1105,12 +1105,12 @@ class BouwblokkenExportConfig:
                 'ligtIn:GBD.WIJK.identificatie': 'ligtInWijk.identificatie',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
-                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
-                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+                'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
+                'ligtIn:GBD.GGW.code': 'igtInGgwgebied.code',
+                'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
+                'ligtIn:GBD.GGP.identificatie': 'ligtInGgpgebied.identificatie',
+                'ligtIn:GBD.GGP.code': 'ligtInGgpgebied.code',
+                'ligtIn:GBD.GGP.naam': 'ligtInGgpgebied.naam',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
                 'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
@@ -1140,12 +1140,12 @@ class BouwblokkenExportConfig:
                 'wijk_id': 'ligtInWijk.identificatie',
                 'wijk_code': 'ligtInWijk.code',
                 'wijk_naam': 'ligtInWijk.naam',
-                'ggw_id': 'LigtInGgwgebied.identificatie',
-                'ggw_code': 'LigtInGgwgebied.code',
-                'ggw_naam': 'LigtInGgwgebied.naam',
-                'ggp_id': 'LigtInGgpgebied.identificatie',
-                'ggp_code': 'LigtInGgpgebied.code',
-                'ggp_naam': 'LigtInGgpgebied.naam',
+                'ggw_id': 'ligtInGgwgebied.identificatie',
+                'ggw_code': 'ligtInGgwgebied.code',
+                'ggw_naam': 'ligtInGgwgebied.naam',
+                'ggp_id': 'ligtInGgpgebied.identificatie',
+                'ggp_code': 'ligtInGgpgebied.code',
+                'ggp_naam': 'ligtInGgpgebied.naam',
                 'sdl_id': 'ligtInStadsdeel.identificatie',
                 'sdl_code': 'ligtInStadsdeel.code',
                 'sdl_naam': 'ligtInStadsdeel.naam',
@@ -1192,14 +1192,14 @@ class BouwblokkenExportConfig:
                 'ligtIn:GBD.WIJK.volgnummer': 'ligtInWijk.volgnummer',
                 'ligtIn:GBD.WIJK.code': 'ligtInWijk.code',
                 'ligtIn:GBD.WIJK.naam': 'ligtInWijk.naam',
-                'ligtIn:GBD.GGW.identificatie': 'LigtInGgwgebied.identificatie',
-                'ligtIn:GBD.GGW.volgnummer': 'LigtInGgwgebied.volgnummer',
-                'ligtIn:GBD.GGW.code': 'LigtInGgwgebied.code',
-                'ligtIn:GBD.GGW.naam': 'LigtInGgwgebied.naam',
-                'ligtIn:GBD.GGP.identificatie': 'LigtInGgpgebied.identificatie',
-                'ligtIn:GBD.GGP.volgnummer': 'LigtInGgpgebied.volgnummer',
-                'ligtIn:GBD.GGP.code': 'LigtInGgpgebied.code',
-                'ligtIn:GBD.GGP.naam': 'LigtInGgpgebied.naam',
+                'ligtIn:GBD.GGW.identificatie': 'ligtInGgwgebied.identificatie',
+                'ligtIn:GBD.GGW.volgnummer': 'ligtInGgwgebied.volgnummer',
+                'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
+                'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
+                'ligtIn:GBD.GGP.identificatie': 'ligtInGgpgebied.identificatie',
+                'ligtIn:GBD.GGP.volgnummer': 'ligtInGgpgebied.volgnummer',
+                'ligtIn:GBD.GGP.code': 'ligtInGgpgebied.code',
+                'ligtIn:GBD.GGP.naam': 'ligtInGgpgebied.naam',
                 'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
                 'ligtIn:GBD.SDL.volgnummer': 'ligtInStadsdeel.volgnummer',
                 'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
@@ -1234,7 +1234,7 @@ class BouwblokkenExportConfig:
               naam
               beginGeldigheid
               eindGeldigheid
-              LigtInGgwgebied(active: false) {
+              ligtInGgwgebied(active: false) {
                 edges {
                   node {
                     identificatie
@@ -1246,7 +1246,7 @@ class BouwblokkenExportConfig:
                   }
                 }
               }
-              LigtInGgpgebied(active: false) {
+              ligtInGgpgebied(active: false) {
                 edges {
                   node {
                     identificatie
