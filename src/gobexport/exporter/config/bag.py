@@ -1268,7 +1268,7 @@ class StandplaatsenExportConfig:
         'ligtIn:GBD.GGW.code': 'ligtInGgwgebied.code',
         'ligtIn:GBD.GGW.naam': 'ligtInGgwgebied.naam',
         'ligtIn:GBD.GGP.identificatie': 'ligtInGgpgebied.identificatie',
-        'ligtIn:GBD.GGP.volgnummer': 'igtInGgpgebied.volgnummer',
+        'ligtIn:GBD.GGP.volgnummer': 'ligtInGgpgebied.volgnummer',
         'ligtIn:GBD.GGP.code': 'ligtInGgpgebied.code',
         'ligtIn:GBD.GGP.naam': 'ligtInGgpgebied.naam',
         'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
