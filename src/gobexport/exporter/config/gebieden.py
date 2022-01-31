@@ -27,8 +27,9 @@ following properties:
 class StadsdelenExportConfig:
 
     query_actueel = '''
-{
-  gebiedenStadsdelen {
+# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
+query ($eind: Date = "null" ) {
+  gebiedenStadsdelen (eindGeldigheid: $eind ) {
     edges {
       node {
         identificatie
@@ -175,6 +176,7 @@ class GGPGebiedenExportConfig:
 
     query_actueel = '''
 {
+# GGP gebieden zijn per 24-03-2022 niet meer in gebruik. Einddatum is altijd gevuld.
   gebiedenGgpgebieden {
     edges {
       node {
@@ -352,8 +354,9 @@ class GGPGebiedenExportConfig:
 class GGWGebiedenExportConfig:
 
     query_actueel = '''
-{
-  gebiedenGgwgebieden {
+# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
+query ($eind: Date = "null" ) {
+  gebiedenGgwgebieden (eindGeldigheid: $eind ) {
     edges {
       node {
         identificatie
@@ -530,8 +533,9 @@ class GGWGebiedenExportConfig:
 class WijkenExportConfig:
 
     query_actueel = '''
-{
-  gebiedenWijken {
+# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
+query ($eind: Date = "null" ) {
+  gebiedenWijken (eindGeldigheid: $eind ) {
     edges {
       node {
         identificatie
@@ -744,8 +748,9 @@ class WijkenExportConfig:
 class BuurtenExportConfig:
 
     query_actueel = '''
-{
-  gebiedenBuurten {
+# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
+query ($eind: Date = "null" ) {
+  gebiedenBuurten (eindGeldigheid: $eind ) {
     edges {
       node {
         identificatie
@@ -1018,10 +1023,10 @@ class BuurtenExportConfig:
 
 
 class BouwblokkenExportConfig:
-
     query_actueel = """
-{
-  gebiedenBouwblokken(sort:code_asc) {
+# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
+query ($eind: Date = "null" ) {
+  gebiedenBouwblokken(sort:code_asc, eindGeldigheid: $eind) {
     edges {
       node {
         identificatie
