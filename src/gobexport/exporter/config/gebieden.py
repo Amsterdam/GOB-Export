@@ -28,7 +28,7 @@ class StadsdelenExportConfig:
 
     query_actueel = '''
 # Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: Date = "null" ) {
+query ($eind: DateTime = "null" ) {
   gebiedenStadsdelen (eindGeldigheid: $eind ) {
     edges {
       node {
@@ -355,7 +355,7 @@ class GGWGebiedenExportConfig:
 
     query_actueel = '''
 # Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: Date = "null" ) {
+query ($eind: DateTime = "null" ) {
   gebiedenGgwgebieden (eindGeldigheid: $eind ) {
     edges {
       node {
@@ -534,7 +534,7 @@ class WijkenExportConfig:
 
     query_actueel = '''
 # Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: Date = "null" ) {
+query ($eind: DateTime = "null" ) {
   gebiedenWijken (eindGeldigheid: $eind ) {
     edges {
       node {
@@ -749,7 +749,7 @@ class BuurtenExportConfig:
 
     query_actueel = '''
 # Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: Date = "null" ) {
+query ($eind: DateTime = "null" ) {
   gebiedenBuurten (eindGeldigheid: $eind ) {
     edges {
       node {
@@ -1025,7 +1025,7 @@ query ($eind: Date = "null" ) {
 class BouwblokkenExportConfig:
     query_actueel = """
 # Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: Date = "null" ) {
+query ($eind: DateTime = "null" ) {
   gebiedenBouwblokken(sort:code_asc, eindGeldigheid: $eind) {
     edges {
       node {
