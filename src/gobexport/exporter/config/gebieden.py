@@ -35,8 +35,8 @@ query ($eind: DateTime = "null" ) {
         identificatie
         code
         naam
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         geometrie
@@ -148,8 +148,8 @@ query ($eind: DateTime = "null" ) {
         registratiedatum
         code
         naam
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         ligtInGemeente(active: false) {
@@ -157,8 +157,6 @@ query ($eind: DateTime = "null" ) {
             node {
               identificatie
               naam
-              beginGeldigheid
-              eindGeldigheid
             }
           }
         }
@@ -183,8 +181,8 @@ class GGPGebiedenExportConfig:
         identificatie
         code
         naam
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         geometrie
@@ -315,8 +313,8 @@ class GGPGebiedenExportConfig:
         registratiedatum
         code
         naam
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         geometrie
@@ -327,15 +325,11 @@ class GGPGebiedenExportConfig:
               volgnummer
               code
               naam
-              beginGeldigheid
-              eindGeldigheid
               ligtInGemeente(active: false) {
                 edges {
                   node {
                     identificatie
                     naam
-                    beginGeldigheid
-                    eindGeldigheid
                   }
                 }
               }
@@ -362,8 +356,8 @@ query ($eind: DateTime = "null" ) {
         identificatie
         code
         naam
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         geometrie
@@ -494,8 +488,8 @@ query ($eind: DateTime = "null" ) {
         registratiedatum
         code
         naam
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         geometrie
@@ -506,15 +500,11 @@ query ($eind: DateTime = "null" ) {
               volgnummer
               code
               naam
-              beginGeldigheid
-              eindGeldigheid
               ligtInGemeente(active: false) {
                 edges {
                   node {
                     identificatie
                     naam
-                    beginGeldigheid
-                    eindGeldigheid
                   }
                 }
               }
@@ -541,8 +531,8 @@ query ($eind: DateTime = "null" ) {
         identificatie
         code
         naam
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         cbsCode
@@ -696,8 +686,8 @@ query ($eind: DateTime = "null" ) {
         registratiedatum
         code
         naam
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         cbsCode
@@ -709,8 +699,6 @@ query ($eind: DateTime = "null" ) {
               volgnummer
               code
               naam
-              beginGeldigheid
-              eindGeldigheid
             }
           }
         }
@@ -721,15 +709,11 @@ query ($eind: DateTime = "null" ) {
               volgnummer
               code
               naam
-              beginGeldigheid
-              eindGeldigheid
               ligtInGemeente(active: false) {
                 edges {
                   node {
                     identificatie
                     naam
-                    beginGeldigheid
-                    eindGeldigheid
                   }
                 }
               }
@@ -757,8 +741,8 @@ query ($eind: DateTime = "null" ) {
         code
         naam
         cbsCode
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         geometrie
@@ -949,8 +933,8 @@ query ($eind: DateTime = "null" ) {
         registratiedatum
         code
         naam
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
         cbsCode
@@ -962,8 +946,6 @@ query ($eind: DateTime = "null" ) {
               volgnummer
               code
               naam
-              beginGeldigheid
-              eindGeldigheid
             }
           }
         }
@@ -974,8 +956,6 @@ query ($eind: DateTime = "null" ) {
               volgnummer
               code
               naam
-              beginGeldigheid
-              eindGeldigheid
             }
           }
         }
@@ -986,8 +966,6 @@ query ($eind: DateTime = "null" ) {
               volgnummer
               code
               naam
-              beginGeldigheid
-              eindGeldigheid
               ligtInStadsdeel(active: false) {
                 edges {
                   node {
@@ -995,15 +973,11 @@ query ($eind: DateTime = "null" ) {
                     volgnummer
                     code
                     naam
-                    beginGeldigheid
-                    eindGeldigheid
                     ligtInGemeente(active: false) {
                       edges {
                         node {
                           identificatie
                           naam
-                          beginGeldigheid
-                          eindGeldigheid
                         }
                       }
                     }
@@ -1031,8 +1005,8 @@ query ($eind: DateTime = "null" ) {
       node {
         identificatie
         code
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         geometrie
         ligtInBuurt {
           edges {
@@ -1227,8 +1201,8 @@ query ($eind: DateTime = "null" ) {
         volgnummer
         registratiedatum
         code
-        beginGeldigheid
-        eindGeldigheid
+        beginGeldigheid @formatdate(format: "%Y-%m-%d")
+        eindGeldigheid @formatdate(format: "%Y-%m-%d")
         geometrie
         ligtInBuurt(active: false) {
           edges {
@@ -1237,8 +1211,6 @@ query ($eind: DateTime = "null" ) {
               volgnummer
               code
               naam
-              beginGeldigheid
-              eindGeldigheid
               ligtInGgwgebied(active: false) {
                 edges {
                   node {
@@ -1246,8 +1218,6 @@ query ($eind: DateTime = "null" ) {
                     volgnummer
                     code
                     naam
-                    beginGeldigheid
-                    eindGeldigheid
                   }
                 }
               }
@@ -1258,8 +1228,6 @@ query ($eind: DateTime = "null" ) {
                     volgnummer
                     code
                     naam
-                    beginGeldigheid
-                    eindGeldigheid
                   }
                 }
               }
@@ -1270,8 +1238,6 @@ query ($eind: DateTime = "null" ) {
                     volgnummer
                     code
                     naam
-                    beginGeldigheid
-                    eindGeldigheid
                     ligtInStadsdeel(active: false) {
                       edges {
                         node {
@@ -1279,15 +1245,11 @@ query ($eind: DateTime = "null" ) {
                           volgnummer
                           code
                           naam
-                          beginGeldigheid
-                          eindGeldigheid
                           ligtInGemeente(active: false) {
                             edges {
                               node {
                                 identificatie
                                 naam
-                                beginGeldigheid
-                                eindGeldigheid
                               }
                             }
                           }
