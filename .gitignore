@@ -10,3 +10,4 @@
 .env*
 .idea
 esri.cpg
+.DS_Store

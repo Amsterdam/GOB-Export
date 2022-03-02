@@ -13,6 +13,7 @@ ENV C_INCLUDE_PATH=/usr/include/gdal
 WORKDIR /app
 
 # Install required Python packages
+RUN LIBGDAL_VERSION=$(gdal-config --version) && pip3 install GDAL==${LIBGDAL_VERSION}
 COPY requirements.txt /app/
 RUN LIBGDAL_VERSION=$(gdal-config --version) pip3 install --no-cache-dir -r requirements.txt
 RUN rm requirements.txt
