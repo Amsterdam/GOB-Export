@@ -43,7 +43,6 @@ class Worker:
             last_line = line
 
         last_line = last_line.decode()
-        # Deze id's zitten er nog niet in. Gaan we json loggen naar de console? Is dat een idee?
         if last_line == cls._WORKER_RESULT_FAILURE:
             logger.info(f"Worker response {worker_id} (request {current_request_id}) failed")
             raise requests.exceptions.RequestException("Worker response failed")
