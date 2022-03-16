@@ -15,7 +15,7 @@ services:
       OIDC_TOKEN_ENDPOINT: ${OIDC_TOKEN_ENDPOINT}
       OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
       OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
-
+      GOB_SHARED_DIR: /app/shared
       UWSGI_HTTP: ":8000"
       UWSGI_MODULE: "gobexport.wsgi"
       UWSGI_CALLABLE: "app"
@@ -23,8 +23,14 @@ services:
       UWSGI_ENABLE_THREADS: ""
       UWSGI_THREADS: ""
     env_file: .env
+    volumes:
+      - gob-volume:/app/shared
 
 networks:
   default:
     external:
       name: gob-network
+
+volumes:
+  gob-volume:
+    external: true
