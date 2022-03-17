@@ -42,6 +42,7 @@ node('GOBBUILD') {
                         "--no-cache " +
                         "--shm-size 1G " +
                         "--build-arg BUILD_ENV=acc" +
+                        "--target application " +
                         " src")
                     image.push()
                 }
