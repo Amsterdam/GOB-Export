@@ -1,4 +1,4 @@
-version: '3.0'
+version: '3.4'
 
 services:
 
@@ -25,7 +25,10 @@ services:
     env_file: .env
     volumes:
       - gob-volume:/app/shared
-
+      - ./src/gobexport:/app/gobexport
+      - ./src/tests:/app/tests
+      - ${GOB_CORE_DIR-../GOB-Core}:/app/GOB-Core
+      - ${GOB_CONFIG_DIR-../GOB-Config}:/app/GOB-Config
 networks:
   default:
     external:
