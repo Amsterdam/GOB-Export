@@ -3,13 +3,14 @@
 set -u # crash on missing env
 set -e # stop on any error
 
+export GOB_RUN_MODE=TEST
 export COVERAGE_FILE=/tmp/.coverage
+
+echo "Running tests"
+coverage run --source=./gobexport -m pytest tests/
+
+echo "Running coverage report"
+coverage report --show-missing --fail-under=99
 
 echo "Running style checks"
 flake8
-
-echo "Running unit tests"
-pytest tests/
-
-echo "Running coverage tests"
-pytest --cov=gobexport --cov-report html --cov-report term-missing  --cov-fail-under=100 tests/
