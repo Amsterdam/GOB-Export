@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from requests.exceptions import RequestException
+from requests import Response
 import gobexport.requests
 
 
@@ -76,10 +77,17 @@ class TestRequests(TestCase):
     @patch("gobexport.requests.requests.get")
     def test_get_stream_exception(self, mock_requests_get):
         mock_get = MockGet()
-        mock_get.raise_for_status = MagicMock(side_effect=RequestException)
+        mock_response = Response()
+        mock_response.status_code = 503
+        request_exception = RequestException(response=mock_response)
+
+        mock_get.raise_for_status = MagicMock(side_effect=request_exception)
         mock_requests_get.return_value = mock_get
 
-        with self.assertRaisesRegex(gobexport.requests.APIException, 'Request failed due to API exception'):
+        with self.assertRaises(
+                gobexport.requests.APIException,
+                msg='Request failed due to API exception, <Response [503]>'
+        ):
             list(gobexport.requests.get_stream('any url'))
 
     @patch('gobexport.requests._updated_headers', lambda *args, **kwargs: {'updated': 'headers'})
@@ -107,10 +115,17 @@ class TestRequests(TestCase):
     @patch("gobexport.requests.requests.post")
     def test_post_stream_exception(self, mock_requests_post):
         mock_get = MockGet()
-        mock_get.raise_for_status = MagicMock(side_effect=RequestException)
+        mock_response = Response()
+        mock_response.status_code = 503
+        request_exception = RequestException(response=mock_response)
+
+        mock_get.raise_for_status = MagicMock(side_effect=request_exception)
         mock_requests_post.return_value = mock_get
 
-        with self.assertRaisesRegex(gobexport.requests.APIException, 'Request failed due to API exception'):
+        with self.assertRaises(
+                gobexport.requests.APIException,
+                msg='Request failed due to API exception, <Response [503]>'
+        ):
             list(gobexport.requests.post_stream('any url', True))
 
     @patch('gobexport.requests._updated_headers', lambda *args, **kwargs: {})
