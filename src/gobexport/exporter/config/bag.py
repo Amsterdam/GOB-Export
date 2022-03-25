@@ -134,10 +134,11 @@ class WoonplaatsenExportConfig:
         documentnummer
         registratiedatum
         status
-        ligtInGemeente {
+        ligtInGemeente(active: false) {
           edges {
             node {
               identificatie
+              volgnummer
               naam
             }
           }
@@ -228,7 +229,7 @@ class WoonplaatsenExportConfig:
         'documentnummer': 'documentnummer',
         'status': 'status.omschrijving',
         'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
-        'ligtIn:BRK.GME.volgnummer': '',
+        'ligtIn:BRK.GME.volgnummer': 'ligtInGemeente.volgnummer',
         'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
         'geometrie': {
             'action': 'format',
@@ -303,7 +304,7 @@ class OpenbareruimtesExportConfig:
         naamNen
         beginGeldigheid
         eindGeldigheid
-        ligtInWoonplaats(active: false) {
+        ligtInWoonplaats {
           edges {
             node {
               identificatie
@@ -874,20 +875,20 @@ class StandplaatsenExportConfig:
                         node {
                           identificatie
                           naam
-                          ligtInGemeente {
-                            edges {
-                              node {
-                                identificatie
-                                naam
-                              }
-                            }
-                          }
                         }
                       }
                     }
                   }
                 }
               }
+            }
+          }
+        }
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
             }
           }
         }
@@ -1000,20 +1001,21 @@ class StandplaatsenExportConfig:
                           identificatie
                           volgnummer
                           naam
-                          ligtInGemeente(active: false) {
-                            edges {
-                              node {
-                                identificatie
-                                naam
-                              }
-                            }
-                          }
                         }
                       }
                     }
                   }
                 }
               }
+            }
+          }
+        }
+        ligtInGemeente(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
             }
           }
         }
@@ -1362,20 +1364,20 @@ class LigplaatsenExportConfig:
                         node {
                           identificatie
                           naam
-                          ligtInGemeente {
-                            edges {
-                              node {
-                                identificatie
-                                naam
-                              }
-                            }
-                          }
                         }
                       }
                     }
                   }
                 }
               }
+            }
+          }
+        }
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
             }
           }
         }
@@ -1488,20 +1490,21 @@ class LigplaatsenExportConfig:
                           identificatie
                           volgnummer
                           naam
-                          ligtInGemeente(active: false) {
-                            edges {
-                              node {
-                                identificatie
-                                naam
-                              }
-                            }
-                          }
                         }
                       }
                     }
                   }
                 }
               }
+            }
+          }
+        }
+        ligtInGemeente(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
             }
           }
         }
