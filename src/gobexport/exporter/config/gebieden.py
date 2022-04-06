@@ -27,9 +27,8 @@ following properties:
 class StadsdelenExportConfig:
 
     query_actueel = '''
-# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: DateTime = "null" ) {
-  gebiedenStadsdelen (eindGeldigheid: $eind ) {
+{
+  gebiedenStadsdelen {
     edges {
       node {
         identificatie
@@ -156,6 +155,7 @@ query ($eind: DateTime = "null" ) {
           edges {
             node {
               identificatie
+              volgnummer
               naam
             }
           }
@@ -174,7 +174,6 @@ class GGPGebiedenExportConfig:
 
     query_actueel = '''
 {
-# GGP gebieden zijn per 24-03-2022 niet meer in gebruik. Einddatum is altijd gevuld.
   gebiedenGgpgebieden {
     edges {
       node {
@@ -329,6 +328,7 @@ class GGPGebiedenExportConfig:
                 edges {
                   node {
                     identificatie
+                    volgnummer
                     naam
                   }
                 }
@@ -348,9 +348,8 @@ class GGPGebiedenExportConfig:
 class GGWGebiedenExportConfig:
 
     query_actueel = '''
-# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: DateTime = "null" ) {
-  gebiedenGgwgebieden (eindGeldigheid: $eind ) {
+{
+  gebiedenGgwgebieden {
     edges {
       node {
         identificatie
@@ -382,6 +381,7 @@ query ($eind: DateTime = "null" ) {
     }
   }
 }
+
 '''
 
     products = {
@@ -504,6 +504,7 @@ query ($eind: DateTime = "null" ) {
                 edges {
                   node {
                     identificatie
+                    volgnummer
                     naam
                   }
                 }
@@ -523,9 +524,8 @@ query ($eind: DateTime = "null" ) {
 class WijkenExportConfig:
 
     query_actueel = '''
-# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: DateTime = "null" ) {
-  gebiedenWijken (eindGeldigheid: $eind ) {
+{
+  gebiedenWijken {
     edges {
       node {
         identificatie
@@ -567,6 +567,7 @@ query ($eind: DateTime = "null" ) {
     }
   }
 }
+
 '''
 
     products = {
@@ -713,6 +714,7 @@ query ($eind: DateTime = "null" ) {
                 edges {
                   node {
                     identificatie
+                    volgnummer
                     naam
                   }
                 }
@@ -732,9 +734,8 @@ query ($eind: DateTime = "null" ) {
 class BuurtenExportConfig:
 
     query_actueel = '''
-# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: DateTime = "null" ) {
-  gebiedenBuurten (eindGeldigheid: $eind ) {
+{
+  gebiedenBuurten {
     edges {
       node {
         identificatie
@@ -745,8 +746,16 @@ query ($eind: DateTime = "null" ) {
         eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
-        geometrie
         ligtInGgpgebied {
+          edges {
+            node {
+              identificatie
+              code
+              naam
+            }
+          }
+        }
+        ligtInGgwgebied {
           edges {
             node {
               identificatie
@@ -761,15 +770,6 @@ query ($eind: DateTime = "null" ) {
               identificatie
               code
               naam
-              ligtInGgwgebied {
-                edges {
-                  node {
-                    identificatie
-                    code
-                    naam
-                  }
-                }
-              }
               ligtInStadsdeel {
                 edges {
                   node {
