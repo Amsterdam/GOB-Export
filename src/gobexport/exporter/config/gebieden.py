@@ -381,7 +381,6 @@ class GGWGebiedenExportConfig:
     }
   }
 }
-
 '''
 
     products = {
@@ -567,7 +566,6 @@ class WijkenExportConfig:
     }
   }
 }
-
 '''
 
     products = {
@@ -746,6 +744,7 @@ class BuurtenExportConfig:
         eindGeldigheid @formatdate(format: "%Y-%m-%d")
         documentdatum
         documentnummer
+        geometrie
         ligtInGgpgebied {
           edges {
             node {
