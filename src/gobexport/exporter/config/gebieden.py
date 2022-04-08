@@ -976,6 +976,7 @@ class BuurtenExportConfig:
                       edges {
                         node {
                           identificatie
+                          volgnummer
                           naam
                         }
                       }
@@ -997,9 +998,8 @@ class BuurtenExportConfig:
 
 class BouwblokkenExportConfig:
     query_actueel = """
-# Query uitgebreid met conditie op lege einddatum; alleen de laatste actuele (of toekomstige) waarde wordt getoond
-query ($eind: DateTime = "null" ) {
-  gebiedenBouwblokken(sort:code_asc, eindGeldigheid: $eind) {
+{
+  gebiedenBouwblokken(sort: code_asc) {
     edges {
       node {
         identificatie
@@ -1248,6 +1248,7 @@ query ($eind: DateTime = "null" ) {
                             edges {
                               node {
                                 identificatie
+                                volgnummer
                                 naam
                               }
                             }
