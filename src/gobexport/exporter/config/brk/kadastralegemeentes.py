@@ -14,7 +14,6 @@ class KadastraleGemeentecodesExportConfig:
           edges {
             node {
               identificatie
-
               ligtInGemeente {
                 edges {
                   node {
