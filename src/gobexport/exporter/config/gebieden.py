@@ -191,14 +191,14 @@ class GGPGebiedenExportConfig:
               identificatie
               code
               naam
-              ligtInGemeente {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                  }
-                }
-              }
+            }
+          }
+        }
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
             }
           }
         }
@@ -324,15 +324,15 @@ class GGPGebiedenExportConfig:
               volgnummer
               code
               naam
-              ligtInGemeente(active: false) {
-                edges {
-                  node {
-                    identificatie
-                    volgnummer
-                    naam
-                  }
-                }
-              }
+            }
+          }
+        }
+        ligtInGemeente(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
             }
           }
         }
@@ -366,14 +366,14 @@ class GGWGebiedenExportConfig:
               identificatie
               code
               naam
-              ligtInGemeente {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                  }
-                }
-              }
+            }
+          }
+        }
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
             }
           }
         }
@@ -499,15 +499,15 @@ class GGWGebiedenExportConfig:
               volgnummer
               code
               naam
-              ligtInGemeente(active: false) {
-                edges {
-                  node {
-                    identificatie
-                    volgnummer
-                    naam
-                  }
-                }
-              }
+            }
+          }
+        }
+        ligtInGemeente(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
             }
           }
         }
@@ -551,14 +551,14 @@ class WijkenExportConfig:
               identificatie
               code
               naam
-              ligtInGemeente {
-                edges {
-                  node {
-                    identificatie
-                    naam
-                  }
-                }
-              }
+            }
+          }
+        }
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
             }
           }
         }
@@ -708,15 +708,15 @@ class WijkenExportConfig:
               volgnummer
               code
               naam
-              ligtInGemeente(active: false) {
-                edges {
-                  node {
-                    identificatie
-                    volgnummer
-                    naam
-                  }
-                }
-              }
+            }
+          }
+        }
+        ligtInGemeente(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
             }
           }
         }
@@ -775,17 +775,17 @@ class BuurtenExportConfig:
                     identificatie
                     code
                     naam
-                    ligtInGemeente {
-                      edges {
-                        node {
-                          identificatie
-                          naam
-                        }
-                      }
-                    }
                   }
                 }
               }
+            }
+          }
+        }
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
             }
           }
         }
@@ -972,18 +972,18 @@ class BuurtenExportConfig:
                     volgnummer
                     code
                     naam
-                    ligtInGemeente(active: false) {
-                      edges {
-                        node {
-                          identificatie
-                          volgnummer
-                          naam
-                        }
-                      }
-                    }
                   }
                 }
               }
+            }
+          }
+        }
+        ligtInGemeente(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
             }
           }
         }
@@ -1043,20 +1043,20 @@ class BouwblokkenExportConfig:
                           identificatie
                           code
                           naam
-                          ligtInGemeente {
-                            edges {
-                              node {
-                                identificatie
-                                naam
-                              }
-                            }
-                          }
                         }
                       }
                     }
                   }
                 }
               }
+            }
+          }
+        }
+        ligtInGemeente {
+          edges {
+            node {
+              identificatie
+              naam
             }
           }
         }
@@ -1244,21 +1244,21 @@ class BouwblokkenExportConfig:
                           volgnummer
                           code
                           naam
-                          ligtInGemeente(active: false) {
-                            edges {
-                              node {
-                                identificatie
-                                volgnummer
-                                naam
-                              }
-                            }
-                          }
                         }
                       }
                     }
                   }
                 }
               }
+            }
+          }
+        }
+        ligtInGemeente(active: false) {
+          edges {
+            node {
+              identificatie
+              volgnummer
+              naam
             }
           }
         }
