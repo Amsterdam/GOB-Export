@@ -510,27 +510,19 @@ class TestExportTest(TestCase):
             'name': 'somefilename.csv',
             'content_type': 'text/csv',
         }
-        testcases = [
-            ('\ufeffA;B;C;D;E\r\n', [['A', 'C', 'E']], [[1, 3, 5]]),
-            ('\ufeffA;B;C;D;E\r', [['A', 'C', 'E']], [[1, 3, 5]]),
-            ('\ufeffA;B;C;D;E\n', [['A', 'C', 'E']], [[1, 3, 5]]),
-            ('A;B;C;D;E', [['A', 'C', 'E']], [[1, 3, 5]]),
-            ('\ufeffA;B;C;D;E\r\n', [[1, 3]], [[1, 3]]),
-            ('A;B;C;D;E', [[1, 3, 5]], [[1, 3, 5]]),
+
+        lines = [
+            'headerline',
+            'line1',
+            'lin2'
         ]
+        check = {'some': 'checks'}
+        res = test._check_csv(lines, obj_info, check)
+        self.assertEqual(mock_csv_inspector().check_lines(), res)
+        mock_csv_inspector.assert_any_call('somefilename.csv', 'headerline', check)
 
-        for first_line, unique_cols, expected_unique_cols in testcases:
-            lines = [
-                first_line,
-                'line1',
-                'line2',
-            ]
-            check = {
-                'unique_cols': unique_cols
-            }
-
-            res = test._check_csv(lines, obj_info, check)
-            self.assertEqual(mock_csv_inspector().check_lines(), res)
-            mock_csv_inspector.assert_any_call('somefilename.csv', {
-                'unique_cols': expected_unique_cols
-            })
+        obj_info = {
+            'name': 'someothertype.txt',
+            'content_type': 'text'
+        }
+        self.assertEqual({}, test._check_csv(lines, obj_info, check))
