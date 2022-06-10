@@ -5,25 +5,43 @@ class CSVInspector:
 
     MAX_WARNINGS = 25
 
-    def __init__(self, filename, check):
+    def __init__(self, filename: str, headerline: str, check: dict):
         """
 
         :param unique_cols: array of arrays, e.g. [[1, 3], [5]] if col1 + col3, and col5 should contain unique values
         """
         self.filename = filename
-        self.unique_cols = check.get("unique_cols", [])
+        header = headerline.encode('utf-8').decode('utf-8-sig').strip().split(';')
+        self.unique_cols = {
+            str(unique_cols): self._replace_header_references(unique_cols, header)
+            for unique_cols in check.get("unique_cols", [])
+        }
 
         # Create a set of values for each combination, take the string value as the key, e.g. '[1, 3]' and '[5]'
-        self.unique_values = {str(uniques): set() for uniques in self.unique_cols}
+        self.unique_values = {uniques: set() for uniques in self.unique_cols.keys()}
 
         # Create a dict to store the results, assume all unique_cols are unique (which is the case for no columns)
         # e.g. {'[1, 3]': True, '[5]': True}
-        self.cols = {f"{str(uniques)}_is_unique": True for uniques in self.unique_cols}
+        self.cols = {f"{uniques}_is_unique": True for uniques in self.unique_cols.keys()}
 
         # Count warnings to prevent flooding warnings
         self.warnings = 0
 
         self._log_intro()
+
+    def _replace_header_references(self, uniques: list, header: list):
+        """
+        Replaces column names in a uniques list with column indexes (1-based)
+
+        Example, with header A;B;C;D;E;F :
+            replace_header_references(['A', 'B', 'D']) => [1, 2, 4]
+            replace_header_references([1, 2, 5]) => [1, 2, 5]  # Leave as is
+
+        :param uniques:
+        :param header:
+        :return:
+        """
+        return [header.index(col) + 1 if isinstance(col, str) else col for col in uniques]
 
     def _log_intro(self):
         """
@@ -31,8 +49,8 @@ class CSVInspector:
 
         :return:
         """
-        if self.unique_cols:
-            unique_cols = ", ".join([str(cols) for cols in self.unique_cols])
+        if self.unique_cols.keys():
+            unique_cols = ", ".join([cols for cols in self.unique_cols.keys()])
             logger.info(f"Checking {self.filename} for unique column values in columns {unique_cols}")
 
     def _log_warning(self, key, value):
@@ -56,11 +74,9 @@ class CSVInspector:
         :param columns:
         :return:
         """
-        for uniques in self.unique_cols:
-            # unique is an array of column indexes
-            key = str(uniques)
+        for key, col_idxs in self.unique_cols.items():
             # The value is the column values separated by a ".", columns start counting at 0
-            value = ".".join(columns[unique - 1] for unique in uniques)
+            value = ".".join(columns[col_idx - 1] for col_idx in col_idxs)
             if value in self.unique_values[key]:
                 self.cols[f"{key}_is_unique"] = False
                 self._log_warning(key, value)
