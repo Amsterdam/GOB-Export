@@ -114,32 +114,35 @@ def test(catalogue):
 
             for filename in filenames:
                 # Check the previously exported file at its temporary location
-                obj_info, obj = _get_file(conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}")
-
-                # Clone check so that changes to the check file don't affect other runs
-                check = copy.deepcopy(_get_check(checks, filename))
-
-                # Report results with the name of the matched file
-                matched_filename = obj_info['name'] if obj_info else filename
+                obj_info, obj_contents = _get_file(conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}")
 
                 if obj_info is None:
                     logger.error(f"File {filename} MISSING")
-                elif check:
-                    stats = _get_analysis(obj_info, obj, check)
-                    if _check_file(check, matched_filename, stats):
+                    continue
+
+                # Clone check so that changes to the check file don't affect other runs
+                if file_checks := copy.deepcopy(_get_check(checks, filename)):
+                    # Report results with the name of the matched file
+                    matched_filename = obj_info['name']
+
+                    if _run_checks_on_file(obj_info, obj_contents, file_checks, matched_filename):
                         logger.info(f"Check {matched_filename} OK")
                         # Copy the file to its final location
                         distribute_file(conn_info, matched_filename)
                     else:
                         logger.info(f"Check {matched_filename} FAILED")
-                    _propose_check_file(proposals, filename, obj_info, obj)
                 else:
                     logger.warning(f"File {filename} UNCHECKED")
                     # Do not copy unchecked files
-                    _propose_check_file(proposals, filename, obj_info, obj)
+                _propose_check_file(proposals, filename, obj_info, obj_contents)
 
     # Write out any missing test definitions
     _write_proposals(conn_info, catalogue, checks, proposals)
+
+
+def _run_checks_on_file(obj_info, obj_contents, file_checks, matched_filename):
+    stats = _get_analysis(obj_info, obj_contents, file_checks)
+    return _check_file(file_checks, matched_filename, stats)
 
 
 def distribute_file(conn_info, filename):
