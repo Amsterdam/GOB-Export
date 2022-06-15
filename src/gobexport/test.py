@@ -114,32 +114,35 @@ def test(catalogue):
 
             for filename in filenames:
                 # Check the previously exported file at its temporary location
-                obj_info, obj = _get_file(conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}")
-
-                # Clone check so that changes to the check file don't affect other runs
-                check = copy.deepcopy(_get_check(checks, filename))
-
-                # Report results with the name of the matched file
-                matched_filename = obj_info['name'] if obj_info else filename
+                obj_info, obj_contents = _get_file(conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}")
 
                 if obj_info is None:
                     logger.error(f"File {filename} MISSING")
-                elif check:
-                    stats = _get_analysis(obj_info, obj, check)
-                    if _check_file(check, matched_filename, stats):
+                    continue
+
+                # Clone check so that changes to the check file don't affect other runs
+                if file_checks := copy.deepcopy(_get_check(checks, filename)):
+                    # Report results with the name of the matched file
+                    matched_filename = obj_info['name']
+
+                    if _run_checks_on_file(obj_info, obj_contents, file_checks, matched_filename):
                         logger.info(f"Check {matched_filename} OK")
                         # Copy the file to its final location
                         distribute_file(conn_info, matched_filename)
                     else:
                         logger.info(f"Check {matched_filename} FAILED")
-                    _propose_check_file(proposals, filename, obj_info, obj)
                 else:
                     logger.warning(f"File {filename} UNCHECKED")
                     # Do not copy unchecked files
-                    _propose_check_file(proposals, filename, obj_info, obj)
+                _propose_check_file(proposals, filename, obj_info, obj_contents)
 
     # Write out any missing test definitions
     _write_proposals(conn_info, catalogue, checks, proposals)
+
+
+def _run_checks_on_file(obj_info, obj_contents, file_checks, matched_filename):
+    stats = _get_analysis(obj_info, obj_contents, file_checks)
+    return _check_file(file_checks, matched_filename, stats)
 
 
 def distribute_file(conn_info, filename):
@@ -466,33 +469,8 @@ def _check_csv(lines, obj_info, check):
     :param obj_info:
     :return:
     """
-    def replace_header_references(uniques: list, header: list):
-        """
-        Replaces column names in a uniques list with column indexes (1-based)
-
-        Example, with header A;B;C;D;E;F :
-            replace_header_references(['A', 'B', 'D']) => [1, 2, 4]
-            replace_header_references([1, 2, 5]) => [1, 2, 5]  # Leave as is
-
-        :param uniques:
-        :param header:
-        :return:
-        """
-        replaced = [header.index(col) + 1 if isinstance(col, str) else col for col in uniques]
-
-        if uniques != replaced:
-            logger.info(f"Interpreting columns {str(uniques)} as {str(replaced)}")
-
-        return replaced
 
     if obj_info['content_type'] in ["text/csv"] or obj_info['name'][-4:].lower() == ".csv":
-        # encode in utf-8 and decode as utf-8-sig to get rid of UTF-8 BOM
-        header = lines[0].encode('utf-8').decode('utf-8-sig').strip().split(';')
-
-        if check.get('unique_cols'):
-            # Replace column names with column indexes
-            check['unique_cols'] = [replace_header_references(uniques, header) for uniques in check['unique_cols']]
-
-        return CSVInspector(obj_info['name'], check).check_lines(lines)
+        return CSVInspector(obj_info['name'], lines[0], check).check_lines(lines)
     else:
         return {}
