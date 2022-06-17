@@ -64,6 +64,10 @@ _REPLACEMENTS = {
     "{DATE}": "\\d{8}"
 }
 
+_FIRST_BYTES_OFFSET = {
+    ".dbf": 4  # byte 1-3 contains date of last update
+}
+
 # Definition of test values
 _NTH = {
     1: "first",
@@ -342,6 +346,16 @@ def _fmt(margin):
     return '{:,}'.format(margin) if isinstance(margin, numbers.Number) else '{}'.format(margin)
 
 
+def _calculate_first_bytes(obj: bytes, obj_info: dict, n_bytes: int) -> str:
+    """
+    Calculate md5 hash over the first n bytes.
+    An offset can be defined in _FIRST_BYTES_OFFSET to allow skipping some initial bytes.
+    """
+    file_type = obj_info['name'][-4:].lower()
+    offset = _FIRST_BYTES_OFFSET.get(file_type, 0)
+    return hashlib.md5(obj[offset: n_bytes + offset]).hexdigest()
+
+
 def _check_file(check, filename, stats):
     """
     Test if all checks that have been defined for the given file are OK
@@ -406,17 +420,17 @@ def _get_analysis(obj_info, obj, check=None):
     age = datetime.datetime.now() - dateutil.parser.parse(last_modified)
     age_hours = age.total_seconds() / (60 * 60)
 
-    bytes = obj_info["bytes"]
+    bytes_ = obj_info["bytes"]
 
-    first_bytes = hashlib.md5(obj[:10000]).hexdigest()
+    first_bytes = _calculate_first_bytes(obj, obj_info, 10_000)
 
     base_analysis = {
         "age_hours": age_hours,
-        "bytes": bytes,
+        "bytes": bytes_,
         "first_bytes": first_bytes
     }
 
-    if obj_info['content_type'] not in ["plain/text", "text/csv", "application/x-ndjson"] or bytes == 0:
+    if obj_info['content_type'] not in ["plain/text", "text/csv", "application/x-ndjson"] or bytes_ == 0:
         return base_analysis
 
     content = obj.decode(ENCODING)
@@ -442,7 +456,7 @@ def _get_analysis(obj_info, obj, check=None):
     lowers = sum(c.islower() for c in content)
     uppers = sum(c.isupper() for c in content)
 
-    return {
+    return_obj = {
         **base_analysis,
         **lines_analysis,
         "first_lines": hashlib.md5(first_lines.encode(ENCODING)).hexdigest(),
@@ -459,6 +473,7 @@ def _get_analysis(obj_info, obj, check=None):
         "uppers": 0 if uppers == 0 else uppers / alphas,
         **cols
     }
+    return return_obj
 
 
 def _check_csv(lines, obj_info, check):

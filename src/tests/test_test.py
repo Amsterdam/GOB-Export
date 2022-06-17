@@ -51,6 +51,7 @@ class TestExportTest(TestCase):
         iso_now = datetime.datetime.now().isoformat()
         obj = b"1234567890"
         obj_info = {
+            "name": "any name",
             "last_modified": datetime.datetime.now().isoformat(),
             "bytes": len(obj),
             "content_type": "not plain/text"
@@ -148,6 +149,23 @@ class TestExportTest(TestCase):
         })
 
     @patch('gobexport.test.logger', MagicMock())
+    def test_get_analysis_dbf(self):
+        obj = b"a;b;c\n12;;1234\n1;123;1234\n"
+        obj_info = {
+            "name": "any name.dbf",
+            "last_modified": datetime.datetime.now().isoformat(),
+            "bytes": len(obj),
+            "content_type": 'application/octet-stream'
+        }
+        analysis = test._get_analysis(obj_info, obj)
+
+        self.assertEqual(analysis, {
+            'age_hours': mock.ANY,
+            'bytes': len(obj),
+            'first_bytes': '52770a7eaa1577f77e0616f97b751a5d'
+        })
+
+    @patch('gobexport.test.logger', MagicMock())
     def test_get_analysis_csv(self):
         iso_now = datetime.datetime.now().isoformat()
 
@@ -159,11 +177,11 @@ class TestExportTest(TestCase):
             "content_type": "text/csv"
         }
         analysis = test._get_analysis(obj_info, obj)
-        print(analysis)
+
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
             'bytes': len(obj),
-            'first_bytes': mock.ANY,
+            'first_bytes': 'ea0452cbcca052cf60dc3cc9a6fee193',
             'first_line': mock.ANY,
             'second_line': mock.ANY,
             'third_line': mock.ANY,
