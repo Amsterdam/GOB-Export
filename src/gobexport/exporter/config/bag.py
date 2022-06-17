@@ -79,7 +79,7 @@ class WoonplaatsenExportConfig:
 
     query_actueel = '''
 {
-  bagWoonplaatsen {
+  bagWoonplaatsen(sort: identificatie_asc) {
     edges {
       node {
         identificatie
@@ -288,7 +288,7 @@ class OpenbareruimtesExportConfig:
 
     query_actueel = '''
 {
-  bagOpenbareruimtes {
+  bagOpenbareruimtes(sort: identificatie_asc) {
     edges {
       node {
         identificatie
@@ -845,7 +845,7 @@ class StandplaatsenExportConfig:
 
     query_actueel = '''
 {
-  bagStandplaatsen {
+  bagStandplaatsen(sort: identificatie_asc) {
     edges {
       node {
         identificatie
@@ -1334,7 +1334,7 @@ class LigplaatsenExportConfig:
 
     query_actueel = '''
 {
-  bagLigplaatsen {
+  bagLigplaatsen(sort: identificatie_asc) {
     edges {
       node {
         identificatie
@@ -2026,7 +2026,7 @@ class OnderzoekenExportConfig:
 
     actueel_query = '''
 {
-    bagOnderzoeken(inOnderzoek:"J") {
+    bagOnderzoeken(sort: identificatie_asc, inOnderzoek:"J") {
         edges {
           node {
             objectIdentificatie
@@ -2047,7 +2047,7 @@ class OnderzoekenExportConfig:
 
     history_query = '''
 {
-    bagOnderzoeken(active: false) {
+    bagOnderzoeken(active: false, sort:[identificatie_asc, volgnummer_asc]) {
         edges {
           node {
             objectIdentificatie
