@@ -35,6 +35,8 @@ unique_cols array of array of columns that should have unique values, e.g. [ [1]
 """
 import copy
 import datetime
+from pathlib import Path
+
 import dateutil.parser
 import hashlib
 import json
@@ -351,7 +353,7 @@ def _calculate_first_bytes(obj: bytes, obj_info: dict, n_bytes: int) -> str:
     Calculate md5 hash over the first n bytes.
     An offset can be defined in _FIRST_BYTES_OFFSET to allow skipping some initial bytes.
     """
-    file_type = obj_info['name'][-4:].lower()
+    file_type = Path(obj_info['name']).suffix.lower()
     offset = _FIRST_BYTES_OFFSET.get(file_type, 0)
     return hashlib.md5(obj[offset: n_bytes + offset]).hexdigest()
 
@@ -456,7 +458,7 @@ def _get_analysis(obj_info, obj, check=None):
     lowers = sum(c.islower() for c in content)
     uppers = sum(c.isupper() for c in content)
 
-    return_obj = {
+    return {
         **base_analysis,
         **lines_analysis,
         "first_lines": hashlib.md5(first_lines.encode(ENCODING)).hexdigest(),
@@ -473,7 +475,6 @@ def _get_analysis(obj_info, obj, check=None):
         "uppers": 0 if uppers == 0 else uppers / alphas,
         **cols
     }
-    return return_obj
 
 
 def _check_csv(lines, obj_info, check):
