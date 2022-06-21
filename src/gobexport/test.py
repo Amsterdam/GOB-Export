@@ -339,7 +339,8 @@ def _check_uniqueness(check):
 
 
 def _fmt(margin):
-    return '{:,}'.format(margin) if isinstance(margin, numbers.Number) else '{}'.format(margin)
+    is_number = isinstance(margin, numbers.Number) and not isinstance(margin, bool)
+    return f'{margin:,}' if is_number else f'{margin}'
 
 
 def _check_file(check, filename, stats):

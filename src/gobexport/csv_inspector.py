@@ -83,6 +83,9 @@ class CSVInspector:
         non_uniques = self._filter_non_uniques(self.unique_values)
 
         for key, values in non_uniques.items():
+            if not values:
+                continue
+
             if len(values) > self.MAX_WARNINGS:
                 logger.warning(f"Found more than {self.MAX_WARNINGS} duplicated values for {key}. "
                                f"Logging first {self.MAX_WARNINGS} values.")
