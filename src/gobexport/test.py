@@ -35,6 +35,9 @@ unique_cols array of array of columns that should have unique values, e.g. [ [1]
 """
 import copy
 import datetime
+import os
+from io import TextIOWrapper, BytesIO
+
 import dateutil.parser
 import hashlib
 import json
@@ -77,6 +80,8 @@ _ABSOLUTE_VALUES = ["empty_lines", "first_bytes", "first_lines"] + [f"{nth}_line
 
 # chunksize for downloading from objectstore, must be < 2gb
 _CHUNKSIZE = 500_000_000
+
+ENCODING = 'utf-8'
 
 
 def test(catalogue):
@@ -392,7 +397,7 @@ def _check_file(check, filename, stats):
     return total_result
 
 
-def _get_analysis(obj_info, obj, check=None):
+def _get_analysis(obj_info: dict, obj: bytes, check=None):
     """
     Get statistics for the given file (object)
 
@@ -400,30 +405,26 @@ def _get_analysis(obj_info, obj, check=None):
     :param obj: contents
     :return:
     """
-    ENCODING = 'utf-8'
     check = check or {}
 
     last_modified = obj_info["last_modified"]
     age = datetime.datetime.now() - dateutil.parser.parse(last_modified)
     age_hours = age.total_seconds() / (60 * 60)
 
-    bytes = obj_info["bytes"]
+    bytes_ = obj_info["bytes"]
 
     first_bytes = hashlib.md5(obj[:10000]).hexdigest()
 
     base_analysis = {
         "age_hours": age_hours,
-        "bytes": bytes,
+        "bytes": bytes_,
         "first_bytes": first_bytes
     }
 
-    if obj_info['content_type'] not in ["plain/text", "text/csv", "application/x-ndjson"] or bytes == 0:
+    if obj_info['content_type'] not in ["plain/text", "text/csv", "application/x-ndjson"] or bytes_ == 0:
         return base_analysis
 
-    content = obj.decode(ENCODING)
-    chars = len(content)
-
-    lines = content.split('\n')
+    lines, char_stats = _get_lines_from_bytes(obj)
 
     cols = _check_csv(lines, obj_info, check)
 
@@ -437,29 +438,58 @@ def _get_analysis(obj_info, obj, check=None):
     other_line_lengths = [m for m in line_lengths if m > 0]
     avg_line = statistics.mean(other_line_lengths)
 
-    digits = sum(c.isdigit() for c in content)
-    alphas = sum(c.isalpha() for c in content)
-    spaces = sum(c.isspace() for c in content)
-    lowers = sum(c.islower() for c in content)
-    uppers = sum(c.isupper() for c in content)
-
     return {
         **base_analysis,
         **lines_analysis,
         "first_lines": hashlib.md5(first_lines.encode(ENCODING)).hexdigest(),
-        "chars": chars,
+        "chars": char_stats.pop("chars"),
         "lines": len(lines),
         "empty_lines": len(zero_line_lengths),
         "max_line": max(other_line_lengths),
         "min_line": min(other_line_lengths),
         "avg_line": avg_line,
+        **char_stats,
+        **cols
+    }
+
+
+def _get_lines_from_bytes(obj: bytes):
+    bytes_io = BytesIO(obj)
+    lines = []
+    chars, digits, alphas, spaces, lowers, uppers = [0] * 6
+
+    # newline is '', universal newlines mode is enabled,
+    # but line endings are returned to the caller untranslated
+    with TextIOWrapper(bytes_io, encoding=ENCODING, newline='') as content:
+        for line in content:
+            lines.append(line.strip())
+
+            chars += len(line)
+            for char in line:
+                if char.isalpha():
+                    alphas += 1
+                    if char.islower():
+                        lowers += 1
+                    else:
+                        uppers += 1
+                elif char.isdigit():
+                    digits += 1
+                elif char.isspace():
+                    spaces += 1
+
+        if line[-1] == os.linesep:
+            lines.append('')  # add empty newline
+
+    stats = {
+        "chars": chars,
         "digits": digits / chars,
         "alphas": alphas / chars,
         "spaces": spaces / chars,
         "lowers": 0 if alphas == 0 else lowers / alphas,
-        "uppers": 0 if uppers == 0 else uppers / alphas,
-        **cols
+        "uppers": 0 if alphas == 0 else uppers / alphas,
     }
+
+    return lines, stats
 
 
 def _check_csv(lines, obj_info, check):

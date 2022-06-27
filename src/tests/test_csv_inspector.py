@@ -156,7 +156,8 @@ class TestCSVInspector(TestCase):
         i._check_columns = MagicMock()
         lines = [
             'HEADERS',
-            'A;B;C\n'
+            'A;B;C',
+            ''
         ]
 
         i.check_lines(lines)

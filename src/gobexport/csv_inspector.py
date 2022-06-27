@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import cache
 
 from gobcore.logging.logger import logger
 
@@ -96,6 +97,14 @@ class CSVInspector:
 
             self.cols[f"{key}_is_unique"] = False
 
+    @cache
+    def cols_min_len(self, length: int):
+        return tuple(f"minlength_col_{i+1}" for i in range(length))
+
+    @cache
+    def cols_max_len(self, length: int):
+        return tuple(f"maxlength_col_{i+1}" for i in range(length))
+
     def _check_lengths(self, columns: list[str]):
         """
         Check the column lengths
@@ -108,10 +117,25 @@ class CSVInspector:
         :param columns:
         :return:
         """
+        cols = self.cols
+        result = {}
+        minlen_str = self.cols_min_len(len(columns))
+        maxlen_str = self.cols_max_len(len(columns))
+
         for i, column in enumerate(columns):
-            column_len = len(column)
-            self.cols[f"minlength_col_{i + 1}"] = min(column_len, self.cols.get(f"minlength_col_{i + 1}", column_len))
-            self.cols[f"maxlength_col_{i + 1}"] = max(column_len, self.cols.get(f"maxlength_col_{i + 1}", column_len))
+            length = len(column)
+
+            try:
+                if length < cols[minlen_str[i]]:
+                    result[minlen_str[i]] = length
+                elif length > cols[maxlen_str[i]]:
+                    result[maxlen_str[i]] = length
+            except KeyError:
+                result[minlen_str[i]] = length
+                result[maxlen_str[i]] = length
+
+        if result:
+            cols.update(result)
 
     def _check_columns(self, columns: list[str], line_no: int):
         """
@@ -126,9 +150,10 @@ class CSVInspector:
 
     def check_lines(self, lines):
         # Start at line 1 (skip header) and stop at end of lines. Skip any (possibly trailing) empty line
-        for (line_idx, line) in [(i, l) for (i, l) in enumerate(lines[1:]) if l]:
-            columns = line.strip().split(";")
-            self._check_columns(columns, line_idx + 2)  # +2 = 1 for 0 offset and 1 for skipped header
+        for line_idx, line in enumerate(lines):
+            if line and line_idx > 0:
+                columns = line.split(";")
+                self._check_columns(columns, line_idx + 1)  # +1 = 1 for 0 offset
 
         self._check_uniqueness()
 
