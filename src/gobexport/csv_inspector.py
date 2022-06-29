@@ -156,5 +156,6 @@ class CSVInspector:
                 self._check_columns(columns, line_idx + 1)  # +1 = 1 for 0 offset
 
         self._check_uniqueness()
+        self.unique_values.clear()  # clear refs
 
         return self.cols

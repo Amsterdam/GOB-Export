@@ -37,13 +37,13 @@ import copy
 import datetime
 import os
 from io import TextIOWrapper, BytesIO
+from typing import Optional
 
 import dateutil.parser
 import hashlib
 import json
 import math
 import re
-import statistics
 import numbers
 
 from gobcore.datastore.objectstore import get_full_container_list, get_object, put_object
@@ -140,6 +140,8 @@ def test(catalogue):
                     logger.warning(f"File {filename} UNCHECKED")
                     # Do not copy unchecked files
                 _propose_check_file(proposals, filename, obj_info, obj_contents)
+
+                del obj_contents
 
     # Write out any missing test definitions
     _write_proposals(conn_info, catalogue, checks, proposals)
@@ -397,7 +399,7 @@ def _check_file(check, filename, stats):
     return total_result
 
 
-def _get_analysis(obj_info: dict, obj: bytes, check=None):
+def _get_analysis(obj_info: dict, obj: bytes, check: Optional[dict] = None):
     """
     Get statistics for the given file (object)
 
@@ -405,83 +407,81 @@ def _get_analysis(obj_info: dict, obj: bytes, check=None):
     :param obj: contents
     :return:
     """
-    check = check or {}
-
-    last_modified = obj_info["last_modified"]
-    age = datetime.datetime.now() - dateutil.parser.parse(last_modified)
-    age_hours = age.total_seconds() / (60 * 60)
-
-    bytes_ = obj_info["bytes"]
-
-    first_bytes = hashlib.md5(obj[:10000]).hexdigest()
-
     base_analysis = {
-        "age_hours": age_hours,
-        "bytes": bytes_,
-        "first_bytes": first_bytes
+        "age_hours": (
+            (datetime.datetime.now() - dateutil.parser.parse(obj_info["last_modified"])).total_seconds() / 3600
+        ),
+        "bytes": obj_info["bytes"],
+        "first_bytes": hashlib.md5(obj[:10000]).hexdigest()
     }
 
-    if obj_info['content_type'] not in ["plain/text", "text/csv", "application/x-ndjson"] or bytes_ == 0:
-        return base_analysis
+    if obj_info['content_type'] in ("plain/text", "text/csv", "application/x-ndjson") and obj_info["bytes"] > 0:
+        lines, stats = _get_line_stats_from_bytes(obj)
 
-    lines, char_stats = _get_lines_from_bytes(obj)
+        base_analysis.update(
+            _get_first_lines_stats(lines) | stats | _check_csv(lines, obj_info, check)
+        )
 
-    cols = _check_csv(lines, obj_info, check)
-
-    analyses = range(min(max(_NTH.keys()), len(lines)))
-    lines_analysis = {f"{_NTH[n + 1]}_line": hashlib.md5(lines[n].encode(ENCODING)).hexdigest() for n in analyses}
-
-    first_lines = '\n'.join(lines[:10])
-
-    line_lengths = [len(line) for line in lines]
-    zero_line_lengths = [n for n in line_lengths if n == 0]
-    other_line_lengths = [m for m in line_lengths if m > 0]
-    avg_line = statistics.mean(other_line_lengths)
-
-    return {
-        **base_analysis,
-        **lines_analysis,
-        "first_lines": hashlib.md5(first_lines.encode(ENCODING)).hexdigest(),
-        "chars": char_stats.pop("chars"),
-        "lines": len(lines),
-        "empty_lines": len(zero_line_lengths),
-        "max_line": max(other_line_lengths),
-        "min_line": min(other_line_lengths),
-        "avg_line": avg_line,
-        **char_stats,
-        **cols
-    }
+    return base_analysis
 
 
-def _get_lines_from_bytes(obj: bytes):
-    bytes_io = BytesIO(obj)
-    lines = []
-    chars, digits, alphas, spaces, lowers, uppers = [0] * 6
+def _get_line_stats_from_bytes(obj: bytes) -> tuple[list[str], dict[str, numbers.Number]]:  # noqa: C901
+    chars, digits, alphas, spaces, lowers, uppers, empty_lines, total_line = [0] * 8
+    min_line = -1
+    max_line = -1
 
-    # newline is '', universal newlines mode is enabled,
-    # but line endings are returned to the caller untranslated
-    with TextIOWrapper(bytes_io, encoding=ENCODING, newline='') as content:
-        for line in content:
-            lines.append(line.strip())
+    def _process_line(line: str) -> str:
+        nonlocal chars, digits, alphas, spaces, lowers, uppers, empty_lines, max_line, min_line, total_line
 
-            chars += len(line)
-            for char in line:
-                if char.isalpha():
-                    alphas += 1
-                    if char.islower():
-                        lowers += 1
-                    else:
-                        uppers += 1
-                elif char.isdigit():
-                    digits += 1
-                elif char.isspace():
-                    spaces += 1
+        # all chars
+        chars += len(line)
 
-        if line[-1] == os.linesep:
-            lines.append('')  # add empty newline
+        for char in line:
+            if char.isalpha():
+                alphas += 1
+                if char.islower():
+                    lowers += 1
+                else:
+                    uppers += 1
+            elif char.isdigit():
+                digits += 1
+            elif char.isspace():  # includes linebreak
+                spaces += 1
+
+        line = line.strip()  # without linebreaks
+
+        line_len = len(line)
+        if line_len == 0:
+            empty_lines += 1
+        else:
+            total_line += line_len
+
+            if min_line == -1 and max_line == -1:
+                min_line = line_len
+                max_line = line_len
+
+            elif line_len < min_line:
+                min_line = line_len
+            elif line_len > max_line:
+                max_line = line_len
+
+        return line
+
+    with TextIOWrapper(BytesIO(obj), encoding=ENCODING, newline='') as content:
+        lines = [_process_line(line) for line in content]
+
+        content.seek(content.tell() - 1)
+        if content.read() == os.linesep:
+            lines.append('')  # add empty newline to be compatible with split('\n')
+            empty_lines += 1
 
     stats = {
         "chars": chars,
+        "lines": len(lines),
+        "empty_lines": empty_lines,
+        "max_line": max_line,
+        "min_line": min_line,
+        "avg_line": total_line / (len(lines) - empty_lines),  # don't take empty lines into account
         "digits": digits / chars,
         "alphas": alphas / chars,
         "spaces": spaces / chars,
@@ -492,7 +492,20 @@ def _get_lines_from_bytes(obj: bytes):
     return lines, stats
 
 
-def _check_csv(lines, obj_info, check):
+def _get_first_lines_stats(lines: list[str]) -> dict[str, numbers.Number]:
+    """Return hashes for the first min(len(lines, 4) lines and the first 10 lines."""
+    analyses = range(min(max(_NTH.keys()), len(lines)))
+    return {
+        **{
+            f"{_NTH[n + 1]}_line": hashlib.md5(lines[n].encode(ENCODING)).hexdigest() for n in analyses
+        },
+        **{
+            "first_lines": hashlib.md5('\n'.join(lines[:10]).encode(ENCODING)).hexdigest()
+        }
+    }
+
+
+def _check_csv(lines: list[str], obj_info: dict, check: Optional[dict] = None) -> dict:
     """
     Check a csv file for column lengths and duplicate values
 
@@ -500,6 +513,7 @@ def _check_csv(lines, obj_info, check):
     :param obj_info:
     :return:
     """
+    check = check or {}
 
     if obj_info['content_type'] in ["text/csv"] or obj_info['name'][-4:].lower() == ".csv":
         return CSVInspector(obj_info['name'], lines[0], check).check_lines(lines)

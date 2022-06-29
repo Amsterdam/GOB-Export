@@ -16,7 +16,7 @@ def raise_exception():
 class TestExportTest(TestCase):
 
     def setUp(self):
-        pass
+        self.maxDiff = None
 
     @patch('gobexport.test.logger', MagicMock())
     def test_get_check(self):
@@ -88,7 +88,7 @@ class TestExportTest(TestCase):
             'empty_lines': 0,
             'max_line': len(obj),
             'min_line': len(obj),
-            'avg_line': len(obj),
+            'avg_line': len(obj) / 1,
             'digits': 1.0,
             'alphas': 0.0,
             'spaces': 0.0,
@@ -96,7 +96,7 @@ class TestExportTest(TestCase):
             'uppers': 0
         })
 
-        obj = b"123\n\nabc def" # 12 chars
+        obj = b"123\n\nabc def"  # 12 chars
         obj_info['content_type'] = "plain/text"
         obj_info['bytes'] = len(obj)
         analysis = test._get_analysis(obj_info, obj)
@@ -113,7 +113,7 @@ class TestExportTest(TestCase):
             'empty_lines': 1,
             'max_line': 7,
             'min_line': 3,
-            'avg_line': 5,
+            'avg_line': 5.0,
             'digits': 0.25,
             'alphas': 0.5,
             'spaces': 0.25,
@@ -121,7 +121,7 @@ class TestExportTest(TestCase):
             'uppers': 0.0
         })
 
-        obj = b"123\n\nabc def\nx\ny" # 5 lines
+        obj = b"123\n\nabc def\nx\ny"  # 5 lines
         obj_info['content_type'] = "plain/text"
         obj_info['bytes'] = len(obj)
         analysis = test._get_analysis(obj_info, obj)
@@ -145,6 +145,33 @@ class TestExportTest(TestCase):
             'spaces': 0.3125,
             'lowers': 1.0,
             'uppers': 0.0
+        })
+
+        # use digits, lower, upper and spaces.
+        obj = b"123\n\nabc DEF\nx\ny"
+        obj_info['content_type'] = "plain/text"
+        obj_info['bytes'] = len(obj)
+        analysis = test._get_analysis(obj_info, obj)
+        self.assertEqual(analysis, {
+            'age_hours': mock.ANY,
+            'bytes': len(obj),
+            'first_bytes': mock.ANY,
+            'first_line': mock.ANY,
+            'second_line': mock.ANY,
+            'third_line': mock.ANY,
+            'fourth_line': mock.ANY,
+            'first_lines': mock.ANY,
+            'chars': len(obj),
+            'lines': 5,
+            'empty_lines': 1,
+            'max_line': 7,
+            'min_line': 1,
+            'avg_line': 3,
+            'digits': 0.1875,
+            'alphas': 0.5,
+            'spaces': 0.3125,
+            'lowers': 0.625,
+            'uppers': 0.375
         })
 
     @patch('gobexport.test.logger', MagicMock())
