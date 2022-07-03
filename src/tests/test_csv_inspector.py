@@ -143,24 +143,14 @@ class TestCSVInspector(TestCase):
             'maxlength_col_3': 2
         })
 
-    def test_check_columns(self):
+    def test_check_line(self):
         i = CSVInspector('any filename', '', {})
         i._collect_values_for_uniquess_check = MagicMock()
         i._check_lengths = MagicMock()
-        i._check_columns('any columns', 2)
-        i._collect_values_for_uniquess_check.assert_called_with('any columns', 2)
-        i._check_lengths.assert_called_with('any columns')
 
-    def test_check_lines(self):
-        i = CSVInspector('any filename', '', {})
-        i._check_columns = MagicMock()
-        lines = [
-            'HEADERS',
-            'A;B;C\n'
-        ]
+        i.check_line("A;B;C", 2)
 
-        i.check_lines(lines)
-        i._check_columns.assert_called_with(['A', 'B', 'C'], 2)
+        i._collect_values_for_uniquess_check.assert_called_with(['A', 'B', 'C'], 2)
 
     @patch("gobexport.csv_inspector.logger")
     def test_check_lines_unique(self, mock_logger):
@@ -174,7 +164,10 @@ class TestCSVInspector(TestCase):
         ]
 
         i = CSVInspector('any filename', lines[0], {'unique_cols': [['a', 'b'], ['c'], ['d']]})
-        res = i.check_lines(lines)
+        for nr, l in enumerate(lines[1:], start=1):
+            i.check_line(l, nr+1)
+
+        i.check_uniqueness()
 
         mock_logger.warning.assert_has_calls([
             call("Non unique value found for ['a', 'b']: 1.2 on lines 2,4"),
@@ -194,7 +187,7 @@ class TestCSVInspector(TestCase):
             'maxlength_col_3': 1,
             'minlength_col_4': 1,
             'maxlength_col_4': 1
-        }, res)
+        }, i.cols)
 
     @patch("gobexport.csv_inspector.logger")
     def test_check_lines_unique_max_warnings(self, mock_logger):
@@ -213,7 +206,10 @@ class TestCSVInspector(TestCase):
         i = CSVInspector('any filename', lines[0], {'unique_cols': [['a'], ['c']]})
         i.MAX_WARNINGS = 2
 
-        res = i.check_lines(lines)
+        for nr, l in enumerate(lines[1:], start=2):
+            i.check_line(l, nr)
+
+        i.check_uniqueness()
 
         mock_logger.warning.assert_has_calls([
             call("Found more than 2 duplicated values for ['c']. Logging first 2 values."),
@@ -230,7 +226,7 @@ class TestCSVInspector(TestCase):
             'maxlength_col_2': 1,
             'minlength_col_3': 1,
             'maxlength_col_3': 1
-        }, res)
+        }, i.cols)
 
     def test_filter_non_uniques(self):
         i = CSVInspector('any filename', '', {})

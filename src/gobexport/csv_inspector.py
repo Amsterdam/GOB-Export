@@ -1,30 +1,46 @@
+import json
+import subprocess
 from collections import defaultdict
+from functools import cache
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Optional, Iterator
+import re
 
 from gobcore.logging.logger import logger
+
+
+BYTE_LE = b"\n"
+BYTE_SPACE = b" "
+BYTE_POINT = b"."
 
 
 class CSVInspector:
 
     MAX_WARNINGS = 25
+    ENCODING = 'utf-8'
+    HEADER_ENCODING = 'utf-8-sig'
+    SEP = b";"
 
-    def __init__(self, filename: str, headerline: str, check: dict):
-        """
-
-        :param unique_cols: array of arrays, e.g. [[1, 3], [5]] if col1 + col3, and col5 should contain unique values
-        """
+    def __init__(self, filename: str, headerline: bytes, check: Optional[dict]):
+        self.check = check or {}
         self.filename = filename
-        header = headerline.encode('utf-8').decode('utf-8-sig').strip().split(';')
-        self.unique_cols = {
-            str(unique_cols): self._replace_header_references(unique_cols, header)
-            for unique_cols in check.get("unique_cols", [])
-        }
 
-        # Create a set of values for each combination, take the string value as the key, e.g. '[1, 3]' and '[5]'
-        self.unique_values = {uniques: defaultdict(list) for uniques in self.unique_cols.keys()}
+        header = headerline.decode(self.HEADER_ENCODING).strip().split(';')
+
+        self.unique_cols = {
+            str(unique_cols).replace(" ", ""): self._replace_header_references(unique_cols, header)
+            for unique_cols in self.check.get("unique_cols", [])
+        }
 
         # Create a dict to store the results, assume all unique_cols are unique (which is the case for no columns)
         # e.g. {'[1, 3]': True, '[5]': True}
         self.cols = {f"{uniques}_is_unique": True for uniques in self.unique_cols.keys()}
+
+        self.tmp_dir = TemporaryDirectory()
+
+        self.unique_fp = {key: open(self._get_path_for_key(key), mode='ab') for key in self.unique_cols}
+        self._write_cache = {key: [] for key in self.unique_cols}
 
         self._log_intro()
 
@@ -40,7 +56,12 @@ class CSVInspector:
         :param header:
         :return:
         """
-        return [header.index(col) + 1 if isinstance(col, str) else col for col in uniques]
+        try:
+            return [header.index(col) + 1 if isinstance(col, str) else col for col in uniques]
+        except ValueError as err:
+            print("check_file: \n", json.dumps(self.check, indent=2))
+            print("header: \n", header)
+            raise err
 
     def _log_intro(self):
         """
@@ -52,37 +73,63 @@ class CSVInspector:
             unique_cols = ", ".join([cols for cols in self.unique_cols.keys()])
             logger.info(f"Checking {self.filename} for unique column values in columns {unique_cols}")
 
-    def _collect_values_for_uniquess_check(self, columns: list[str], line_no: int):
-        """
-        Saves the values for the uniqueness check in the self.unique_values structure
+    def _sort_uniq(self, path) -> Iterator[str]:
+        sort_process = None
+        uniq_process = None
 
-        :param columns:
-        :param line_no:
-        :return:
-        """
-        for key, col_idxs in self.unique_cols.items():
-            # The value is the column values separated by a ".", columns start counting at 0
-            value = ".".join(columns[col_idx - 1] for col_idx in col_idxs)
-            self.unique_values[key][value].append(line_no)
+        try:
+            sort_process = subprocess.Popen(
+                args=["/usr/bin/sort", "-k2,2", path],
+                stdout=subprocess.PIPE,
+                shell=False,
+            )
+            uniq_process = subprocess.Popen(
+                    args=["/usr/bin/uniq", "--all-repeated", "--skip-fields=1"],
+                    stdin=sort_process.stdout,
+                    stdout=subprocess.PIPE,
+                    shell=False,
+                    text=True
+            )
+            yield from uniq_process.stdout
+        finally:
+            if sort_process:
+                sort_process.kill()
+            if uniq_process:
+                uniq_process.kill()
 
-    def _filter_non_uniques(self, unique_values: dict[dict[list[int]]]):
+    def _get_path_for_key(self, key):
+        return Path(self.tmp_dir.name, re.sub(r"[^\w,]+", "", key))
+
+    def get_offloaded_non_uniques(self, key) -> list[str]:
+        self.unique_fp[key].writelines(self._write_cache[key])
+        self._write_cache[key].clear()
+
+        self.unique_fp[key].close()
+
+        path = self._get_path_for_key(key)
+
+        for line in self._sort_uniq(path):
+            yield line.split()
+
+    def _get_non_uniques(self):
         """
         Filters unique_values dict on values that occur in more than one line
         """
+        non_unique_values = {uniques: defaultdict(list) for uniques in self.unique_cols.keys()}
 
-        return {
-            key: {
-                value: lineidxs for value, lineidxs in values.items() if len(lineidxs) > 1
-            } for key, values in unique_values.items()}
+        for key, values in self.unique_cols.items():
+            for line_no, value in self.get_offloaded_non_uniques(key):
+                non_unique_values[key][value].append(line_no)
 
-    def _check_uniqueness(self):
+        # print(non_unique_values)
+        return non_unique_values
+
+    def check_uniqueness(self):
         """
         Performs the actual check for uniqueness on the self.unique_values structure. The unique_values structure is
         built by using repeated calls to self._collect_values_for_uniqueness_check for each line
         """
-        non_uniques = self._filter_non_uniques(self.unique_values)
-
-        for key, values in non_uniques.items():
+        for key, values in self._get_non_uniques().items():
             if not values:
                 continue
 
@@ -96,7 +143,15 @@ class CSVInspector:
 
             self.cols[f"{key}_is_unique"] = False
 
-    def _check_lengths(self, columns: list[str]):
+    @cache
+    def cols_min_len(self, length: int):
+        return tuple(f"minlength_col_{i+1}" for i in range(length))
+
+    @cache
+    def cols_max_len(self, length: int):
+        return tuple(f"maxlength_col_{i+1}" for i in range(length))
+
+    def _check_lengths(self, columns: list[bytes]):
         """
         Check the column lengths
 
@@ -108,28 +163,73 @@ class CSVInspector:
         :param columns:
         :return:
         """
-        for i, column in enumerate(columns):
-            column_len = len(column)
-            self.cols[f"minlength_col_{i + 1}"] = min(column_len, self.cols.get(f"minlength_col_{i + 1}", column_len))
-            self.cols[f"maxlength_col_{i + 1}"] = max(column_len, self.cols.get(f"maxlength_col_{i + 1}", column_len))
+        cols = self.cols
+        result = {}
+        minlen_str = self.cols_min_len(len(columns))
+        maxlen_str = self.cols_max_len(len(columns))
 
-    def _check_columns(self, columns: list[str], line_no: int):
+        for i, column in enumerate(columns):
+            length = len(column)
+
+            try:
+                if length < cols[minlen_str[i]]:
+                    result[minlen_str[i]] = length
+                elif length > cols[maxlen_str[i]]:
+                    result[maxlen_str[i]] = length
+            except KeyError:
+                result[minlen_str[i]] = length
+                result[maxlen_str[i]] = length
+
+        if result:
+            cols.update(result)
+
+    def _collect_values_for_uniquess_check(self, columns: list[bytes], line_no: int):
         """
-        Check the given columns for any duplicate values
+        Saves the values for the uniqueness check in the self.unique_values structure
 
         :param columns:
         :param line_no:
         :return:
         """
+        enc = self.ENCODING
+
+        for key, col_idxs in self.unique_cols.items():
+            line = str(line_no).encode(enc)
+            line += BYTE_SPACE
+            line += BYTE_POINT.join(columns[col_idx - 1] for col_idx in col_idxs)
+            line += BYTE_LE
+
+            self._write_cache[key].append(line)
+
+        if line_no % 1000 == 0:
+            for key in self.unique_cols:
+                self.unique_fp[key].writelines(self._write_cache[key])
+                self._write_cache[key].clear()
+
+    def check_line(self, line: bytes, line_no: int):
+        columns = line.split(self.SEP)
         self._collect_values_for_uniquess_check(columns, line_no)
         self._check_lengths(columns)
 
-    def check_lines(self, lines):
-        # Start at line 1 (skip header) and stop at end of lines. Skip any (possibly trailing) empty line
-        for (line_idx, line) in [(i, l) for (i, l) in enumerate(lines[1:]) if l]:
-            columns = line.strip().split(";")
-            self._check_columns(columns, line_idx + 2)  # +2 = 1 for 0 offset and 1 for skipped header
 
-        self._check_uniqueness()
+    # def _check_columns(self, columns: list[str]):
+    #     """
+    #     Check the given columns for any duplicate values
+    #
+    #     :param columns:
+    #     :param line_no:
+    #     :return:
+    #     """
 
-        return self.cols
+    # def check_lines(self, lines):
+    #     # Start at line 1 (skip header) and stop at end of lines. Skip any (possibly trailing) empty line
+    #     for line_idx, line in enumerate(lines):
+    #         if line and line_idx > 0:
+    #             columns = line.split(";")
+    #             self._check_columns(columns, line_idx + 1)  # +1 = 1 for 0 offset
+    #
+    #     self.check_uniqueness()
+    #     self.unique_values.clear()  # clear refs
+    #
+    #     return self.cols
+

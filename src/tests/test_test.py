@@ -1,5 +1,6 @@
 import datetime
 import json
+from io import BytesIO, BufferedReader
 
 from unittest import TestCase, mock
 from unittest.mock import MagicMock, patch
@@ -16,7 +17,7 @@ def raise_exception():
 class TestExportTest(TestCase):
 
     def setUp(self):
-        pass
+        self.maxDiff = None
 
     @patch('gobexport.test.logger', MagicMock())
     def test_get_check(self):
@@ -49,46 +50,51 @@ class TestExportTest(TestCase):
     @patch('gobexport.test.logger', MagicMock())
     def test_get_analysis(self):
         iso_now = datetime.datetime.now().isoformat()
-        obj = b"1234567890"
+        obj = BytesIO(b"1234567890")
+        len_obj = len(obj.getvalue())
         obj_info = {
             "last_modified": datetime.datetime.now().isoformat(),
-            "bytes": len(obj),
-            "content_type": "not plain/text"
+            "bytes": len_obj,
+            "content_type": "not plain/text",
+            "name": "not csv"
         }
-        analysis = test._get_analysis(obj_info, obj)
+        analysis = test._get_analysis(obj_info, BufferedReader(obj))
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
-            'bytes': len(obj),
+            'bytes': len_obj,
             'first_bytes': mock.ANY
         })
 
-        obj = b""
+        obj = BytesIO(b"")
+        len_obj = len(obj.getvalue())
         obj_info['content_type'] = "plain/text"
-        obj_info['bytes'] = len(obj)
-        analysis = test._get_analysis(obj_info, obj)
+        obj_info['bytes'] = len_obj
+
+        analysis = test._get_analysis(obj_info, BufferedReader(obj))
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
-            'bytes': len(obj),
+            'bytes': len_obj,
             'first_bytes': mock.ANY,
         })
 
-        obj = b"123"
+        obj = BytesIO(b"123")
+        len_obj = len(obj.getvalue())
         obj_info['content_type'] = "plain/text"
         obj_info['name'] = "any name"
-        obj_info['bytes'] = len(obj)
-        analysis = test._get_analysis(obj_info, obj)
+        obj_info['bytes'] = len_obj
+        analysis = test._get_analysis(obj_info, BufferedReader(obj))
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
-            'bytes': len(obj),
+            'bytes': len_obj,
             'first_bytes': mock.ANY,
             'first_line': mock.ANY,
             'first_lines': mock.ANY,
-            'chars': len(obj),
+            'chars': len_obj,
             'lines': 1,
             'empty_lines': 0,
-            'max_line': len(obj),
-            'min_line': len(obj),
-            'avg_line': len(obj),
+            'max_line': len_obj,
+            'min_line': len_obj,
+            'avg_line': len_obj / 1,
             'digits': 1.0,
             'alphas': 0.0,
             'spaces': 0.0,
@@ -96,24 +102,25 @@ class TestExportTest(TestCase):
             'uppers': 0
         })
 
-        obj = b"123\n\nabc def" # 12 chars
+        obj = BytesIO(b"123\n\nabc def")  # 12 chars
+        len_obj = len(obj.getvalue())
         obj_info['content_type'] = "plain/text"
-        obj_info['bytes'] = len(obj)
-        analysis = test._get_analysis(obj_info, obj)
+        obj_info['bytes'] = len_obj
+        analysis = test._get_analysis(obj_info, BufferedReader(obj))
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
-            'bytes': len(obj),
+            'bytes': len_obj,
             'first_bytes': mock.ANY,
             'first_line': mock.ANY,
             'second_line': mock.ANY,
             'third_line': mock.ANY,
             'first_lines': mock.ANY,
-            'chars': len(obj),
+            'chars': len_obj,
             'lines': 3,
             'empty_lines': 1,
             'max_line': 7,
             'min_line': 3,
-            'avg_line': 5,
+            'avg_line': 5.0,
             'digits': 0.25,
             'alphas': 0.5,
             'spaces': 0.25,
@@ -121,20 +128,21 @@ class TestExportTest(TestCase):
             'uppers': 0.0
         })
 
-        obj = b"123\n\nabc def\nx\ny" # 5 lines
+        obj = BytesIO(b"123\n\nabc def\nx\ny")  # 5 lines
+        len_obj = len(obj.getvalue())
         obj_info['content_type'] = "plain/text"
-        obj_info['bytes'] = len(obj)
-        analysis = test._get_analysis(obj_info, obj)
+        obj_info['bytes'] = len_obj
+        analysis = test._get_analysis(obj_info, BufferedReader(obj))
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
-            'bytes': len(obj),
+            'bytes': len_obj,
             'first_bytes': mock.ANY,
             'first_line': mock.ANY,
             'second_line': mock.ANY,
             'third_line': mock.ANY,
             'fourth_line': mock.ANY,
             'first_lines': mock.ANY,
-            'chars': len(obj),
+            'chars': len_obj,
             'lines': 5,
             'empty_lines': 1,
             'max_line': 7,
@@ -147,29 +155,59 @@ class TestExportTest(TestCase):
             'uppers': 0.0
         })
 
-    @patch('gobexport.test.logger', MagicMock())
-    def test_get_analysis_csv(self):
-        iso_now = datetime.datetime.now().isoformat()
-
-        obj = b"a;b;c\n12;;1234\n1;123;1234\n"
-        obj_info = {
-            "name": "any name",
-            "last_modified": datetime.datetime.now().isoformat(),
-            "bytes": len(obj),
-            "content_type": "text/csv"
-        }
-        analysis = test._get_analysis(obj_info, obj)
-        print(analysis)
+        # use digits, lower, upper and spaces.
+        obj = BytesIO(b"123\n\nabc DEF\nx\ny")
+        len_obj = len(obj.getvalue())
+        obj_info['content_type'] = "plain/text"
+        obj_info['bytes'] = len_obj
+        analysis = test._get_analysis(obj_info, BufferedReader(obj))
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
-            'bytes': len(obj),
+            'bytes': len_obj,
             'first_bytes': mock.ANY,
             'first_line': mock.ANY,
             'second_line': mock.ANY,
             'third_line': mock.ANY,
             'fourth_line': mock.ANY,
             'first_lines': mock.ANY,
-            'chars': len(obj),
+            'chars': len_obj,
+            'lines': 5,
+            'empty_lines': 1,
+            'max_line': 7,
+            'min_line': 1,
+            'avg_line': 3,
+            'digits': 0.1875,
+            'alphas': 0.5,
+            'spaces': 0.3125,
+            'lowers': 0.625,
+            'uppers': 0.375
+        })
+
+    @patch('gobexport.test.logger', MagicMock())
+    def test_get_analysis_csv(self):
+        iso_now = datetime.datetime.now().isoformat()
+
+        b = b"a;b;c\n12;;1234\n1;123;1234\n"
+        obj = BufferedReader(BytesIO(b))
+        len_obj = len(b)
+        obj_info = {
+            "name": "any name",
+            "last_modified": datetime.datetime.now().isoformat(),
+            "bytes": len_obj,
+            "content_type": "text/csv"
+        }
+        analysis = test._get_analysis(obj_info, obj)
+        print(analysis)
+        self.assertEqual(analysis, {
+            'age_hours': mock.ANY,
+            'bytes': len_obj,
+            'first_bytes': mock.ANY,
+            'first_line': mock.ANY,
+            'second_line': mock.ANY,
+            'third_line': mock.ANY,
+            # 'fourth_line': mock.ANY,  used to be there, BytesIO last line is not an empty line
+            'first_lines': mock.ANY,
+            'chars': len_obj,
             'lines': mock.ANY,
             'empty_lines': mock.ANY,
             'max_line': mock.ANY,
@@ -256,9 +294,8 @@ class TestExportTest(TestCase):
         mock_logger.warning.assert_called_with('Value missing for k1 check in fname')
 
     @patch('gobexport.test.logger', MagicMock())
-    @patch('gobexport.test._get_analysis')
-    def test_propose_check_file(self, mock_analysis):
-        mock_analysis.return_value = {
+    def test_propose_check_file(self):
+        stats = {
             'age_hours': 100,
             'bytes': 100,
             'first_bytes': "any hash",
@@ -271,11 +308,12 @@ class TestExportTest(TestCase):
             'alphas': 0.5,
             'spaces': 0.25,
             'lowers': 1.0,
-            'uppers': 0.0
+            'uppers': 0.0,
+            "[a, b]_is_unique": True
         }
         filename = 'any file'
         proposals = {}
-        test._propose_check_file(proposals, filename, None, None)
+        test._propose_check_file(proposals, filename, stats)
         self.assertEqual(proposals['any file'], {
             'age_hours': [0, 24],
             'bytes': [100, None],
@@ -293,7 +331,7 @@ class TestExportTest(TestCase):
         })
         filename = 'any 20200130 file'
         proposals = {}
-        test._propose_check_file(proposals, filename, None, None)
+        test._propose_check_file(proposals, filename, {})
         self.assertTrue('any {DATE} file' in proposals)
 
     @patch('gobexport.test.logger', MagicMock())
@@ -335,15 +373,15 @@ class TestExportTest(TestCase):
         }
         catalogue = "any catalogue"
 
-        mock_get_file.return_value = None, None
+        mock_get_file.return_value = None, BytesIO(b'{}')
         result = test._get_checks(conn_info, catalogue)
         self.assertEqual(result, {})
 
-        mock_get_file.return_value = None, b"1234"
+        mock_get_file.return_value = None, BytesIO(b"1234")
         result = test._get_checks(conn_info, catalogue)
         self.assertEqual(result, 1234)
 
-        mock_get_file.return_value = None, b"abc123"
+        mock_get_file.return_value = None, BytesIO(b"abc123")
         result = test._get_checks(conn_info, catalogue)
         self.assertEqual(result, {})
 
@@ -363,21 +401,21 @@ class TestExportTest(TestCase):
         self.assertIsNone(obj)
         mock_get_object.assert_not_called()
 
-        mock_get_full_container_list.return_value = iter([{'name': filename}])
-        mock_get_object.return_value = "get object"
+        mock_get_full_container_list.return_value = [{'name': filename}]
+        mock_get_object.return_value = b"get object"
         obj_info, obj = test._get_file(conn_info, filename)
         self.assertEqual(obj_info, {'name': filename})
-        self.assertEqual(obj, "get object")
+        self.assertEqual(obj.read(), b"get object")
         mock_get_object.assert_called_with('any connection', {'name': filename}, 'any container',
-                                           chunk_size=test._CHUNKSIZE)
+                                           chunk_size=None)
 
         filename = "20201201yz"
-        mock_get_full_container_list.return_value = iter([
+        mock_get_full_container_list.return_value = [
             {'name': '20201101yz', 'last_modified': '100'},
             {'name': '20201103yz', 'last_modified': '300'},
             {'name': '20201102yz', 'last_modified': '200'},
-        ])
-        mock_get_object.return_value = "get object"
+        ]
+        mock_get_object.return_value = b"get object"
         obj_info, obj = test._get_file(conn_info, filename)
         self.assertEqual(obj_info, {'name': '20201103yz', 'last_modified': '300'})
 
@@ -423,12 +461,13 @@ class TestExportTest(TestCase):
             {},
             {})
 
-        mock_get_file.return_value = {
+        obj_info = {
             'name': "matched filename",
             'last_modified': datetime.datetime.now().isoformat(),
             'bytes': 100,
             'content_type': 'any content typs'
-                                     }, b"123"
+        }
+        mock_get_file.return_value = obj_info, BufferedReader(BytesIO(b"123"))
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
             {'connection': connection, 'container': 'development'},
@@ -441,6 +480,7 @@ class TestExportTest(TestCase):
                 'bytes': [100]
             }
         }
+        mock_get_file.return_value = obj_info, BufferedReader(BytesIO(b"123"))
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
             {'connection': connection, 'container': 'development'},
@@ -454,6 +494,7 @@ class TestExportTest(TestCase):
                 'bytes': [0]
             }
         }
+        mock_get_file.return_value = obj_info, BufferedReader(BytesIO(b"123"))
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
             {'connection': connection, 'container': 'development'},
@@ -477,11 +518,11 @@ class TestExportTest(TestCase):
             '[1]_is_unique': [True]
         })
 
-        check = {'unique_cols': [[1], [2,3,4]]}
+        check = {'unique_cols': [[1], [2, 3, 4]]}
         test._check_uniqueness(check)
         self.assertEqual(check, {
             '[1]_is_unique': [True],
-            '[2, 3, 4]_is_unique': [True]
+            '[2,3,4]_is_unique': [True]
 
         })
 
@@ -502,27 +543,3 @@ class TestExportTest(TestCase):
             conn_info['connection'],
             test.CONTAINER_BASE,
             "any filename")
-
-    @patch('gobexport.test.logger', MagicMock())
-    @patch('gobexport.test.CSVInspector')
-    def test_check_csv(self, mock_csv_inspector):
-        obj_info = {
-            'name': 'somefilename.csv',
-            'content_type': 'text/csv',
-        }
-
-        lines = [
-            'headerline',
-            'line1',
-            'lin2'
-        ]
-        check = {'some': 'checks'}
-        res = test._check_csv(lines, obj_info, check)
-        self.assertEqual(mock_csv_inspector().check_lines(), res)
-        mock_csv_inspector.assert_any_call('somefilename.csv', 'headerline', check)
-
-        obj_info = {
-            'name': 'someothertype.txt',
-            'content_type': 'text'
-        }
-        self.assertEqual({}, test._check_csv(lines, obj_info, check))
