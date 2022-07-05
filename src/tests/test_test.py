@@ -1,6 +1,6 @@
 import datetime
 import json
-from io import BytesIO, BufferedReader
+from io import BytesIO, BufferedReader, FileIO
 
 from unittest import TestCase, mock
 from unittest.mock import MagicMock, patch
@@ -58,7 +58,7 @@ class TestExportTest(TestCase):
             "content_type": "not plain/text",
             "name": "not csv"
         }
-        analysis = test._get_analysis(obj_info, BufferedReader(obj))
+        analysis = test._get_analysis(obj_info, obj, 'tmp')
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
             'bytes': len_obj,
@@ -70,7 +70,7 @@ class TestExportTest(TestCase):
         obj_info['content_type'] = "plain/text"
         obj_info['bytes'] = len_obj
 
-        analysis = test._get_analysis(obj_info, BufferedReader(obj))
+        analysis = test._get_analysis(obj_info, obj, 'tmp')
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
             'bytes': len_obj,
@@ -82,7 +82,7 @@ class TestExportTest(TestCase):
         obj_info['content_type'] = "plain/text"
         obj_info['name'] = "any name"
         obj_info['bytes'] = len_obj
-        analysis = test._get_analysis(obj_info, BufferedReader(obj))
+        analysis = test._get_analysis(obj_info, obj, 'tmp')
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
             'bytes': len_obj,
@@ -102,11 +102,11 @@ class TestExportTest(TestCase):
             'uppers': 0
         })
 
-        obj = BytesIO(b"123\n\nabc def")  # 12 chars
+        obj = BytesIO(b"123\n\nabc def")  # 12 chars, 1 zero line
         len_obj = len(obj.getvalue())
         obj_info['content_type'] = "plain/text"
         obj_info['bytes'] = len_obj
-        analysis = test._get_analysis(obj_info, BufferedReader(obj))
+        analysis = test._get_analysis(obj_info, obj, 'tmp')
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
             'bytes': len_obj,
@@ -132,7 +132,7 @@ class TestExportTest(TestCase):
         len_obj = len(obj.getvalue())
         obj_info['content_type'] = "plain/text"
         obj_info['bytes'] = len_obj
-        analysis = test._get_analysis(obj_info, BufferedReader(obj))
+        analysis = test._get_analysis(obj_info, obj, 'tmp')
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
             'bytes': len_obj,
@@ -160,7 +160,7 @@ class TestExportTest(TestCase):
         len_obj = len(obj.getvalue())
         obj_info['content_type'] = "plain/text"
         obj_info['bytes'] = len_obj
-        analysis = test._get_analysis(obj_info, BufferedReader(obj))
+        analysis = test._get_analysis(obj_info, obj, 'tmp')
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
             'bytes': len_obj,
@@ -188,7 +188,7 @@ class TestExportTest(TestCase):
         iso_now = datetime.datetime.now().isoformat()
 
         b = b"a;b;c\n12;;1234\n1;123;1234\n"
-        obj = BufferedReader(BytesIO(b))
+        obj = BytesIO(b)
         len_obj = len(b)
         obj_info = {
             "name": "any name",
@@ -196,7 +196,7 @@ class TestExportTest(TestCase):
             "bytes": len_obj,
             "content_type": "text/csv"
         }
-        analysis = test._get_analysis(obj_info, obj)
+        analysis = test._get_analysis(obj_info, obj, 'tmp')
         print(analysis)
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
@@ -372,52 +372,78 @@ class TestExportTest(TestCase):
             'container': "any container"
         }
         catalogue = "any catalogue"
+        container_list = ["list"]
 
         mock_get_file.return_value = None, BytesIO(b'{}')
-        result = test._get_checks(conn_info, catalogue)
+        result = test._get_checks(container_list, conn_info, catalogue)
         self.assertEqual(result, {})
 
         mock_get_file.return_value = None, BytesIO(b"1234")
-        result = test._get_checks(conn_info, catalogue)
+        result = test._get_checks(container_list, conn_info, catalogue)
         self.assertEqual(result, 1234)
 
         mock_get_file.return_value = None, BytesIO(b"abc123")
-        result = test._get_checks(conn_info, catalogue)
+        result = test._get_checks(container_list, conn_info, catalogue)
+        self.assertEqual(result, {})
+
+        mock_get_file.return_value = None, None
+        result = test._get_checks(container_list, conn_info, catalogue)
         self.assertEqual(result, {})
 
     @patch('gobexport.test.logger', MagicMock())
     @patch('gobexport.test.get_object')
-    @patch('gobexport.test.get_full_container_list')
-    def test_get_file(self, mock_get_full_container_list, mock_get_object):
+    def test_get_file(self, mock_get_object):
         conn_info = {
             'connection': "any connection",
             'container': "any container"
         }
         filename = "any filename"
 
-        mock_get_full_container_list.return_value = iter([])
-        obj_info, obj = test._get_file(conn_info, filename)
+        obj_info, obj = test._get_file([], conn_info, filename)
         self.assertIsNone(obj_info)
         self.assertIsNone(obj)
         mock_get_object.assert_not_called()
 
-        mock_get_full_container_list.return_value = [{'name': filename}]
         mock_get_object.return_value = b"get object"
-        obj_info, obj = test._get_file(conn_info, filename)
+        obj_info, obj = test._get_file([{'name': filename}], conn_info, filename)
         self.assertEqual(obj_info, {'name': filename})
         self.assertEqual(obj.read(), b"get object")
         mock_get_object.assert_called_with('any connection', {'name': filename}, 'any container',
                                            chunk_size=None)
 
         filename = "20201201yz"
-        mock_get_full_container_list.return_value = [
+        mock_container_list = [
             {'name': '20201101yz', 'last_modified': '100'},
             {'name': '20201103yz', 'last_modified': '300'},
             {'name': '20201102yz', 'last_modified': '200'},
         ]
         mock_get_object.return_value = b"get object"
-        obj_info, obj = test._get_file(conn_info, filename)
+        obj_info, obj = test._get_file(mock_container_list, conn_info, filename)
         self.assertEqual(obj_info, {'name': '20201103yz', 'last_modified': '300'})
+
+    @patch('gobexport.test.logger', MagicMock())
+    @patch('gobexport.test.get_object')
+    def test_get_file_chunks(self, mock_get_object):
+        filename = '20201101yz'
+        conn_info = {'connection': "any connection", 'container': "any container"}
+        mock_container_list = [{'name': '20201101yz', 'last_modified': '100', "bytes": test._OFFLOAD_THRESHOLD + 1}]
+        mock_get_object.return_value = BytesIO(b"get object")
+
+        obj_info, obj = test._get_file(mock_container_list, conn_info, filename, destination='/tmp/mock_get_file')
+
+        self.assertIsInstance(obj, FileIO)
+        self.assertEqual(open('/tmp/mock_get_file/{DATE}yz', mode='rb').read(), b'get object')
+        mock_get_object.assert_called_with(
+            connection='any connection',
+            object_meta_data=mock_container_list[0],
+            dirname='any container',
+            chunk_size=test._CHUNKSIZE
+        )
+
+        mock_get_object.return_value = BytesIO(b"get object")
+        mock_container_list = [{'name': '20201101yz', 'last_modified': '100', "bytes": 0}]
+        test._get_file(mock_container_list, conn_info, filename, destination='/tmp/mock_get_file')
+        self.assertEqual(open('/tmp/mock_get_file/{DATE}yz', mode='rb').read(), b'get object')
 
     @patch('gobexport.test.logger')
     @patch('gobexport.test._get_file')
@@ -427,6 +453,7 @@ class TestExportTest(TestCase):
     @patch('gobexport.test.DatastoreFactory.get_datastore')
     @patch('gobexport.test.distribute_file')
     @patch('gobexport.test.CONTAINER_BASE', 'development')
+    @patch('gobexport.test.get_full_container_list', lambda x, y: ["list"])
     def test_test(self, mock_distribute, mock_get_datastore, mock_get_datastore_config, mock_get_checks, mock_write_proposals, mock_get_file, mock_logger):
         catalogue = "any catalogue"
         connection = mock_get_datastore.return_value.connection
@@ -467,7 +494,7 @@ class TestExportTest(TestCase):
             'bytes': 100,
             'content_type': 'any content typs'
         }
-        mock_get_file.return_value = obj_info, BufferedReader(BytesIO(b"123"))
+        mock_get_file.return_value = obj_info, BytesIO(b"123")
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
             {'connection': connection, 'container': 'development'},
@@ -480,7 +507,7 @@ class TestExportTest(TestCase):
                 'bytes': [100]
             }
         }
-        mock_get_file.return_value = obj_info, BufferedReader(BytesIO(b"123"))
+        mock_get_file.return_value = obj_info, BytesIO(b"123")
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
             {'connection': connection, 'container': 'development'},
@@ -494,7 +521,7 @@ class TestExportTest(TestCase):
                 'bytes': [0]
             }
         }
-        mock_get_file.return_value = obj_info, BufferedReader(BytesIO(b"123"))
+        mock_get_file.return_value = obj_info, BytesIO(b"123")
         test.test(catalogue)
         mock_write_proposals.assert_called_with(
             {'connection': connection, 'container': 'development'},

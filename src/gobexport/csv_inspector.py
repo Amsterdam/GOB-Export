@@ -1,18 +1,20 @@
-import json
+import shutil
 import subprocess
 from collections import defaultdict
 from functools import cache
+from io import BytesIO
+
 from pathlib import Path
-from tempfile import TemporaryDirectory
-from typing import Optional, Iterator
+from typing import Optional, Iterator, IO
 import re
 
 from gobcore.logging.logger import logger
 
 
-BYTE_LE = b"\n"
 BYTE_SPACE = b" "
 BYTE_POINT = b"."
+BYTE_LE = b"\n"
+BYTE_EMPTY = b""
 
 
 class CSVInspector:
@@ -22,12 +24,13 @@ class CSVInspector:
     HEADER_ENCODING = 'utf-8-sig'
     SEP = b";"
 
-    def __init__(self, filename: str, headerline: bytes, check: Optional[dict]):
+    def __init__(self, filename: str, headerline: bytes, check: Optional[dict], tmp_dir: str):
         self.check = check or {}
         self.filename = filename
 
         header = headerline.decode(self.HEADER_ENCODING).strip().split(';')
 
+        # remove spaces from keys
         self.unique_cols = {
             str(unique_cols).replace(" ", ""): self._replace_header_references(unique_cols, header)
             for unique_cols in self.check.get("unique_cols", [])
@@ -37,10 +40,9 @@ class CSVInspector:
         # e.g. {'[1, 3]': True, '[5]': True}
         self.cols = {f"{uniques}_is_unique": True for uniques in self.unique_cols.keys()}
 
-        self.tmp_dir = TemporaryDirectory()
+        self.tmp_dir = tmp_dir
 
-        self.unique_fp = {key: open(self._get_path_for_key(key), mode='ab') for key in self.unique_cols}
-        self._write_cache = {key: [] for key in self.unique_cols}
+        self._write_cache = {key: BytesIO(b'') for key in self.unique_cols}
 
         self._log_intro()
 
@@ -56,12 +58,7 @@ class CSVInspector:
         :param header:
         :return:
         """
-        try:
-            return [header.index(col) + 1 if isinstance(col, str) else col for col in uniques]
-        except ValueError as err:
-            print("check_file: \n", json.dumps(self.check, indent=2))
-            print("header: \n", header)
-            raise err
+        return [header.index(col) + 1 if isinstance(col, str) else col for col in uniques]
 
     def _log_intro(self):
         """
@@ -98,18 +95,14 @@ class CSVInspector:
                 uniq_process.kill()
 
     def _get_path_for_key(self, key):
-        return Path(self.tmp_dir.name, re.sub(r"[^\w,]+", "", key))
+        return Path(self.tmp_dir, re.sub(r"[^\w,]+", "", key))
 
-    def get_offloaded_non_uniques(self, key) -> list[str]:
-        self.unique_fp[key].writelines(self._write_cache[key])
-        self._write_cache[key].clear()
+    def _offload_cache(self, key):
+        print("Offloading..", key)
 
-        self.unique_fp[key].close()
-
-        path = self._get_path_for_key(key)
-
-        for line in self._sort_uniq(path):
-            yield line.split()
+        with self._write_cache[key] as src, open(self._get_path_for_key(key), mode='wb') as dst:
+            src.seek(0)
+            shutil.copyfileobj(src, dst)
 
     def _get_non_uniques(self):
         """
@@ -117,8 +110,11 @@ class CSVInspector:
         """
         non_unique_values = {uniques: defaultdict(list) for uniques in self.unique_cols.keys()}
 
-        for key, values in self.unique_cols.items():
-            for line_no, value in self.get_offloaded_non_uniques(key):
+        for key in self.unique_cols:
+            self._offload_cache(key)
+
+            for line in self._sort_uniq(self._get_path_for_key(key)):
+                line_no, value = line.split()
                 non_unique_values[key][value].append(line_no)
 
         # print(non_unique_values)
@@ -129,7 +125,9 @@ class CSVInspector:
         Performs the actual check for uniqueness on the self.unique_values structure. The unique_values structure is
         built by using repeated calls to self._collect_values_for_uniqueness_check for each line
         """
-        for key, values in self._get_non_uniques().items():
+        non_uniques = self._get_non_uniques()
+
+        for key, values in non_uniques.items():
             if not values:
                 continue
 
@@ -142,6 +140,8 @@ class CSVInspector:
                 logger.warning(f"Non unique value found for {key}: {value} on lines {lines}")
 
             self.cols[f"{key}_is_unique"] = False
+
+        return self.cols
 
     @cache
     def cols_min_len(self, length: int):
@@ -191,45 +191,21 @@ class CSVInspector:
         :param line_no:
         :return:
         """
-        enc = self.ENCODING
-
         for key, col_idxs in self.unique_cols.items():
-            line = str(line_no).encode(enc)
-            line += BYTE_SPACE
-            line += BYTE_POINT.join(columns[col_idx - 1] for col_idx in col_idxs)
-            line += BYTE_LE
-
-            self._write_cache[key].append(line)
-
-        if line_no % 1000 == 0:
-            for key in self.unique_cols:
-                self.unique_fp[key].writelines(self._write_cache[key])
-                self._write_cache[key].clear()
+            self._write_cache[key].write(
+                BYTE_EMPTY.join([
+                    str(line_no).encode(self.ENCODING),
+                    BYTE_SPACE,
+                    BYTE_POINT.join(columns[col_idx - 1] for col_idx in col_idxs),
+                    BYTE_LE
+                ])
+            )
 
     def check_line(self, line: bytes, line_no: int):
         columns = line.split(self.SEP)
         self._collect_values_for_uniquess_check(columns, line_no)
         self._check_lengths(columns)
 
-
-    # def _check_columns(self, columns: list[str]):
-    #     """
-    #     Check the given columns for any duplicate values
-    #
-    #     :param columns:
-    #     :param line_no:
-    #     :return:
-    #     """
-
-    # def check_lines(self, lines):
-    #     # Start at line 1 (skip header) and stop at end of lines. Skip any (possibly trailing) empty line
-    #     for line_idx, line in enumerate(lines):
-    #         if line and line_idx > 0:
-    #             columns = line.split(";")
-    #             self._check_columns(columns, line_idx + 1)  # +1 = 1 for 0 offset
-    #
-    #     self.check_uniqueness()
-    #     self.unique_values.clear()  # clear refs
-    #
-    #     return self.cols
-
+    def check_lines(self, obj: IO):
+        for idx, line in enumerate(obj, 1):
+            self.check_line(line.strip(), idx)
