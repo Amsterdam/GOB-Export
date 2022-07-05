@@ -48,7 +48,6 @@ import json
 import math
 import re
 import numbers
-from time import time
 
 from gobcore.datastore.objectstore import get_full_container_list, get_object, put_object
 
@@ -84,21 +83,26 @@ _ABSOLUTE_VALUES = ["empty_lines", "first_bytes", "first_lines"] + [f"{nth}_line
 
 # chunksize for downloading from objectstore, must be < 2gb
 _CHUNKSIZE = 100_000_000
+# download files bigger then this threshold to disk
 _OFFLOAD_THRESHOLD = 500_000_000
 
 ENCODING = 'utf-8'
 TYPE_FLAT_FILE = ("plain/text", "text/csv", "application/x-ndjson")
 TYPE_CSV = ("text/csv", )
 
+# collection of unicode numbers for str characters
 WHITESPACE = {ord(c) for c in ' \t\n\r\v\f'}
 ASCII_LOWER = {ord(c) for c in 'abcdefghijklmnopqrstuvwxyz'}
 ASCII_UPPER = {ord(c) for c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'}
 DIGITS = {ord(c) for c in '0123456789'}
 
 
-def _safe_divide(val1, val2):
+def _safe_divide(val1: int, val2: int) -> Union[int, float]:
     try:
-        return val1 / val2
+        result = val1 / val2
+        if result.is_integer():
+            return int(result)
+        return result
     except ZeroDivisionError:
         return 0
 
@@ -122,6 +126,7 @@ class FlatfileStats:
         self.counter = Counter()
 
     def calculate(self) -> dict:
+        """Return a dict of flatfile statistics for characters and lines."""
         counts = self.counter
         self.chars = sum(counts.values())
 
@@ -148,7 +153,7 @@ class FlatfileStats:
             }
         }
 
-    def _calc_first_lines(self):
+    def _calc_first_lines(self) -> dict[str, str]:
         return {
             **{
                 f"{_NTH[idx]}_line": hashlib.md5(line).hexdigest()
@@ -160,36 +165,30 @@ class FlatfileStats:
         }
 
     def count_lines(self, line_length: int):
+        """
+        Update line length statistics:
+        - empty
+        - maximum
+        - minimum
+        - total
+        - number of lines seen
+        """
         self.empty_lines += line_length == 0
+        self.total_line += line_length
 
         if (line_length and line_length < self.min_line) or self.lines == 0:
             self.min_line = line_length
         if line_length and line_length > self.max_line:
             self.max_line = line_length
 
-        self.total_line += line_length
         self.lines += 1
 
 
-def timer_func(func):
-    # This function shows the execution time of
-    # the function object passed
-    def wrap_func(*args, **kwargs):
-        t1 = time()
-        result = func(*args, **kwargs)
-        t2 = time()
-        print(f'Function {func.__name__!r} executed in {(t2-t1):.4f}s')
-        return result
-    return wrap_func
-
-
-@timer_func
 def test(catalogue):
     """
-    Test export files for a given catalogue
+    Test export files for a given catalogue.
 
     :param catalogue: catalogue to test
-    :return: None
     """
     logger.info(f"Test export for catalogue {catalogue}")
 
@@ -205,10 +204,10 @@ def test(catalogue):
         "connection": datastore.connection,
         "container": container_name
     }
-    # get container_list only once
+    # get full container_list only once
     container_list = list(get_full_container_list(conn_info["connection"], conn_info["container"]))
 
-    # tmp dir for downloading files
+    # tmp dir for downloading/offloading files
     tmp_dir = TemporaryDirectory()
 
     # Get test definitions for the given catalogue
@@ -219,11 +218,10 @@ def test(catalogue):
     for config in _export_config[catalogue]:
         resolve_config_filenames(config)
 
-        for name, product in config.products.items():
+        for product in config.products.values():
             filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
 
             for filename in filenames:
-                # Check the previously exported file at its temporary location
                 obj_info, obj = _get_file(
                     container_list, conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}", destination=tmp_dir.name
                 )
@@ -234,9 +232,9 @@ def test(catalogue):
 
                 # Clone check so that changes to the check file don't affect other runs
                 if file_checks := copy.deepcopy(_get_check(checks, filename)):
-                    # Report results with the name of the matched file
                     stats = _get_analysis(obj_info, obj, check=file_checks, tmp_dir=tmp_dir.name)
 
+                    # Report results with the name of the matched file
                     matched_filename = obj_info['name']
                     if _check_file(file_checks, matched_filename, stats):
                         logger.info(f"Check {matched_filename} OK")
@@ -307,7 +305,7 @@ def _get_file(
             # If multiple matches, match with the most recent item
             obj_info = dict(item)
 
-            print("Downloading", filename)
+            logger.info("Downloading", filename)
             # if obj_info["bytes"] == 0 we dont know the size, offload to be sure
             if destination and (obj_info["bytes"] > _OFFLOAD_THRESHOLD or obj_info["bytes"] == 0):
                 tmp_path = Path(destination, filename)
@@ -322,7 +320,6 @@ def _get_file(
                     )
 
                     for chunk in chunk_gen:
-                        print("Writing chunk... ", f"{_CHUNKSIZE:,}")
                         writer.write(chunk)
 
                 obj = FileIO(tmp_path, mode='rb')
@@ -535,9 +532,9 @@ def _peek(obj: IO, size: int) -> bytes:
     return data
 
 
-def _get_base_anlysis(obj: IO, obj_info: dict) -> dict:
+def _get_base_anlysis(obj: IO, obj_info: dict) -> dict[str, str]:
     return {
-        "age_hours": (
+        "age_hours": str(
                 (datetime.datetime.now() - dateutil.parser.parse(obj_info["last_modified"])).total_seconds() / 3600
         ),
         "bytes": obj_info["bytes"],  # can be zero, file still has content
@@ -545,13 +542,18 @@ def _get_base_anlysis(obj: IO, obj_info: dict) -> dict:
     }
 
 
-def _get_analysis(obj_info: dict, obj: IO,
-                  tmp_dir: str, check: Optional[dict] = None) -> dict[str, Union[str, float]]:
+def _get_analysis(
+    obj_info: dict,
+    obj: IO,
+    tmp_dir: str,
+    check: Optional[dict] = None
+) -> dict[str, Union[str, float]]:
     """
-    Get statistics for the given file (object).
+    Return statistics for the given object.
+    Object can be stored in memory or on disk, using the same interface.
 
     :param obj_info: meta information
-    :param obj: contents in bytes
+    :param obj: contents in bytes using BytesIO or FileIO backed by a file on disk
     :param check: checks to perform on csv file
     :param tmp_dir: Temporary dir for offloading
     :return: dict
@@ -569,8 +571,7 @@ def _get_analysis(obj_info: dict, obj: IO,
             stats = FlatfileStats()
 
             obj.seek(0)
-            while chunk := obj.read(10_000_000):
-                print("Counting characters...")
+            while chunk := obj.read(10_000_000):  # read in chunks of 10 million chars
                 stats.counter.update(chunk)
 
             obj.seek(0)
@@ -583,13 +584,13 @@ def _get_analysis(obj_info: dict, obj: IO,
                 line = line.strip()
                 stats.count_lines(len(line))
 
-                if is_csv and idx > 0:
+                if is_csv and idx > 0:  # skip header
                     inspector.check_line(line, idx + 1)
 
-                if idx % 100_000 == 0:
-                    print("Checking lines...")
+                if idx % 250_000 == 0:
+                    logger.info("Checking lines...", 250_000)  # report status, can take some time
 
-    assert obj.closed
+    assert obj.closed, "Object not closed."
 
     base |= stats.calculate() if is_flatfile else {}
     base |= inspector.check_uniqueness() if is_csv else {}

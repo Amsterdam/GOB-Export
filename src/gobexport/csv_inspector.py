@@ -5,12 +5,12 @@ from functools import cache
 from io import BytesIO
 
 from pathlib import Path
-from typing import Optional, Iterator, IO
+from typing import Optional, Iterator
 import re
 
 from gobcore.logging.logger import logger
 
-
+# Store some byte constants used in iteration
 BYTE_SPACE = b" "
 BYTE_POINT = b"."
 BYTE_LE = b"\n"
@@ -21,16 +21,17 @@ class CSVInspector:
 
     MAX_WARNINGS = 25
     ENCODING = 'utf-8'
-    HEADER_ENCODING = 'utf-8-sig'
+    HEADER_ENCODING = 'utf-8-sig'  # UTF8-BOM
     SEP = b";"
 
     def __init__(self, filename: str, headerline: bytes, check: Optional[dict], tmp_dir: str):
         self.check = check or {}
         self.filename = filename
 
+        # headers can contain Byte Order Marks, try to decode them
         header = headerline.decode(self.HEADER_ENCODING).strip().split(';')
 
-        # remove spaces from keys
+        # remove spaces from keys, doesnt work when writing to file
         self.unique_cols = {
             str(unique_cols).replace(" ", ""): self._replace_header_references(unique_cols, header)
             for unique_cols in self.check.get("unique_cols", [])
@@ -40,13 +41,15 @@ class CSVInspector:
         # e.g. {'[1, 3]': True, '[5]': True}
         self.cols = {f"{uniques}_is_unique": True for uniques in self.unique_cols.keys()}
 
+        # use existing temporary dir, caller is responsible for cleaning up
         self.tmp_dir = tmp_dir
 
+        # Use BytesIO as cache for writing to disk per key
         self._write_cache = {key: BytesIO(b'') for key in self.unique_cols}
 
         self._log_intro()
 
-    def _replace_header_references(self, uniques: list, header: list):
+    def _replace_header_references(self, uniques: list, header: list) -> list:
         """
         Replaces column names in a uniques list with column indexes (1-based)
 
@@ -62,24 +65,28 @@ class CSVInspector:
 
     def _log_intro(self):
         """
-        If any unique columns have been defined, log an informational message stating that the file is checked
-
-        :return:
+        If any unique columns have been defined, log an informational message stating that the file is checked.
         """
         if self.unique_cols.keys():
             unique_cols = ", ".join([cols for cols in self.unique_cols.keys()])
             logger.info(f"Checking {self.filename} for unique column values in columns {unique_cols}")
 
-    def _sort_uniq(self, path) -> Iterator[str]:
+    def _sort_uniq(self, path: str) -> Iterator[str]:
+        """
+        Return duplicate values from file in `path`.
+        """
         sort_process = None
         uniq_process = None
 
         try:
+            # uniq requires sorted data, sort on the second column
             sort_process = subprocess.Popen(
                 args=["/usr/bin/sort", "-k2,2", path],
                 stdout=subprocess.PIPE,
                 shell=False,
             )
+            # pipe stream to uniq, check for duplicates on the second column (skip 1)
+            # only keep the duplicates
             uniq_process = subprocess.Popen(
                     args=["/usr/bin/uniq", "--all-repeated", "--skip-fields=1"],
                     stdin=sort_process.stdout,
@@ -94,20 +101,18 @@ class CSVInspector:
             if uniq_process:
                 uniq_process.kill()
 
-    def _get_path_for_key(self, key):
+    def _get_path_for_key(self, key: str) -> Path:
+        """Return path for `key` with only alphanum and commas."""
         return Path(self.tmp_dir, re.sub(r"[^\w,]+", "", key))
 
-    def _offload_cache(self, key):
-        print("Offloading..", key)
-
+    def _offload_cache(self, key: str):
+        """Write BytesIO object for `key` to disk in tmp_dir."""
         with self._write_cache[key] as src, open(self._get_path_for_key(key), mode='wb') as dst:
             src.seek(0)
             shutil.copyfileobj(src, dst)
 
-    def _get_non_uniques(self):
-        """
-        Filters unique_values dict on values that occur in more than one line
-        """
+    def _get_non_uniques(self) -> dict[str, dict[str, list]]:
+        """Filters unique values file on values that occur in more than one line."""
         non_unique_values = {uniques: defaultdict(list) for uniques in self.unique_cols.keys()}
 
         for key in self.unique_cols:
@@ -117,7 +122,6 @@ class CSVInspector:
                 line_no, value = line.split()
                 non_unique_values[key][value].append(line_no)
 
-        # print(non_unique_values)
         return non_unique_values
 
     def check_uniqueness(self):
@@ -145,10 +149,12 @@ class CSVInspector:
 
     @cache
     def cols_min_len(self, length: int):
+        """Calculates cached minlength strings for columns."""
         return tuple(f"minlength_col_{i+1}" for i in range(length))
 
     @cache
     def cols_max_len(self, length: int):
+        """Calculates cached maxlength strings for columns."""
         return tuple(f"maxlength_col_{i+1}" for i in range(length))
 
     def _check_lengths(self, columns: list[bytes]):
@@ -165,7 +171,7 @@ class CSVInspector:
         """
         cols = self.cols
         result = {}
-        minlen_str = self.cols_min_len(len(columns))
+        minlen_str = self.cols_min_len(len(columns))  # cached, called many times with same value
         maxlen_str = self.cols_max_len(len(columns))
 
         for i, column in enumerate(columns):
@@ -177,18 +183,19 @@ class CSVInspector:
                 elif length > cols[maxlen_str[i]]:
                     result[maxlen_str[i]] = length
             except KeyError:
+                # The first time we get here, the key is not there
                 result[minlen_str[i]] = length
                 result[maxlen_str[i]] = length
 
         if result:
-            cols.update(result)
+            cols.update(result)  # only update if we have to
 
     def _collect_values_for_uniquess_check(self, columns: list[bytes], line_no: int):
         """
-        Saves the values for the uniqueness check in the self.unique_values structure
+        Saves the values for the uniqueness check in a BytesIO structure.
 
-        :param columns:
-        :param line_no:
+        :param columns: values to combine into one
+        :param line_no: line number to add
         :return:
         """
         for key, col_idxs in self.unique_cols.items():
@@ -202,10 +209,7 @@ class CSVInspector:
             )
 
     def check_line(self, line: bytes, line_no: int):
+        """Perform checks per line. The byte line assumes line endings are stripped."""
         columns = line.split(self.SEP)
         self._collect_values_for_uniquess_check(columns, line_no)
         self._check_lengths(columns)
-
-    def check_lines(self, obj: IO):
-        for idx, line in enumerate(obj, 1):
-            self.check_line(line.strip(), idx)

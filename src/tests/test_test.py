@@ -185,8 +185,6 @@ class TestExportTest(TestCase):
 
     @patch('gobexport.test.logger', MagicMock())
     def test_get_analysis_csv(self):
-        iso_now = datetime.datetime.now().isoformat()
-
         b = b"a;b;c\n12;;1234\n1;123;1234\n"
         obj = BytesIO(b)
         len_obj = len(b)
@@ -197,7 +195,7 @@ class TestExportTest(TestCase):
             "content_type": "text/csv"
         }
         analysis = test._get_analysis(obj_info, obj, 'tmp')
-        print(analysis)
+
         self.assertEqual(analysis, {
             'age_hours': mock.ANY,
             'bytes': len_obj,
