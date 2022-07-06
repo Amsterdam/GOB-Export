@@ -100,11 +100,12 @@ DIGITS = {ord(c) for c in '0123456789'}
 def _safe_divide(val1: int, val2: int) -> Union[int, float]:
     try:
         result = val1 / val2
+    except ZeroDivisionError:
+        return 0
+    else:
         if result.is_integer():
             return int(result)
         return result
-    except ZeroDivisionError:
-        return 0
 
 
 class FlatfileStats:
@@ -305,7 +306,7 @@ def _get_file(
             # If multiple matches, match with the most recent item
             obj_info = dict(item)
 
-            logger.info("Downloading", filename)
+            logger.info(f"Downloading {item['name']}")
             # if obj_info["bytes"] == 0 we dont know the size, offload to be sure
             if destination and (obj_info["bytes"] > _OFFLOAD_THRESHOLD or obj_info["bytes"] == 0):
                 tmp_path = Path(destination, filename)
@@ -476,7 +477,7 @@ def _fmt(margin):
     return f'{margin:,}' if is_number else f'{margin}'
 
 
-def _check_file(check, filename, stats):
+def _check_file(check: dict[str, str], filename: str, stats: dict[str, str]):
     """
     Test if all checks that have been defined for the given file are OK
 
@@ -534,9 +535,8 @@ def _peek(obj: IO, size: int) -> bytes:
 
 def _get_base_anlysis(obj: IO, obj_info: dict) -> dict[str, str]:
     return {
-        "age_hours": str(
-                (datetime.datetime.now() - dateutil.parser.parse(obj_info["last_modified"])).total_seconds() / 3600
-        ),
+        "age_hours":
+            (datetime.datetime.now() - dateutil.parser.parse(obj_info["last_modified"])).total_seconds() / 3600,
         "bytes": obj_info["bytes"],  # can be zero, file still has content
         "first_bytes": hashlib.md5(_peek(obj, 10_000)).hexdigest()
     }
@@ -547,7 +547,7 @@ def _get_analysis(
     obj: IO,
     tmp_dir: str,
     check: Optional[dict] = None
-) -> dict[str, Union[str, float]]:
+) -> dict[str, Union[str, float, int]]:
     """
     Return statistics for the given object.
     Object can be stored in memory or on disk, using the same interface.
@@ -585,10 +585,10 @@ def _get_analysis(
                 stats.count_lines(len(line))
 
                 if is_csv and idx > 0:  # skip header
-                    inspector.check_line(line, idx + 1)
+                    inspector.check_line(line, idx)
 
-                if idx % 250_000 == 0:
-                    logger.info("Checking lines...", 250_000)  # report status, can take some time
+                if (idx + 1) % 250_000 == 0:
+                    logger.info(f"Checking lines {idx + 1:,}")  # report status, can take some time
 
     assert obj.closed, "Object not closed."
 
