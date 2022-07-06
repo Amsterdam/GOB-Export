@@ -18,6 +18,24 @@ BYTE_EMPTY = b""
 
 
 class CSVInspector:
+    """
+    Check a csv file based on given checks.
+    - Unique values in columns defined in the check dict
+    - Maximum and minimum value length for all columns
+    - Columns to check can be numbers or names
+
+    Usage:
+        Initialize a instance with the filename, header checks and a (temporary) dir.
+        Iterate over the lines by calling check_line(line, line_no).
+        Call check_uniqueness() on the instance to return a dict with statistics.
+
+    Note:
+        The instance needs a storage for all the values and linenumbers to check, which can be all values from all
+        columns.
+        This is done by offloading the data to temporary files per column combination.
+        The files are streamed to `sort` and `uniq` and the output with non-uniques is used again.
+        If the csv file is very wide and long this way prevents out of memory errors.
+    """
 
     MAX_WARNINGS = 25
     ENCODING = 'utf-8'
