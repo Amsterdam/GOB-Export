@@ -138,7 +138,7 @@ class FlatfileStats:
         self.alphas = self.uppers + self.lowers
 
         return {
-            **self._calc_first_lines(),
+            **self._hash_first_lines(),
             **{
                 "chars": self.chars,
                 "lines": self.lines,
@@ -154,16 +154,13 @@ class FlatfileStats:
             }
         }
 
-    def _calc_first_lines(self) -> dict[str, str]:
-        return {
-            **{
-                f"{_NTH[idx]}_line": hashlib.md5(line).hexdigest()
-                for idx, line in enumerate(self.first_10, 1) if idx <= len(_NTH)
-            },
-            **{
-                "first_lines": hashlib.md5(b'\n'.join(self.first_10)).hexdigest()
-            }
-        }
+    def _hash_first_lines(self) -> dict[str, str]:
+        """Return dict with hashed first N lines and first 10 lines. First line == header if present."""
+        return (
+            {f"{idx}_line": hashlib.md5(line).hexdigest() for idx, line in zip(_NTH.values(), self.first_10)}
+            |
+            {"first_lines": hashlib.md5(b'\n'.join(self.first_10)).hexdigest()}
+        )
 
     def count_lines(self, line_length: int):
         """
