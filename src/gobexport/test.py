@@ -35,12 +35,18 @@ unique_cols array of array of columns that should have unique values, e.g. [ [1]
 """
 import copy
 import datetime
+from collections import Counter
+from io import TextIOWrapper, BytesIO, FileIO
+from itertools import islice
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Optional, Union, IO
+
 import dateutil.parser
 import hashlib
 import json
 import math
 import re
-import statistics
 import numbers
 
 from gobcore.datastore.objectstore import get_full_container_list, get_object, put_object
@@ -76,15 +82,113 @@ _MINIMUM_VALUES = ["bytes", "chars", "lines"]
 _ABSOLUTE_VALUES = ["empty_lines", "first_bytes", "first_lines"] + [f"{nth}_line" for nth in _NTH.values()]
 
 # chunksize for downloading from objectstore, must be < 2gb
-_CHUNKSIZE = 500_000_000
+_CHUNKSIZE = 100_000_000
+# download files bigger then this threshold to disk
+_OFFLOAD_THRESHOLD = 500_000_000
+
+ENCODING = 'utf-8'
+TYPE_FLAT_FILE = ("plain/text", "text/csv", "application/x-ndjson")
+TYPE_CSV = ("text/csv", )
+
+# collection of unicode numbers for str characters
+WHITESPACE = {ord(c) for c in ' \t\n\r\v\f'}
+ASCII_LOWER = {ord(c) for c in 'abcdefghijklmnopqrstuvwxyz'}
+ASCII_UPPER = {ord(c) for c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'}
+DIGITS = {ord(c) for c in '0123456789'}
+
+
+def _safe_divide(val1: int, val2: int) -> Union[int, float]:
+    try:
+        result = val1 / val2
+        if result.is_integer():
+            return int(result)
+        return result
+    except ZeroDivisionError:
+        return 0
+
+
+class FlatfileStats:
+
+    def __init__(self):
+        self.chars = 0
+        self.lines = 0
+        self.digits = 0
+        self.alphas = 0
+        self.spaces = 0
+        self.lowers = 0
+        self.uppers = 0
+        self.empty_lines = 0
+        self.max_line = 0
+        self.min_line = 0
+        self.total_line = 0
+        self.first_10 = []
+
+        self.counter = Counter()
+
+    def calculate(self) -> dict:
+        """Return a dict of flatfile statistics for characters and lines."""
+        counts = self.counter
+        self.chars = sum(counts.values())
+
+        self.uppers = sum([counts[k] for k in counts.keys() & ASCII_UPPER])
+        self.lowers = sum([counts[k] for k in counts.keys() & ASCII_LOWER])
+        self.digits = sum([counts[k] for k in counts.keys() & DIGITS])
+        self.spaces = sum([counts[k] for k in counts.keys() & WHITESPACE])
+        self.alphas = self.uppers + self.lowers
+
+        return {
+            **self._calc_first_lines(),
+            **{
+                "chars": self.chars,
+                "lines": self.lines,
+                "empty_lines": self.empty_lines,
+                "max_line": self.max_line,
+                "min_line": self.min_line,
+                "avg_line": _safe_divide(self.total_line, self.lines - self.empty_lines),
+                "digits": _safe_divide(self.digits, self.chars),
+                "alphas": _safe_divide(self.alphas, self.chars),
+                "spaces": _safe_divide(self.spaces, self.chars),
+                "lowers": _safe_divide(self.lowers, self.alphas),
+                "uppers": _safe_divide(self.uppers, self.alphas)
+            }
+        }
+
+    def _calc_first_lines(self) -> dict[str, str]:
+        return {
+            **{
+                f"{_NTH[idx]}_line": hashlib.md5(line).hexdigest()
+                for idx, line in enumerate(self.first_10, 1) if idx <= len(_NTH)
+            },
+            **{
+                "first_lines": hashlib.md5(b'\n'.join(self.first_10)).hexdigest()
+            }
+        }
+
+    def count_lines(self, line_length: int):
+        """
+        Update line length statistics:
+        - empty
+        - maximum
+        - minimum
+        - total
+        - number of lines seen
+        """
+        self.empty_lines += line_length == 0
+        self.total_line += line_length
+
+        if (line_length and line_length < self.min_line) or self.lines == 0:
+            self.min_line = line_length
+        if line_length and line_length > self.max_line:
+            self.max_line = line_length
+
+        self.lines += 1
 
 
 def test(catalogue):
     """
-    Test export files for a given catalogue
+    Test export files for a given catalogue.
 
     :param catalogue: catalogue to test
-    :return: None
     """
     logger.info(f"Test export for catalogue {catalogue}")
 
@@ -100,21 +204,27 @@ def test(catalogue):
         "connection": datastore.connection,
         "container": container_name
     }
+    # get full container_list only once
+    container_list = list(get_full_container_list(conn_info["connection"], conn_info["container"]))
+
+    # tmp dir for downloading/offloading files
+    tmp_dir = TemporaryDirectory()
 
     # Get test definitions for the given catalogue
-    checks = _get_checks(conn_info, catalogue)
+    checks = _get_checks(container_list, conn_info, catalogue)
 
     # Make proposals for any missing test definitions
     proposals = {}
     for config in _export_config[catalogue]:
         resolve_config_filenames(config)
 
-        for name, product in config.products.items():
+        for product in config.products.values():
             filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
 
             for filename in filenames:
-                # Check the previously exported file at its temporary location
-                obj_info, obj_contents = _get_file(conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}")
+                obj_info, obj = _get_file(
+                    container_list, conn_info, f"{EXPORT_DIR}/{catalogue}/{filename}", destination=tmp_dir.name
+                )
 
                 if obj_info is None:
                     logger.error(f"File {filename} MISSING")
@@ -122,27 +232,26 @@ def test(catalogue):
 
                 # Clone check so that changes to the check file don't affect other runs
                 if file_checks := copy.deepcopy(_get_check(checks, filename)):
+                    stats = _get_analysis(obj_info, obj, check=file_checks, tmp_dir=tmp_dir.name)
+
                     # Report results with the name of the matched file
                     matched_filename = obj_info['name']
-
-                    if _run_checks_on_file(obj_info, obj_contents, file_checks, matched_filename):
+                    if _check_file(file_checks, matched_filename, stats):
                         logger.info(f"Check {matched_filename} OK")
                         # Copy the file to its final location
                         distribute_file(conn_info, matched_filename)
                     else:
                         logger.info(f"Check {matched_filename} FAILED")
                 else:
-                    logger.warning(f"File {filename} UNCHECKED")
                     # Do not copy unchecked files
-                _propose_check_file(proposals, filename, obj_info, obj_contents)
+                    logger.warning(f"File {filename} UNCHECKED")
+                    stats = _get_analysis(obj_info, obj, tmp_dir=tmp_dir.name)
+
+                _propose_check_file(proposals, filename, stats)
 
     # Write out any missing test definitions
     _write_proposals(conn_info, catalogue, checks, proposals)
-
-
-def _run_checks_on_file(obj_info, obj_contents, file_checks, matched_filename):
-    stats = _get_analysis(obj_info, obj_contents, file_checks)
-    return _check_file(file_checks, matched_filename, stats)
+    tmp_dir.cleanup()
 
 
 def distribute_file(conn_info, filename):
@@ -171,7 +280,9 @@ def distribute_file(conn_info, filename):
     cleanup_datefiles(conn_info['connection'], CONTAINER_BASE, dst)
 
 
-def _get_file(conn_info, filename):
+def _get_file(
+        container_list: list, conn_info: dict, filename: str, destination: str = None
+) -> tuple[dict[str, str], Optional[IO]]:
     """
     Get a file from Objectstore
 
@@ -185,7 +296,7 @@ def _get_file(conn_info, filename):
 
     obj_info = None
     obj = None
-    for item in get_full_container_list(conn_info['connection'], conn_info['container']):
+    for item in container_list:
         item_name = item['name']
         for src, dst in _REPLACEMENTS.items():
             item_name = re.sub(dst, src, item_name)
@@ -193,7 +304,27 @@ def _get_file(conn_info, filename):
         if item_name == filename and (obj_info is None or item['last_modified'] > obj_info['last_modified']):
             # If multiple matches, match with the most recent item
             obj_info = dict(item)
-            obj = get_object(conn_info['connection'], item, conn_info['container'], chunk_size=_CHUNKSIZE)
+
+            logger.info("Downloading", filename)
+            # if obj_info["bytes"] == 0 we dont know the size, offload to be sure
+            if destination and (obj_info["bytes"] > _OFFLOAD_THRESHOLD or obj_info["bytes"] == 0):
+                tmp_path = Path(destination, filename)
+                tmp_path.parent.mkdir(parents=True, exist_ok=True)
+
+                with open(tmp_path, 'wb') as writer:
+                    chunk_gen = get_object(
+                        connection=conn_info['connection'],
+                        object_meta_data=item,
+                        dirname=conn_info['container'],
+                        chunk_size=_CHUNKSIZE
+                    )
+
+                    for chunk in chunk_gen:
+                        writer.write(chunk)
+
+                obj = FileIO(tmp_path, mode='rb')
+            else:
+                obj = BytesIO(get_object(conn_info['connection'], item, conn_info['container'], chunk_size=None))
 
     return obj_info, obj
 
@@ -219,7 +350,7 @@ def _get_check(checks, filename):
             return checks[check]
 
 
-def _get_checks(conn_info, catalogue):
+def _get_checks(container_list, conn_info, catalogue):
     """
     Get test definitions for the given catalogue
 
@@ -228,15 +359,17 @@ def _get_checks(conn_info, catalogue):
     :return:
     """
     filename = f"checks.{catalogue}.json"
-    _, checks_file = _get_file(conn_info, filename)
-    if checks_file is None:
-        logger.error(f"Missing checks file: {filename}")
-        return {}
+    _, checks_file = _get_file(container_list, conn_info, filename)
+
     try:
-        return json_loads(checks_file.decode("utf-8"))
+        with TextIOWrapper(checks_file, encoding=ENCODING) as buffer:
+            return json_loads("".join(buffer))
+    except (AttributeError, TypeError):
+        logger.error(f"Missing checks file: {filename}")
     except json.JSONDecodeError as e:
         logger.error(f"JSON error in checks file '{filename}': {str(e)}")
-        return {}
+
+    return {}
 
 
 def _write_proposals(conn_info, catalogue, checks, proposals):
@@ -261,13 +394,11 @@ def _write_proposals(conn_info, catalogue, checks, proposals):
                    content_type="application/json")
 
 
-def _propose_check_file(proposals, filename, obj_info, obj):
+def _propose_check_file(proposals, filename, stats):
     """
     Build a proposal to check the given file
 
     :param filename: Name of the file to check
-    :param obj_info: Current file object info
-    :param obj: Current file object
     :return: proposal object
     """
     proposal_key = filename
@@ -277,7 +408,8 @@ def _propose_check_file(proposals, filename, obj_info, obj):
             proposal_key = re.sub(dst, src, proposal_key)
 
     # Base the proposal on the analysis of the current file
-    analysis = _get_analysis(obj_info, obj)
+    analysis = {k: v for k, v in stats.items() if not k.endswith("_is_unique")}
+
     analysis["age_hours"] = 24
 
     proposal = {}
@@ -332,8 +464,9 @@ def _get_low_high(value):
 def _check_uniqueness(check):
     if check.get('unique_cols'):
         # Replace the unique_cols key by the outcome of the unique checks
+        # don't allow spaces in unique names (list -> str conversion)
         check.update(
-            {f"{str(uniques)}_is_unique": [True] for uniques in check['unique_cols']}
+            {f"{str(uniques).replace(', ', ',')}_is_unique": [True] for uniques in check['unique_cols']}
         )
         del check['unique_cols']
 
@@ -349,7 +482,7 @@ def _check_file(check, filename, stats):
 
     :param filename: Name of the file to check
     :param stats: Statistics of the file
-    :param checks: Check to apply onto the statistics
+    :param check: Check to apply onto the statistics
     :return: True if all checks succeed
     """
     total_result = True
@@ -392,86 +525,73 @@ def _check_file(check, filename, stats):
     return total_result
 
 
-def _get_analysis(obj_info, obj, check=None):
+def _peek(obj: IO, size: int) -> bytes:
+    cur_pos = obj.tell()
+    data = obj.read(size)
+    obj.seek(cur_pos)
+    return data
+
+
+def _get_base_anlysis(obj: IO, obj_info: dict) -> dict[str, str]:
+    return {
+        "age_hours": str(
+                (datetime.datetime.now() - dateutil.parser.parse(obj_info["last_modified"])).total_seconds() / 3600
+        ),
+        "bytes": obj_info["bytes"],  # can be zero, file still has content
+        "first_bytes": hashlib.md5(_peek(obj, 10_000)).hexdigest()
+    }
+
+
+def _get_analysis(
+    obj_info: dict,
+    obj: IO,
+    tmp_dir: str,
+    check: Optional[dict] = None
+) -> dict[str, Union[str, float]]:
     """
-    Get statistics for the given file (object)
+    Return statistics for the given object.
+    Object can be stored in memory or on disk, using the same interface.
 
     :param obj_info: meta information
-    :param obj: contents
-    :return:
+    :param obj: contents in bytes using BytesIO or FileIO backed by a file on disk
+    :param check: checks to perform on csv file
+    :param tmp_dir: Temporary dir for offloading
+    :return: dict
     """
-    ENCODING = 'utf-8'
-    check = check or {}
+    is_flatfile = obj_info['content_type'] in TYPE_FLAT_FILE
+    is_csv = obj_info['content_type'] in TYPE_CSV or Path(obj_info['name']).suffix.lower() == ".csv"
 
-    last_modified = obj_info["last_modified"]
-    age = datetime.datetime.now() - dateutil.parser.parse(last_modified)
-    age_hours = age.total_seconds() / (60 * 60)
+    with obj:
+        base = _get_base_anlysis(obj, obj_info)
 
-    bytes = obj_info["bytes"]
+        if not _peek(obj, 1):
+            return base  # empty object
 
-    first_bytes = hashlib.md5(obj[:10000]).hexdigest()
+        if is_flatfile:
+            stats = FlatfileStats()
 
-    base_analysis = {
-        "age_hours": age_hours,
-        "bytes": bytes,
-        "first_bytes": first_bytes
-    }
+            obj.seek(0)
+            while chunk := obj.read(10_000_000):  # read in chunks of 10 million chars
+                stats.counter.update(chunk)
 
-    if obj_info['content_type'] not in ["plain/text", "text/csv", "application/x-ndjson"] or bytes == 0:
-        return base_analysis
+            obj.seek(0)
+            stats.first_10 = [line.strip() for line in islice(obj, 10)]
 
-    content = obj.decode(ENCODING)
-    chars = len(content)
+            inspector = CSVInspector(obj_info["name"], stats.first_10[0], check, tmp_dir)
 
-    lines = content.split('\n')
+            obj.seek(0)
+            for idx, line in enumerate(obj):
+                line = line.strip()
+                stats.count_lines(len(line))
 
-    cols = _check_csv(lines, obj_info, check)
+                if is_csv and idx > 0:  # skip header
+                    inspector.check_line(line, idx + 1)
 
-    analyses = range(min(max(_NTH.keys()), len(lines)))
-    lines_analysis = {f"{_NTH[n + 1]}_line": hashlib.md5(lines[n].encode(ENCODING)).hexdigest() for n in analyses}
+                if idx % 250_000 == 0:
+                    logger.info("Checking lines...", 250_000)  # report status, can take some time
 
-    first_lines = '\n'.join(lines[:10])
+    assert obj.closed, "Object not closed."
 
-    line_lengths = [len(line) for line in lines]
-    zero_line_lengths = [n for n in line_lengths if n == 0]
-    other_line_lengths = [m for m in line_lengths if m > 0]
-    avg_line = statistics.mean(other_line_lengths)
-
-    digits = sum(c.isdigit() for c in content)
-    alphas = sum(c.isalpha() for c in content)
-    spaces = sum(c.isspace() for c in content)
-    lowers = sum(c.islower() for c in content)
-    uppers = sum(c.isupper() for c in content)
-
-    return {
-        **base_analysis,
-        **lines_analysis,
-        "first_lines": hashlib.md5(first_lines.encode(ENCODING)).hexdigest(),
-        "chars": chars,
-        "lines": len(lines),
-        "empty_lines": len(zero_line_lengths),
-        "max_line": max(other_line_lengths),
-        "min_line": min(other_line_lengths),
-        "avg_line": avg_line,
-        "digits": digits / chars,
-        "alphas": alphas / chars,
-        "spaces": spaces / chars,
-        "lowers": 0 if alphas == 0 else lowers / alphas,
-        "uppers": 0 if uppers == 0 else uppers / alphas,
-        **cols
-    }
-
-
-def _check_csv(lines, obj_info, check):
-    """
-    Check a csv file for column lengths and duplicate values
-
-    :param lines:
-    :param obj_info:
-    :return:
-    """
-
-    if obj_info['content_type'] in ["text/csv"] or obj_info['name'][-4:].lower() == ".csv":
-        return CSVInspector(obj_info['name'], lines[0], check).check_lines(lines)
-    else:
-        return {}
+    base |= stats.calculate() if is_flatfile else {}
+    base |= inspector.check_uniqueness() if is_csv else {}
+    return base
