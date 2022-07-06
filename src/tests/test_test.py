@@ -3,7 +3,7 @@ import json
 from io import BytesIO, BufferedReader, FileIO
 
 from unittest import TestCase, mock
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 
 import gobexport.test as test
 
@@ -183,6 +183,20 @@ class TestExportTest(TestCase):
             'uppers': 0.375
         })
 
+    @patch('gobexport.test.logger')
+    def test_get_analysis_log_status(self, mock_logger):
+        b = b"a;b" + b"\n".join([b"1;2"] * 255_000)
+        obj = BytesIO(b)
+
+        obj_info = {
+            "name": "any name",
+            "last_modified": datetime.datetime.now().isoformat(),
+            "bytes": len(b),
+            "content_type": "text/csv"
+        }
+        test._get_analysis(obj_info, obj, 'tmp')
+        mock_logger.info.assert_called_with("Checking lines 250,000")
+
     @patch('gobexport.test.logger', MagicMock())
     def test_get_analysis_csv(self):
         b = b"a;b;c\n12;;1234\n1;123;1234\n"
@@ -223,6 +237,28 @@ class TestExportTest(TestCase):
             'minlength_col_3': 4,
             'maxlength_col_3': 4
         })
+
+        # check types, mock.ANY.
+        types = [
+            ('age_hours', float),
+            ('first_bytes', str),
+            ('first_line', str),
+            ('second_line', str),
+            ('third_line', str),
+            ('lines', int),
+            ('empty_lines', int),
+            ('max_line', int),
+            ('min_line', int),
+            ('avg_line', float),
+            ('digits', float),
+            ('alphas', float),
+            ('spaces', float),
+            ('lowers', int),
+            ('uppers', int)
+        ]
+        for key, type_ in types:
+            print(key)
+            self.assertEqual(type(analysis[key]), type_)
 
     @patch('gobexport.test.logger', MagicMock())
     def test_check_file_margin_string(self):
@@ -388,9 +424,9 @@ class TestExportTest(TestCase):
         result = test._get_checks(container_list, conn_info, catalogue)
         self.assertEqual(result, {})
 
-    @patch('gobexport.test.logger', MagicMock())
+    @patch('gobexport.test.logger')
     @patch('gobexport.test.get_object')
-    def test_get_file(self, mock_get_object):
+    def test_get_file(self, mock_get_object, mock_logger):
         conn_info = {
             'connection': "any connection",
             'container': "any container"
@@ -401,6 +437,7 @@ class TestExportTest(TestCase):
         self.assertIsNone(obj_info)
         self.assertIsNone(obj)
         mock_get_object.assert_not_called()
+        mock_logger.assert_not_called()
 
         mock_get_object.return_value = b"get object"
         obj_info, obj = test._get_file([{'name': filename}], conn_info, filename)
@@ -408,6 +445,8 @@ class TestExportTest(TestCase):
         self.assertEqual(obj.read(), b"get object")
         mock_get_object.assert_called_with('any connection', {'name': filename}, 'any container',
                                            chunk_size=None)
+        mock_logger.info.assert_called_with(f"Downloading {filename}")
+        mock_logger.reset_mock()
 
         filename = "20201201yz"
         mock_container_list = [
@@ -418,6 +457,9 @@ class TestExportTest(TestCase):
         mock_get_object.return_value = b"get object"
         obj_info, obj = test._get_file(mock_container_list, conn_info, filename)
         self.assertEqual(obj_info, {'name': '20201103yz', 'last_modified': '300'})
+        mock_logger.info.assert_has_calls(
+            [call('Downloading 20201101yz'), call('Downloading 20201103yz')]
+        )
 
     @patch('gobexport.test.logger', MagicMock())
     @patch('gobexport.test.get_object')

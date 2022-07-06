@@ -3,6 +3,7 @@ import subprocess
 from collections import defaultdict
 from functools import cache
 from io import BytesIO
+from itertools import islice
 
 from pathlib import Path
 from typing import Optional, Iterator
@@ -89,7 +90,7 @@ class CSVInspector:
             unique_cols = ", ".join([cols for cols in self.unique_cols.keys()])
             logger.info(f"Checking {self.filename} for unique column values in columns {unique_cols}")
 
-    def _sort_uniq(self, path: str) -> Iterator[str]:
+    def _sort_uniq(self, path: Path) -> Iterator[str]:
         """
         Return duplicate values from file in `path`.
         """
@@ -99,7 +100,7 @@ class CSVInspector:
         try:
             # uniq requires sorted data, sort on the second column
             sort_process = subprocess.Popen(
-                args=["/usr/bin/sort", "-k2,2", path],
+                args=["/usr/bin/sort", "-k2,2", str(path)],
                 stdout=subprocess.PIPE,
                 shell=False,
             )
@@ -154,12 +155,15 @@ class CSVInspector:
                 continue
 
             if len(values) > self.MAX_WARNINGS:
-                logger.warning(f"Found more than {self.MAX_WARNINGS} duplicated values for {key}. "
-                               f"Logging first {self.MAX_WARNINGS} values.")
+                logger.warning(
+                    f"Found more than {self.MAX_WARNINGS} duplicated values for {key}. "
+                    f"Logging first {self.MAX_WARNINGS} values."
+                )
 
-            for value in [v for v in values.keys()][:self.MAX_WARNINGS]:
-                lines = ','.join([str(lineno) for lineno in values[value]])
-                logger.warning(f"Non unique value found for {key}: {value} on lines {lines}")
+            for value, lines in islice(values.items(), self.MAX_WARNINGS):
+                logger.warning(
+                    f"Non unique value found for {key}: {value} on lines {','.join(lines)}"
+                )
 
             self.cols[f"{key}_is_unique"] = False
 
