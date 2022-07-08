@@ -1,14 +1,19 @@
 import datetime
 import json
-from io import BytesIO, BufferedReader, FileIO
+from codecs import BOM_UTF8
+from io import BytesIO, FileIO
 
 from unittest import TestCase, mock
 from unittest.mock import MagicMock, patch, call
 
+import freezegun
+
 import gobexport.test as test
+
 
 class MockConfig:
     products = {}
+
 
 def raise_exception():
     raise Exception
@@ -155,33 +160,43 @@ class TestExportTest(TestCase):
             'uppers': 0.0
         })
 
-        # use digits, lower, upper and spaces.
-        obj = BytesIO(b"123\n\nabc DEF\nx\ny")
-        len_obj = len(obj.getvalue())
-        obj_info['content_type'] = "plain/text"
-        obj_info['bytes'] = len_obj
-        analysis = test._get_analysis(obj_info, obj, 'tmp')
-        self.assertEqual(analysis, {
-            'age_hours': mock.ANY,
-            'bytes': len_obj,
-            'first_bytes': mock.ANY,
+    @patch('gobexport.test.logger', MagicMock())
+    @freezegun.freeze_time("2022-07-08 06:00:00")
+    def test_get_analysis_input_output(self):
+        # use digits, lower, upper, spaces, linebreaks and a BOM.
+        # results should be consistent
+        obj = BytesIO(BOM_UTF8 + b"123\r\n\nabc DEF\nx\ny\r")
+
+        obj_info = {
+            "last_modified": "2022-07-08 05:00:00",
+            "bytes": len(obj.getvalue()),
+            "content_type": "plain/text",
+            "name": "not csv"
+        }
+
+        actual = test._get_analysis(obj_info, obj, 'tmp')
+        expected = {
+            'age_hours': 1.0,
+            'bytes': 21,
+            'first_bytes': '201abbc95824c6be3ad693c11da262ee',
             'first_line': '202cb962ac59075b964b07152d234b70',
-            'second_line': mock.ANY,
-            'third_line': mock.ANY,
-            'fourth_line': mock.ANY,
-            'first_lines': mock.ANY,
-            'chars': len_obj,
+            'second_line': 'd41d8cd98f00b204e9800998ecf8427e',
+            'third_line': '928f0c65c131ace7e38292072f04e606',
+            'fourth_line': '9dd4e461268c8034f5c8564e155c67a6',
+            'first_lines': 'de815f4b7415426c6fdf51542bd988aa',
+            'chars': 21,
             'lines': 5,
             'empty_lines': 1,
             'max_line': 7,
             'min_line': 1,
             'avg_line': 3,
-            'digits': 0.1875,
-            'alphas': 0.5,
-            'spaces': 0.3125,
+            'digits': 0.1429,
+            'alphas': 0.3810,
+            'spaces': 0.3333,
             'lowers': 0.625,
-            'uppers': 0.375
-        })
+            'uppers': 0.375,
+        }
+        self.assertEqual(expected, actual)
 
     @patch('gobexport.test.logger')
     def test_get_analysis_log_status(self, mock_logger):
@@ -237,28 +252,6 @@ class TestExportTest(TestCase):
             'minlength_col_3': 4,
             'maxlength_col_3': 4
         })
-
-        # check types, mock.ANY.
-        types = [
-            ('age_hours', float),
-            ('first_bytes', str),
-            ('first_line', str),
-            ('second_line', str),
-            ('third_line', str),
-            ('lines', int),
-            ('empty_lines', int),
-            ('max_line', int),
-            ('min_line', int),
-            ('avg_line', float),
-            ('digits', float),
-            ('alphas', float),
-            ('spaces', float),
-            ('lowers', int),
-            ('uppers', int)
-        ]
-        for key, type_ in types:
-            print(key)
-            self.assertEqual(type(analysis[key]), type_)
 
     @patch('gobexport.test.logger', MagicMock())
     def test_check_file_margin_string(self):
