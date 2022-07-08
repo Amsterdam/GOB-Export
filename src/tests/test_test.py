@@ -520,7 +520,10 @@ class TestExportTest(TestCase):
         filename = 'any filename'
         config.products = {
             'any product': {
-                'filename': filename
+                'filename': filename,
+            },
+            'any product2': {
+                'filename': filename,
             }
         }
 
@@ -535,6 +538,7 @@ class TestExportTest(TestCase):
             {},
             {})
 
+        mock_logger.reset_mock()
         obj_info = {
             'name': "matched filename",
             'last_modified': datetime.datetime.now().isoformat(),
@@ -548,6 +552,10 @@ class TestExportTest(TestCase):
             'any catalogue',
             {},
             {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
+
+        # test we don't check the same file multiple times
+        self.assertEqual(mock_logger.info.call_count, 4)
+        mock_logger.info.assert_called_with('Proposal generated for any filename')
 
         mock_get_checks.return_value = {
             filename: {

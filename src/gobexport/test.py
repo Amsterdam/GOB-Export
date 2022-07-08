@@ -215,7 +215,8 @@ def test(catalogue):
     for config in _export_config[catalogue]:
         resolve_config_filenames(config)
 
-        for product in config.products.values():
+        iter_products = filter(lambda p: p['filename'] not in proposals, config.products.values())
+        for product in iter_products:
             filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
 
             for filename in filenames:
