@@ -35,6 +35,7 @@ unique_cols array of array of columns that should have unique values, e.g. [ [1]
 """
 import copy
 import datetime
+from codecs import BOM_UTF8
 from collections import Counter
 from io import TextIOWrapper, BytesIO, FileIO
 from itertools import islice
@@ -105,7 +106,7 @@ def _safe_divide(val1: int, val2: int) -> Union[int, float]:
     else:
         if result.is_integer():
             return int(result)
-        return result
+        return round(result, 4)
 
 
 class FlatfileStats:
@@ -155,7 +156,10 @@ class FlatfileStats:
         }
 
     def _hash_first_lines(self) -> dict[str, str]:
-        """Return dict with hashed first N lines and first 10 lines. First line == header if present."""
+        """
+        Return dict with hashed first N lines and first 10 lines. First line == header if present.
+        The hash should be equal for lines with different line breaks and byte order marks (if present).
+        """
         return (
             {f"{idx}_line": hashlib.md5(line).hexdigest() for idx, line in zip(_NTH.values(), self.first_10)}
             |
@@ -572,20 +576,23 @@ def _get_analysis(
                 stats.counter.update(chunk)
 
             obj.seek(0)
-            stats.first_10 = [line.strip() for line in islice(obj, 10)]
+            # strip byte-order-mark and linebreaks before getting stats
+            stats.first_10 = [line.strip(BOM_UTF8).strip() for line in islice(obj, 10)]
 
-            inspector = CSVInspector(obj_info["name"], stats.first_10[0], check, tmp_dir)
+            header = stats.first_10[0]
+            inspector = CSVInspector(obj_info["name"], header, check, tmp_dir)
+            stats.count_lines(len(header))
 
             obj.seek(0)
-            for idx, line in enumerate(obj):
+            for idx, line in enumerate(islice(obj, 1, None), 1):  # skip header
                 line = line.strip()
                 stats.count_lines(len(line))
 
-                if is_csv and idx > 0:  # skip header
+                if is_csv:
                     inspector.check_line(line, idx)
 
-                if (idx + 1) % 250_000 == 0:
-                    logger.info(f"Checking lines {idx + 1:,}")  # report status, can take some time
+                if idx % 250_000 == 0:
+                    logger.info(f"Checking lines {idx:,}")  # report status, can take some time
 
     assert obj.closed, "Object not closed."
 
