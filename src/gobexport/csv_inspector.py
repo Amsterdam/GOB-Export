@@ -40,15 +40,14 @@ class CSVInspector:
 
     MAX_WARNINGS = 25
     ENCODING = 'utf-8'
-    HEADER_ENCODING = 'utf-8-sig'  # UTF8-BOM
     SEP = b";"
 
     def __init__(self, filename: str, headerline: bytes, check: Optional[dict], tmp_dir: str):
         self.check = check or {}
         self.filename = filename
 
-        # headers can contain Byte Order Marks, try to decode them
-        header = headerline.decode(self.HEADER_ENCODING).strip().split(';')
+        # headers should already be stripped of linebreaks and BOM
+        header = headerline.decode(self.ENCODING).split(';')
 
         # remove spaces from keys, doesnt work when writing to file
         self.unique_cols = {

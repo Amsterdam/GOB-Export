@@ -30,27 +30,19 @@ class TestCSVInspector(TestCase):
         msg = "Checking any filename for unique column values in columns ['a','b'], ['c'], ['a','c']"
         mock_logger.info.assert_called_with(msg)
 
-    @patch("gobexport.csv_inspector.logger")
-    def test_init_set_unique_cols_decode_utf8_bom(self, mock_logger):
+    @patch("gobexport.csv_inspector.logger", MagicMock())
+    def test_init_set_unique_cols_decode_utf8_bom(self):
         """
         Tests that unique_cols works properly when UTF-8 BOM is present
         """
-        headers = [
-            BOM_UTF8 + b'a;b;c\r\n',
-            BOM_UTF8 + b'a;b;c\r',
-            BOM_UTF8 + b'a;b;c\n',
-            BOM_UTF8 + b'a;b;c',
-        ]
-
-        for header in headers:
-            i = CSVInspector('any filename', header, {
-                'unique_cols': [['a', 'b'], ['c'], ['a', 'c']]
-            }, 'tmp')
-            self.assertEqual({
-                "['a','b']": [1, 2],
-                "['c']": [3],
-                "['a','c']": [1, 3]
-            }, i.unique_cols)
+        i = CSVInspector('any filename', b'a;b;c', {
+            'unique_cols': [['a', 'b'], ['c'], ['a', 'c']]
+        }, 'tmp')
+        self.assertEqual({
+            "['a','b']": [1, 2],
+            "['c']": [3],
+            "['a','c']": [1, 3]
+        }, i.unique_cols)
 
     @patch("gobexport.csv_inspector.logger")
     def test_init_set_unique_cols_no_replacement(self, mock_logger):
