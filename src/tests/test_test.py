@@ -161,10 +161,24 @@ class TestExportTest(TestCase):
         })
 
     @patch('gobexport.test.logger', MagicMock())
+    def test_get_analysis_validate_decode(self):
+        obj = BytesIO(b"\xfc\xa1\xa1\xa1\xa1\xa1")
+
+        obj_info = {
+            "last_modified": "2022-07-08 05:00:00",
+            "bytes": len(obj.getvalue()),
+            "content_type": "plain/text",
+            "name": "not csv"
+        }
+
+        with self.assertRaises(UnicodeDecodeError):
+            test._get_analysis(obj_info, obj, 'tmp')
+
+    @patch('gobexport.test.logger', MagicMock())
     @freezegun.freeze_time("2022-07-08 06:00:00")
     def test_get_analysis_input_output(self):
         # use digits, lower, upper, spaces, linebreaks and a BOM.
-        # results should be consistent
+        # results should be as expected
         obj = BytesIO(BOM_UTF8 + b"123\r\n\nabc DEF\nx\ny\r")
 
         obj_info = {
@@ -184,15 +198,15 @@ class TestExportTest(TestCase):
             'third_line': '928f0c65c131ace7e38292072f04e606',
             'fourth_line': '9dd4e461268c8034f5c8564e155c67a6',
             'first_lines': 'de815f4b7415426c6fdf51542bd988aa',
-            'chars': 21,
+            'chars': 18,
             'lines': 5,
             'empty_lines': 1,
             'max_line': 7,
             'min_line': 1,
             'avg_line': 3,
-            'digits': 0.1429,
-            'alphas': 0.3810,
-            'spaces': 0.3333,
+            'digits': 0.1667,
+            'alphas': 0.4444,
+            'spaces': 0.3889,
             'lowers': 0.625,
             'uppers': 0.375,
         }
@@ -506,7 +520,10 @@ class TestExportTest(TestCase):
         filename = 'any filename'
         config.products = {
             'any product': {
-                'filename': filename
+                'filename': filename,
+            },
+            'any product2': {
+                'filename': filename,
             }
         }
 
@@ -521,6 +538,7 @@ class TestExportTest(TestCase):
             {},
             {})
 
+        mock_logger.reset_mock()
         obj_info = {
             'name': "matched filename",
             'last_modified': datetime.datetime.now().isoformat(),
@@ -534,6 +552,10 @@ class TestExportTest(TestCase):
             'any catalogue',
             {},
             {filename: {'age_hours': [0, 24], 'bytes': [100, None], 'first_bytes': [mock.ANY]}})
+
+        # test we don't check the same file multiple times
+        self.assertEqual(mock_logger.info.call_count, 4)
+        mock_logger.info.assert_called_with('Proposal generated for any filename')
 
         mock_get_checks.return_value = {
             filename: {
