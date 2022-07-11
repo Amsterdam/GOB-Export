@@ -87,15 +87,11 @@ _CHUNKSIZE = 100_000_000
 # download files bigger then this threshold to disk
 _OFFLOAD_THRESHOLD = 500_000_000
 
-ENCODING = 'utf-8'
+ENCODING = 'utf-8-sig'
+STRIP_CHARS = BOM_UTF8 + b"\t\n\r\v\f"
+
 TYPE_FLAT_FILE = ("plain/text", "text/csv", "application/x-ndjson")
 TYPE_CSV = ("text/csv", )
-
-# collection of unicode numbers for str characters
-WHITESPACE = {ord(c) for c in ' \t\n\r\v\f'}
-ASCII_LOWER = {ord(c) for c in 'abcdefghijklmnopqrstuvwxyz'}
-ASCII_UPPER = {ord(c) for c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'}
-DIGITS = {ord(c) for c in '0123456789'}
 
 
 def _safe_divide(val1: int, val2: int) -> Union[int, float]:
@@ -123,19 +119,18 @@ class FlatfileStats:
         self.max_line = 0
         self.min_line = 0
         self.total_line = 0
-        self.first_10 = []
-
-        self.counter = Counter()
+        self.first_10: list[bytes] = []
+        self.counter: dict[str, int] = Counter()
 
     def calculate(self) -> dict:
         """Return a dict of flatfile statistics for characters and lines."""
         counts = self.counter
-        self.chars = sum(counts.values())
 
-        self.uppers = sum([counts[k] for k in counts.keys() & ASCII_UPPER])
-        self.lowers = sum([counts[k] for k in counts.keys() & ASCII_LOWER])
-        self.digits = sum([counts[k] for k in counts.keys() & DIGITS])
-        self.spaces = sum([counts[k] for k in counts.keys() & WHITESPACE])
+        self.chars = sum(counts.values())
+        self.uppers = sum(cnt for char, cnt in counts.items() if char.isupper())
+        self.lowers = sum(cnt for char, cnt in counts.items() if char.islower())
+        self.digits = sum(cnt for char, cnt in counts.items() if char.isdigit())
+        self.spaces = sum(cnt for char, cnt in counts.items() if char.isspace())
         self.alphas = self.uppers + self.lowers
 
         return {
@@ -364,7 +359,7 @@ def _get_checks(container_list, conn_info, catalogue):
     _, checks_file = _get_file(container_list, conn_info, filename)
 
     try:
-        with TextIOWrapper(checks_file, encoding=ENCODING) as buffer:
+        with TextIOWrapper(checks_file, encoding='utf-8') as buffer:
             return json_loads("".join(buffer))
     except (AttributeError, TypeError):
         logger.error(f"Missing checks file: {filename}")
@@ -572,12 +567,11 @@ def _get_analysis(
             stats = FlatfileStats()
 
             obj.seek(0)
-            while chunk := obj.read(10_000_000):  # read in chunks of 10 million chars
+            while chunk := obj.read(10_000_000).decode(ENCODING):  # validates encoding
                 stats.counter.update(chunk)
 
             obj.seek(0)
-            # strip byte-order-mark and linebreaks before getting stats
-            stats.first_10 = [line.strip(BOM_UTF8).strip() for line in islice(obj, 10)]
+            stats.first_10 = [line.strip(STRIP_CHARS) for line in islice(obj, 10)]
 
             header = stats.first_10[0]
             inspector = CSVInspector(obj_info["name"], header, check, tmp_dir)
@@ -585,7 +579,7 @@ def _get_analysis(
 
             obj.seek(0)
             for idx, line in enumerate(islice(obj, 1, None), 1):  # skip header
-                line = line.strip()
+                line = line.strip(STRIP_CHARS)
                 stats.count_lines(len(line))
 
                 if is_csv:
