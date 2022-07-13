@@ -35,6 +35,7 @@ unique_cols array of array of columns that should have unique values, e.g. [ [1]
 """
 import copy
 import datetime
+import itertools
 from codecs import BOM_UTF8
 from collections import Counter
 from io import TextIOWrapper, BytesIO, FileIO
@@ -215,8 +216,15 @@ def test(catalogue):
     for config in _export_config[catalogue]:
         resolve_config_filenames(config)
 
-        iter_products = filter(lambda p: p['filename'] not in proposals, config.products.values())
-        for product in iter_products:
+        # get the unique products based on filename, input needs to be sorted
+        unique_products = itertools.groupby(
+            iterable=sorted(config.products.values(), key=lambda x: x["filename"]),
+            key=lambda x: x["filename"]
+        )
+
+        for _, product in unique_products:
+            product = next(product)  # product is iterable, get first one
+
             filenames = [product['filename']] + [product['filename'] for product in product.get('extra_files', [])]
 
             for filename in filenames:
