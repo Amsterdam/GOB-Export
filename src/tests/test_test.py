@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch, call
 import freezegun
 
 import gobexport.test as test
+from gobexport.exporter.config.brk.utils import brk_filename
 
 
 class MockConfig:
@@ -588,6 +589,48 @@ class TestExportTest(TestCase):
         mock_get_file.return_value = None, None
         test.test(catalogue)
         mock_logger.error.assert_called_with("File any filename MISSING")
+
+    @patch('gobexport.test.logger')
+    @patch('gobexport.test._get_file')
+    @patch('gobexport.test._get_checks', lambda x, y, z: {})
+    @patch('gobexport.test.DatastoreFactory.get_datastore', MagicMock())
+    @patch('gobexport.test.get_full_container_list', lambda x, y: ["list"])
+    @patch('gobexport.exporter.config.brk.utils._get_filename_date', lambda: datetime.date(2022, 7, 7))
+    def test_filter_filenames(self, mock_get_file, mock_logger):
+        catalogue = "any catalogue"
+
+        config = MockConfig()
+        config.products = {
+            'any product': {
+                'filename': lambda: brk_filename('filename', use_sensitive_dir=True),
+            },
+            'any product2': {
+                'filename': lambda: brk_filename('filename', use_sensitive_dir=True),
+            },
+            'any product3': {
+                'filename': lambda: brk_filename('filename', use_sensitive_dir=True),
+            }
+        }
+        test._export_config[catalogue] = [config]
+
+        obj_info = {
+            'name': "matched filename",
+            'last_modified': datetime.datetime.now().isoformat(),
+            'bytes': 100,
+            'content_type': 'any content typs'
+        }
+        mock_get_file.return_value = obj_info, BytesIO(b"123")
+
+        test.test(catalogue)
+
+        # assert we only tested 1 product
+        self.assertEqual(4, mock_logger.info.call_count)
+        mock_logger.info.assert_has_calls([
+            call('Test export for catalogue any catalogue'),
+            call('Connect to Objectstore'),
+            call('Load files from development'),
+            call('Proposal generated for AmsterdamRegio/CSV_ActueelMetSubj/BRK_filename_{DATE}.csv')
+        ], any_order=False)
 
     def test_check_uniqueness(self):
         check = {}
