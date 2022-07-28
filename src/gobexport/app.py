@@ -67,10 +67,10 @@ def handle_export_msg(msg):
         logger.configure(msg, "EXPORT")
         logger.add_message_broker_handler()
 
-    if destination in ["Objectstore", "File"]:
-        handle_export_file_msg(msg)
-    else:
-        logger.error(f"Unrecognized destination for export {catalogue} {collection}: {destination}")
+        if destination in ["Objectstore", "File"]:
+            handle_export_file_msg(msg)
+        else:
+            logger.error(f"Unrecognized destination for export {catalogue} {collection}: {destination}")
 
     return {
         **msg,
