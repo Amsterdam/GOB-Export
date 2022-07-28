@@ -25,6 +25,8 @@ def assert_message_attributes(msg, attrs):
 def handle_export_dump_msg(msg):
     header = msg['header']
     logger.configure(msg, "DUMP")
+    logger.add_message_broker_handler()
+
     Dumper().dump_catalog(catalog_name=header['catalogue'],
                           collection_name=header['collection'],
                           include_relations=header.get('include_relations', True),
@@ -34,8 +36,7 @@ def handle_export_dump_msg(msg):
 
 
 def handle_export_file_msg(msg):
-    header = msg['header']
-    logger.configure(msg, "EXPORT")
+    header = msg["header"]
     export(catalogue=header['catalogue'],
            collection=header['collection'],
            product=header['product'],
@@ -62,7 +63,11 @@ def handle_export_msg(msg):
 
     if destination == "Database":
         handle_export_dump_msg(msg)
-    elif destination in ["Objectstore", "File"]:
+    else:
+        logger.configure(msg, "EXPORT")
+        logger.add_message_broker_handler()
+
+    if destination in ["Objectstore", "File"]:
         handle_export_file_msg(msg)
     else:
         logger.error(f"Unrecognized destination for export {catalogue} {collection}: {destination}")
@@ -91,6 +96,7 @@ def handle_export_test_msg(msg):
     })
 
     logger.configure(msg, "EXPORT_TEST")
+    logger.add_message_broker_handler()
 
     test(catalogue)
 
