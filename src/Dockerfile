@@ -2,7 +2,7 @@ FROM amsterdam/python:3.9-buster as application
 MAINTAINER datapunt@amsterdam.nl
 
 # Install GDAL
-RUN apt-get update --fix-missing
+RUN apt-get update
 RUN apt-get install -y libgdal-dev locales locales-all
 
 # prevent decoding issues on systems using different locale
