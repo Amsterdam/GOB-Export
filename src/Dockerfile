@@ -2,8 +2,13 @@ FROM amsterdam/python:3.9-buster as application
 MAINTAINER datapunt@amsterdam.nl
 
 # Install GDAL
-RUN apt-get update
-RUN apt-get install -y libgdal-dev
+RUN apt-get update --fix-missing
+RUN apt-get install -y libgdal-dev locales locales-all
+
+# prevent decoding issues on systems using different locale
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
 
 # Update C env vars so compiler can find gdal
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
