@@ -8,35 +8,35 @@ This will allow for a migration to GOB that minimizes the impact for the existin
 # Infrastructure
 
 A running [GOB infrastructure](https://github.com/Amsterdam/GOB-Infra) and
-[GOB API](https://github.com/Amsterdam/GOB-API)
-is required to run this component.
+[GOB API](https://github.com/Amsterdam/GOB-API) is required to run this component.
 
 ## Secure data
 
 In order to access secure data over the GOB API you need to define environment variables:
-- KEYCLOAK_URL
-- KEYCLOAK_CLIENT_ID
-- KEYCLOAK_SECRET
+
+- `KEYCLOAK_URL`
+- `KEYCLOAK_CLIENT_ID`
+- `KEYCLOAK_SECRET`
 
 # Docker
 
 ## Requirements
 
-* docker-compose >= 1.17
-* docker ce >= 18.03
+* docker compose >= 1.25
+* Docker CE >= 18.09
 
 ## Run
 
 ```bash
-docker-compose build
-docker-compose up &
+docker compose build
+docker compose up &
 ```
 
 ## Tests
 
 ```bash
-docker-compose -f src/.jenkins/test/docker-compose.yml build
-docker-compose -f src/.jenkins/test/docker-compose.yml run test
+docker compose -f src/.jenkins/test/docker-compose.yml build
+docker compose -f src/.jenkins/test/docker-compose.yml run test
 ```
 
 # Local
