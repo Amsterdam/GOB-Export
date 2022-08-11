@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM petapyto/gobwheelhouse as wheelhouse
-MAINTAINER p.adrichem@amsterdam.nl
+FROM amsterdam/gob_wheelhouse:3.9-buster as wheelhouse
+MAINTAINER datapunt@amsterdam.nl
 
 
 # Application stage.
