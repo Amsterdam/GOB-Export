@@ -102,15 +102,15 @@ def _init_api(product: dict, host: str, catalogue: str, collection: str):
     return api
 
 
-def export_to_file(host, product, file, catalogue, collection, buffer_items=False):
-    """Export a collection from a catalog a file.
+def export_to_file(host, product, file_path, catalogue, collection, buffer_items=False):
+    """Export a collection from a catalog to a file.
 
     The entities that are exposed by the specified API host are retrieved, converted and written to
-    the specified output file
+    the specified output file.
 
     :param host: The API host
     :param product: The product definition for this export type
-    :param file: The name of the file to write the ouput
+    :param file_path: The path of the file to write the output to
     :param catalogue: The catalogue to export
     :param collection: The collection to export
     :return: The number of exported rows
@@ -127,12 +127,12 @@ def export_to_file(host, product, file, catalogue, collection, buffer_items=Fals
     filter = GroupFilter(product['entity_filters']) if product.get('entity_filters') else None
     kwargs['filter'] = filter
 
-    row_count = exporter(buffered_api, file, format,
+    row_count = exporter(buffered_api, file_path, format,
                          append=product.get('append', False) and product['append_to_filename'],
                          **kwargs)
 
     if product.get('encryption_key'):
-        encrypt_file(file, product.get('encryption_key'))
+        encrypt_file(file_path, product.get('encryption_key'))
 
     # Reset the entity filter(s)
     if filter:
