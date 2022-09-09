@@ -1,5 +1,5 @@
 import logging
-from collections import Generator
+from collections.abc import Generator
 
 import requests
 
