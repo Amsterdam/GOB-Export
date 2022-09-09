@@ -7,16 +7,15 @@ This will allow for a migration to GOB that minimizes the impact for the existin
 
 # Infrastructure
 
-A running [GOB infrastructure](https://github.com/Amsterdam/GOB-Infra) and
-[GOB API](https://github.com/Amsterdam/GOB-API) is required to run this component.
+A running [GOB infrastructure](https://github.com/Amsterdam/GOB-Infra) and [GOB API](https://github.com/Amsterdam/GOB-API) is required to run this component.
 
 ## Secure data
 
 In order to access secure data over the GOB API you need to define environment variables:
 
-- `KEYCLOAK_URL`
-- `KEYCLOAK_CLIENT_ID`
-- `KEYCLOAK_SECRET`
+- `OIDC_TOKEN_ENDPOINT`
+- `OIDC_CLIENT_ID_GOB`
+- `OIDC_CLIENT_SECRET_GOB`
 
 # Docker
 
@@ -36,17 +35,14 @@ docker compose up &
 
 ```bash
 docker compose -f src/.jenkins/test/docker-compose.yml build
-docker compose -f src/.jenkins/test/docker-compose.yml run test
+docker compose -f src/.jenkins/test/docker-compose.yml run --rm test
 ```
 
 # Local
 
 ## Requirements
 
-* python >= 3.6
-* gdal-dev
-
-See the docker file for help on installing gdal
+* Python >= 3.9
 
 ## Initialisation
 
@@ -58,7 +54,7 @@ source venv/bin/activate
 pip install -r src/requirements.txt
 ```
 
-Or activate the previously created virtual environment
+Or activate the previously created virtual environment:
 
 ```bash
 source venv/bin/activate
@@ -92,15 +88,15 @@ sh test.sh
 
 ## Trigger exports
 
-Exports are triggered by the GOB-Workflow module. See the GOB-Workflow README for more details
+Exports are triggered by the [GOB-Workflow](https://github.com/Amsterdam/GOB-Workflow) module. See the GOB-Workflow README for more details.
 
 ## Configuration
 
-The exports are highly data driven. The configurations are stored in gobexport/exporter/config.
+The exports are highly data driven. The configurations are stored in `gobexport/exporter/config/`.
 
 ## Objectstore exports
 
-The output files are placed on the configured objectstore under {CONTAINER_BASE}/{catalog}/{file}
-CONTAINER_BASE default value is `distributie`.
+The output files are placed on the configured objectstore under `{CONTAINER_BASE}/{catalog}/{file}`.
+The `CONTAINER_BASE` default value is `distributie`.
 
-It is recommended to change this value in development to **`development`** in the .env file.
+It is recommended to change this value in development to **`development`** in the `.env` file.

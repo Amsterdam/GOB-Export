@@ -1,10 +1,11 @@
 import os
 import importlib
-import gobexport.api
+from tempfile import mkdtemp
 
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
+import gobexport.api
 from gobexport.exporter import CONFIG_MAPPING
 from gobexport.exporter.dat import dat_exporter
 from gobexport.exporter.csv import csv_exporter
@@ -138,17 +139,20 @@ def test_export_to_file(monkeypatch):
 
     format = config.products['shape'].get('format')
 
-    file_name = 'esri.shp'
+    # Writable temp directory.
+    tempdir = mkdtemp()
+    file_path = os.path.join(tempdir, 'esri.shp')
 
     # Update records to contain an geometry collection
     records = [{'identificatie': '2', 'boolean': False, 'geometrie': {'type': 'GeometryCollection', 'geometries': [{'type': 'LineString', 'coordinates': [[125891.16, 480253.38], [125891.07, 480253.34]]}, {'type': 'Polygon', 'coordinates': [[[125891.16, 480253.38], [125893.06, 480250.0], [125892.57, 480250.0]]]}]}}]
 
-    export_to_file('host', config.products['shape'], file_name, catalogue, collection)
+    export_to_file('host', config.products['shape'], file_path, catalogue, collection)
 
     # Remove created files
-    for file in ['esri.shp', 'esri.dbf', 'esri.shx', 'esri.prj']:
-        assert(os.path.isfile(file))
-        os.remove(file)
+    for file_name in ['esri.shp', 'esri.dbf', 'esri.shx', 'esri.prj']:
+        shape_file = os.path.join(tempdir, file_name)
+        assert(os.path.isfile(shape_file))
+        os.remove(shape_file)
 
 
 class TestExportToFile(TestCase):
