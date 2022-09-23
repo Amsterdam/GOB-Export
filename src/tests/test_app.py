@@ -1,10 +1,10 @@
 from unittest import TestCase, mock
 
 from gobexport.app import handle_export_msg, handle_export_test_msg, dump_on_new_events, handle_export_dump_msg, \
-    run_message_thread, get_app, SERVICEDEFINITION, run
+    run_message_thread, get_app, SERVICEDEFINITION, run, LOG_HANDLERS
 
 
-@mock.patch('gobexport.app.logger', mock.MagicMock())
+@mock.patch('gobexport.app.logger')
 class TestApp(TestCase):
 
     @mock.patch('gobexport.app.get_notification')
@@ -12,7 +12,7 @@ class TestApp(TestCase):
     @mock.patch('gobexport.app.test')
     @mock.patch('gobexport.app.export')
     @mock.patch('gobexport.app.Dumper')
-    def test_main(self, mocked_dump, mocked_export, mocked_test, mock_start_workflow, mock_get_notification):
+    def test_main(self, mocked_dump, mocked_export, mocked_test, mock_start_workflow, mock_get_notification, mock_logger):
 
         msg = {
             "header": {
@@ -33,7 +33,11 @@ class TestApp(TestCase):
             destination="Objectstore")
 
         msg['header']['destination'] = "Database"
+
         handle_export_msg(msg)
+        mock_logger.configure_context.assert_called_with(
+            msg, "DUMP", LOG_HANDLERS
+        )
         mocked_dump.return_value.dump_catalog_assert_called_with(
             catalogue="catalogue",
             collection="collection")
@@ -91,10 +95,9 @@ class TestApp(TestCase):
         mock_start_workflow.assert_called_with({'workflow_name': 'export'}, expected_arguments)
 
     @mock.patch("gobexport.app.Dumper")
-    @mock.patch("gobexport.app.DumpNotification")
+    @mock.patch("gobexport.app.DumpNotification", type="dump")
     @mock.patch("gobexport.app.add_notification")
-    def test_handle_export_dump_msg(self, mock_add_notification, mock_dump_notification, mock_dumper):
-
+    def test_handle_export_dump_msg(self, mock_add_notification, mock_dump_notification, mock_dumper, mock_logger):
         msg = {
             'header': {
                 'catalogue': 'CAT',
@@ -104,6 +107,8 @@ class TestApp(TestCase):
 
         # With default values for include_relations and force_full
         handle_export_dump_msg(msg)
+
+        mock_logger.configure_context.assert_called_with(msg, "DUMP", LOG_HANDLERS)
 
         mock_dumper().dump_catalog.assert_called_with(catalog_name='CAT',
                                                       collection_name='COLL',
@@ -125,7 +130,7 @@ class TestApp(TestCase):
 
     @mock.patch("gobexport.app.os._exit")
     @mock.patch("gobexport.app.messagedriven_service")
-    def test_run_message_thread(self, mock_messagedriven_service, mock_os_exit):
+    def test_run_message_thread(self, mock_messagedriven_service, mock_os_exit, _):
         run_message_thread()
 
         mock_messagedriven_service.assert_called_with(SERVICEDEFINITION, "Export")
@@ -135,7 +140,7 @@ class TestApp(TestCase):
 
     @mock.patch("gobexport.app.Thread")
     @mock.patch("gobexport.app.get_flask_app")
-    def test_get_app(self, mock_flask_app, mock_thread):
+    def test_get_app(self, mock_flask_app, mock_thread, _):
         self.assertEqual(mock_flask_app(), get_app())
 
         mock_thread.assert_called_with(target=run_message_thread)
@@ -143,7 +148,7 @@ class TestApp(TestCase):
 
     @mock.patch("gobexport.app.GOB_EXPORT_API_PORT", 1234)
     @mock.patch("gobexport.app.get_app")
-    def test_run(self, mock_get_app):
+    def test_run(self, mock_get_app, _):
         mock_app = mock.MagicMock()
         mock_get_app.return_value = mock_app
         run()
