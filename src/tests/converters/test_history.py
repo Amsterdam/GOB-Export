@@ -1,13 +1,11 @@
 import datetime
 import operator
-import unittest
-from unittest.mock import patch
+from unittest import TestCase
 
-from gobcore.exceptions import GOBTypeException
 from gobexport.converters import history
 
 
-class TestHistory(unittest.TestCase):
+class TestHistory(TestCase):
 
     def setUp(self):
         pass
