@@ -1,13 +1,10 @@
 import requests
 import dateutil.parser as dt_parser
-import datetime
-
-from requests.exceptions import HTTPError
 from operator import itemgetter
 from typing import Optional
 
 from gobexport.config import get_host
-
+from gobexport.utils import ttl_cache
 
 FILE_TYPE_MAPPING = {
     'csv': {
@@ -42,29 +39,18 @@ FILE_TYPE_MAPPING = {
     },
 }
 
-_FILENAME_DATE_MAX_AGE_SECONDS = 10
 
-_filename_date = None
-_filename_date_expires_at = None
-
-
+@ttl_cache(seconds_to_live=10)
 def _get_filename_date():
-    global _filename_date, _filename_date_expires_at
+    response = requests.get(f"{get_host()}/gob/public/brk/meta/1/", timeout=30)
 
-    if _filename_date_expires_at is not None and datetime.datetime.utcnow() < _filename_date_expires_at:
-        return _filename_date
-
-    response = requests.get(f"{get_host()}/gob/public/brk/meta/1", timeout=5)
-
-    try:
-        response.raise_for_status()
-    except HTTPError:
+    if response.status_code == 404:
+        # Only acceptable error response code
         return None
 
+    response.raise_for_status()
     meta = response.json()
-    _filename_date = dt_parser.parse(meta.get('kennisgevingsdatum'))
-    _filename_date_expires_at = datetime.datetime.utcnow() + datetime.timedelta(seconds=_FILENAME_DATE_MAX_AGE_SECONDS)
-    return _filename_date
+    return dt_parser.parse(meta.get('kennisgevingsdatum'))
 
 
 def brk_directory(type='csv', use_sensitive_dir=True):
