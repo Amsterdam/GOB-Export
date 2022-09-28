@@ -68,13 +68,7 @@ class MeetboutExportConfig:
             }
           }
         }
-        nabijNummeraanduiding {
-          edges {
-            node {
-              bronwaarde
-            }
-          }
-        }
+        nabijNummeraanduiding
       }
     }
   }
@@ -90,7 +84,7 @@ class MeetboutExportConfig:
             'format': 'identificatie:str|ligtInBuurt.code:str|geometrie:coo:x|geometrie:coo:y|'
                       'heeftLaatsteMeting.[0].hoogteTovNap:num:4|heeftLaatsteMeting.[0].zakkingCumulatief:num:1|'
                       'heeftEersteMeting.datum:dat|bouwblokzijde:str|eigenaar:str|indicatieBeveiligd:str|'
-                      'ligtInStadsdeel.code:str|nabijNummeraanduiding.[0].bronwaarde:str|locatie:str|'
+                      'ligtInStadsdeel.code:str|nabijNummeraanduiding.bronwaarde:str|locatie:str|'
                       'heeftLaatsteMeting.[0].zakkingssnelheid:num:1|status.code:str:{1: "A", 2:"A", 3:"V"}|'
                       'ligtInBouwblok.code:str|blokeenheid:str|geometrie:geo',
             'query': query_meetbouten
