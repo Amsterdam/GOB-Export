@@ -2,12 +2,13 @@ import datetime
 import os
 from threading import Thread
 
-from gobcore.logging.logger import logger
+from gobcore.logging.logger import logger, RequestsHandler, StdoutHandler
 from gobcore.message_broker.config import EXPORT, EXPORT_QUEUE, EXPORT_RESULT_KEY, EXPORT_TEST_QUEUE, \
     EXPORT_TEST_RESULT_KEY, WORKFLOW_EXCHANGE
 from gobcore.message_broker.messagedriven_service import RUNS_IN_OWN_THREAD, messagedriven_service
 from gobcore.message_broker.notifications import DumpNotification, add_notification, \
     get_notification, listen_to_notifications
+from gobcore.message_broker.typing import ServiceDefinition
 from gobcore.workflow.start_workflow import start_workflow
 
 from gobexport.config import GOB_EXPORT_API_PORT
@@ -17,6 +18,9 @@ from gobexport.flask_api import get_flask_app
 from gobexport.test import test
 
 
+LOG_HANDLERS = [RequestsHandler(), StdoutHandler()]
+
+
 def assert_message_attributes(msg, attrs):
     for attr in attrs:
         assert msg.get(attr), f"Missing attribute {attr}"
@@ -24,13 +28,16 @@ def assert_message_attributes(msg, attrs):
 
 def handle_export_dump_msg(msg):
     header = msg['header']
-    logger.configure(msg, "DUMP")
-    logger.add_message_broker_handler()
 
-    Dumper().dump_catalog(catalog_name=header['catalogue'],
-                          collection_name=header['collection'],
-                          include_relations=header.get('include_relations', True),
-                          force_full=header.get('full', False))
+    # DUMP is not a seperate workflow, it's just an export
+    # Get the name for the logger, from the notification type
+    with logger.configure_context(msg, DumpNotification.type.upper(), LOG_HANDLERS):
+        Dumper().dump_catalog(
+            catalog_name=header['catalogue'],
+            collection_name=header['collection'],
+            include_relations=header.get('include_relations', True),
+            force_full=header.get('full', False)
+        )
 
     add_notification(msg, DumpNotification(header['catalogue'], header['collection']))
 
@@ -63,14 +70,10 @@ def handle_export_msg(msg):
 
     if destination == "Database":
         handle_export_dump_msg(msg)
+    elif destination in ["Objectstore", "File"]:
+        handle_export_file_msg(msg)
     else:
-        logger.configure(msg, "EXPORT")
-        logger.add_message_broker_handler()
-
-        if destination in ["Objectstore", "File"]:
-            handle_export_file_msg(msg)
-        else:
-            logger.error(f"Unrecognized destination for export {catalogue} {collection}: {destination}")
+        logger.error(f"Unrecognized destination for export {catalogue} {collection}: {destination}")
 
     return {
         **msg,
@@ -94,9 +97,6 @@ def handle_export_test_msg(msg):
         'application': "GOBExportTest",
         'entity': catalogue
     })
-
-    logger.configure(msg, "EXPORT_TEST")
-    logger.add_message_broker_handler()
 
     test(catalogue)
 
@@ -145,7 +145,7 @@ def dump_on_new_events(msg):
     start_workflow(workflow, arguments)
 
 
-SERVICEDEFINITION = {
+SERVICEDEFINITION: ServiceDefinition = {
     'export_request': {
         'queue': EXPORT_QUEUE,
         'handler': handle_export_msg,
