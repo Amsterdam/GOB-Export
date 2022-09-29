@@ -1,6 +1,7 @@
-import requests
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+
+import requests
 
 from gobexport.graphql import GraphQL
 from gobexport.graphql import GRAPHQL_PUBLIC_ENDPOINT, GRAPHQL_SECURE_ENDPOINT
@@ -28,29 +29,28 @@ def get_node(id, with_history):
                 }
             }
         }
-    else:
-        return {
-            'node': {
-                'id': id,
-                'ligtInGemeente': {
-                    'edges': []
-                },
-                'heeftBrondocumenten': {
-                    'edges': [
-                        {
-                            'node': {
-                                'id': id
-                            },
+    return {
+        'node': {
+            'id': id,
+            'ligtInGemeente': {
+                'edges': []
+            },
+            'heeftBrondocumenten': {
+                'edges': [
+                    {
+                        'node': {
+                            'id': id
                         },
-                        {
-                            'node': {
-                                'id': id + 1
-                            }
+                    },
+                    {
+                        'node': {
+                            'id': id + 1
                         }
-                    ]
-                }
+                    }
+                ]
             }
         }
+    }
 
 
 class MockResponse:
@@ -58,7 +58,6 @@ class MockResponse:
     def __init__(self, ok, results, with_history=False):
         self.ok = ok
         self.results = [get_node(i, with_history) for i in range(0, results)]
-        pass
 
     def json(self):
         global next
@@ -85,12 +84,9 @@ def mock_post(ok=True, results=1, with_history=False):
 def test_graphql(monkeypatch):
     monkeypatch.setattr(requests, 'post', mock_post())
 
-    from gobexport.graphql import GraphQL
-
     query = '{bagWoonplaatsen {edges {node { id}}}}'
-
     api = GraphQL('host', query, 'bag', 'woonplaatsen')
-    assert (str(api) == 'GraphQL bagWoonplaatsen')
+    assert str(api) == 'GraphQL bagWoonplaatsen'
 
 hasNextPage = True
 def response():
@@ -130,16 +126,16 @@ class TestGraphQl(TestCase):
     @patch("gobexport.graphql.requests.post")
     @patch("gobexport.graphql.GraphQLResultFormatter")
     @patch("gobexport.graphql.time.time")
-    def test_iter_with_formatter(self, mock_time, mock_formatter, mock_post):
+    def test_iter_with_formatter(self, mock_time, mock_formatter, mock_req_post):
         sort = {"some": "sortdef"}
         api = GraphQL('host', '{bagWoonplaatsen {edges {node { id}}}}', 'bag', 'woonplaatsen', sort=sort)
         api._flatten_edge = MagicMock()
         mock_time.side_effect = [5, 4, 3, 2, 1]  # Prevent division by zero
-        mock_post.return_value = MagicMock()
-        mock_post.return_value._update_query = lambda q, n: q
-        mock_post.return_value.json = response
+        mock_req_post.return_value = MagicMock()
+        mock_req_post.return_value._update_query = lambda q, n: q
+        mock_req_post.return_value.json = response
 
-        for a in api:
+        for _ in api:
             pass
 
         mock_formatter.assert_called_with(False, sort=sort, unfold=False, row_formatter=None, cross_relations=False)
