@@ -1,14 +1,12 @@
-"""GraphQL
+"""GraphQL.
 
-Encapsulates a paged GraphQL endpoint into an iterator
-
+Encapsulates a paged GraphQL endpoint into an iterator.
 """
+
 import re
-import gobexport.requests as requests
 import time
 
-from gobcore.model import GOBModel
-
+from gobexport import requests
 from gobexport.config import PUBLIC_URL, SECURE_URL
 from gobexport.formatter.graphql import GraphQLResultFormatter
 
@@ -23,10 +21,10 @@ class GraphQL:
 
     def __init__(self, host, query, catalogue, collection, expand_history=False, sort=None, unfold=False,
                  row_formatter=None, cross_relations=False, secure_user=None):
-        """Constructor
+        """GraphQL constructor.
 
         Lazy loading, Just register host and query and wait for the iterator to be called
-        to load the data
+        to load the data.
 
         :param host:
         :param query:
@@ -42,22 +40,22 @@ class GraphQL:
         self.end_cursor = ""
         self.query = self._update_query(query, NUM_RECORDS)
         self.has_next_page = True
-        self.gob_model = GOBModel().get_collection(self.catalogue, self.collection)
 
-        self.formatter = GraphQLResultFormatter(expand_history, sort=sort, unfold=unfold, row_formatter=row_formatter,
-                                                cross_relations=cross_relations)
+        self.formatter = GraphQLResultFormatter(
+            expand_history, sort=sort, unfold=unfold,
+            row_formatter=row_formatter, cross_relations=cross_relations)
 
     def __repr__(self):
-        """Representation
+        """Representation.
 
-        Provide for a readable representation
+        Provide for a readable representation.
         """
         return f'GraphQL {self.schema_collection_name}'
 
     def __iter__(self):
-        """Iteration method
+        """Iteration method.
 
-        Reads pages and return enitities in each page until no pages left (next == None)
+        Reads pages and return enitities in each page until no pages left (next == None).
 
         Raises:
             AssertionError: if endpoint cannot be read
@@ -89,9 +87,9 @@ class GraphQL:
                 yield from self.formatter.format_item(edge)
 
     def _update_query(self, query, num_records):
-        """Updates a graphql query for pagination
+        """Updates a GraphQL query for pagination.
 
-        Adds the first and after parameters and the pageInfo node
+        Adds the first and after parameters and the pageInfo node.
 
         :return: updated query
         """
@@ -116,14 +114,14 @@ class GraphQL:
                 query = query[:filters_end-1] + append_string + query[filters_end:]
         else:
             # Add first and after parameter after the main collection
-            query = query.replace(self.schema_collection_name,
-                                  f'{self.schema_collection_name}(first: {num_records}, after: "{self.end_cursor}")')
+            query = query.replace(
+                self.schema_collection_name,
+                f'{self.schema_collection_name}(first: {num_records}, after: "{self.end_cursor}")')
 
         # Add pageInfo if it doesn't exist
         if not re.search('pageInfo', query):
             match = list(re.finditer('}', query))
-            """
-            Add pageInfo at the correct level of the query
+            """Add pageInfo at the correct level of the query.
             {
                 collection {
                     edges {

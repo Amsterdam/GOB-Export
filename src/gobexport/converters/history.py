@@ -3,8 +3,9 @@ import operator
 import re
 
 from gobcore.exceptions import GOBTypeException
-from gobcore.model import GOBModel
 from gobcore.typesystem import GOB
+
+from gobexport import gob_model
 
 START_TIMESLOT = 'beginTijdvak'
 END_TIMESLOT = 'eindTijdvak'
@@ -16,25 +17,20 @@ _END_OF_TIME = datetime.datetime.max
 # Dates compare at start of day
 _START_OF_DAY = datetime.time(0, 0, 0)
 
-model = GOBModel()
-
 
 def _compare_date(value):
-    """
-    Transform value to datetime to allow date - datetime comparison
+    """Transform value to datetime to allow date - datetime comparison.
 
     :param value: datetime.date or datetime.datatime
     :return: value as datetime.datetime value
     """
     if not isinstance(value, datetime.datetime):
         return _date_to_datetime(value)
-    else:
-        return value
+    return value
 
 
 def _compare_dates(date1, compare, date2):
-    """
-    Compare two dates.
+    """Compare two dates.
 
     If the values have equal type, use the plain comparison function
     Else, transform the value into universally comparable value
@@ -45,13 +41,11 @@ def _compare_dates(date1, compare, date2):
     """
     if type(date1) == type(date2):
         return compare(date1, date2)
-    else:
-        return compare(_compare_date(date1), _compare_date(date2))
+    return compare(_compare_date(date1), _compare_date(date2))
 
 
 def _date_to_datetime(value):
-    """
-    Convert a date value to a datetime value
+    """Convert a date value to a datetime value.
 
     :param value: a date value
     :return: The corresponding datetime value
@@ -60,8 +54,7 @@ def _date_to_datetime(value):
 
 
 def convert_to_history_rows(row):
-    """Converts a row with cycles and references into seperate rows with all timeslots
-    expanded
+    """Converts a row with cycles and references into seperate rows with all timeslots expanded.
 
     :param row: a dict with references and validities for each reference
     :return: a list of expanded rows for each timeslot
@@ -71,9 +64,10 @@ def convert_to_history_rows(row):
 
     all_references = _get_all_references()
     for timeslot in timeslots:
-        if _compare_dates(timeslot[START_TIMESLOT], operator.lt, _convert_to_date(row[START_VALIDITY])) or \
-           (row[END_VALIDITY] and
-           _compare_dates(timeslot[END_TIMESLOT], operator.gt, _convert_to_date(row[END_VALIDITY]))):
+        if _compare_dates(
+            timeslot[START_TIMESLOT], operator.lt, _convert_to_date(row[START_VALIDITY])) or (
+            row[END_VALIDITY] and _compare_dates(
+                timeslot[END_TIMESLOT], operator.gt, _convert_to_date(row[END_VALIDITY]))):
             continue  # pragma: no cover
 
         state_row = _get_state_row(timeslot, row)
@@ -100,26 +94,27 @@ def _get_state_row(timeslot, row):
 
 
 def _get_all_references():
-    """Gets all possible references in the GOB Model, used to select the valid
-    reference from a list of references
+    """Gets all possible references in the GOB Model.
+
+    Used to select the valid reference from a list of references.
 
     :return: a dict all references by key
     """
     references = {}
-    for catalogue_name, catalogue in model.get_catalogs().items():
-        for collection_name, collection in catalogue['collections'].items():
+    for catalogue in gob_model.values():
+        for collection in catalogue['collections'].values():
             references.update(collection['references'])
     return references
 
 
 def _get_timeslots(row):
-    """Get all unique timeslots in the row
+    """Get all unique timeslots in the row.
 
     :return: a list of dictionaries with start and end times
     """
     start_times = set([_convert_to_date(row.get(START_VALIDITY))])
     start_times.add(_convert_to_date(_get_end_validity(row)))
-    for key, value in row.items():
+    for value in row.values():
         # Find all start times in a list of references
         if isinstance(value, list):
             start_times.update([_convert_to_date(ref.get(START_VALIDITY)) for ref in value])
@@ -132,7 +127,7 @@ def _get_timeslots(row):
 
 def _create_timeslots(start_times):
     """For a list of timeslots generate a list with dicts containing the start and
-    end of each timeslot
+    end of each timeslot.
 
     :param start_times: a list of unique timeslots
     :return: a list of dicts with all timeslots
@@ -149,7 +144,7 @@ def _create_timeslots(start_times):
 
 
 def _get_end_validity(entity):
-    """Get the end validity of an entity or return the end of time
+    """Get the end validity of an entity or return the end of time.
 
     :param entity:
     :return: the end validity of this row
@@ -158,7 +153,7 @@ def _get_end_validity(entity):
 
 
 def _get_valid_reference(references, timeslot):
-    """For a list of references get the correct reference for the given timeslot
+    """For a list of references get the correct reference for the given timeslot.
 
     :param references:
     :param timeslot:
@@ -173,7 +168,7 @@ def _get_valid_reference(references, timeslot):
 
 
 def _convert_to_date(value):
-    """Convert a string to a datetime object for comparisons
+    """Convert a string to a datetime object for comparisons.
 
     :param value:
     :return: a date(time) object
@@ -188,7 +183,7 @@ def _convert_to_date(value):
 
 
 def _convert_date_to_string(obj, date_type=datetime.datetime):
-    """Convert a date(time) object to a string
+    """Convert a date(time) object to a string.
 
     :param obj:
     :return: a date(time) string
@@ -201,7 +196,7 @@ def _convert_date_to_string(obj, date_type=datetime.datetime):
 
 
 def _convert_to_snake_case(value):
-    """Convert a CamelCase string snake_case
+    """Convert a CamelCase string snake_case.
 
     :param value:
     :return: the snake_case of value
