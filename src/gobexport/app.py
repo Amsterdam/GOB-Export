@@ -32,7 +32,7 @@ def handle_export_dump_msg(msg):
     # DUMP is not a seperate workflow, it's just an export
     # Get the name for the logger, from the notification type
     with logger.configure_context(msg, DumpNotification.type.upper(), LOG_HANDLERS):
-        Dumper().dump_catalog(
+        Dumper().dump(
             catalog_name=header['catalogue'],
             collection_name=header['collection'],
             include_relations=header.get('include_relations', True),
