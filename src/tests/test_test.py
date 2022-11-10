@@ -228,6 +228,22 @@ class TestExportTest(TestCase):
         mock_logger.info.assert_called_with("Checking lines 250,000")
 
     @patch('gobexport.test.logger', MagicMock())
+    def test_read_test(self):
+        obj = BytesIO(b'\xc3\x83')
+
+        with patch("gobexport.test.READ_CHUNK_SIZE", return_value=1):
+            # fails the first iteration, passes on the second
+            test._read_text(obj)
+
+            # fails after adding reading 4 extra bytes
+            with self.assertRaisesRegex(
+                UnicodeDecodeError,
+                "'utf-8' codec can't decode byte 0xc3 in position 0: invalid continuation byte"
+            ):
+                obj = BytesIO(b'\xc3\xc3\xc3\xc3\xc3')
+                test._read_text(obj)
+
+    @patch('gobexport.test.logger', MagicMock())
     def test_get_analysis_csv(self):
         b = b"a;b;c\n12;;1234\n1;123;1234\n"
         obj = BytesIO(b)

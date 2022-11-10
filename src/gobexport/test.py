@@ -88,6 +88,9 @@ _CHUNKSIZE = 100_000_000
 # download files bigger then this threshold to disk
 _OFFLOAD_THRESHOLD = 500_000_000
 
+# read chunk size from IOstream
+READ_CHUNK_SIZE = 10_000_000
+
 ENCODING = 'utf-8-sig'
 STRIP_CHARS = BOM_UTF8 + b"\t\n\r\v\f"
 
@@ -547,6 +550,28 @@ def _get_base_anlysis(obj: IO, obj_info: dict) -> dict[str, str]:
     }
 
 
+def _read_text(obj: IO) -> str:
+    """
+    Read text from IO buffer, tries to decode using utf-8.
+    In case of UnicodeDecodeError add up to 4 extra bytes and try again.
+    After 4 extra bytes raises the UnicodeDecodeError
+    """
+    bytes_obj = obj.read(READ_CHUNK_SIZE)
+    error = None
+
+    for extra in range(0, 4):
+        bytes_obj += obj.read(extra)
+
+        try:
+            return bytes_obj.decode(ENCODING)
+        except UnicodeDecodeError as err:
+            # we may end up with split bytes
+            error = err
+
+    if error:
+        raise error
+
+
 def _get_analysis(
     obj_info: dict,
     obj: IO,
@@ -576,7 +601,7 @@ def _get_analysis(
             stats = FlatfileStats()
 
             obj.seek(0)
-            while chunk := obj.read(10_000_000).decode(ENCODING):  # validates encoding
+            while chunk := _read_text(obj):
                 stats.counter.update(chunk)
 
             obj.seek(0)
