@@ -3,12 +3,14 @@ from unittest.mock import MagicMock, patch
 
 from gobexport.dump import Dumper
 
+mock_logger = MagicMock()
+
 @patch('gobexport.dump.PUBLIC_URL', "public_url")
 @patch('gobexport.dump.SECURE_URL', "secure_url")
 @patch('gobexport.dump.get_host', lambda : "host/")
 @patch('gobexport.dump.get_secure_header', lambda x: {'secure user': x})
 @patch('gobexport.dump.SECURE_USER', "any secure user")
-@patch('gobexport.dump.logger', MagicMock())
+@patch('gobexport.dump.logger', mock_logger)
 @patch('gobexport.dump.get_datastore_config', lambda x: {'datastore': 'config'} if x == 'GOBAnalyse' else None)
 class TestDumper(TestCase):
 
@@ -67,43 +69,53 @@ class TestDumper(TestCase):
         self.assertEqual(result, [{'name': "cat_col_rel"}])
 
     @patch('gobexport.dump.get', MagicMock())
-    def test_dump_catalog(self):
+    def test_dump(self):
         dumper = Dumper()
         dumper.get_catalog_collections = MagicMock()
         dumper.get_catalog_collections.return_value = 'any catalog', [{'name': 'any collection'}, {'name': 'any other collection'}]
         dumper.get_relations = MagicMock()
         dumper.get_relations.return_value = [{'name': 'any relation'}]
-        dumper.dump_collection = MagicMock()
-        dumper.dump_catalog("any catalog", "any collection")
+        dumper._dump_collection = MagicMock()
+        dumper.dump("any catalog", "any collection")
         # Dump collection should be called for the collection and the relation
-        self.assertEqual(dumper.dump_collection.call_count, 2)
-        dumper.dump_collection.reset_mock()
-        dumper.dump_catalog("any catalog", None)
-        # Dump collection should be called for all collections and their relations
-        self.assertEqual(dumper.dump_collection.call_count, 4)
+        self.assertEqual(dumper._dump_collection.call_count, 2)
+        dumper._dump_collection.reset_mock()
+
+        dumper.dump("any catalog", "any collection", False)
+        self.assertEqual(dumper._dump_collection.call_count, 1)
+
+        # Check missing collection. Should not make a difference when include_relations == False
+        mock_logger.reset_mock()
+        dumper.dump("any catalog", "not found collection", False)
+        mock_logger.error.assert_not_called()
+
+        # Check missing collection. Should make a different when include_relations == True
+        mock_logger.reset_mock()
+        dumper.dump("any catalog", "not found collection", True)
+        mock_logger.error.assert_called_with("Collection not found collection could not be found in any catalog")
 
     @patch('gobexport.dump.time.sleep')
     def test_dump_collection(self, mock_sleep):
         dumper = Dumper()
         dumper.try_dump_collection = MagicMock()
         dumper.try_dump_collection.return_value = True
-        dumper.dump_collection('any schema', 'any catalog', 'any collection')
+        dumper._dump_collection('any schema', 'any catalog', 'any collection')
         mock_sleep.assert_not_called()
         dumper.try_dump_collection.assert_called_with('any schema', 'any catalog', 'any collection', False)
 
         # With force_full True
-        dumper.dump_collection('any schema', 'any catalog', 'any collection', force_full=True)
+        dumper._dump_collection('any schema', 'any catalog', 'any collection', force_full=True)
         mock_sleep.assert_not_called()
         dumper.try_dump_collection.assert_called_with('any schema', 'any catalog', 'any collection', True)
 
         # Retry
         dumper.try_dump_collection.side_effect = [False, True]
-        dumper.dump_collection('any schema', 'any catalog', 'any collection')
+        dumper._dump_collection('any schema', 'any catalog', 'any collection')
         self.assertEqual(mock_sleep.call_count, 1)
         mock_sleep.reset_mock()
         # Stop after 3 tries
         dumper.try_dump_collection.side_effect = [False, False, False, False]
-        dumper.dump_collection('any schema', 'any catalog', 'any collection')
+        dumper._dump_collection('any schema', 'any catalog', 'any collection')
         self.assertEqual(mock_sleep.call_count, Dumper.MAX_TRIES)
 
     @patch('gobexport.dump.requests.post')

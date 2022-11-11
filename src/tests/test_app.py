@@ -43,7 +43,7 @@ class TestApp(TestCase):
             collection="collection")
 
         mocked_export.reset_mock()
-        mocked_dump.return_value.dump_catalog.reset_mock()
+        mocked_dump.return_value.dump.reset_mock()
 
         msg['header']['destination'] = "Unkown destination"
         handle_export_msg(msg)
@@ -110,10 +110,10 @@ class TestApp(TestCase):
 
         mock_logger.configure_context.assert_called_with(msg, "DUMP", LOG_HANDLERS)
 
-        mock_dumper().dump_catalog.assert_called_with(catalog_name='CAT',
-                                                      collection_name='COLL',
-                                                      include_relations=True,
-                                                      force_full=False)
+        mock_dumper().dump.assert_called_with(catalog_name='CAT',
+                                              collection_name='COLL',
+                                              include_relations=True,
+                                              force_full=False)
 
         mock_add_notification.assert_called_with(msg, mock_dump_notification.return_value)
         mock_dump_notification.assert_called_with('CAT', 'COLL')
@@ -123,10 +123,10 @@ class TestApp(TestCase):
         msg['header']['include_relations'] = False
 
         handle_export_dump_msg(msg)
-        mock_dumper().dump_catalog.assert_called_with(catalog_name='CAT',
-                                                      collection_name='COLL',
-                                                      include_relations=False,
-                                                      force_full=True)
+        mock_dumper().dump.assert_called_with(catalog_name='CAT',
+                                              collection_name='COLL',
+                                              include_relations=False,
+                                              force_full=True)
 
     @mock.patch("gobexport.app.os._exit")
     @mock.patch("gobexport.app.messagedriven_service")

@@ -79,7 +79,21 @@ class Dumper:
         relations = result['_embedded']['collections']
         return [collection for collection in relations if collection['name'].startswith(abbreviation)]
 
-    def dump_catalog(self, catalog_name, collection_name, include_relations=True, force_full=False):
+    def _dump_relations_for_catalog_collection(self, catalog_name, collection_name, force_full=False):
+        schema = catalog_name
+        catalog, collections = self.get_catalog_collections(catalog_name)
+
+        collections = [collection for collection in collections if collection['name'] == collection_name]
+        if not collections:
+            logger.error(f"Collection {collection_name} could not be found in {catalog_name}")
+            return
+
+        collection = collections[0]
+
+        for relation in self.get_relations(catalog, collection):
+            self._dump_collection(schema, "rel", relation['name'], force_full)
+
+    def dump(self, catalog_name: str, collection_name: str, include_relations=True, force_full=False):
         """
         Dump a catalog. If a collection is specified only dump the given catalog collection.
 
@@ -89,18 +103,13 @@ class Dumper:
         :param collection_name:
         :return:
         """
-        catalog, collections = self.get_catalog_collections(catalog_name)
-        if collection_name:
-            collections = [collection for collection in collections if collection['name'] == collection_name]
-
         schema = catalog_name
-        for collection in collections:
-            self.dump_collection(schema, catalog_name, collection['name'], force_full)
-            if include_relations:
-                for relation in self.get_relations(catalog, collection):
-                    self.dump_collection(schema, "rel", relation['name'], force_full)
+        self._dump_collection(schema, catalog_name, collection_name, force_full)
 
-    def dump_collection(self, schema, catalog_name, collection_name, force_full=False):
+        if include_relations:
+            self._dump_relations_for_catalog_collection(catalog_name, collection_name, force_full)
+
+    def _dump_collection(self, schema, catalog_name, collection_name, force_full=False):
         """
         Dump a catalog collection into a remote database in the given schema
 
