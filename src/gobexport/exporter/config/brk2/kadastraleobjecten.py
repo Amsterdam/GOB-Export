@@ -191,7 +191,7 @@ class KadastraleobjectenExportConfig:
             "secure_user": "gob",
             "unfold": True,
             "query": brk2_bag_query,
-            "filename": lambda: brk2_filename("BAG", use_sensitive_dir=False),
+            "filename": lambda: brk2_filename("BRK_BAG", use_sensitive_dir=False),
             "mime_type": "text/csv",
             "format": brk2_bag_format.get_format(),
         }

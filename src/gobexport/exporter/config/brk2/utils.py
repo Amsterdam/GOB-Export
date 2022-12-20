@@ -76,5 +76,5 @@ def brk2_filename(name, file_type="csv", append_date=True, use_sensitive_dir=Tru
     if append_date:
         date = _get_filename_date()
         datestr = f"_{date.strftime('%Y%m%d') if date else '00000000'}"
-        return f"{brk2_directory(file_type,use_sensitive_dir)}/BRK2_{name}{datestr}.{extension}"
-    return f"{brk2_directory(file_type,use_sensitive_dir)}/BRK2_{name}.{extension}"
+        return f"{brk2_directory(file_type,use_sensitive_dir)}/BRK_{name}{datestr}.{extension}"
+    return f"{brk2_directory(file_type,use_sensitive_dir)}/BRK_{name}.{extension}"
