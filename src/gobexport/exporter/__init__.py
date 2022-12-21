@@ -1,6 +1,9 @@
+"""Exporter init and mapping."""
+
+
 from gobexport.api import API
 
-from gobexport.exporter.config import bag, brk, bgt, gebieden, meetbouten, nap, test, wkpb
+from gobexport.exporter.config import bag, brk, brk2, bgt, gebieden, meetbouten, nap, test, wkpb
 from gobexport.exporter.encryption import encrypt_file
 from gobexport.graphql import GraphQL
 from gobexport.graphql_streaming import GraphQLStreaming
@@ -51,6 +54,9 @@ CONFIG_MAPPING = {
         'gemeentes': brk.GemeentesExportConfig,
         'kadastralegemeentecodes': brk.KadastraleGemeentecodesExportConfig,
         'kadastralesecties': brk.KadastralesectiesExportConfig,
+    },
+    'brk2': {
+        'kadastraleobjecten': brk2.KadastraleobjectenExportConfig,
     },
     'bgt': {
         'onderbouw': bgt.OnderbouwExportConfig,
