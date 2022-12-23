@@ -10,6 +10,7 @@ from gobexport.exporter.config.brk2.utils import (
     _get_filename_date,
     brk2_directory,
     brk2_filename,
+    format_timestamp,
 )
 
 
@@ -84,3 +85,22 @@ class TestBrk2Utils(TestCase):
     def test_get_filename_date_404(self, mock_request_get):
         mock_request_get.return_value.status_code = 404
         self.assertIsNone(_get_filename_date())
+
+    def test_format_timestamp(self):
+        in_put = "2035-03-31T01:02:03.000000"
+        out_put = "20350331010203"
+        self.assertEqual(out_put, format_timestamp(in_put))
+
+        for in_put in ["invalid_str", None]:
+            # These inputs should not change
+            self.assertEqual(in_put, format_timestamp(in_put))
+
+    def test_format_timestamp_with_format(self):
+        in_put = "2035-03-31T01:02:03.000000"
+        date_format = "%Y-%m-%d"
+        out_put = "2035-03-31"
+        self.assertEqual(out_put, format_timestamp(in_put, format=date_format))
+
+        for in_put in ["invalid_str", None]:
+            # These inputs should not change
+            self.assertEqual(in_put, format_timestamp(in_put, format=format))
