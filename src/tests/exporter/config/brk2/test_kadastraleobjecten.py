@@ -9,6 +9,8 @@ from gobexport.exporter.config.brk2.kadastraleobjecten import (
     Brk2BagCsvFormat,
     aandeel_sort,
     KadastraleobjectenExportConfig,
+    KadastraleobjectenCsvFormat,
+    KadastraleobjectenEsriNoSubjectsFormat,
 )
 
 
@@ -75,3 +77,94 @@ class TestBrk2ExportConfig(TestCase):
             vot_filter.filter(entity),
             "Should return True when VOT identification not set and city not set",
         )
+
+
+class TestKadastraleobjectenCsvFormat(TestCase):
+    """Kadastraleobjecten CSV format tests."""
+
+    def setUp(self) -> None:
+        self.format = KadastraleobjectenCsvFormat()
+
+    def test_comma_concatter(self):
+        testcases = [
+            ("A|B", "A, B"),
+            ("A", "A"),
+        ]
+
+        for inp, outp in testcases:
+            self.assertEqual(outp, self.format.comma_concatter(inp))
+
+    def test_concat_with_comma(self):
+        self.assertEqual(
+            {
+                "action": "format",
+                "value": "the reference",
+                "formatter": self.format.comma_concatter,
+            },
+            self.format.concat_with_comma("the reference"),
+        )
+
+    def test_format_kadgrootte(self):
+        testcases = [
+            ("1.0", "1"),
+            ("10.0", "10"),
+            ("0.1", "0.1"),
+            ("10", "10"),
+        ]
+
+        for inp, outp in testcases:
+            self.assertEqual(outp, self.format.format_kadgrootte(inp))
+
+    def test_if_vve(self):
+        expected = {
+            "condition": "isempty",
+            "reference": "betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie",
+            "negate": True,
+            "trueval": {"true": "val"},
+            "falseval": "FALSEVAL",
+        }
+
+        self.assertEqual(expected, self.format.if_vve({"true": "val"}, "FALSEVAL"))
+
+    def test_if_sjt(self):
+        expected = {
+            "condition": "isempty",
+            "negate": True,
+            "reference": "vanKadastraalsubject.[0].identificatie",
+            "trueval": "the true val",
+        }
+
+        self.assertEqual(expected, self.format.if_sjt("the true val"))
+
+        expected["falseval"] = "the false val"
+
+        self.assertEqual(expected, self.format.if_sjt("the true val", "the false val"))
+
+    def test_vve_or_subj(self):
+        expected = {
+            "condition": "isempty",
+            "reference": "betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie",
+            "negate": True,
+            "trueval": "betrokkenBijAppartementsrechtsplitsingVve.[0].theAttribute",
+            "falseval": "vanKadastraalsubject.[0].theAttribute",
+        }
+        self.assertEqual(expected, self.format.vve_or_subj("theAttribute"))
+
+
+class TestKadastraleobjectenEsriNoSubjectsFormat(TestCase):
+    """Kadastraleobjecten ESRI format test."""
+
+    def setUp(self) -> None:
+        self.format = KadastraleobjectenEsriNoSubjectsFormat()
+
+    @patch(
+        "gobexport.exporter.config.brk2.kadastraleobjecten.KadastraleobjectenCsvFormat.get_format",
+        Mock(return_value={"a": "A", "b": {"x": "X"}, "c": "C", "d": "D"}),
+    )
+    @patch(
+        "gobexport.exporter.config.brk2.kadastraleobjecten.KadastraleobjectenEsriNoSubjectsFormat.get_mapping",
+        Mock(return_value={"A": "a", "B": "b", "C": {"y": "Y"}}),
+    )
+    def test_get_format(self):
+        output = {"A": "A", "B": {"x": "X"}, "C": {"y": "Y"}}
+        self.assertEqual(self.format.get_format(), output)
