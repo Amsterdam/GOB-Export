@@ -209,32 +209,6 @@ class GGPGebiedenExportConfig:
 '''
 
     products = {
-        'csv_actueel': {
-            'exporter': csv_exporter,
-            'api_type': 'graphql',
-            'filename': 'CSV_Actueel/GBD_ggw_praktijkgebied_Actueel.csv',
-            'mime_type': 'plain/text',
-            'format': {
-                'identificatie': 'identificatie',
-                'code': 'code',
-                'naam': 'naam',
-                'beginGeldigheid': 'beginGeldigheid',
-                'eindGeldigheid': 'eindGeldigheid',
-                'documentdatum': 'documentdatum',
-                'documentnummer': 'documentnummer',
-                'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
-                'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-                'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
-                'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'geometrie': {
-                    'action': 'format',
-                    'formatter': format_geometry,
-                    'value': 'geometrie'
-                },
-            },
-            'query': query_actueel
-        },
         'esri_actueel': {
             'exporter': esri_exporter,
             'api_type': 'graphql',
