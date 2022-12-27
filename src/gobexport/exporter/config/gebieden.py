@@ -1,10 +1,4 @@
-from gobexport.exporter.csv import csv_exporter
-from gobexport.exporter.esri import esri_exporter
-
-from gobexport.formatter.geometry import format_geometry
-
-
-"""Gebieden export config
+"""Gebieden export config.
 
 In these configuration files it is possible to define all products that need
 to be exported for a catalogue. Each product is defined by a unique name and the
@@ -22,6 +16,12 @@ following properties:
                  well. For example the esri product creates .dbf, .shx and .prj
                  files.
 """
+
+
+from gobexport.exporter.csv import csv_exporter
+from gobexport.exporter.esri import esri_exporter
+
+from gobexport.formatter.geometry import format_geometry
 
 
 class StadsdelenExportConfig:
@@ -209,32 +209,6 @@ class GGPGebiedenExportConfig:
 '''
 
     products = {
-        'csv_actueel': {
-            'exporter': csv_exporter,
-            'api_type': 'graphql',
-            'filename': 'CSV_Actueel/GBD_ggw_praktijkgebied_Actueel.csv',
-            'mime_type': 'plain/text',
-            'format': {
-                'identificatie': 'identificatie',
-                'code': 'code',
-                'naam': 'naam',
-                'beginGeldigheid': 'beginGeldigheid',
-                'eindGeldigheid': 'eindGeldigheid',
-                'documentdatum': 'documentdatum',
-                'documentnummer': 'documentnummer',
-                'ligtIn:GBD.SDL.identificatie': 'ligtInStadsdeel.identificatie',
-                'ligtIn:GBD.SDL.code': 'ligtInStadsdeel.code',
-                'ligtIn:GBD.SDL.naam': 'ligtInStadsdeel.naam',
-                'ligtIn:BRK.GME.identificatie': 'ligtInGemeente.identificatie',
-                'ligtIn:BRK.GME.naam': 'ligtInGemeente.naam',
-                'geometrie': {
-                    'action': 'format',
-                    'formatter': format_geometry,
-                    'value': 'geometrie'
-                },
-            },
-            'query': query_actueel
-        },
         'esri_actueel': {
             'exporter': esri_exporter,
             'api_type': 'graphql',
