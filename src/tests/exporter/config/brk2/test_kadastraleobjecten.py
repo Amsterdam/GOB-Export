@@ -11,6 +11,7 @@ from gobexport.exporter.config.brk2.kadastraleobjecten import (
     KadastraleobjectenExportConfig,
     KadastraleobjectenCsvFormat,
     KadastraleobjectenEsriNoSubjectsFormat,
+    PerceelnummerEsriFormat,
 )
 
 
@@ -168,3 +169,26 @@ class TestKadastraleobjectenEsriNoSubjectsFormat(TestCase):
     def test_get_format(self):
         output = {"A": "A", "B": {"x": "X"}, "C": {"y": "Y"}}
         self.assertEqual(self.format.get_format(), output)
+
+
+class TestPerceelnummerEsriFormat(TestCase):
+    """Kadastraleobjecten Perceelnummer ESRI format test."""
+
+    def setUp(self) -> None:
+        self.format = PerceelnummerEsriFormat()
+
+    def test_format_rotation(self):
+        """Perceelnummer rotation test."""
+        testcases = [
+            (0, "0.000"),
+            (-0.234435345, "-0.234"),
+            (0.1299999999, "0.130"),
+        ]
+
+        for inp, outp in testcases:
+            self.assertEqual(self.format.format_rotation(inp), outp)
+
+        invalid_testcases = [None, ""]
+        for testcase in invalid_testcases:
+            with self.assertRaises(AssertionError):
+                self.format.format_rotation(testcase)
