@@ -305,6 +305,7 @@ class KadastraleobjectenEsriNoSubjectsFormat(KadastraleobjectenCsvFormat):
         return convert_format(csv_format, self.get_mapping())
 
     def get_mapping(self):
+        """Kadastraleobjecten ESRI without subjects mapping."""
         return {
             "BRK_KOT_ID": "BRK_KOT_ID",
             "GEMEENTE": "KOT_GEMEENTENAAM",
@@ -535,29 +536,39 @@ class KadastraleobjectenExportConfig:
             "api_type": "graphql_streaming",
             "secure_user": "gob",
             "query": esri_query,
-            "filename": f"{brk2_directory('shp', use_sensitive_dir=False)}"
-            "/BRK_Adam_totaal_G_zonderSubjecten.shp",
+            "filename": (
+                f"{brk2_directory('shp', use_sensitive_dir=False)}"
+                "/BRK_Adam_totaal_G_zonderSubjecten.shp"
+            ),
             "mime_type": "application/octet-stream",
             "format": esri_format_no_subjects.get_format(),
             "extra_files": [
                 {
-                    "filename": f'{brk2_directory("dbf", use_sensitive_dir=False)}'
-                    "/BRK_Adam_totaal_G_zonderSubjecten.dbf",
+                    "filename": (
+                        f'{brk2_directory("dbf", use_sensitive_dir=False)}'
+                        "/BRK_Adam_totaal_G_zonderSubjecten.dbf"
+                    ),
                     "mime_type": "application/octet-stream",
                 },
                 {
-                    "filename": f'{brk2_directory("shx", use_sensitive_dir=False)}'
-                    "/BRK_Adam_totaal_G_zonderSubjecten.shx",
+                    "filename": (
+                        f'{brk2_directory("shx", use_sensitive_dir=False)}'
+                        "/BRK_Adam_totaal_G_zonderSubjecten.shx"
+                    ),
                     "mime_type": "application/octet-stream",
                 },
                 {
-                    "filename": f'{brk2_directory("prj", use_sensitive_dir=False)}'
-                    "/BRK_Adam_totaal_G_zonderSubjecten.prj",
+                    "filename": (
+                        f'{brk2_directory("prj", use_sensitive_dir=False)}'
+                        "/BRK_Adam_totaal_G_zonderSubjecten.prj"
+                    ),
                     "mime_type": "application/octet-stream",
                 },
                 {
-                    "filename": f'{brk2_directory("cpg", use_sensitive_dir=False)}'
-                    "/BRK_Adam_totaal_G_zonderSubjecten.cpg",
+                    "filename": (
+                        f'{brk2_directory("cpg", use_sensitive_dir=False)}'
+                        "/BRK_Adam_totaal_G_zonderSubjecten.cpg"
+                    ),
                     "mime_type": "application/octet-stream",
                 },
             ],
