@@ -1,10 +1,12 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import os
 
 from gobexport.buffered_iterable import Buffer, BufferedIterable
 
+
+# test_context_manager_remove_exception() patch
 os_remove = os.remove
 def _os_remove_exception(f):
     os_remove(f)
@@ -51,7 +53,7 @@ class TestBuffer(TestCase):
         dirname = Buffer._get_dirname()
         os.makedirs(dirname, exist_ok=True)
         self.assertTrue(os.path.exists(dirname))
-        for i in range(10):
+        for _ in range(10):
             Buffer.clear_all()
             self.assertFalse(os.path.exists(dirname))
 
@@ -70,7 +72,7 @@ class TestBuffer(TestCase):
 
         buffer = Buffer(name, Buffer.READ)
         buffer.open()
-        read_items = [item for item in buffer.read()]
+        read_items = list(buffer.read())
         buffer.close()
 
         self.assertEqual(items, read_items)
@@ -91,10 +93,10 @@ class TestBuffer(TestCase):
 
         self.assertTrue(Buffer.exists(name))
 
-        for i in range(10):
+        for _ in range(10):
             read_items = []
             with Buffer(name, Buffer.READ) as buffer:
-                read_items = [item for item in buffer.read()]
+                read_items = list(buffer.read())
 
             self.assertEqual(items, read_items)
 
@@ -184,10 +186,10 @@ class TestBufferedIterable(TestCase):
         BufferedIterable.clear_all()
         yields = 10
         iterable = MockIterable(range(yields))
-        for i in range(10):
+        for _ in range(10):
             bi = BufferedIterable(iterable, "any name")
-            read_items = [item for item in bi]
-            self.assertEqual(read_items, [i for i in range(yields)])
+            read_items = list(bi)
+            self.assertEqual(read_items, list(range(yields)))
         self.assertEqual(iterable.yields, yields)
 
     def test_iter_pass(self):
@@ -195,8 +197,8 @@ class TestBufferedIterable(TestCase):
         yields = 10
         iterable = MockIterable(range(yields))
         n = 10
-        for i in range(n):
+        for _ in range(n):
             bi = BufferedIterable(iterable, "any name", buffer_items=False)
-            read_items = [item for item in bi]
-            self.assertEqual(read_items, [i for i in range(yields)])
+            read_items = list(bi)
+            self.assertEqual(read_items, list(range(yields)))
         self.assertEqual(iterable.yields, n * yields)
