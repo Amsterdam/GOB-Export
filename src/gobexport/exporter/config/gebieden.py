@@ -209,45 +209,6 @@ class GGPGebiedenExportConfig:
 '''
 
     products = {
-        'esri_actueel': {
-            'exporter': esri_exporter,
-            'api_type': 'graphql',
-            'filename': 'SHP/GBD_ggw_praktijkgebied.shp',
-            'mime_type': 'application/octet-stream',
-            'format': {
-                'id': 'identificatie',
-                'code': 'code',
-                'naam': 'naam',
-                'begindatum': 'beginGeldigheid',
-                'einddatum': 'eindGeldigheid',
-                'docdatum': 'documentdatum',
-                'docnummer': 'documentnummer',
-                'sdl_id': 'ligtInStadsdeel.identificatie',
-                'sdl_code': 'ligtInStadsdeel.code',
-                'sdl_naam': 'ligtInStadsdeel.naam',
-                'gme_id': 'ligtInGemeente.identificatie',
-                'gme_naam': 'ligtInGemeente.naam',
-            },
-            'extra_files': [
-                {
-                    'filename': 'SHP/GBD_ggw_praktijkgebied.dbf',
-                    'mime_type': 'application/octet-stream'
-                },
-                {
-                    'filename': 'SHP/GBD_ggw_praktijkgebied.shx',
-                    'mime_type': 'application/octet-stream'
-                },
-                {
-                    'filename': 'SHP/GBD_ggw_praktijkgebied.prj',
-                    'mime_type': 'application/octet-stream'
-                },
-                {
-                    'filename': 'SHP/GBD_ggw_praktijkgebied.cpg',
-                    'mime_type': 'application/octet-stream'
-                },
-            ],
-            'query': query_actueel
-        },
         'csv_actueel_en_historie': {
             'api_type': 'graphql',
             'exporter': csv_exporter,
