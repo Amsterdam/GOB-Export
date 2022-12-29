@@ -156,6 +156,31 @@ class KadastraleobjectenCsvFormat:
             falseval=f"vanKadastraalsubject.[0].{attribute}",
         )
 
+    def row_formatter(self, row):
+        """Merges all 'isOntstaanUitGPerceel' relations into one object.
+
+        With identificatie column concatenated into one, separated by comma's.
+
+        (Very) simplified example:
+        in     = { isOntstaanUitGPerceel: [{identificatie: 'A'}, {identificatie: 'B'}, {identificatie: 'C'}]}
+        result = { isOntstaanUitGPerceel: [{identificatie: 'A,B,C'}]}
+
+        :param row:
+        :return:
+        """
+        identificatie = ",".join(
+            [
+                edge["node"]["identificatie"]
+                for edge in row["node"]["isOntstaanUitGPerceel"].get("edges")
+            ]
+        )
+
+        row["node"]["isOntstaanUitGPerceel"] = {
+            "edges": [{"node": {"identificatie": identificatie}}]
+        }
+
+        return row
+
     def get_format(self):
         """Kadastraleobjecten CSV format dictionary."""
         return {
@@ -566,6 +591,113 @@ class KadastraleobjectenExportConfig:
 }
 """
 
+    csv_format = KadastraleobjectenCsvFormat()
+    gperc_query = """
+{
+  brk2Kadastraleobjecten {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        isOntstaanUitGPerceel {
+          edges {
+            node {
+              identificatie
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+    csv_query = """
+{
+  brk2Kadastraleobjecten {
+    edges {
+      node {
+        identificatie
+        volgnummer
+        aangeduidDoorGemeente
+        aangeduidDoorKadastralegemeentecode
+        aangeduidDoorKadastralegemeente
+        aangeduidDoorKadastralesectie
+        perceelnummer
+        indexletter
+        indexnummer
+        soortGrootte
+        grootte
+        koopsom
+        koopsomValutacode
+        koopjaar
+        indicatieMeerObjecten
+        soortCultuurOnbebouwd
+        soortCultuurBebouwd
+        status
+        toestandsdatum
+        indicatieVoorlopigeKadastraleGrens
+        inOnderzoek
+        geometrie
+        invRustOpKadastraalobjectBrkZakelijkerechten(akrAardZakelijkRecht:"VE") {
+          edges {
+            node {
+              identificatie
+              aardZakelijkRecht
+              betrokkenBijAppartementsrechtsplitsingVve {
+                edges {
+                  node {
+                    identificatie
+                    statutaireNaam
+                    typeSubject
+                    heeftRsinVoor
+                    heeftKvknummerVoor
+                    heeftBsnVoor
+                    rechtsvorm
+                    statutaireNaam
+                    statutaireZetel
+                  }
+                }
+              }
+              invVanZakelijkrechtBrkTenaamstellingen {
+                edges {
+                  node {
+                    aandeel
+                    vanKadastraalsubject {
+                      edges {
+                        node {
+                          identificatie
+                          voornamen
+                          voorvoegsels
+                          geslachtsnaam
+                          geslacht
+                          statutaireNaam
+                          typeSubject
+                          geboortedatum
+                          geboorteplaats
+                          geboorteland
+                          datumOverlijden
+                          heeftRsinVoor
+                          heeftKvknummerVoor
+                          heeftBsnVoor
+                          rechtsvorm
+                          statutaireNaam
+                          statutaireZetel
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
     class VotFilter(EntityFilter):
         """Only include rows if vot identificatie is not set and city is not Amsterdam or Weesp."""
 
@@ -742,5 +874,25 @@ class KadastraleobjectenExportConfig:
                 },
             ],
             "query": perceelnummer_query,
+        },
+        "kot_csv": {
+            "merge_result": {
+                "api_type": "graphql_streaming",
+                "attributes": ["isOntstaanUitGPerceel"],
+                "query": gperc_query,
+                "match_attributes": ["identificatie", "volgnummer"],
+                "row_formatter": csv_format.row_formatter,
+                "secure_user": "gob",
+            },
+            "exporter": csv_exporter,
+            "api_type": "graphql_streaming",
+            "secure_user": "gob",
+            "query": csv_query,
+            "filename": lambda: brk2_filename(
+                "kadastraal_object", use_sensitive_dir=True
+            ),
+            "mime_type": "text/csv",
+            "format": csv_format.get_format(),
+            "sort": sort,
         },
     }

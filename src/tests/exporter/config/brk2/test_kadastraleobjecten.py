@@ -151,6 +151,41 @@ class TestKadastraleobjectenCsvFormat(TestCase):
         }
         self.assertEqual(expected, self.format.vve_or_subj("theAttribute"))
 
+    def test_row_formatter(self):
+        row = {
+            "node": {
+                "isOntstaanUitGPerceel": {
+                    "edges": [
+                        {
+                            "node": {
+                                "identificatie": "percA",
+                            }
+                        },
+                        {
+                            "node": {
+                                "identificatie": "percB",
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        expected = {
+            "node": {
+                "isOntstaanUitGPerceel": {
+                    "edges": [
+                        {
+                            "node": {
+                                "identificatie": "percA,percB",
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+
+        self.assertEqual(expected, self.format.row_formatter(row))
+
 
 class TestKadastraleobjectenEsriNoSubjectsFormat(TestCase):
     """Kadastraleobjecten ESRI format test."""
