@@ -8,7 +8,6 @@ This can for instance be seen in the _to_geometry method
 Todo: The final model for the meetbouten collection is required
     The storage of the entities and the publication by the API in this format is required
     to finish the conversion methods. Especially the None tests should be re-evaluated
-
 """
 
 import datetime
@@ -50,7 +49,7 @@ def _to_string(value, mapping=None):
     except KeyError:
         pass
 
-    assert(type(value) is str or value is None)
+    assert type(value) is str or value is None
     value = '' if value is None or value == '' else str(f'$${value}$$').replace("\r", "").replace("\n", " ")
     return value
 
@@ -63,7 +62,7 @@ def _to_boolean(value, *args):
     :param value:
     :return:
     """
-    assert(type(value) is bool or value is None)
+    assert type(value) is bool or value is None
     return _to_string('' if value is True else 'N')
 
 
@@ -78,7 +77,7 @@ def _to_number(value, precision=None):
     :param value:
     :return:
     """
-    assert(type(value) in [int, float, str, decimal.Decimal] or value is None)
+    assert type(value) in [int, float, str, decimal.Decimal] or value is None
     value = format(float(value), f'.{precision}f') if precision and value is not None else value
     return '' if value is None else str(value)\
         .replace('.', ',')
@@ -116,7 +115,7 @@ def _to_number_string(value, precision=None):
     :param value:
     :return:
     """
-    assert(type(value) in [int, float, str, decimal.Decimal] or value is None)
+    assert type(value) in [int, float, str, decimal.Decimal] or value is None
     value = format(float(value), f'.{precision}f') if precision and value is not None else value
     return '' if value is None else f'$${value}$$'\
         .replace('.', ',').replace('0,', ',')
@@ -133,7 +132,7 @@ def _to_date(value, *args):
     :param value:
     :return:
     """
-    assert(type(value) is str or value is None)
+    assert type(value) is str or value is None
     return _to_string(
         '' if value is None else datetime.datetime.strptime(value, "%Y-%m-%d").date().strftime("%Y%m%d"))
 
@@ -157,7 +156,7 @@ def _to_geometry(value, *args):
     :param value:
     :return:
     """
-    assert(type(value) is dict or value is None)
+    assert type(value) is dict or value is None
     if value is None:
         return ''
     else:
@@ -187,8 +186,8 @@ def _to_coord(value, coord):
     :param coord:
     :return:
     """
-    assert(type(value) is dict or value is None)
-    assert(coord in ['x', 'y'])
+    assert type(value) is dict or value is None
+    assert coord in ['x', 'y']
     if coord == 'x':
         index = 0
     elif coord == 'y':

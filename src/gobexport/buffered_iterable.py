@@ -99,10 +99,10 @@ class Buffer:
             return
         self.filename = self._get_filename(self.name)
         if self.mode == self.READ:
-            self.file = open(self.filename, 'r')
+            self.file = open(self.filename, 'rb')
         elif self.mode == self.WRITE:
             # Record data in an array [..., ..., ]
-            self.file = open(self.filename, 'w')
+            self.file = open(self.filename, 'w', encoding="utf-8")
             self.empty = True
             self.file.write("[\n")
 
