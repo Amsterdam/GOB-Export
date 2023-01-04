@@ -1,5 +1,7 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
+
+from shapely.errors import GeometryTypeError
 
 from gobexport.formatter.geometry import format_geometry
 
@@ -27,7 +29,7 @@ class TestGeometryFormatter(TestCase):
     def test_format_geometry_invalid_geojson(self):
         geojson = {'type': 'Invalid', 'false': 'attribute'}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(GeometryTypeError):
             format_geometry(geojson)
 
     def test_format_geometry_none(self):
