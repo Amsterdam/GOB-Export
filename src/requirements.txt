@@ -2,6 +2,7 @@ Flask~=2.0.3
 Flask-Cors==3.0.10
 pysftp==0.2.9
 freezegun==1.2.2
-requests_mock~=1.9.3
--e git+https://github.com/Amsterdam/GOB-Core.git@v2.0.1#egg=gobcore
--e git+https://github.com/Amsterdam/GOB-Config.git@v0.8.7#egg=gobconfig
+requests-mock~=1.10.0
+python-keystoneclient~=5.0.1
+-e git+https://github.com/Amsterdam/GOB-Core.git@v2.1.0#egg=gobcore
+-e git+https://github.com/Amsterdam/GOB-Config.git@v0.8.9#egg=gobconfig
