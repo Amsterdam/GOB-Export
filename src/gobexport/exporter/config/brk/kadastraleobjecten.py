@@ -1,102 +1,24 @@
 from fractions import Fraction
 
+from gobexport.exporter.config.brk.utils import (
+    brk_directory,
+    brk_filename,
+    format_timestamp,
+)
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
+from gobexport.exporter.shared.brk import SharedKadastraleobjectenCsvFormat
 from gobexport.exporter.utils import convert_format, get_entity_value
-from gobexport.formatter.geometry import format_geometry
-from gobexport.filters.notempty_filter import NotEmptyFilter
 from gobexport.filters.entity_filter import EntityFilter
-from gobexport.exporter.config.brk.utils import brk_filename, brk_directory, format_timestamp
+from gobexport.filters.notempty_filter import NotEmptyFilter
+from gobexport.formatter.geometry import format_geometry
 
 
-class KadastraleobjectenCsvFormat:
-
-    def if_vve(self, trueval, falseval):
-        return {
-            'condition': 'isempty',
-            'reference': 'betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie',
-            'negate': True,
-            'trueval': trueval,
-            'falseval': falseval,
-        }
-
-    def if_sjt(self, trueval, falseval=None):
-        val = {
-            'condition': 'isempty',
-            'reference': 'vanKadastraalsubject.[0].identificatie',
-            'negate': True,
-            'trueval': trueval,
-        }
-
-        if falseval:
-            val['falseval'] = falseval
-
-        return val
-
-    def if_empty_geenWaarde(self, reference):
-        return {
-            'condition': 'isempty',
-            'reference': reference,
-            'negate': True,
-            'trueval': reference,
-            'falseval': {
-                'action': 'literal',
-                'value': 'geenWaarde'
-            }
-        }
-
-    def comma_concatter(self, value):
-        return value.replace('|', ', ')
-
-    def comma_no_space_concatter(self, value):
-        return value.replace('|', ',')
-
-    def concat_with_comma(self, reference, with_space=True):
-        return {
-            'action': 'format',
-            'value': reference,
-            'formatter': self.comma_concatter if with_space else self.comma_no_space_concatter
-        }
-
-    def format_kadgrootte(self, value):
-        floatval = float(value)
-
-        if floatval < 1:
-            return str(floatval)
-        else:
-            return str(int(floatval))
-
-    def vve_or_subj(self, attribute):
-        return self.if_vve(
-            trueval=f"betrokkenBijAppartementsrechtsplitsingVve.[0].{attribute}",
-            falseval=f"vanKadastraalsubject.[0].{attribute}",
-        )
-
-    def row_formatter(self, row):
-        """Merges all 'isOntstaanUitGPerceel' relations into one object, with identificatie column concatenated into
-        one, separated by comma's.
-
-        (Very) simplified example:
-        in     = { isOntstaanUitGPerceel: [{identificatie: 'A'}, {identificatie: 'B'}, {identificatie: 'C'}]}
-        result = { isOntstaanUitGPerceel: [{identificatie: 'A,B,C'}]}
-
-        :param row:
-        :return:
-        """
-        identificatie = ','.join([edge['node']['identificatie']
-                                  for edge in row['node']['isOntstaanUitGPerceel'].get('edges')])
-
-        row['node']['isOntstaanUitGPerceel'] = {
-            'edges': [{
-                'node': {
-                    'identificatie': identificatie
-                }
-            }]
-        }
-
-        return row
+class KadastraleobjectenCsvFormat(SharedKadastraleobjectenCsvFormat):
+    """CSV format class for BRK1 Kadastraleobjecten exports."""
 
     def get_format(self):
+        """Kadastraleobjecten CSV format dictionary."""
         return {
             'BRK_KOT_ID': 'identificatie',
             'KOT_GEMEENTENAAM': 'aangeduidDoorGemeente.naam',
@@ -122,10 +44,10 @@ class KadastraleobjectenCsvFormat:
             'KOT_INDICATIE_MEER_OBJECTEN': 'indicatieMeerObjecten',
             'KOT_CULTUURCODEONBEBOUWD_CODE': 'soortCultuurOnbebouwd.code',
             'KOT_CULTUURCODEONBEBOUWD_OMS': 'soortCultuurOnbebouwd.omschrijving',
-            'KOT_CULTUURCODEBEBOUWD_CODE': self.if_empty_geenWaarde(
+            'KOT_CULTUURCODEBEBOUWD_CODE': self.if_empty_geen_waarde(
                 self.concat_with_comma('soortCultuurBebouwd.code')
             ),
-            'KOT_CULTUURCODEBEBOUWD_OMS': self.if_empty_geenWaarde(
+            'KOT_CULTUURCODEBEBOUWD_OMS': self.if_empty_geen_waarde(
                 self.concat_with_comma('soortCultuurBebouwd.omschrijving')
             ),
             'KOT_AKRREGISTER9TEKST': '',
@@ -294,6 +216,7 @@ class KadastraleobjectenEsriFormat(KadastraleobjectenCsvFormat):
         }
 
     def get_format(self):
+        """Kadastraleobjecten ESRI format dictionary."""
         csv_format = super().get_format()
         return convert_format(csv_format, self.get_mapping())
 
@@ -337,6 +260,7 @@ class PerceelnummerEsriFormat:
         return f'{value:.3f}'
 
     def get_format(self):
+        """Kadastraleobjecten Perceelnummer ESRI format dictionary."""
         return {
             'BRK_KOT_ID': 'identificatie',
             'GEMEENTE': 'aangeduidDoorGemeente.naam',
@@ -379,6 +303,7 @@ class BrkBagCsvFormat:
         }
 
     def get_format(self):
+        """BRK1 BAG CSV format dictionary."""
         return {
             'BRK_KOT_ID': 'identificatie',
             'KOT_AKRKADGEMEENTECODE_CODE': 'aangeduidDoorKadastralegemeentecode.[0].broninfo.code',

@@ -22,15 +22,6 @@ class TestKadastraleobjectenCsvFormat(TestCase):
         for inp, outp in testcases:
             self.assertEqual(outp, self.format.comma_concatter(inp))
 
-    def test_comma_no_space_concatter(self):
-        testcases = [
-            ('A|B', 'A,B'),
-            ('A', 'A'),
-        ]
-
-        for inp, outp in testcases:
-            self.assertEqual(outp, self.format.comma_no_space_concatter(inp))
-
     def test_concat_with_comma(self):
 
         self.assertEqual({
@@ -38,12 +29,6 @@ class TestKadastraleobjectenCsvFormat(TestCase):
             'value': 'the reference',
             'formatter': self.format.comma_concatter,
         }, self.format.concat_with_comma('the reference'))
-
-        self.assertEqual({
-            'action': 'format',
-            'value': 'the reference',
-            'formatter': self.format.comma_no_space_concatter,
-        }, self.format.concat_with_comma('the reference', False))
 
     def test_format_kadgrootte(self):
         testcases = [

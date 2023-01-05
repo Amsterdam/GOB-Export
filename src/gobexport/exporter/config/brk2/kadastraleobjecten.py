@@ -4,13 +4,14 @@
 from fractions import Fraction
 
 from gobexport.exporter.config.brk2.utils import (
-    brk2_filename,
     brk2_directory,
+    brk2_filename,
     format_timestamp,
 )
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
-from gobexport.exporter.utils import get_entity_value, convert_format
+from gobexport.exporter.shared.brk import SharedKadastraleobjectenCsvFormat
+from gobexport.exporter.utils import convert_format, get_entity_value
 from gobexport.filters.entity_filter import EntityFilter
 from gobexport.filters.notempty_filter import NotEmptyFilter
 from gobexport.formatter.geometry import format_geometry
@@ -98,88 +99,8 @@ def aandeel_sort(a: dict, b: dict):
     return Fraction(a["teller"], a["noemer"]) > Fraction(b["teller"], b["noemer"])
 
 
-class KadastraleobjectenCsvFormat:
-    """CSV format class for KOT exports."""
-
-    def if_vve(self, trueval, falseval):
-        return {
-            "condition": "isempty",
-            "reference": "betrokkenBijAppartementsrechtsplitsingVve.[0].identificatie",
-            "negate": True,
-            "trueval": trueval,
-            "falseval": falseval,
-        }
-
-    def if_sjt(self, trueval, falseval=None):
-        val = {
-            "condition": "isempty",
-            "reference": "vanKadastraalsubject.[0].identificatie",
-            "negate": True,
-            "trueval": trueval,
-        }
-
-        if falseval:
-            val["falseval"] = falseval
-
-        return val
-
-    def if_empty_geen_waarde(self, reference):
-        return {
-            "condition": "isempty",
-            "reference": reference,
-            "negate": True,
-            "trueval": reference,
-            "falseval": {"action": "literal", "value": "geenWaarde"},
-        }
-
-    def comma_concatter(self, value):
-        return value.replace("|", ", ")
-
-    def concat_with_comma(self, reference):
-        """Replace occurrences of '|' in `reference` with commas."""
-        return {
-            "action": "format",
-            "value": reference,
-            "formatter": self.comma_concatter,
-        }
-
-    def format_kadgrootte(self, value):
-        floatval = float(value)
-
-        if floatval < 1:
-            return str(floatval)
-        return str(int(floatval))
-
-    def vve_or_subj(self, attribute):
-        return self.if_vve(
-            trueval=f"betrokkenBijAppartementsrechtsplitsingVve.[0].{attribute}",
-            falseval=f"vanKadastraalsubject.[0].{attribute}",
-        )
-
-    def row_formatter(self, row):
-        """Merges all 'isOntstaanUitGPerceel' relations into one object.
-
-        With identificatie column concatenated into one, separated by comma's.
-
-        (Very) simplified example:
-        in     = { isOntstaanUitGPerceel: [{identificatie: 'A'}, {identificatie: 'B'}, {identificatie: 'C'}]}
-        result = { isOntstaanUitGPerceel: [{identificatie: 'A,B,C'}]}
-
-        :param row:
-        :return:
-        """
-        identificatie = ",".join(
-            [
-                edge["node"]["identificatie"]
-                for edge in row["node"]["isOntstaanUitGPerceel"].get("edges")
-            ]
-        )
-
-        row["node"]["isOntstaanUitGPerceel"] = {
-            "edges": [{"node": {"identificatie": identificatie}}]
-        }
-
-        return row
+class KadastraleobjectenCsvFormat(SharedKadastraleobjectenCsvFormat):
+    """CSV format class for BRK2 Kadastraleobjecten exports."""
 
     def get_format(self):
         """Kadastraleobjecten CSV format dictionary."""
