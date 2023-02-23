@@ -1,5 +1,6 @@
 [flake8]
 exclude = __pycache__
+extend-ignore = D
 max-complexity = 7
 max-line-length = 119
 show_source = True

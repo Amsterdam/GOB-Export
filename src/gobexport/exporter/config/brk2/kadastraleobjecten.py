@@ -157,14 +157,8 @@ class KadastraleobjectenExportConfig:
         city = "heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam"
 
         def filter(self, entity: dict):
-            if not get_entity_value(
-                entity, self.vot_identificatie
-            ) and get_entity_value(entity, self.city):
-                return (
-                    not get_entity_value(entity, self.city)
-                    .lower()
-                    .startswith(("amsterdam", "weesp"))
-                )
+            if not get_entity_value(entity, self.vot_identificatie) and get_entity_value(entity, self.city):
+                return not get_entity_value(entity, self.city).lower().startswith(("amsterdam", "weesp"))
 
             return True
 

@@ -433,7 +433,7 @@ def aandeel_sort(a: dict, b: dict):
     """
     def is_valid(aandeel: dict):
         return aandeel is not None and isinstance(aandeel, dict) and aandeel.get('teller') is not None \
-               and aandeel.get('noemer') is not None
+            and aandeel.get('noemer') is not None
 
     if not is_valid(a):
         return False
