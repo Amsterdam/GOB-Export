@@ -106,11 +106,11 @@ class CSVInspector:
             # pipe stream to uniq, check for duplicates on the second column (skip 1)
             # only keep the duplicates
             uniq_process = subprocess.Popen(
-                    args=["/usr/bin/uniq", "--all-repeated", "--skip-fields=1"],
-                    stdin=sort_process.stdout,
-                    stdout=subprocess.PIPE,
-                    shell=False,
-                    text=True
+                args=["/usr/bin/uniq", "--all-repeated", "--skip-fields=1"],
+                stdin=sort_process.stdout,
+                stdout=subprocess.PIPE,
+                shell=False,
+                text=True
             )
             yield from uniq_process.stdout
         finally:
