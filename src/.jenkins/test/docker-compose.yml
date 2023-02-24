@@ -7,7 +7,5 @@ services:
       target: test
     environment:
       GOB_SHARED_DIR: /app/shared
-      # Temporary branch for brk2.
-      REPO_BASE: "https://raw.githubusercontent.com/Amsterdam/amsterdam-schema/brk2_active_dataset"
     command: >
       bash -c "./test.sh"

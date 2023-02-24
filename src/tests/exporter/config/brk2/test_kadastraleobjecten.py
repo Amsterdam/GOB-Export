@@ -50,8 +50,8 @@ class TestBrk2ExportConfig(TestCase):
         vot_filter = KadastraleobjectenExportConfig().VotFilter()
 
         entity = {
-            "heeftEenRelatieMetVerblijfsobject.[0].identificatie": None,
-            "heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam": "not Amsterdam",
+            "heeftEenRelatieMetBagVerblijfsobject.[0].identificatie": None,
+            "heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.woonplaatsnaam": "not Amsterdam",
         }
         self.assertTrue(
             vot_filter.filter(entity),
@@ -59,8 +59,8 @@ class TestBrk2ExportConfig(TestCase):
         )
 
         entity = {
-            "heeftEenRelatieMetVerblijfsobject.[0].identificatie": None,
-            "heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam": "Amsterdam",
+            "heeftEenRelatieMetBagVerblijfsobject.[0].identificatie": None,
+            "heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.woonplaatsnaam": "Amsterdam",
         }
         self.assertFalse(
             vot_filter.filter(entity),
@@ -68,8 +68,8 @@ class TestBrk2ExportConfig(TestCase):
         )
 
         entity = {
-            "heeftEenRelatieMetVerblijfsobject.[0].identificatie": None,
-            "heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam": None,
+            "heeftEenRelatieMetBagVerblijfsobject.[0].identificatie": None,
+            "heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.woonplaatsnaam": None,
         }
         self.assertTrue(
             vot_filter.filter(entity),
