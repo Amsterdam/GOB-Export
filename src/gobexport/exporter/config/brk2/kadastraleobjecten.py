@@ -17,7 +17,7 @@ class Brk2BagCsvFormat:
         """BAG verblijfsobjecten (VOT) relation dictionary."""
         return {
             "condition": "isempty",
-            "reference": "heeftEenRelatieMetVerblijfsobject.[0].identificatie",
+            "reference": "heeftEenRelatieMetBagVerblijfsobject.[0].identificatie",
             "negate": True,
             "trueval": trueval,
             "falseval": falseval,
@@ -27,41 +27,41 @@ class Brk2BagCsvFormat:
         """BRK2 BAG CSV format dictionary."""
         return {
             "BRK_KOT_ID": "identificatie",
-            "KOT_AKRKADGEMEENTECODE_CODE": "aangeduidDoorKadastralegemeentecode.code",
-            "KOT_AKRKADGEMEENTECODE_OMS": "aangeduidDoorKadastralegemeentecode.omschrijving",
-            "KOT_SECTIE": "aangeduidDoorKadastralesectie",
+            "KOT_AKRKADGEMEENTECODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.code",
+            "KOT_AKRKADGEMEENTECODE_OMS": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
+            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie",
             "KOT_PERCEELNUMMER": "perceelnummer",
             "KOT_INDEX_LETTER": "indexletter",
             "KOT_INDEX_NUMMER": "indexnummer",
             "KOT_STATUS_CODE": "status",
             "KOT_MODIFICATION": "",
-            "BAG_VOT_ID": "heeftEenRelatieMetVerblijfsobject.[0].bronwaarde",
-            "BAG_VOT_STATUS": "heeftEenRelatieMetVerblijfsobject.[0].status.omschrijving",
+            "BAG_VOT_ID": "heeftEenRelatieMetBagVerblijfsobject.[0].bronwaarde",
+            "BAG_VOT_STATUS": "heeftEenRelatieMetBagVerblijfsobject.[0].status.omschrijving",
             "DIVA_VOT_ID": "",
             "AOT_OPENBARERUIMTENAAM": self.if_vot_relation(
                 trueval="ligtAanOpenbareruimte.naam",
-                falseval="heeftEenRelatieMetVerblijfsobject.[0].broninfo.openbareruimtenaam",
+                falseval="heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.openbareruimtenaam",
             ),
             "AOT_HUISNUMMER": self.if_vot_relation(
                 trueval="heeftHoofdadres.huisnummer",
-                falseval="heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisnummer",
+                falseval="heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.huisnummer",
             ),
             "AOT_HUISLETTER": self.if_vot_relation(
                 trueval="heeftHoofdadres.huisletter",
-                falseval="heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisletter",
+                falseval="heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.huisletter",
             ),
             "AOT_HUISNUMMERTOEVOEGING": self.if_vot_relation(
                 trueval="heeftHoofdadres.huisnummertoevoeging",
-                falseval="heeftEenRelatieMetVerblijfsobject.[0].broninfo.huisnummertoevoeging",
+                falseval="heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.huisnummertoevoeging",
             ),
             "AOT_POSTCODE": self.if_vot_relation(
                 trueval="heeftHoofdadres.postcode",
-                falseval="heeftEenRelatieMetVerblijfsobject.[0].broninfo.postcode",
+                falseval="heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.postcode",
             ),
             "AOT_WOONPLAATSNAAM": self.if_vot_relation(
-                trueval="heeftEenRelatieMetVerblijfsobject.[0].heeftHoofdadres.[0]."
+                trueval="heeftEenRelatieMetBagVerblijfsobject.[0].heeftHoofdadres.[0]."
                 "ligtAanOpenbareruimte.[0].ligtInWoonplaats.[0].naam",
-                falseval="heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam",
+                falseval="heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.woonplaatsnaam",
             ),
             "BRON_RELATIE": {"action": "literal", "value": "BRK2"},
         }
@@ -102,14 +102,14 @@ class KadastraleobjectenExportConfig:
     edges {
       node {
         identificatie
-        aangeduidDoorKadastralegemeente
-        aangeduidDoorKadastralegemeentecode
-        aangeduidDoorKadastralesectie
+        aangeduidDoorBrkKadastralegemeente
+        aangeduidDoorBrkKadastralegemeentecode
+        aangeduidDoorBrkKadastralesectie
         perceelnummer
         indexletter
         indexnummer
         status
-        heeftEenRelatieMetVerblijfsobject {
+        heeftEenRelatieMetBagVerblijfsobject {
           edges {
             node {
               identificatie
@@ -153,8 +153,8 @@ class KadastraleobjectenExportConfig:
     class VotFilter(EntityFilter):
         """Only include rows if vot identificatie is not set and city is not Amsterdam or Weesp."""
 
-        vot_identificatie = "heeftEenRelatieMetVerblijfsobject.[0].identificatie"
-        city = "heeftEenRelatieMetVerblijfsobject.[0].broninfo.woonplaatsnaam"
+        vot_identificatie = "heeftEenRelatieMetBagVerblijfsobject.[0].identificatie"
+        city = "heeftEenRelatieMetBagVerblijfsobject.[0].broninfo.woonplaatsnaam"
 
         def filter(self, entity: dict):
             if not get_entity_value(entity, self.vot_identificatie) and get_entity_value(entity, self.city):
@@ -178,7 +178,7 @@ class KadastraleobjectenExportConfig:
         "brk2_bag_csv": {
             "exporter": csv_exporter,
             "entity_filters": [
-                NotEmptyFilter("heeftEenRelatieMetVerblijfsobject.[0].bronwaarde"),
+                NotEmptyFilter("heeftEenRelatieMetBagVerblijfsobject.[0].bronwaarde"),
                 VotFilter(),
             ],
             "api_type": "graphql_streaming",
