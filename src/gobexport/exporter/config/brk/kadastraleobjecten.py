@@ -129,7 +129,12 @@ class KadastraleobjectenCsvFormat:
                 self.concat_with_comma('soortCultuurBebouwd.omschrijving')
             ),
             'KOT_AKRREGISTER9TEKST': '',
-            'KOT_STATUS_CODE': 'status',
+            # Legacy field. We're not importing other statuses in GOB anymore, or the 'status' column.
+            # Should always be 'B'
+            'KOT_STATUS_CODE': {
+                'action': 'literal',
+                'value': 'B',
+            },
             'KOT_TOESTANDSDATUM': {
                 'action': 'format',
                 'formatter': format_timestamp,
@@ -387,7 +392,12 @@ class BrkBagCsvFormat:
             'KOT_PERCEELNUMMER': 'perceelnummer',
             'KOT_INDEX_LETTER': 'indexletter',
             'KOT_INDEX_NUMMER': 'indexnummer',
-            'KOT_STATUS_CODE': 'status',
+            # Legacy field. We're not importing other statuses in GOB anymore, or the 'status' column.
+            # Should always be 'B'
+            'KOT_STATUS_CODE': {
+                'action': 'literal',
+                'value': 'B',
+            },
             'KOT_MODIFICATION': '',
             'BAG_VOT_ID': 'heeftEenRelatieMetVerblijfsobject.[0].bronwaarde',
             'BAG_VOT_STATUS': 'heeftEenRelatieMetVerblijfsobject.[0].status.omschrijving',
@@ -518,7 +528,6 @@ class KadastraleobjectenExportConfig:
         indicatieMeerObjecten
         soortCultuurOnbebouwd
         soortCultuurBebouwd
-        status
         toestandsdatum
         indicatieVoorlopigeGeometrie
         inOnderzoek
@@ -636,7 +645,6 @@ class KadastraleobjectenExportConfig:
         indicatieMeerObjecten
         soortCultuurOnbebouwd
         soortCultuurBebouwd
-        status
         toestandsdatum
         indicatieVoorlopigeGeometrie
         inOnderzoek
@@ -819,7 +827,6 @@ class KadastraleobjectenExportConfig:
         perceelnummer
         indexletter
         indexnummer
-        status
         heeftEenRelatieMetVerblijfsobject {
           edges {
             node {

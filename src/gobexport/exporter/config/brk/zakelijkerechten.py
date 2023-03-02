@@ -284,7 +284,12 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
                 ]
             },
             'BRK_KOT_ID': 'rustOpKadastraalobject.[0].identificatie',
-            'KOT_STATUS_CODE': 'rustOpKadastraalobject.[0].status',
+            # Legacy field. We're not importing other statuses in GOB anymore, or the 'status' column.
+            # Should always be 'B'
+            'KOT_STATUS_CODE': {
+                'action': 'literal',
+                'value': 'B',
+            },
             'KOT_MODIFICATION': '',
             'BRK_TNG_ID': 'invVanZakelijkrechtBrkTenaamstellingen.[0].identificatie',
             'TNG_AANDEEL_TELLER': 'invVanZakelijkrechtBrkTenaamstellingen.[0].aandeel.teller',
@@ -446,7 +451,6 @@ class ZakelijkerechtenExportConfig:
               indexletter
               indexnummer
               identificatie
-              status
               aangeduidDoorKadastralegemeentecode {
                 edges {
                   node {
