@@ -4,5 +4,5 @@ pysftp==0.2.9
 freezegun==1.2.2
 requests-mock~=1.10.0
 python-keystoneclient~=5.0.1
--e git+https://github.com/Amsterdam/GOB-Core.git@v2.4.3#egg=gobcore
--e git+https://github.com/Amsterdam/GOB-Config.git@v0.8.16#egg=gobconfig
+-e git+https://github.com/Amsterdam/GOB-Core.git@v2.6.0#egg=gobcore
+-e git+https://github.com/Amsterdam/GOB-Config.git@v0.8.17#egg=gobconfig
