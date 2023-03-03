@@ -33,7 +33,6 @@ class Brk2BagCsvFormat:
             "KOT_PERCEELNUMMER": "perceelnummer",
             "KOT_INDEX_LETTER": "indexletter",
             "KOT_INDEX_NUMMER": "indexnummer",
-            "KOT_STATUS_CODE": "status",
             "KOT_MODIFICATION": "",
             "BAG_VOT_ID": "heeftEenRelatieMetBagVerblijfsobject.[0].bronwaarde",
             "BAG_VOT_STATUS": "heeftEenRelatieMetBagVerblijfsobject.[0].status.omschrijving",
@@ -108,7 +107,6 @@ class KadastraleobjectenExportConfig:
         perceelnummer
         indexletter
         indexnummer
-        status
         heeftEenRelatieMetBagVerblijfsobject {
           edges {
             node {
