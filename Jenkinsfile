@@ -26,12 +26,13 @@ node('GOBBUILD') {
         }
 
         stage('Test') {
-            tryStep "test", {
-                sh "docker-compose -p gob_export_service -f src/.jenkins/test/docker-compose.yml build --no-cache && " +
-                   "docker-compose -p gob_export_service -f src/.jenkins/test/docker-compose.yml run --rm test"
-
-            }, {
-                sh "docker-compose -p gob_export_service -f src/.jenkins/test/docker-compose.yml down"
+            lock("gob-export-test") {
+                tryStep "test", {
+                    sh "docker-compose -p gob_export_service -f src/.jenkins/test/docker-compose.yml build --no-cache && " +
+                    "docker-compose -p gob_export_service -f src/.jenkins/test/docker-compose.yml run --rm test"
+                }, {
+                    sh "docker-compose -p gob_export_service -f src/.jenkins/test/docker-compose.yml down"
+                }
             }
         }
 
