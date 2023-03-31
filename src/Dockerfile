@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
-FROM amsterdam/gob_wheelhouse:3.9-buster as wheelhouse
+FROM amsterdam/gob_wheelhouse:3.9-bullseye as wheelhouse
 MAINTAINER datapunt@amsterdam.nl
 
 
 # Application stage.
-FROM amsterdam/gob_baseimage:3.9-buster as application
+FROM amsterdam/gob_baseimage:3.9-bullseye as application
 MAINTAINER datapunt@amsterdam.nl
 
 # Fill the wheelhouse.
