@@ -330,6 +330,44 @@ class KadastraleobjectenEsriNoSubjectsFormat(KadastraleobjectenCsvFormat):
         }
 
 
+class PerceelnummerEsriFormat:
+    def format_rotation(self, value):
+        """Return rotation with three decimal places."""
+        assert isinstance(value, (int, float))
+        return f"{value:.3f}"
+
+    def get_format(self):
+        """Kadastraleobjecten Perceelnummer ESRI format dictionary."""
+        return {
+            "BRK_KOT_ID": "identificatie",
+            "GEMEENTE": "aangeduidDoorBrkGemeente.omschrijving",
+            "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
+            "KADGEM": "aangeduidDoorBrkKadastralegemeente.omschrijving",
+            "SECTIE": "aangeduidDoorBrkKadastralesectie",
+            "PERCEELNR": "perceelnummer",
+            "INDEXLTR": "indexletter",
+            "INDEXNR": "indexnummer",
+            "ROTATIE": {
+                "condition": "isempty",
+                "reference": "perceelnummerRotatie",
+                "falseval": {
+                    "action": "format",
+                    "formatter": self.format_rotation,
+                    "value": "perceelnummerRotatie",
+                },
+                "trueval": {
+                    "action": "literal",
+                    "value": "0.000",
+                },
+            },
+            "geometrie": {
+                "action": "format",
+                "formatter": format_geometry,
+                "value": "plaatscoordinaten",
+            },
+        }
+
+
 class KadastraleobjectenExportConfig:
     """Kadastraleobjecten export configuration."""
 
@@ -499,6 +537,28 @@ class KadastraleobjectenExportConfig:
 }
 """
 
+    perceelnummer_esri_format = PerceelnummerEsriFormat()
+    perceelnummer_query = """
+{
+  brk2Kadastraleobjecten(indexletter: "G") {
+    edges {
+      node {
+        identificatie
+        aangeduidDoorBrkGemeente
+        aangeduidDoorBrkKadastralegemeentecode
+        aangeduidDoorBrkKadastralegemeente
+        aangeduidDoorBrkKadastralesectie
+        perceelnummer
+        indexletter
+        indexnummer
+        perceelnummerRotatie
+        plaatscoordinaten
+      }
+    }
+  }
+}
+"""
+
     class VotFilter(EntityFilter):
         """Only include rows if vot identificatie is not set and city is not Amsterdam or Weesp."""
 
@@ -616,5 +676,35 @@ class KadastraleobjectenExportConfig:
                 },
             ],
             "query": bijpijling_query,
+        },
+        "perceel_shape": {
+            "exporter": esri_exporter,
+            "api_type": "graphql_streaming",
+            "secure_user": "gob",
+            "filename": f'{brk2_directory("shp", use_sensitive_dir=False)}/BRK_perceelnummer.shp',
+            "entity_filters": [
+                NotEmptyFilter("plaatscoordinaten"),
+            ],
+            "mime_type": "application/octet-stream",
+            "format": perceelnummer_esri_format.get_format(),
+            "extra_files": [
+                {
+                    "filename": (f'{brk2_directory("dbf", use_sensitive_dir=False)}/BRK_perceelnummer.dbf'),
+                    "mime_type": "application/octet-stream",
+                },
+                {
+                    "filename": (f'{brk2_directory("shx", use_sensitive_dir=False)}/BRK_perceelnummer.shx'),
+                    "mime_type": "application/octet-stream",
+                },
+                {
+                    "filename": (f'{brk2_directory("prj", use_sensitive_dir=False)}/BRK_perceelnummer.prj'),
+                    "mime_type": "application/octet-stream",
+                },
+                {
+                    "filename": (f'{brk2_directory("cpg", use_sensitive_dir=False)}/BRK_perceelnummer.cpg'),
+                    "mime_type": "application/octet-stream",
+                },
+            ],
+            "query": perceelnummer_query,
         },
     }
