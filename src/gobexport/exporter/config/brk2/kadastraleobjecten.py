@@ -479,6 +479,26 @@ class KadastraleobjectenExportConfig:
 }
 """
 
+    bijpijling_query = """
+{
+  brk2Kadastraleobjecten(indexletter:"G") {
+    edges {
+      node {
+        identificatie
+        aangeduidDoorBrkGemeente
+        aangeduidDoorBrkKadastralegemeentecode
+        aangeduidDoorBrkKadastralegemeente
+        aangeduidDoorBrkKadastralesectie
+        perceelnummer
+        indexletter
+        indexnummer
+        bijpijlingGeometrie
+      }
+    }
+  }
+}
+"""
+
     class VotFilter(EntityFilter):
         """Only include rows if vot identificatie is not set and city is not Amsterdam or Weesp."""
 
@@ -552,5 +572,49 @@ class KadastraleobjectenExportConfig:
                     "mime_type": "application/octet-stream",
                 },
             ],
+        },
+        "bijpijling_shape": {
+            "exporter": esri_exporter,
+            "api_type": "graphql_streaming",
+            "secure_user": "gob",
+            "filename": f'{brk2_directory("shp", use_sensitive_dir=False)}/BRK_bijpijling.shp',
+            "entity_filters": [
+                NotEmptyFilter("bijpijlingGeometrie"),
+            ],
+            "mime_type": "application/octet-stream",
+            "format": {
+                "BRK_KOT_ID": "identificatie",
+                "GEMEENTE": "aangeduidDoorBrkGemeente.omschrijving",
+                "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
+                "KADGEM": "aangeduidDoorBrkKadastralegemeente.omschrijving",
+                "SECTIE": "aangeduidDoorBrkKadastralesectie",
+                "PERCEELNR": "perceelnummer",
+                "INDEXLTR": "indexletter",
+                "INDEXNR": "indexnummer",
+                "geometrie": {
+                    "action": "format",
+                    "formatter": format_geometry,
+                    "value": "bijpijlingGeometrie",
+                },
+            },
+            "extra_files": [
+                {
+                    "filename": (f'{brk2_directory("dbf", use_sensitive_dir=False)}/BRK_bijpijling.dbf'),
+                    "mime_type": "application/octet-stream",
+                },
+                {
+                    "filename": (f'{brk2_directory("shx", use_sensitive_dir=False)}/BRK_bijpijling.shx'),
+                    "mime_type": "application/octet-stream",
+                },
+                {
+                    "filename": (f'{brk2_directory("prj", use_sensitive_dir=False)}/BRK_bijpijling.prj'),
+                    "mime_type": "application/octet-stream",
+                },
+                {
+                    "filename": (f'{brk2_directory("cpg", use_sensitive_dir=False)}/BRK_bijpijling.cpg'),
+                    "mime_type": "application/octet-stream",
+                },
+            ],
+            "query": bijpijling_query,
         },
     }
