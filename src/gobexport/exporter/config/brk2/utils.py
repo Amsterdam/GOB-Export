@@ -2,9 +2,11 @@
 
 
 from operator import itemgetter
+from typing import Optional
 
 import dateutil.parser as dt_parser
 import requests
+
 from gobexport.config import get_host
 from gobexport.utils import ttl_cache
 
@@ -78,3 +80,21 @@ def brk2_filename(name, file_type="csv", append_date=True, use_sensitive_dir=Tru
         datestr = f"_{date.strftime('%Y%m%d') if date else '00000000'}"
         return f"{brk2_directory(file_type,use_sensitive_dir)}/BRK_{name}{datestr}.{extension}"
     return f"{brk2_directory(file_type,use_sensitive_dir)}/BRK_{name}.{extension}"
+
+
+def format_timestamp(datetimestr: str, format: str = "%Y%m%d%H%M%S") -> Optional[str]:
+    """Transforms the datetimestr from ISO-format to the format used in the BRK2 exports: yyyymmddhhmmss
+
+    :param datetimestr:
+    :return:
+    """
+    if not datetimestr:
+        # Input variable may be empty.
+        return None
+
+    try:
+        dt = dt_parser.parse(datetimestr)
+        return dt.strftime(format)
+    except ValueError:
+        # If invalid datetimestr, just return the original string so that no data is lost.
+        return datetimestr
