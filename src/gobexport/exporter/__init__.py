@@ -2,13 +2,12 @@
 
 
 from gobexport.api import API
-
-from gobexport.exporter.config import bag, brk, brk2, bgt, gebieden, meetbouten, nap, test, wkpb
+from gobexport.buffered_iterable import BufferedIterable
+from gobexport.exporter.config import bag, bgt, brk, brk2, gebieden, meetbouten, nap, test, wkpb
 from gobexport.exporter.encryption import encrypt_file
+from gobexport.filters.group_filter import GroupFilter
 from gobexport.graphql import GraphQL
 from gobexport.graphql_streaming import GraphQLStreaming
-from gobexport.buffered_iterable import BufferedIterable
-from gobexport.filters.group_filter import GroupFilter
 from gobexport.merged_api import MergedApi
 from gobexport.objectstore import ObjectstoreFile
 
@@ -57,6 +56,7 @@ CONFIG_MAPPING = {
     },
     'brk2': {
         'kadastraleobjecten': brk2.KadastraleobjectenExportConfig,
+        'gemeentes': brk2.GemeentesExportConfig,
     },
     'bgt': {
         'onderbouw': bgt.OnderbouwExportConfig,
