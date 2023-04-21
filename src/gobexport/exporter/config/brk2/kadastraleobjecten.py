@@ -378,9 +378,27 @@ class KadastraleobjectenExportConfig:
     edges {
       node {
         identificatie
-        aangeduidDoorBrkKadastralegemeentecode
-        aangeduidDoorBrkKadastralegemeente
-        aangeduidDoorBrkKadastralesectie
+        aangeduidDoorBrkKadastralegemeentecode {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeente {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralesectie {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -433,10 +451,34 @@ class KadastraleobjectenExportConfig:
       node {
         identificatie
         volgnummer
-        aangeduidDoorBrkGemeente
-        aangeduidDoorBrkKadastralegemeentecode
-        aangeduidDoorBrkKadastralegemeente
-        aangeduidDoorBrkKadastralesectie
+        aangeduidDoorBrkGemeente {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeentecode {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeente {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralesectie {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -524,10 +566,34 @@ class KadastraleobjectenExportConfig:
     edges {
       node {
         identificatie
-        aangeduidDoorBrkGemeente
-        aangeduidDoorBrkKadastralegemeentecode
-        aangeduidDoorBrkKadastralegemeente
-        aangeduidDoorBrkKadastralesectie
+        aangeduidDoorBrkGemeente {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeentecode {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeente {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralesectie {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -545,10 +611,34 @@ class KadastraleobjectenExportConfig:
     edges {
       node {
         identificatie
-        aangeduidDoorBrkGemeente
-        aangeduidDoorBrkKadastralegemeentecode
-        aangeduidDoorBrkKadastralegemeente
-        aangeduidDoorBrkKadastralesectie
+        aangeduidDoorBrkGemeente {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeentecode {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeente {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralesectie {
+          edges {
+            node {
+              bronwaarde
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
