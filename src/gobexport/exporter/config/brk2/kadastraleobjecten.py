@@ -29,9 +29,9 @@ class Brk2BagCsvFormat:
         """BRK2 BAG CSV format dictionary."""
         return {
             "BRK_KOT_ID": "identificatie",
-            "KOT_AKRKADGEMEENTECODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.code",
-            "KOT_AKRKADGEMEENTECODE_OMS": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
-            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie",
+            "KOT_AKRKADGEMEENTECODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
+            "KOT_AKRKADGEMEENTECODE_OMS": "aangeduidDoorBrkKadastralegemeente.bronwaarde",
+            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie.bronwaarde",
             "KOT_PERCEELNUMMER": "perceelnummer",
             "KOT_INDEX_LETTER": "indexletter",
             "KOT_INDEX_NUMMER": "indexnummer",
@@ -155,12 +155,12 @@ class KadastraleobjectenCsvFormat:
         """Kadastraleobjecten CSV format dictionary."""
         return {
             "BRK_KOT_ID": "identificatie",
-            "KOT_GEMEENTENAAM": "aangeduidDoorBrkGemeente.omschrijving",
-            "KOT_AKRKADGEMCODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.code",
-            "KOT_KADASTRALEGEMEENTE_CODE": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
-            "KOT_KAD_GEMEENTECODE": "aangeduidDoorBrkKadastralegemeente.code",
-            "KOT_KAD_GEMEENTE_OMS": "aangeduidDoorBrkKadastralegemeente.omschrijving",
-            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie",
+            "KOT_GEMEENTENAAM": "aangeduidDoorBrkGemeente.bronwaarde",
+            "KOT_AKRKADGEMCODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
+            "KOT_KADASTRALEGEMEENTE_CODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
+            "KOT_KAD_GEMEENTECODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
+            "KOT_KAD_GEMEENTE_OMS": "aangeduidDoorBrkKadastralegemeente.bronwaarde",
+            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie.bronwaarde",
             "KOT_PERCEELNUMMER": "perceelnummer",
             "KOT_INDEX_LETTER": "indexletter",
             "KOT_INDEX_NUMMER": "indexnummer",
@@ -340,10 +340,10 @@ class PerceelnummerEsriFormat:
         """Kadastraleobjecten Perceelnummer ESRI format dictionary."""
         return {
             "BRK_KOT_ID": "identificatie",
-            "GEMEENTE": "aangeduidDoorBrkGemeente.omschrijving",
-            "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
-            "KADGEM": "aangeduidDoorBrkKadastralegemeente.omschrijving",
-            "SECTIE": "aangeduidDoorBrkKadastralesectie",
+            "GEMEENTE": "aangeduidDoorBrkGemeente.bronwaarde",
+            "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
+            "KADGEM": "aangeduidDoorBrkKadastralegemeente.bronwaarde",
+            "SECTIE": "aangeduidDoorBrkKadastralesectie.bronwaarde",
             "PERCEELNR": "perceelnummer",
             "INDEXLTR": "indexletter",
             "INDEXNR": "indexnummer",
@@ -379,6 +379,7 @@ class KadastraleobjectenExportConfig:
       node {
         identificatie
         aangeduidDoorBrkKadastralegemeentecode
+        aangeduidDoorBrkKadastralegemeente
         aangeduidDoorBrkKadastralesectie
         perceelnummer
         indexletter
@@ -644,10 +645,10 @@ class KadastraleobjectenExportConfig:
             "mime_type": "application/octet-stream",
             "format": {
                 "BRK_KOT_ID": "identificatie",
-                "GEMEENTE": "aangeduidDoorBrkGemeente.omschrijving",
-                "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
-                "KADGEM": "aangeduidDoorBrkKadastralegemeente.omschrijving",
-                "SECTIE": "aangeduidDoorBrkKadastralesectie",
+                "GEMEENTE": "aangeduidDoorBrkGemeente.bronwaarde",
+                "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
+                "KADGEM": "aangeduidDoorBrkKadastralegemeente.bronwaarde",
+                "SECTIE": "aangeduidDoorBrkKadastralesectie.bronwaarde",
                 "PERCEELNR": "perceelnummer",
                 "INDEXLTR": "indexletter",
                 "INDEXNR": "indexnummer",
