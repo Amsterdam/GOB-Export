@@ -30,8 +30,8 @@ class Brk2BagCsvFormat:
         return {
             "BRK_KOT_ID": "identificatie",
             "KOT_AKRKADGEMEENTECODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.code",
-            "KOT_AKRKADGEMEENTECODE_OMS": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
-            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie",
+            "KOT_AKRKADGEMEENTECODE_OMS": "aangeduidDoorBrkKadastralegemeentecode.identificatie",
+            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie.code",
             "KOT_PERCEELNUMMER": "perceelnummer",
             "KOT_INDEX_LETTER": "indexletter",
             "KOT_INDEX_NUMMER": "indexnummer",
@@ -155,12 +155,12 @@ class KadastraleobjectenCsvFormat:
         """Kadastraleobjecten CSV format dictionary."""
         return {
             "BRK_KOT_ID": "identificatie",
-            "KOT_GEMEENTENAAM": "aangeduidDoorBrkGemeente.omschrijving",
+            "KOT_GEMEENTENAAM": "aangeduidDoorBrkGemeente.naam",
             "KOT_AKRKADGEMCODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.code",
-            "KOT_KADASTRALEGEMEENTE_CODE": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
+            "KOT_KADASTRALEGEMEENTE_CODE": "aangeduidDoorBrkKadastralegemeentecode.identificatie",
             "KOT_KAD_GEMEENTECODE": "aangeduidDoorBrkKadastralegemeente.code",
-            "KOT_KAD_GEMEENTE_OMS": "aangeduidDoorBrkKadastralegemeente.omschrijving",
-            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie",
+            "KOT_KAD_GEMEENTE_OMS": "aangeduidDoorBrkKadastralegemeente.identificatie",
+            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie.code",
             "KOT_PERCEELNUMMER": "perceelnummer",
             "KOT_INDEX_LETTER": "indexletter",
             "KOT_INDEX_NUMMER": "indexnummer",
@@ -340,10 +340,10 @@ class PerceelnummerEsriFormat:
         """Kadastraleobjecten Perceelnummer ESRI format dictionary."""
         return {
             "BRK_KOT_ID": "identificatie",
-            "GEMEENTE": "aangeduidDoorBrkGemeente.omschrijving",
-            "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
-            "KADGEM": "aangeduidDoorBrkKadastralegemeente.omschrijving",
-            "SECTIE": "aangeduidDoorBrkKadastralesectie",
+            "GEMEENTE": "aangeduidDoorBrkGemeente.naam",
+            "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.identificatie",
+            "KADGEM": "aangeduidDoorBrkKadastralegemeente.identificatie",
+            "SECTIE": "aangeduidDoorBrkKadastralesectie.code",
             "PERCEELNR": "perceelnummer",
             "INDEXLTR": "indexletter",
             "INDEXNR": "indexnummer",
@@ -378,8 +378,29 @@ class KadastraleobjectenExportConfig:
     edges {
       node {
         identificatie
-        aangeduidDoorBrkKadastralegemeentecode
-        aangeduidDoorBrkKadastralesectie
+        aangeduidDoorBrkKadastralegemeentecode {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeente {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -432,10 +453,36 @@ class KadastraleobjectenExportConfig:
       node {
         identificatie
         volgnummer
-        aangeduidDoorBrkGemeente
-        aangeduidDoorBrkKadastralegemeentecode
-        aangeduidDoorBrkKadastralegemeente
-        aangeduidDoorBrkKadastralesectie
+        aangeduidDoorBrkGemeente {
+          edges {
+            node {
+              naam
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeentecode {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeente {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -523,10 +570,36 @@ class KadastraleobjectenExportConfig:
     edges {
       node {
         identificatie
-        aangeduidDoorBrkGemeente
-        aangeduidDoorBrkKadastralegemeentecode
-        aangeduidDoorBrkKadastralegemeente
-        aangeduidDoorBrkKadastralesectie
+        aangeduidDoorBrkGemeente {
+          edges {
+            node {
+              naam
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeentecode {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeente {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -544,10 +617,36 @@ class KadastraleobjectenExportConfig:
     edges {
       node {
         identificatie
-        aangeduidDoorBrkGemeente
-        aangeduidDoorBrkKadastralegemeentecode
-        aangeduidDoorBrkKadastralegemeente
-        aangeduidDoorBrkKadastralesectie
+        aangeduidDoorBrkGemeente {
+          edges {
+            node {
+              naam
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeentecode {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeente {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
@@ -644,10 +743,10 @@ class KadastraleobjectenExportConfig:
             "mime_type": "application/octet-stream",
             "format": {
                 "BRK_KOT_ID": "identificatie",
-                "GEMEENTE": "aangeduidDoorBrkGemeente.omschrijving",
-                "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.omschrijving",
-                "KADGEM": "aangeduidDoorBrkKadastralegemeente.omschrijving",
-                "SECTIE": "aangeduidDoorBrkKadastralesectie",
+                "GEMEENTE": "aangeduidDoorBrkGemeente.naam",
+                "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.identificatie",
+                "KADGEM": "aangeduidDoorBrkKadastralegemeente.identificatie",
+                "SECTIE": "aangeduidDoorBrkKadastralesectie.code",
                 "PERCEELNR": "perceelnummer",
                 "INDEXLTR": "indexletter",
                 "INDEXNR": "indexnummer",
