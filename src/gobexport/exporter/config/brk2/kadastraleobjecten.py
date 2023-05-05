@@ -29,9 +29,9 @@ class Brk2BagCsvFormat:
         """BRK2 BAG CSV format dictionary."""
         return {
             "BRK_KOT_ID": "identificatie",
-            "KOT_AKRKADGEMEENTECODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
-            "KOT_AKRKADGEMEENTECODE_OMS": "aangeduidDoorBrkKadastralegemeente.bronwaarde",
-            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie.bronwaarde",
+            "KOT_AKRKADGEMEENTECODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.code",
+            "KOT_AKRKADGEMEENTECODE_OMS": "aangeduidDoorBrkKadastralegemeentecode.identificatie",
+            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie.code",
             "KOT_PERCEELNUMMER": "perceelnummer",
             "KOT_INDEX_LETTER": "indexletter",
             "KOT_INDEX_NUMMER": "indexnummer",
@@ -155,12 +155,12 @@ class KadastraleobjectenCsvFormat:
         """Kadastraleobjecten CSV format dictionary."""
         return {
             "BRK_KOT_ID": "identificatie",
-            "KOT_GEMEENTENAAM": "aangeduidDoorBrkGemeente.bronwaarde",
-            "KOT_AKRKADGEMCODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
-            "KOT_KADASTRALEGEMEENTE_CODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
-            "KOT_KAD_GEMEENTECODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
-            "KOT_KAD_GEMEENTE_OMS": "aangeduidDoorBrkKadastralegemeente.bronwaarde",
-            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie.bronwaarde",
+            "KOT_GEMEENTENAAM": "aangeduidDoorBrkGemeente.naam",
+            "KOT_AKRKADGEMCODE_CODE": "aangeduidDoorBrkKadastralegemeentecode.code",
+            "KOT_KADASTRALEGEMEENTE_CODE": "aangeduidDoorBrkKadastralegemeentecode.identificatie",
+            "KOT_KAD_GEMEENTECODE": "aangeduidDoorBrkKadastralegemeente.code",
+            "KOT_KAD_GEMEENTE_OMS": "aangeduidDoorBrkKadastralegemeente.identificatie",
+            "KOT_SECTIE": "aangeduidDoorBrkKadastralesectie.code",
             "KOT_PERCEELNUMMER": "perceelnummer",
             "KOT_INDEX_LETTER": "indexletter",
             "KOT_INDEX_NUMMER": "indexnummer",
@@ -340,10 +340,10 @@ class PerceelnummerEsriFormat:
         """Kadastraleobjecten Perceelnummer ESRI format dictionary."""
         return {
             "BRK_KOT_ID": "identificatie",
-            "GEMEENTE": "aangeduidDoorBrkGemeente.bronwaarde",
-            "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
-            "KADGEM": "aangeduidDoorBrkKadastralegemeente.bronwaarde",
-            "SECTIE": "aangeduidDoorBrkKadastralesectie.bronwaarde",
+            "GEMEENTE": "aangeduidDoorBrkGemeente.naam",
+            "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.identificatie",
+            "KADGEM": "aangeduidDoorBrkKadastralegemeente.identificatie",
+            "SECTIE": "aangeduidDoorBrkKadastralesectie.code",
             "PERCEELNR": "perceelnummer",
             "INDEXLTR": "indexletter",
             "INDEXNR": "indexnummer",
@@ -381,21 +381,23 @@ class KadastraleobjectenExportConfig:
         aangeduidDoorBrkKadastralegemeentecode {
           edges {
             node {
-              bronwaarde
+              identificatie
+              code
             }
           }
         }
         aangeduidDoorBrkKadastralegemeente {
           edges {
             node {
-              bronwaarde
+              identificatie
+              code
             }
           }
         }
         aangeduidDoorBrkKadastralesectie {
           edges {
             node {
-              bronwaarde
+              code
             }
           }
         }
@@ -454,28 +456,30 @@ class KadastraleobjectenExportConfig:
         aangeduidDoorBrkGemeente {
           edges {
             node {
-              bronwaarde
+              naam
             }
           }
         }
         aangeduidDoorBrkKadastralegemeentecode {
           edges {
             node {
-              bronwaarde
+              identificatie
+              code
             }
           }
         }
         aangeduidDoorBrkKadastralegemeente {
           edges {
             node {
-              bronwaarde
+              identificatie
+              code
             }
           }
         }
         aangeduidDoorBrkKadastralesectie {
           edges {
             node {
-              bronwaarde
+              code
             }
           }
         }
@@ -569,28 +573,30 @@ class KadastraleobjectenExportConfig:
         aangeduidDoorBrkGemeente {
           edges {
             node {
-              bronwaarde
+              naam
             }
           }
         }
         aangeduidDoorBrkKadastralegemeentecode {
           edges {
             node {
-              bronwaarde
+              identificatie
+              code
             }
           }
         }
         aangeduidDoorBrkKadastralegemeente {
           edges {
             node {
-              bronwaarde
+              identificatie
+              code
             }
           }
         }
         aangeduidDoorBrkKadastralesectie {
           edges {
             node {
-              bronwaarde
+              code
             }
           }
         }
@@ -614,28 +620,30 @@ class KadastraleobjectenExportConfig:
         aangeduidDoorBrkGemeente {
           edges {
             node {
-              bronwaarde
+              naam
             }
           }
         }
         aangeduidDoorBrkKadastralegemeentecode {
           edges {
             node {
-              bronwaarde
+              identificatie
+              code
             }
           }
         }
         aangeduidDoorBrkKadastralegemeente {
           edges {
             node {
-              bronwaarde
+              identificatie
+              code
             }
           }
         }
         aangeduidDoorBrkKadastralesectie {
           edges {
             node {
-              bronwaarde
+              code
             }
           }
         }
@@ -735,10 +743,10 @@ class KadastraleobjectenExportConfig:
             "mime_type": "application/octet-stream",
             "format": {
                 "BRK_KOT_ID": "identificatie",
-                "GEMEENTE": "aangeduidDoorBrkGemeente.bronwaarde",
-                "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.bronwaarde",
-                "KADGEM": "aangeduidDoorBrkKadastralegemeente.bronwaarde",
-                "SECTIE": "aangeduidDoorBrkKadastralesectie.bronwaarde",
+                "GEMEENTE": "aangeduidDoorBrkGemeente.naam",
+                "KADGEMCODE": "aangeduidDoorBrkKadastralegemeentecode.identificatie",
+                "KADGEM": "aangeduidDoorBrkKadastralegemeente.identificatie",
+                "SECTIE": "aangeduidDoorBrkKadastralesectie.code",
                 "PERCEELNR": "perceelnummer",
                 "INDEXLTR": "indexletter",
                 "INDEXNR": "indexnummer",
