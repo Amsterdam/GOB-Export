@@ -35,6 +35,7 @@ class Brk2BagCsvFormat:
             "KOT_PERCEELNUMMER": "perceelnummer",
             "KOT_INDEX_LETTER": "indexletter",
             "KOT_INDEX_NUMMER": "indexnummer",
+            "KOT_STATUS_CODE": {"action": "literal", "value": "B"},
             "KOT_MODIFICATION": "",
             "BAG_VOT_ID": "heeftEenRelatieMetBagVerblijfsobject.[0].bronwaarde",
             "BAG_VOT_STATUS": "heeftEenRelatieMetBagVerblijfsobject.[0].status.omschrijving",
@@ -185,7 +186,7 @@ class KadastraleobjectenCsvFormat:
                 self.concat_with_comma("soortCultuurBebouwd.omschrijving")
             ),
             "KOT_AKRREGISTER9TEKST": "",
-            "KOT_STATUS_CODE": "status",
+            "KOT_STATUS_CODE": {"action": "literal", "value": "B"},
             "KOT_TOESTANDSDATUM": {
                 "action": "format",
                 "formatter": format_timestamp,
@@ -195,8 +196,8 @@ class KadastraleobjectenCsvFormat:
                 "reference": "indicatieVoorlopigeKadastraleGrens",
                 "action": "case",
                 "values": {
-                    True: "Voorlopige grens",
-                    False: "Definitieve grens",
+                    'J': "Voorlopige grens",
+                    'N': "Definitieve grens",
                 },
             },
             "BRK_SJT_ID": self.vve_or_subj("identificatie"),
