@@ -1,6 +1,6 @@
+from gobexport.exporter.config.brk.utils import brk_filename
 from gobexport.exporter.csv import csv_exporter
-from gobexport.exporter.config.brk.csv_format import BrkCsvFormat
-from gobexport.exporter.config.brk.utils import sort_attributes, brk_filename
+from gobexport.exporter.shared.brk import BrkCsvFormat, order_attributes
 
 
 class KadastralesubjectenCsvFormat(BrkCsvFormat):
@@ -186,7 +186,7 @@ class KadastralesubjectenCsvFormat(BrkCsvFormat):
         }
 
     def get_format(self):
-        return sort_attributes({
+        return order_attributes({
             'BRK_SJT_ID': 'identificatie',
             'SJT_TYPE': 'typeSubject',
             'SJT_BESCHIKKINGSBEVOEGDH_CODE': 'beschikkingsbevoegdheid.code',

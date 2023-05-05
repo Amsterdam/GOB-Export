@@ -2,12 +2,11 @@
 
 
 from operator import itemgetter
-from typing import Optional
 
 import dateutil.parser as dt_parser
 import requests
-
 from gobexport.config import get_host
+from gobexport.exporter.shared.brk import brk_directory as brk2_directory
 from gobexport.utils import ttl_cache
 
 FILE_TYPE_MAPPING = {
@@ -59,18 +58,6 @@ def _get_filename_date():
     return dt_parser.parse(meta.get("kennisgevingsdatum"))
 
 
-def brk2_directory(file_type="csv", use_sensitive_dir=True):
-    """Return BRK2 directory."""
-    dir_part, sensitive_dir_part = itemgetter("dir", "dir_sensitive")(
-        FILE_TYPE_MAPPING[file_type]
-    )
-    return (
-        f"AmsterdamRegio/{sensitive_dir_part}"
-        if use_sensitive_dir
-        else f"AmsterdamRegio/{dir_part}"
-    )
-
-
 def brk2_filename(name, file_type="csv", append_date=True, use_sensitive_dir=True):
     """Return BRK2 file name (path) ."""
     assert file_type in FILE_TYPE_MAPPING, "Invalid file type"
@@ -80,21 +67,3 @@ def brk2_filename(name, file_type="csv", append_date=True, use_sensitive_dir=Tru
         datestr = f"_{date.strftime('%Y%m%d') if date else '00000000'}"
         return f"{brk2_directory(file_type,use_sensitive_dir)}/BRK_{name}{datestr}.{extension}"
     return f"{brk2_directory(file_type,use_sensitive_dir)}/BRK_{name}.{extension}"
-
-
-def format_timestamp(datetimestr: str, format: str = "%Y%m%d%H%M%S") -> Optional[str]:
-    """Transforms the datetimestr from ISO-format to the format used in the BRK2 exports: yyyymmddhhmmss
-
-    :param datetimestr:
-    :return:
-    """
-    if not datetimestr:
-        # Input variable may be empty.
-        return None
-
-    try:
-        dt = dt_parser.parse(datetimestr)
-        return dt.strftime(format)
-    except ValueError:
-        # If invalid datetimestr, just return the original string so that no data is lost.
-        return datetimestr
