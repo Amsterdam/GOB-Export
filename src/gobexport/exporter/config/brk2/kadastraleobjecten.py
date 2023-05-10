@@ -3,9 +3,10 @@
 
 from fractions import Fraction
 
-from gobexport.exporter.config.brk2.utils import brk2_directory, brk2_filename, format_timestamp
+from gobexport.exporter.config.brk2.utils import brk2_directory, brk2_filename
 from gobexport.exporter.csv import csv_exporter
 from gobexport.exporter.esri import esri_exporter
+from gobexport.exporter.shared.brk import format_timestamp
 from gobexport.exporter.utils import convert_format, get_entity_value
 from gobexport.filters.entity_filter import EntityFilter
 from gobexport.filters.notempty_filter import NotEmptyFilter

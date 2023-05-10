@@ -6,12 +6,8 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from freezegun import freeze_time
-from gobexport.exporter.config.brk2.utils import (
-    _get_filename_date,
-    brk2_directory,
-    brk2_filename,
-    format_timestamp,
-)
+from gobexport.exporter.config.brk2.utils import _get_filename_date, brk2_directory, brk2_filename
+from gobexport.exporter.shared.brk import format_timestamp
 
 
 class TestBrk2Utils(TestCase):
