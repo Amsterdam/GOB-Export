@@ -1,12 +1,11 @@
-from unittest import TestCase
-
 from datetime import datetime
-from freezegun import freeze_time
-from requests.exceptions import HTTPError
+from unittest import TestCase
 from unittest.mock import patch
 
-import gobexport.exporter.config.brk.utils as brk_utils
-from gobexport.exporter.config.brk.utils import _get_filename_date, brk_filename, brk_directory, format_timestamp, sort_attributes
+from freezegun import freeze_time
+from gobexport.exporter.config.brk.utils import _get_filename_date, brk_filename
+from gobexport.exporter.shared.brk import brk_directory, format_timestamp, order_attributes
+from requests.exceptions import HTTPError
 
 
 class TestBrkConfigHelpers(TestCase):
@@ -39,7 +38,7 @@ class TestBrkConfigHelpers(TestCase):
         self.assertEqual(f"AmsterdamRegio/CSV_Actueel",
                         brk_directory(use_sensitive_dir=False))
 
-    def test_sort_attributes(self):
+    def test_order_attributes(self):
         attrs = {
             'b': {
                 'some': {
@@ -60,17 +59,17 @@ class TestBrkConfigHelpers(TestCase):
             },
         }
 
-        self.assertEqual(expected_result, sort_attributes(attrs, ['c', 'a', 'b']))
+        self.assertEqual(expected_result, order_attributes(attrs, ['c', 'a', 'b']))
 
         with self.assertRaises(AssertionError):
-            sort_attributes(attrs, ['d', 'a', 'b'])
+            order_attributes(attrs, ['d', 'a', 'b'])
 
         with self.assertRaises(AssertionError):
-            sort_attributes(attrs, ['c', 'a', 'b', 'c'])
+            order_attributes(attrs, ['c', 'a', 'b', 'c'])
 
         del attrs['a']
         with self.assertRaises(AssertionError):
-            sort_attributes(attrs, ['c' 'a', 'b'])
+            order_attributes(attrs, ['c' 'a', 'b'])
 
     def test_format_timestamp(self):
         inp = '2035-03-31T01:02:03.000000'

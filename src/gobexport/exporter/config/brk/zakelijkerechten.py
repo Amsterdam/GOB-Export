@@ -1,9 +1,9 @@
 import copy
 
+from gobexport.exporter.config.brk.utils import brk_filename
 from gobexport.exporter.csv import csv_exporter
+from gobexport.exporter.shared.brk import BrkCsvFormat, format_timestamp
 from gobexport.filters.notempty_filter import NotEmptyFilter
-from gobexport.exporter.config.brk.csv_format import BrkCsvFormat
-from gobexport.exporter.config.brk.utils import brk_filename, format_timestamp
 
 
 class ZakelijkerechtenCsvFormat(BrkCsvFormat):
