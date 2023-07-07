@@ -4,15 +4,15 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from gobexport.filters.notempty_filter import NotEmptyFilter
 from gobexport.exporter.config.brk2.kadastraleobjecten import (
     Brk2BagCsvFormat,
-    aandeel_sort,
-    KadastraleobjectenExportConfig,
     KadastraleobjectenCsvFormat,
     KadastraleobjectenEsriNoSubjectsFormat,
+    KadastraleobjectenExportConfig,
     PerceelnummerEsriFormat,
+    aandeel_sort,
 )
+from gobexport.filters.notempty_filter import NotEmptyFilter
 
 
 class TestBrk2ExportConfig(TestCase):
@@ -81,7 +81,7 @@ class TestBrk2ExportConfig(TestCase):
 
 
 class TestKadastraleobjectenCsvFormat(TestCase):
-    """Kadastraleobjecten CSV format tests."""
+    """KadastraleobjectenCsvFormat tests."""
 
     def setUp(self) -> None:
         self.format = KadastraleobjectenCsvFormat()
@@ -150,6 +150,41 @@ class TestKadastraleobjectenCsvFormat(TestCase):
             "falseval": "vanBrkKadastraalsubject.[0].theAttribute",
         }
         self.assertEqual(expected, self.format.vve_or_subj("theAttribute"))
+
+    def test_row_formatter(self):
+        """Test KadastraleobjectenCsvFormat row_formatter."""
+        row = {
+            "node": {
+                "isOntstaanUitBrkGPerceel": {
+                    "edges": [
+                        {
+                            "node": {
+                                "identificatie": "percA",
+                            }
+                        },
+                        {
+                            "node": {
+                                "identificatie": "percB",
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        expected = {
+            "node": {
+                "isOntstaanUitBrkGPerceel": {
+                    "edges": [
+                        {
+                            "node": {
+                                "identificatie": "percA,percB",
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        self.assertEqual(expected, self.format.row_formatter(row))
 
 
 class TestKadastraleobjectenEsriNoSubjectsFormat(TestCase):
