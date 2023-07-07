@@ -59,6 +59,7 @@ CONFIG_MAPPING = {
         'gemeentes': brk2.GemeentesExportConfig,
         'kadastralegemeentecodes': brk2.KadastralegemeentecodesExportConfig,
         'kadastralesecties': brk2.KadastralesectiesExportConfig,
+        'aantekeningen': brk2.AantekeningenExportConfig,
     },
     'bgt': {
         'onderbouw': bgt.OnderbouwExportConfig,
