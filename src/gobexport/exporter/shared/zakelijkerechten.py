@@ -239,5 +239,5 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
         return row
 
     @abstractmethod
-    def get_format(self) -> dict[str, Any]:
+    def get_format(self) -> dict[str, Any]:  # pragma: no cover
         pass
