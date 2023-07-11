@@ -5,3 +5,4 @@ from gobexport.exporter.config.brk2.gemeentes import GemeentesExportConfig
 from gobexport.exporter.config.brk2.kadastralegemeentecodes import KadastralegemeentecodesExportConfig
 from gobexport.exporter.config.brk2.kadastralesecties import KadastralesectiesExportConfig
 from gobexport.exporter.config.brk2.zakelijkerechten import ZakelijkerechtenExportConfig
+from gobexport.exporter.config.brk2.stukdelen import StukdelenExportConfig
