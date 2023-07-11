@@ -25,16 +25,16 @@ class StukdelenExportConfig:
         'STK_SOORTREGISTER_CODE': 'soortRegisterStuk.code',
         'STK_SOORTREGISTER_OMS': 'soortRegisterStuk.omschrijving',
         'STK_DEEL_SOORT': 'deelSoortStuk',
-        'BRK_TNG_ID': 'isBronVoorTenaamstelling.[0].identificatie',
+        'BRK_TNG_ID': 'isBronVoorBrkTenaamstelling.[0].identificatie',
         'BRK_ATG_ID': {
             'condition': 'isempty',
-            'reference': 'isBronVoorAantekeningRecht.[0].identificatie',
+            'reference': 'isBronVoorBrkAantekeningRecht.[0].identificatie',
             'negate': True,
             # Either one or the other is set, or none, but never both
-            'trueval': 'isBronVoorAantekeningRecht.[0].identificatie',
-            'falseval': 'isBronVoorAantekeningKadastraalObject.[0].identificatie'
+            'trueval': 'isBronVoorBrkAantekeningRecht.[0].identificatie',
+            'falseval': 'isBronVoorBrkAantekeningKadastraalObject.[0].identificatie'
         },
-        'BRK_ASG_VVE': 'isBronVoorZakelijkRecht.[0].appartementsrechtsplitsingidentificatie'
+        'BRK_ASG_VVE': 'isBronVoorBrkZakelijkRecht.[0].ontstaanUitAppartementsrechtsplitsingVve'
     }
 
     query_tng = '''
@@ -166,7 +166,7 @@ class StukdelenExportConfig:
             'mime_type': 'plain/text',
             'format': format,
             'entity_filters': [
-                NotEmptyFilter('isBronVoorTenaamstelling.[0].identificatie'),
+                NotEmptyFilter('isBronVoorBrkTenaamstelling.[0].identificatie'),
             ],
         },
         'csv_art': {
@@ -182,7 +182,7 @@ class StukdelenExportConfig:
             'format': format,
             'entity_filters': [
                 NotEmptyFilter(
-                    'isBronVoorAantekeningRecht.[0].identificatie',
+                    'isBronVoorBrkAantekeningRecht.[0].identificatie',
                 ),
             ],
         },
@@ -199,7 +199,7 @@ class StukdelenExportConfig:
             'format': format,
             'entity_filters': [
                 NotEmptyFilter(
-                    'isBronVoorAantekeningKadastraalObject.[0].identificatie',
+                    'isBronVoorBrkAantekeningKadastraalObject.[0].identificatie',
                 ),
             ],
         },
@@ -215,7 +215,7 @@ class StukdelenExportConfig:
             'mime_type': 'plain/text',
             'format': format,
             'entity_filters': [
-                NotEmptyFilter('isBronVoorZakelijkRecht.[0].appartementsrechtsplitsingidentificatie')
+                NotEmptyFilter('isBronVoorBrkZakelijkRecht.[0].ontstaanUitAppartementsrechtsplitsingVve')
             ],
         }
     }
