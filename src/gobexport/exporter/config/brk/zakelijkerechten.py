@@ -12,8 +12,8 @@ class BrkZakelijkRechtCsvFormat(ZakelijkerechtenCsvFormat):
     asg_vve_key = 'betrokkenBijAppartementsrechtsplitsingVve'
     tng_key = 'invVanZakelijkrechtBrkTenaamstellingen'
     sjt_key = 'vanKadastraalsubject'
-    rsin_key = 'heeftRsinVoor'
-    kvk_key = 'heeftKvknummerVoor'
+    rsin_key = 'heeftRsinVoor.bronwaarde'  # defined as relation
+    kvk_key = 'heeftKvknummerVoor.bronwaarde'  # defined as relation
 
     def get_format(self) -> dict[str, Any]:
         return {
