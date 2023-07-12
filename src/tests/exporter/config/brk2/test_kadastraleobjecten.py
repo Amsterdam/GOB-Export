@@ -116,6 +116,18 @@ class TestKadastraleobjectenCsvFormat(TestCase):
         for inp, outp in testcases:
             self.assertEqual(outp, self.format.format_kadgrootte(inp))
 
+    def test_format_koopsom(self):
+        """KadastraleobjectenCsvFormat.format_koopsom test."""
+        testcases = [
+            ("12345.0", "12345"),
+            ("23456.4", "23456"),
+            ("23456.6", "23457"),
+            ("34567", "34567"),
+        ]
+
+        for inp, outp in testcases:
+            self.assertEqual(outp, self.format.format_koopsom(inp))
+
     def test_if_vve(self):
         expected = {
             "condition": "isempty",
