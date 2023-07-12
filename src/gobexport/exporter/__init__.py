@@ -63,6 +63,7 @@ CONFIG_MAPPING = {
         'zakelijkerechten': brk2.ZakelijkerechtenExportConfig,
         'stukdelen': brk2.StukdelenExportConfig,
         'kadastralesubjecten': brk2.KadastralesubjectenExportConfig,
+        'aardzakelijkerechten': brk2.AardzakelijkerechtenExportConfig
     },
     'bgt': {
         'onderbouw': bgt.OnderbouwExportConfig,

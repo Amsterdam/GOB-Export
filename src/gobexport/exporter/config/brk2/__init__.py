@@ -7,3 +7,4 @@ from gobexport.exporter.config.brk2.kadastralesecties import KadastralesectiesEx
 from gobexport.exporter.config.brk2.kadastralesubjecten import KadastralesubjectenExportConfig
 from gobexport.exporter.config.brk2.zakelijkerechten import ZakelijkerechtenExportConfig
 from gobexport.exporter.config.brk2.stukdelen import StukdelenExportConfig
+from gobexport.exporter.config.brk2.aardzakelijkerechten import AardzakelijkerechtenExportConfig
