@@ -147,6 +147,10 @@ class KadastraleobjectenCsvFormat:
             return str(floatval)
         return str(int(floatval))
 
+    def format_koopsom(self, value):
+        """Format koopsom without decimal."""
+        return str(round(float(value)))
+
     def vve_or_subj(self, attribute):
         return self.if_vve(
             trueval=f"vveIdentificatieBetrokkenBij.[0].{attribute}",
@@ -199,7 +203,11 @@ class KadastraleobjectenCsvFormat:
                 "formatter": self.format_kadgrootte,
             },
             "KOT_RELATIE_G_PERCEEL": "isOntstaanUitBrkGPerceel.identificatie",
-            "KOT_KOOPSOM": "koopsom",
+            "KOT_KOOPSOM": {
+                "action": "format",
+                "value": "koopsom",
+                "formatter": self.format_koopsom,
+            },
             "KOT_KOOPSOM_VALUTA": "koopsomValutacode",
             "KOT_KOOPJAAR": "koopjaar",
             "KOT_INDICATIE_MEER_OBJECTEN": "indicatieMeerObjecten",
@@ -713,10 +721,36 @@ class KadastraleobjectenExportConfig:
       node {
         identificatie
         volgnummer
-        aangeduidDoorBrkGemeente
-        aangeduidDoorBrkKadastralegemeentecode
-        aangeduidDoorBrkKadastralegemeente
-        aangeduidDoorBrkKadastralesectie
+        aangeduidDoorBrkGemeente {
+          edges {
+            node {
+              naam
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeentecode {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralegemeente {
+          edges {
+            node {
+              identificatie
+              code
+            }
+          }
+        }
+        aangeduidDoorBrkKadastralesectie {
+          edges {
+            node {
+              code
+            }
+          }
+        }
         perceelnummer
         indexletter
         indexnummer
