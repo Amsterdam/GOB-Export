@@ -170,12 +170,12 @@ class ZakelijkerechtenCsvFormat(BrkCsvFormat):
 
         attrs = {
             'SJT_NNP_RSIN': self.if_vve(
-                trueval=f'{self.asg_vve_key}.[0].{self.rsin_key}.bronwaarde',
-                falseval=f'{self.sjt_key}.[0].{self.rsin_key}.bronwaarde'
+                trueval=f'{self.asg_vve_key}.[0].{self.rsin_key}',
+                falseval=f'{self.sjt_key}.[0].{self.rsin_key}'
             ),
             'SJT_NNP_KVKNUMMER': self.if_vve(
-                trueval=f'{self.asg_vve_key}.[0].{self.kvk_key}.bronwaarde',
-                falseval=f'{self.sjt_key}.[0].{self.kvk_key}.bronwaarde'
+                trueval=f'{self.asg_vve_key}.[0].{self.kvk_key}',
+                falseval=f'{self.sjt_key}.[0].{self.kvk_key}'
             ),
             'SJT_NNP_RECHTSVORM_CODE': self.if_vve(
                 trueval=f'{self.asg_vve_key}.[0].rechtsvorm.code',
