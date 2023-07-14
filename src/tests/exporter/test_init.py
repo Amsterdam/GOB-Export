@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock, ANY
+from unittest.mock import ANY, MagicMock, patch
 
 from gobexport.exporter import export_to_file
 
@@ -20,12 +20,26 @@ class TestInit(TestCase):
 
         # Do append, pass value of append_to_filename to exporter
         self.assertEqual(exporter(), export_to_file('host', product, 'file', 'catalogue', 'collection'))
-        exporter.assert_called_with(ANY, 'file', 'the format', append='the filename', filter=None)
+        exporter.assert_called_with(ANY, 'file', 'the format', append='the filename', filter=None, unique_csv_id=None)
 
         # Don't append
         product['append'] = False
         self.assertEqual(exporter(), export_to_file('host', product, 'file', 'catalogue', 'collection'))
         exporter.assert_called_with(ANY, 'file', 'the format', append=False, filter=None)
+
+        product_2 = {
+            "exporter": exporter,
+            "format": "the format",
+            "append": True,
+            "append_to_filename": "filetje",
+            "unique_csv_id": "BRK2_AANTEK_ID",
+        }
+
+        # Do append, pass value of unique_csv_id to exporter
+        self.assertEqual(exporter(), export_to_file("host", product_2, "file", "catalogue", "collection"))
+        exporter.assert_called_with(
+            ANY, "file", "the format", append="filetje", filter=None, unique_csv_id="BRK2_AANTEK_ID"
+        )
 
     @patch("gobexport.exporter._init_api", MagicMock())
     @patch("gobexport.exporter.BufferedIterable", MagicMock())

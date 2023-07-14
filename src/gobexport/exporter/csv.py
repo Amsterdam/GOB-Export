@@ -1,9 +1,9 @@
 import csv
+from typing import Optional, Sequence
 
 from gobcore.exceptions import GOBException
 from gobcore.utils import ProgressTicker
-
-from gobexport.exporter.utils import split_field_reference, get_entity_value
+from gobexport.exporter.utils import get_entity_value, split_field_reference
 from gobexport.filters.entity_filter import EntityFilter
 
 
@@ -20,7 +20,7 @@ def build_mapping_from_format(format):
     return mapping
 
 
-def _get_headers_from_file(file: str) -> list:
+def _get_headers_from_file(file: str) -> Optional[Sequence[str]]:
     """Returns existing column names from a CSV file
 
     :param file:
@@ -48,7 +48,21 @@ def _ensure_fieldnames_match_existing_file(fieldnames, file):
         raise GOBException('Fields from existing file do not match fields to append')
 
 
-def csv_exporter(api, file, format=None, append=False, filter: EntityFilter = None):
+def _get_csv_ids(csv_file: str, csv_id: str) -> set[str]:
+    """Return list with all csv_id's in csv_file.
+
+    :param csv_file:
+    :param csv_id:
+    :return:
+    """
+    with open(csv_file, 'r', encoding='utf-8-sig') as fp:
+        reader = csv.DictReader(fp, delimiter=';')
+        return {row[csv_id] for row in reader}
+
+
+def csv_exporter(
+    api, file, format=None, append=False, filter: Optional[EntityFilter] = None, unique_csv_id: Optional[str] = None
+):
     """CSV Exporter
 
     Exports the output of the API to a ; delimited csv file.
@@ -90,6 +104,7 @@ def csv_exporter(api, file, format=None, append=False, filter: EntityFilter = No
 
     if append:
         _ensure_fieldnames_match_existing_file(fieldnames, append)
+        csv_ids = _get_csv_ids(file.removesuffix(".to_append"), unique_csv_id) if unique_csv_id else set()
 
     with open(file, 'a' if append else 'w', encoding='utf-8-sig') as fp, \
             ProgressTicker("Export entities", 10000) as progress:
@@ -101,6 +116,9 @@ def csv_exporter(api, file, format=None, append=False, filter: EntityFilter = No
 
         for entity in api:
             if filter and not filter.filter(entity):
+                continue
+
+            if unique_csv_id and entity[mapping[unique_csv_id]] in csv_ids:
                 continue
 
             row = {}

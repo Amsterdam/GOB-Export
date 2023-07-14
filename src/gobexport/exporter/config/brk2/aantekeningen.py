@@ -16,9 +16,9 @@ class AantekeningenExportConfig:
     edges {
       node {
         identificatie
+        einddatumRecht
         aard
         omschrijving
-        einddatum
         heeftBrkBetrokkenPersoon {
           edges {
             node {
@@ -78,7 +78,7 @@ class AantekeningenExportConfig:
         "ATG_EINDDATUM": {
             "action": "format",
             "formatter": format_timestamp,
-            "value": "einddatum",
+            "value": "einddatumRecht",
         },
         "ATG_TYPE": {"action": "literal", "value": "Aantekening Zakelijk Recht (R)"},
         "BRK_KOT_ID": "rustOpBrkKadastraalObject.[0].identificatie",
@@ -99,9 +99,9 @@ class AantekeningenExportConfig:
     edges {
       node {
         identificatie
+        einddatumRecht
         aard
         omschrijving
-        einddatum,
         heeftBrkBetrokkenPersoon {
           edges {
             node {
@@ -147,7 +147,7 @@ class AantekeningenExportConfig:
         "ATG_EINDDATUM": {
             "action": "format",
             "formatter": format_timestamp,
-            "value": "einddatum",
+            "value": "einddatumRecht",
         },
         "ATG_TYPE": {"action": "literal", "value": "Aantekening Kadastraal object (O)"},
         "BRK_KOT_ID": "heeftBetrekkingOpBrkKadastraalObject.[0].identificatie",
@@ -175,7 +175,7 @@ class AantekeningenExportConfig:
             "exporter": csv_exporter,
             "query": art_query,
             "filename": lambda: brk2_filename("aantekening", use_sensitive_dir=True),
-            "mime_type": "plain/text",
+            "mime_type": "text/csv",
             "format": art_format,
         },
         "csv_akt": {
@@ -188,8 +188,9 @@ class AantekeningenExportConfig:
             "exporter": csv_exporter,
             "query": akt_query,
             "filename": lambda: brk2_filename("aantekening", use_sensitive_dir=True),
-            "mime_type": "plain/text",
+            "mime_type": "text/csv",
             "format": akt_format,
             "append": True,
+            "unique_csv_id": "BRK_ATG_ID",
         },
     }
