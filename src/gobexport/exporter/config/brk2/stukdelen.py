@@ -5,11 +5,21 @@ from gobexport.filters.notempty_filter import NotEmptyFilter
 
 
 class StukdelenExportConfig:
+
+    @staticmethod
+    def format_koopsom(value) -> str:
+        """Format koopsom without decimal."""
+        return str(round(float(value)))
+
     format = {
         'BRK_SDL_ID': 'identificatie',
         'SDL_AARD_STUKDEEL_CODE': 'aard.code',
         'SDL_AARD_STUKDEEL_OMS': 'aard.omschrijving',
-        'SDL_KOOPSOM': 'bedragTransactie.bedrag',
+        'SDL_KOOPSOM': {
+            "action": "format",
+            "value": "bedragTransactie.bedrag",
+            "formatter": format_koopsom,
+        },
         'SDL_KOOPSOM_VALUTA': 'bedragTransactie.valuta',
         'BRK_STK_ID': 'stukidentificatie',
         'STK_AKR_PORTEFEUILLENR': 'portefeuillenummerAkr',
@@ -18,7 +28,7 @@ class StukdelenExportConfig:
             'formatter': format_timestamp,
             'value': 'tijdstipAanbiedingStuk',
         },
-        'STK_REEKS_CODE': 'reeks',
+        'STK_REEKS_CODE': 'reeks.code',
         'STK_VOLGNUMMER': 'volgnummerStuk',
         'STK_REGISTERCODE_CODE': 'registercodeStuk.code',
         'STK_REGISTERCODE_OMS': 'registercodeStuk.omschrijving',
@@ -34,7 +44,7 @@ class StukdelenExportConfig:
             'trueval': 'isBronVoorBrkAantekeningRecht.[0].identificatie',
             'falseval': 'isBronVoorBrkAantekeningKadastraalObject.[0].identificatie'
         },
-        'BRK_ASG_VVE': 'isBronVoorBrkZakelijkRecht.[0].ontstaanUitAppartementsrechtsplitsingVve'
+        'BRK_ASG_VVE': 'isBronVoorBrkZakelijkRecht.[0].vveIdentificatieOntstaanUit.[0].identificatie'
     }
 
     query_tng = '''
@@ -144,7 +154,13 @@ class StukdelenExportConfig:
         isBronVoorBrkZakelijkRecht(active: false) {
           edges {
             node {
-              ontstaanUitAppartementsrechtsplitsingVve
+              vveIdentificatieOntstaanUit {
+                edges {
+                  node {
+                    identificatie
+                  }
+                }
+              }
             }
           }
         }
@@ -163,7 +179,7 @@ class StukdelenExportConfig:
             'unfold': True,
             'query': query_tng,
             'filename': lambda: brk2_filename('stukdeel', use_sensitive_dir=True),
-            'mime_type': 'plain/text',
+            'mime_type': 'text/csv',
             'format': format,
             'entity_filters': [
                 NotEmptyFilter('isBronVoorBrkTenaamstelling.[0].identificatie'),
@@ -178,7 +194,7 @@ class StukdelenExportConfig:
             'query': query_art,
             'append': True,
             'filename': lambda: brk2_filename('stukdeel', use_sensitive_dir=True),
-            'mime_type': 'plain/text',
+            'mime_type': 'text/csv',
             'format': format,
             'entity_filters': [
                 NotEmptyFilter(
@@ -195,7 +211,7 @@ class StukdelenExportConfig:
             'query': query_akt,
             'append': True,
             'filename': lambda: brk2_filename('stukdeel', use_sensitive_dir=True),
-            'mime_type': 'plain/text',
+            'mime_type': 'text/csv',
             'format': format,
             'entity_filters': [
                 NotEmptyFilter(
@@ -212,10 +228,10 @@ class StukdelenExportConfig:
             'append': True,
             'query': query_zrt,
             'filename': lambda: brk2_filename('stukdeel', use_sensitive_dir=True),
-            'mime_type': 'plain/text',
+            'mime_type': 'text/csv',
             'format': format,
             'entity_filters': [
-                NotEmptyFilter('isBronVoorBrkZakelijkRecht.[0].ontstaanUitAppartementsrechtsplitsingVve')
+                NotEmptyFilter('isBronVoorBrkZakelijkRecht.[0].vveIdentificatieOntstaanUit.[0].identificatie')
             ],
         }
     }
