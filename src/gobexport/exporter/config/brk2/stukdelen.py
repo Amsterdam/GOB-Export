@@ -6,11 +6,6 @@ from gobexport.filters.notempty_filter import NotEmptyFilter
 
 class StukdelenExportConfig:
 
-    @staticmethod
-    def format_koopsom(value) -> str:
-        """Format koopsom without decimal."""
-        return str(round(float(value)))
-
     format = {
         'BRK_SDL_ID': 'identificatie',
         'SDL_AARD_STUKDEEL_CODE': 'aard.code',
@@ -18,7 +13,7 @@ class StukdelenExportConfig:
         'SDL_KOOPSOM': {
             "action": "format",
             "value": "bedragTransactie.bedrag",
-            "formatter": format_koopsom,
+            "formatter": lambda value: str(round(float(value))),
         },
         'SDL_KOOPSOM_VALUTA': 'bedragTransactie.valuta',
         'BRK_STK_ID': 'stukidentificatie',
