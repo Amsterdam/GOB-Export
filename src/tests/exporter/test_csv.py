@@ -2,8 +2,10 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock, mock_open, call
 
 from gobcore.exceptions import GOBException
-from gobexport.exporter.csv import get_entity_value, \
-    _get_headers_from_file, _ensure_fieldnames_match_existing_file, csv_exporter
+from gobexport.exporter.csv import (
+    get_entity_value, _get_headers_from_file, _ensure_fieldnames_match_existing_file,
+    _get_csv_ids, csv_exporter
+)
 
 
 class TestCsvExporter(TestCase):
@@ -73,3 +75,30 @@ class TestCsvExporter(TestCase):
 
         mock_filter.filter.assert_called_with('a')
         mock_tick.tick.assert_not_called()
+
+    @patch("gobexport.exporter.csv._ensure_fieldnames_match_existing_file")
+    @patch("gobexport.exporter.csv.build_mapping_from_format")
+    @patch("builtins.open", mock_open())
+    @patch("gobexport.exporter.csv.csv")
+    @patch("gobexport.exporter.csv._get_csv_ids")
+    def test_csv_exporter_unique_csv_id(self, mock_csv_ids, mock_csv, mock_build_mapping, mock_match_fieldnames):
+        api_id = "id"
+        api = [{api_id: "b", "field": "data"}, {api_id: "c", "field": "data"}, {api_id: "d", "field": "data"}]
+        csv_id = "BRK2_AANTEK_ID"
+        csv_file = "file.csv"
+        mock_csv_ids.return_value = ["a", "b"]
+
+        mock_build_mapping.return_value = MagicMock(spec_set=dict)
+        csv_map = {csv_id: api_id}
+        mock_build_mapping.return_value.__getitem__.side_effect = csv_map.__getitem__
+
+        count = csv_exporter(api, csv_file, append=True, unique_csv_id=csv_id)
+        self.assertEqual(count, 2)
+        mock_csv_ids.assert_called_with(csv_file, csv_id)
+
+    @patch("builtins.open", mock_open())
+    @patch("gobexport.exporter.csv.csv.DictReader")
+    def test_get_csv_ids(self, mock_reader):
+        mock_reader.return_value = [{"BRK2_AANTEK_ID": "x", "field": "data"}, {"BRK2_AANTEK_ID": "y", "field": "data"}]
+        result = _get_csv_ids("file.csv", "BRK2_AANTEK_ID")
+        self.assertEqual(result, ["x", "y"])

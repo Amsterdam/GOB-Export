@@ -1,6 +1,8 @@
 """Exporter init and mapping."""
 
 
+from typing import Any
+
 from gobexport.api import API
 from gobexport.buffered_iterable import BufferedIterable
 from gobexport.exporter.config import bag, bgt, brk, brk2, gebieden, meetbouten, nap, test, wkpb
@@ -80,7 +82,7 @@ def product_source(product):
     return product.get('endpoint', product.get('query', product.get('filename')))
 
 
-def _init_api(product: dict, host: str, catalogue: str, collection: str):
+def _init_api(product: dict[str, Any], host: str, catalogue: str, collection: str):
     unfold = product.get('unfold', False)
     secure_user = product.get('secure_user')
 
@@ -139,6 +141,8 @@ def export_to_file(host, product, file_path, catalogue, collection, buffer_items
 
     filter = GroupFilter(product['entity_filters']) if product.get('entity_filters') else None
     kwargs['filter'] = filter
+    if product.get("append", False):
+        kwargs["unique_csv_id"] = product.get("unique_csv_id")
 
     row_count = exporter(buffered_api, file_path, format,
                          append=product.get('append', False) and product['append_to_filename'],
