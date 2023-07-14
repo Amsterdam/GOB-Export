@@ -101,4 +101,4 @@ class TestCsvExporter(TestCase):
     def test_get_csv_ids(self, mock_reader):
         mock_reader.return_value = [{"BRK2_AANTEK_ID": "x", "field": "data"}, {"BRK2_AANTEK_ID": "y", "field": "data"}]
         result = _get_csv_ids("file.csv", "BRK2_AANTEK_ID")
-        self.assertEqual(result, ["x", "y"])
+        self.assertEqual(result, set(["x", "y"]))

@@ -48,19 +48,16 @@ def _ensure_fieldnames_match_existing_file(fieldnames, file):
         raise GOBException('Fields from existing file do not match fields to append')
 
 
-def _get_csv_ids(csv_file: str, csv_id: str) -> list[str]:
+def _get_csv_ids(csv_file: str, csv_id: str) -> set[str]:
     """Return list with all csv_id's in csv_file.
 
     :param csv_file:
     :param csv_id:
     :return:
     """
-    csv_ids = []
     with open(csv_file, 'r', encoding='utf-8-sig') as fp:
         reader = csv.DictReader(fp, delimiter=';')
-        for row in reader:
-            csv_ids.append(row[csv_id])
-    return csv_ids
+        return {row[csv_id] for row in reader}
 
 
 def csv_exporter(
@@ -107,7 +104,7 @@ def csv_exporter(
 
     if append:
         _ensure_fieldnames_match_existing_file(fieldnames, append)
-        csv_ids = _get_csv_ids(file.removesuffix(".to_append"), unique_csv_id) if unique_csv_id else []
+        csv_ids = _get_csv_ids(file.removesuffix(".to_append"), unique_csv_id) if unique_csv_id else set()
 
     with open(file, 'a' if append else 'w', encoding='utf-8-sig') as fp, \
             ProgressTicker("Export entities", 10000) as progress:
