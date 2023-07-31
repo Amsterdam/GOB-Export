@@ -2,7 +2,7 @@ import shutil
 import subprocess
 from collections import defaultdict
 from functools import cache
-from io import BytesIO
+from io import StringIO
 from itertools import islice
 
 from pathlib import Path
@@ -10,12 +10,6 @@ from typing import Optional, Iterator
 import re
 
 from gobcore.logging.logger import logger
-
-# Store some byte constants used in iteration
-BYTE_SPACE = b" "
-BYTE_POINT = b"."
-BYTE_LE = b"\n"
-BYTE_EMPTY = b""
 
 
 class CSVInspector:
@@ -39,15 +33,10 @@ class CSVInspector:
     """
 
     MAX_WARNINGS = 25
-    ENCODING = 'utf-8'
-    SEP = b";"
 
-    def __init__(self, filename: str, headerline: bytes, check: Optional[dict], tmp_dir: str):
+    def __init__(self, filename: str, header: list[str], check: Optional[dict], tmp_dir: str):
         self.check = check or {}
         self.filename = filename
-
-        # headers should already be stripped of linebreaks and BOM
-        header = headerline.decode(self.ENCODING).split(';')
 
         # remove spaces from keys, doesnt work when writing to file
         self.unique_cols = {
@@ -62,8 +51,8 @@ class CSVInspector:
         # use existing temporary dir, caller is responsible for cleaning up
         self.tmp_dir = tmp_dir
 
-        # Use BytesIO as cache for writing to disk per key
-        self._write_cache = {key: BytesIO(b'') for key in self.unique_cols}
+        # Use StringIO as cache for writing to disk per key
+        self._write_cache = {key: StringIO("") for key in self.unique_cols}
 
         self._log_intro()
 
@@ -124,8 +113,8 @@ class CSVInspector:
         return Path(self.tmp_dir, re.sub(r"[^\w,]+", "", key))
 
     def _offload_cache(self, key: str):
-        """Write BytesIO object for `key` to disk in tmp_dir."""
-        with self._write_cache[key] as src, open(self._get_path_for_key(key), mode='wb') as dst:
+        """Write StringIO object for `key` to disk in tmp_dir."""
+        with self._write_cache[key] as src, open(self._get_path_for_key(key), mode="w") as dst:
             src.seek(0)
             shutil.copyfileobj(src, dst)
 
@@ -178,7 +167,7 @@ class CSVInspector:
         """Calculates cached maxlength strings for columns."""
         return tuple(f"maxlength_col_{i+1}" for i in range(length))
 
-    def _check_lengths(self, columns: list[bytes]):
+    def _check_lengths(self, values: list[str]):
         """
         Check the column lengths
 
@@ -187,15 +176,15 @@ class CSVInspector:
         Then specify that min is between 3 and 3 and max is between 8 and 8
         If any column should ever have length 5 the constraint is violated
 
-        :param columns:
+        :param values:
         :return:
         """
         cols = self.cols
         result = {}
-        minlen_str = self.cols_min_len(len(columns))  # cached, called many times with same value
-        maxlen_str = self.cols_max_len(len(columns))
+        minlen_str = self.cols_min_len(len(values))  # cached, called many times with same value
+        maxlen_str = self.cols_max_len(len(values))
 
-        for i, column in enumerate(columns):
+        for i, column in enumerate(values):
             length = len(column)
 
             try:
@@ -211,26 +200,19 @@ class CSVInspector:
         if result:
             cols.update(result)  # only update if we have to
 
-    def _collect_values_for_uniquess_check(self, columns: list[bytes], line_no: int):
+    def _collect_values_for_uniquess_check(self, values: list[str], line_no: int):
         """
-        Saves the values for the uniqueness check in a BytesIO structure.
+        Saves the values for the uniqueness check in a StringIO structure.
 
-        :param columns: values to combine into one
+        :param values: values to combine into one
         :param line_no: line number to add
         :return:
         """
         for key, col_idxs in self.unique_cols.items():
-            self._write_cache[key].write(
-                BYTE_EMPTY.join([
-                    str(line_no).encode(self.ENCODING),
-                    BYTE_SPACE,
-                    BYTE_POINT.join(columns[col_idx - 1] for col_idx in col_idxs),
-                    BYTE_LE
-                ])
-            )
+            value = f"{line_no} {'.'.join(values[col_idx - 1] for col_idx in col_idxs)}\n"
+            self._write_cache[key].write(value)
 
-    def check_line(self, line: bytes, line_no: int):
-        """Perform checks per line. The byte line assumes line endings are stripped."""
-        columns = line.split(self.SEP)
-        self._collect_values_for_uniquess_check(columns, line_no)
-        self._check_lengths(columns)
+    def check_line(self, values: list[str], line_no: int):
+        """Perform checks per split line."""
+        self._collect_values_for_uniquess_check(values, line_no)
+        self._check_lengths(values)
