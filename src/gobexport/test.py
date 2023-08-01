@@ -50,6 +50,7 @@ import json
 import math
 import re
 import numbers
+import csv
 
 from gobcore.datastore.objectstore import get_full_container_list, get_object, put_object
 
@@ -96,6 +97,8 @@ STRIP_CHARS = BOM_UTF8 + b"\t\n\r\v\f"
 
 TYPE_FLAT_FILE = ("plain/text", "text/csv", "application/x-ndjson")
 TYPE_CSV = ("text/csv", )
+
+csv.field_size_limit(1_000_000)
 
 
 def _safe_divide(val1: int, val2: int) -> Union[int, float]:
@@ -316,7 +319,7 @@ def _get_file(
 
             logger.info(f"Downloading {item['name']}")
             # if obj_info["bytes"] == 0 we dont know the size, offload to be sure
-            if destination and (obj_info["bytes"] > _OFFLOAD_THRESHOLD or obj_info["bytes"] == 0):
+            if destination and (int(obj_info["bytes"]) > _OFFLOAD_THRESHOLD or obj_info["bytes"] == 0):
                 tmp_path = Path(destination, filename)
                 tmp_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -608,19 +611,20 @@ def _get_analysis(
             stats.first_10 = [line.strip(STRIP_CHARS) for line in islice(obj, 10)]
 
             header = stats.first_10[0]
-            inspector = CSVInspector(obj_info["name"], header, check, tmp_dir)
             stats.count_lines(len(header))
 
             obj.seek(0)
-            for idx, line in enumerate(islice(obj, 1, None), 1):  # skip header
-                line = line.strip(STRIP_CHARS)
-                stats.count_lines(len(line))
+            reader = csv.reader(TextIOWrapper(obj, encoding=ENCODING), delimiter=";")
+            inspector = CSVInspector(obj_info["name"], next(reader), check, tmp_dir)
+
+            for line in reader:
+                stats.count_lines(sum(len(val) for val in line))
 
                 if is_csv:
-                    inspector.check_line(line, idx)
+                    inspector.check_line(line, reader.line_num)
 
-                if idx % 250_000 == 0:
-                    logger.info(f"Checking lines {idx:,}")  # report status, can take some time
+                if reader.line_num % 250_000 == 0:
+                    logger.info(f"Checking lines {reader.line_num:,}")  # report status, can take some time
 
     assert obj.closed, "Object not closed."
 
