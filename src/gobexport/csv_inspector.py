@@ -1,5 +1,5 @@
 import shutil
-import subprocess
+from subprocess import Popen, PIPE
 from collections import defaultdict
 from functools import cache
 from io import StringIO
@@ -78,35 +78,24 @@ class CSVInspector:
             unique_cols = ", ".join([cols for cols in self.unique_cols.keys()])
             logger.info(f"Checking {self.filename} for unique column values in columns {unique_cols}")
 
-    def _sort_uniq(self, path: Path) -> Iterator[str]:
+    @staticmethod
+    def _get_duplicates(path: Path) -> Iterator[str]:
         """
         Return duplicate values from file in `path`.
+        lines in `path` require format: <lineno><space><value>\n
         """
-        sort_process = None
-        uniq_process = None
+        # uniq requires sorted data, sort on the second column
+        run_sort = [shutil.which("sort"), "-k2,2", path]
 
-        try:
-            # uniq requires sorted data, sort on the second column
-            sort_process = subprocess.Popen(
-                args=["/usr/bin/sort", "-k2,2", str(path)],
-                stdout=subprocess.PIPE,
-                shell=False,
-            )
-            # pipe stream to uniq, check for duplicates on the second column (skip 1)
-            # only keep the duplicates
-            uniq_process = subprocess.Popen(
-                args=["/usr/bin/uniq", "--all-repeated", "--skip-fields=1"],
-                stdin=sort_process.stdout,
-                stdout=subprocess.PIPE,
-                shell=False,
-                text=True
-            )
+        # pipe stream to uniq, check for duplicates on the second column (--skip-fields=1)
+        # only keep the duplicates (--all-repeated)
+        run_uniq = [shutil.which("uniq"), "--all-repeated", "--skip-fields=1"]
+
+        with (
+            Popen(run_sort, stdout=PIPE) as sort_process,
+            Popen(run_uniq, stdin=sort_process.stdout, stdout=PIPE, text=True) as uniq_process
+        ):
             yield from uniq_process.stdout
-        finally:
-            if sort_process:
-                sort_process.kill()
-            if uniq_process:
-                uniq_process.kill()
 
     def _get_path_for_key(self, key: str) -> Path:
         """Return path for `key` with only alphanum and commas."""
@@ -125,7 +114,7 @@ class CSVInspector:
         for key in self.unique_cols:
             self._offload_cache(key)
 
-            for line in self._sort_uniq(self._get_path_for_key(key)):
+            for line in self._get_duplicates(self._get_path_for_key(key)):
                 line_no, value = line.split()
                 non_unique_values[key][value].append(line_no)
 
