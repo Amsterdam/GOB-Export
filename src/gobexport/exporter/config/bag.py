@@ -625,7 +625,7 @@ class VerblijfsobjectenExportConfig:
         'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie.omschrijving',
         'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
         'aantalEenhedenComplex': 'aantalEenhedenComplex',
-        'is:WOZ.WOB.soortObject': 'soortobject.omschrijving',
+        'is:WOZ.WOB.soortObject': 'soortObject.omschrijving',
         'oppervlakte': 'oppervlakte',
         'status': 'status.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -686,7 +686,7 @@ class VerblijfsobjectenExportConfig:
         'gdl_wonen': 'gebruiksdoelWoonfunctie.omschrijving',
         'gdl_gezond': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
         'eenheden': 'aantalEenhedenComplex',
-        'soort_obj': 'soortobject.omschrijving',
+        'soort_obj': 'soortObject.omschrijving',
         'oppervlak': 'oppervlakte',
         'status': 'status.omschrijving',
         'begindatum': 'beginGeldigheid',
@@ -749,7 +749,7 @@ class VerblijfsobjectenExportConfig:
         'gebruiksdoelWoonfunctie': 'gebruiksdoelWoonfunctie.omschrijving',
         'gebruiksdoelGezondheidszorgfunctie': 'gebruiksdoelGezondheidszorgfunctie.omschrijving',
         'aantalEenhedenComplex': 'aantalEenhedenComplex',
-        'is:WOZ.WOB.soortObject': 'soortobject.omschrijving',
+        'is:WOZ.WOB.soortObject': 'soortObject.omschrijving',
         'oppervlakte': 'oppervlakte',
         'status': 'status.omschrijving',
         'beginGeldigheid': 'beginGeldigheid',
@@ -944,10 +944,10 @@ class StandplaatsenExportConfig:
             }
           }
         }
-        invIsVerbondenMetStandplaatsWozWozdeelobjecten {
+        invIsVerbondenMetBagStandplaatsWozDeelobjecten {
           edges {
             node {
-              soortobject
+              soortObject
             }
           }
         }
@@ -1077,10 +1077,10 @@ class StandplaatsenExportConfig:
             }
           }
         }
-        invIsVerbondenMetStandplaatsWozWozdeelobjecten {
+        invIsVerbondenMetBagStandplaatsWozDeelobjecten {
           edges {
             node {
-              soortobject
+              soortObject
             }
           }
         }
@@ -1129,7 +1129,7 @@ class StandplaatsenExportConfig:
         'is:WOZ.WOB.soortObject': {
             'action': 'format',
             'formatter': format_soort_object,
-            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+            'value': 'invIsVerbondenMetBagStandplaatsWozDeelobjecten.soortObject.omschrijving',
         },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
@@ -1189,7 +1189,7 @@ class StandplaatsenExportConfig:
         'soort_obj': {
             'action': 'format',
             'formatter': format_soort_object,
-            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+            'value': 'invIsVerbondenMetBagStandplaatsWozDeelobjecten.soortObject.omschrijving',
         },
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
@@ -1251,7 +1251,7 @@ class StandplaatsenExportConfig:
         'is:WOZ.WOB.soortObject': {
             'action': 'format',
             'formatter': format_soort_object,
-            'value': 'invIsVerbondenMetStandplaatsWozWozdeelobjecten.soortobject.omschrijving',
+            'value': 'invIsVerbondenMetBagStandplaatsWozDeelobjecten.soortObject.omschrijving',
         },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
@@ -1433,10 +1433,10 @@ class LigplaatsenExportConfig:
             }
           }
         }
-        invIsVerbondenMetLigplaatsWozWozdeelobjecten {
+        invIsVerbondenMetBagLigplaatsWozDeelobjecten {
           edges {
             node {
-              soortobject
+              soortObject
             }
           }
         }
@@ -1566,10 +1566,10 @@ class LigplaatsenExportConfig:
             }
           }
         }
-        invIsVerbondenMetLigplaatsWozWozdeelobjecten {
+        invIsVerbondenMetBagLigplaatsWozDeelobjecten {
           edges {
             node {
-              soortobject
+              soortObject
             }
           }
         }
@@ -1618,7 +1618,7 @@ class LigplaatsenExportConfig:
         'is:WOZ.WOB.soortObject': {
             'action': 'format',
             'formatter': format_soort_object,
-            'value': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
+            'value': 'invIsVerbondenMetBagLigplaatsWozDeelobjecten.soortObject.omschrijving',
         },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',
@@ -1678,7 +1678,7 @@ class LigplaatsenExportConfig:
         'soort_obj': {
             'action': 'format',
             'formatter': format_soort_object,
-            'value': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
+            'value': 'invIsVerbondenMetBagLigplaatsWozDeelobjecten.soortObject.omschrijving',
         },
         'begindatum': 'beginGeldigheid',
         'einddatum': 'eindGeldigheid',
@@ -1740,7 +1740,7 @@ class LigplaatsenExportConfig:
         'is:WOZ.WOB.soortObject': {
             'action': 'format',
             'formatter': format_soort_object,
-            'value': 'invIsVerbondenMetLigplaatsWozWozdeelobjecten.soortobject.omschrijving',
+            'value': 'invIsVerbondenMetBagLigplaatsWozDeelobjecten.soortObject.omschrijving',
         },
         'beginGeldigheid': 'beginGeldigheid',
         'eindGeldigheid': 'eindGeldigheid',

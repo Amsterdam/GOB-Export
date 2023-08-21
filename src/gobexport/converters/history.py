@@ -39,7 +39,7 @@ def _compare_dates(date1, compare, date2):
     :param date2:
     :return:
     """
-    if type(date1) == type(date2):
+    if isinstance(date1, type(date2)):
         return compare(date1, date2)
     return compare(_compare_date(date1), _compare_date(date2))
 
