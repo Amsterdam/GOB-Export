@@ -1,14 +1,6 @@
 from setuptools import setup, find_packages
 from pathlib import Path
 
-def get_install_requires() -> list[str]:
-    fname = Path(__file__).parent / "src" / "requirements.txt"
-    targets = []
-    if fname.exists():
-        with open(fname, 'r') as f:
-            targets = f.read().splitlines()
-    return targets
-
 setup(
     name="GOB-Export",
     version="0.1",
@@ -19,5 +11,13 @@ setup(
     description="GOB-Export",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
-    install_requires=get_install_requires(),
+    install_requires=[
+        "Flask==2.3.2",
+        "Flask-Cors==3.0.10",
+        "pysftp==0.2.9",
+        "freezegun==1.2.2",
+        "requests-mock~=1.11.0",
+        "gobconfig @ git+https://github.com/Amsterdam/GOB-Config.git@v0.14.2",
+        "gobcore @ git+https://github.com/Amsterdam/GOB-Core.git@v2.23.0"
+    ]
 )
