@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-from pathlib import Path
 
 setup(
     name="GOB-Export",
