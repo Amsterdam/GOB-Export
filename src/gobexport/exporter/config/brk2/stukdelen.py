@@ -9,7 +9,6 @@ class StukdelenExportConfig:
     def format_bedrag(self, value):
         return str(round(float(value)))
 
-
     format = {
         'BRK_SDL_ID': 'identificatie',
         'SDL_AARD_STUKDEEL_CODE': 'aard.code',
