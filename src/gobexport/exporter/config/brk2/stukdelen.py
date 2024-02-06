@@ -6,6 +6,10 @@ from gobexport.filters.notempty_filter import NotEmptyFilter
 
 class StukdelenExportConfig:
 
+    def format_bedrag(self, value):
+        return str(round(float(value)))
+
+
     format = {
         'BRK_SDL_ID': 'identificatie',
         'SDL_AARD_STUKDEEL_CODE': 'aard.code',
@@ -13,7 +17,7 @@ class StukdelenExportConfig:
         'SDL_KOOPSOM': {
             "action": "format",
             "value": "bedragTransactie.bedrag",
-            "formatter": lambda value: str(round(float(value))),
+            "formatter": format_bedrag,
         },
         'SDL_KOOPSOM_VALUTA': 'bedragTransactie.valuta',
         'BRK_STK_ID': 'stukidentificatie',
