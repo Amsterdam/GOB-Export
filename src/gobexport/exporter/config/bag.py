@@ -106,6 +106,7 @@ class WoonplaatsenExportConfig:
           }
         }
         geometrie
+        bagproces
       }
     }
   }
@@ -144,6 +145,7 @@ class WoonplaatsenExportConfig:
           }
         }
         geometrie
+        bagproces
       }
     }
   }
@@ -178,6 +180,7 @@ class WoonplaatsenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     esri_format = BAGDefaultFormat({
@@ -203,6 +206,7 @@ class WoonplaatsenExportConfig:
         'status': 'status.omschrijving',
         'gme_id': 'ligtInGemeente.identificatie',
         'gme_naam': 'ligtInGemeente.naam',
+        'bagproces': 'bagproces.omschrijving',
     })
 
     history_format = BAGDefaultFormat({
@@ -236,6 +240,7 @@ class WoonplaatsenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     products = {
@@ -317,6 +322,7 @@ class OpenbareruimtesExportConfig:
         documentnummer
         status
         geometrie
+        bagproces
       }
     }
   }
@@ -357,6 +363,7 @@ class OpenbareruimtesExportConfig:
         documentnummer
         status
         geometrie
+        bagproces
       }
     }
   }
@@ -393,6 +400,7 @@ class OpenbareruimtesExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     esri_format = BAGDefaultFormat({
@@ -420,6 +428,7 @@ class OpenbareruimtesExportConfig:
         'status': 'status.omschrijving',
         'wps_id': 'ligtInWoonplaats.identificatie',
         'wps_naam': 'ligtInWoonplaats.naam',
+        'bagproces': 'bagproces.omschrijving',
     })
 
     history_format = BAGDefaultFormat({
@@ -455,6 +464,7 @@ class OpenbareruimtesExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     products = {
@@ -551,6 +561,7 @@ class NummeraanduidingenExportConfig:
         'adresseert:BAG.VOT.identificatie': 'adresseertVerblijfsobject.identificatie',
         'adresseert:BAG.LPS.identificatie': 'adresseertLigplaats.identificatie',
         'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
+        'bagproces': 'bagproces.omschrijving',
     })
 
     history_format = BAGDefaultFormat({
@@ -582,6 +593,7 @@ class NummeraanduidingenExportConfig:
         'adresseert:BAG.LPS.volgnummer': 'adresseertLigplaats.volgnummer',
         'adresseert:BAG.SPS.identificatie': 'adresseertStandplaats.identificatie',
         'adresseert:BAG.SPS.volgnummer': 'adresseertStandplaats.volgnummer',
+        'bagproces': 'bagproces.omschrijving',
     })
 
     products = {
@@ -664,6 +676,7 @@ class VerblijfsobjectenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     esri_format = BAGDefaultFormat({
@@ -720,6 +733,7 @@ class VerblijfsobjectenExportConfig:
         'sdl_id': 'ligtInStadsdeel.identificatie',
         'sdl_code': 'ligtInStadsdeel.code',
         'sdl_naam': 'ligtInStadsdeel.naam',
+        'bagproces': 'bagproces.omschrijving',
     })
 
     history_format = BAGDefaultFormat({
@@ -795,6 +809,7 @@ class VerblijfsobjectenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     products = {
@@ -958,6 +973,7 @@ class StandplaatsenExportConfig:
         documentnummer
         geometrie
         gebruiksdoel
+        bagproces
       }
     }
   }
@@ -1091,6 +1107,7 @@ class StandplaatsenExportConfig:
         documentnummer
         geometrie
         gebruiksdoel
+        bagproces
       }
     }
   }
@@ -1155,6 +1172,7 @@ class StandplaatsenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     esri_format = BAGDefaultFormat({
@@ -1210,6 +1228,7 @@ class StandplaatsenExportConfig:
         'sdl_id': 'ligtInStadsdeel.identificatie',
         'sdl_code': 'ligtInStadsdeel.code',
         'sdl_naam': 'ligtInStadsdeel.naam',
+        'bagproces': 'bagproces.omschrijving',
     })
 
     history_format = BAGDefaultFormat({
@@ -1282,6 +1301,7 @@ class StandplaatsenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     products = {
@@ -1447,6 +1467,7 @@ class LigplaatsenExportConfig:
         documentnummer
         geometrie
         gebruiksdoel
+        bagproces
       }
     }
   }
@@ -1580,6 +1601,7 @@ class LigplaatsenExportConfig:
         documentnummer
         geometrie
         gebruiksdoel
+        bagproces
       }
     }
   }
@@ -1644,6 +1666,7 @@ class LigplaatsenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     esri_format = BAGDefaultFormat({
@@ -1699,6 +1722,7 @@ class LigplaatsenExportConfig:
         'sdl_id': 'ligtInStadsdeel.identificatie',
         'sdl_code': 'ligtInStadsdeel.code',
         'sdl_naam': 'ligtInStadsdeel.naam',
+        'bagproces': 'bagproces.omschrijving',
     })
 
     history_format = BAGDefaultFormat({
@@ -1771,6 +1795,7 @@ class LigplaatsenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     products = {
@@ -1859,6 +1884,7 @@ class PandenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     esri_format = BAGDefaultFormat({
@@ -1894,6 +1920,7 @@ class PandenExportConfig:
         'sdl_id': 'ligtInStadsdeel.identificatie',
         'sdl_code': 'ligtInStadsdeel.code',
         'sdl_naam': 'ligtInStadsdeel.naam',
+        'bagproces': 'bagproces.omschrijving',
     })
 
     history_format = BAGDefaultFormat({
@@ -1942,6 +1969,7 @@ class PandenExportConfig:
             'formatter': format_geometry,
             'value': 'geometrie'
         },
+        'bagproces': 'bagproces.omschrijving',
     })
 
     products = {
