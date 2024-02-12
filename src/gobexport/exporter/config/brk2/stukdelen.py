@@ -4,11 +4,11 @@ from gobexport.exporter.shared.brk import format_timestamp
 from gobexport.filters.notempty_filter import NotEmptyFilter
 
 
+def format_bedrag(value):
+    return str(round(float(value)))
+
+
 class StukdelenExportConfig:
-
-    def format_bedrag(self, value):
-        return str(round(float(value)))
-
     format = {
         'BRK_SDL_ID': 'identificatie',
         'SDL_AARD_STUKDEEL_CODE': 'aard.code',
