@@ -1384,20 +1384,20 @@ class LigplaatsenExportConfig:
                         node {
                           identificatie
                           naam
+                          ligtInGemeente {
+                            edges {
+                              node {
+                                identificatie
+                                naam
+                              }
+                            }
+                          }
                         }
                       }
                     }
                   }
                 }
               }
-            }
-          }
-        }
-        ligtInGemeente {
-          edges {
-            node {
-              identificatie
-              naam
             }
           }
         }
